@@ -33,17 +33,19 @@ Material You theme dành cho Hako/DocLN.
 - Hoặc [Violentmonkey](https://violentmonkey.github.io/get-it/)
 
 ### Bước 2: Cài đặt extension CORS (Quan trọng)
-- **Chromium** (Chrome, Edge, Brave): [Allow CORS: Access-Control-Allow-Origin](https://chromewebstore.google.com/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf)
-- **Firefox**: [CORS Everywhere](https://addons.mozilla.org/en-US/firefox/addon/cors-everywhere/)
+- **Allow CORS: Access-Control-Allow-Origin**: [Chromium](https://chromewebstore.google.com/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf) hoặc [Firefox](https://addons.mozilla.org/firefox/addon/access-control-allow-origin/)
 
 ### Bước 3: Cài đặt script
-Chọn bản [Stable](https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js) hoặc bản [Nightly](https://github.com/sang765/HakoMonetTheme/raw/nightly/HakoMonetTheme.user.js) và nhấn "Install"
+Chọn bản [Stable](https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js) hoặc bản [Nightly](https://github.com/sang765/HakoMonetTheme/raw/nightly/HakoMonetTheme.user.js) và nhấn "Install"  
+![Install Userscript](/.github/assets/Install_us.jpg)
 
 ### Bước 4: Thiết lập CORS extension
-Sau khi cài đặt extension CORS, hãy bật nó lên và thêm các domain sau vào whitelist:
-- `https://docln.sbs`
-- `https://docln.net` 
-- `https://ln.hako.vn`
+Sau khi cài đặt extension Allow CORS: Access-Control-Allow-Origin, hãy bật nó lên để kích hoạt  
+![CORS Disable](/.github/assets/cors_disable.jpg)![CORS Enable](/.github/assets/cors_enable.jpg)
+
+### Bước 5: Cấp quyền cross-origin cho userscript
+Khi vào bất kỳ trang web nào của Hako thì sẽ thông báo như ở dưới hình hiện lên. Hãy ấn "Always allow domain" và tận hưởng thành quả.  
+![Userscript Ask](/.github/assets/userscript_asking.jpg)
 
 </div>
 
