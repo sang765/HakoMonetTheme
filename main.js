@@ -1,7 +1,6 @@
 // ==UserScript==
 // @name         HakoMonetTheme Main Loader
 // @namespace    https://github.com/sang765
-// @version      N20250901
 // @description  Main loader for HakoMonetTheme
 // @author       SangsDayy
 // @match        https://docln.sbs/*
