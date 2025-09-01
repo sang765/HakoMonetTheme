@@ -9,7 +9,7 @@ Material You theme dành cho Hako/DocLN.
 ![Violentmonkey](https://img.shields.io/badge/Violentmonkey-Supported-green.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-## 🌟 Tính năng
+## 🌟 Tính năng 🌟
 
 <div align="left">
 
@@ -24,7 +24,7 @@ Material You theme dành cho Hako/DocLN.
 
 </div>
 
-## 📦 Cài đặt
+## 📦 Cài đặt 📦
 
 <div align="left">
 
@@ -47,7 +47,7 @@ Sau khi cài đặt extension CORS, hãy bật nó lên và thêm các domain sa
 
 </div>
 
-## ❓ Tại sao cần có Allow CORS?
+## ❓ Tại sao cần có Allow CORS? ❓
 
 <div align="left">
 
@@ -62,7 +62,7 @@ Extension Allow CORS giúp:
 
 </div>
 
-## 🔄 Cập nhật
+## 🔄 Cập nhật 🔄
 
 <div align="left">
 
@@ -74,7 +74,7 @@ Script sẽ tự động kiểm tra cập nhật mỗi 30 phút. Bạn cũng có
 
 </div>
 
-## 🐛 Báo cáo lỗi & Đề xuất
+## 🐛 Báo cáo lỗi & Đề xuất 🐛
 
 <div align="left">
 
@@ -85,7 +85,7 @@ Nếu bạn gặp vấn đề hoặc có đề xuất cải tiến, vui lòng:
 
 </div>
 
-## 📖 Hướng dẫn sử dụng
+## 📖 Hướng dẫn sử dụng 📖
 
 <div align="left">
 
@@ -98,13 +98,13 @@ Màu sắc chủ đề sẽ được tự động điều chỉnh dựa trên �
 
 </div>
 
-## 🖼️ Hình ảnh
+## 🖼️ Hình ảnh 🖼️
 
 ![Novel 1](/.github/assets/Novel-1.png)![Novel 2](/.github/assets/Novel-2.png)![Novel 3](/.github/assets/Novel-3.png)  
 ![Novel 3-1](/.github/assets/3-1.png)![Novel 3-2](/.github/assets/3-2.png)![Novel 3-3](/.github/assets/3-3.png)  
 ![Menu](/.github/assets/menu.png)![Notification](/.github/assets/notification.png)![Account](/.github/assets/account.png)
 
-## 🔧 Technical Details
+## 🔧 Technical Details 🔧
 
 <div align="left">
 
@@ -115,7 +115,7 @@ Màu sắc chủ đề sẽ được tự động điều chỉnh dựa trên �
 
 </div>
 
-## 📜 License
+## 📜 License 📜
 
 <div align="left">
 
@@ -123,7 +123,7 @@ MIT License - xem file [LICENSE](LICENSE) để biết thêm chi tiết.
 
 </div>
 
-## 🙏 Ghi nhận
+## 🙏 Ghi nhận 🙏
 
 <div align="left">
 
