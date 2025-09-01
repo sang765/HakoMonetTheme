@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Hako: Monet Theme [Nightly]
 // @namespace    https://github.com/sang765
-// @version      v20250901
+// @version      N20250901
 // @description  Material You theme for Hako/DocLN.
 // @description:vi Material You theme dành cho Hako/DocLN.
 // @icon         https://docln.sbs/img/logo-9.png
