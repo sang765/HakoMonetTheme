@@ -117,7 +117,7 @@ Màu sắc chủ đề sẽ được tự động điều chỉnh dựa trên �
 
 ## 📜 License 📜
 
-<div align="left">
+<div align="center">
 
 MIT License - xem file [LICENSE](LICENSE) để biết thêm chi tiết.
 
@@ -125,7 +125,7 @@ MIT License - xem file [LICENSE](LICENSE) để biết thêm chi tiết.
 
 ## 🙏 Ghi nhận 🙏
 
-<div align="left">
+<div align="center">
 
 Cảm ơn các contributors và cộng đồng đã đóng góp ý tưởng và báo cáo lỗi để cải thiện script này.  
 
