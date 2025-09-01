@@ -3,69 +3,320 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hako: Monet Theme - Documentation</title>
+    <title>Hako: Monet Theme - Material You theme for Hako/DocLN</title>
+    <meta name="description" content="Material You theme dành cho Hako/DocLN. Tự động phân tích màu sắc từ ảnh bìa truyện và áp dụng Material You color scheme.">
     <style>
+        :root {
+            --primary-color: #6c5ce7;
+            --secondary-color: #a29bfe;
+            --accent-color: #fd79a8;
+            --text-color: #2d3436;
+            --bg-color: #ffffff;
+            --card-bg: #f8f9fa;
+            --border-color: #dfe6e9;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --text-color: #f5f6fa;
+                --bg-color: #2d3436;
+                --card-bg: #1e272e;
+                --border-color: #485460;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             line-height: 1.6;
-            max-width: 800px;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 1000px;
             margin: 0 auto;
-            padding: 20px;
-            color: #333;
+            padding: 0 20px;
         }
-        h1, h2, h3 {
-            color: #2c3e50;
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+            margin-bottom: 2rem;
         }
-        code {
-            background-color: #f4f4f4;
-            padding: 2px 5px;
-            border-radius: 3px;
-            font-family: monospace;
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
         }
-        pre {
-            background-color: #f4f4f4;
-            padding: 10px;
-            border-radius: 5px;
-            overflow-x: auto;
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
         }
+
+        .badges {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 1rem 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        section {
+            margin: 3rem 0;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            margin: 1.5rem 0 1rem;
+            color: var(--secondary-color);
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .feature-item {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .step-list {
+            list-style-type: none;
+        }
+
+        .step-list li {
+            margin-bottom: 1.5rem;
+            padding-left: 2.5rem;
+            position: relative;
+        }
+
+        .step-list li:before {
+            content: counter(step);
+            counter-increment: step;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 2rem;
+            height: 2rem;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
         .button {
             display: inline-block;
-            background-color: #3498db;
+            background: var(--primary-color);
             color: white;
-            padding: 10px 20px;
+            padding: 12px 24px;
             text-decoration: none;
-            border-radius: 5px;
-            margin: 10px 0;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: background 0.3s, transform 0.3s;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+        }
+
+        .button:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .button.secondary {
+            background: var(--secondary-color);
+        }
+
+        .button.accent {
+            background: var(--accent-color);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .screenshot {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin: 1.5rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Hako: Monet Theme</h1>
-    <p>Material You theme dành cho Hako/DocLN.</p>
-    
-    <a href="https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js" class="button">Cài đặt script</a>
-    <a href="https://github.com/sang765/HakoMonetTheme/issues" class="button">Báo cáo lỗi</a>
-    
-    <h2>Tính năng</h2>
-    <ul>
-        <li>Tự động phân tích màu sắc từ ảnh bìa truyện</li>
-        <li>Áp dụng Material You color scheme</li>
-        <li>Giao diện responsive và hiện đại</li>
-        <li>Hỗ trợ cả light mode và dark mode</li>
-        <li>Tối ưu hóa trải nghiệm đọc truyện</li>
-    </ul>
-    
-    <h2>Cài đặt</h2>
-    <ol>
-        <li>Cài đặt extension Tampermonkey hoặc Violentmonkey</li>
-        <li>Nhấn vào nút "Cài đặt script" phía trên</li>
-        <li>Nhấn "Install" trong userscript manager</li>
-    </ol>
-    
-    <h2>Hỗ trợ</h2>
-    <p>Nếu bạn gặp vấn đề hoặc có đề xuất, vui lòng <a href="https://github.com/sang765/HakoMonetTheme/issues">tạo issue trên Github</a>.</p>
-    
-    <h2>Mã nguồn</h2>
-    <p>Dự án được phát triển tại <a href="https://github.com/sang765/HakoMonetTheme">github.com/sang765/HakoMonetTheme</a>.</p>
+    <header>
+        <div class="container">
+            <h1>Hako: Monet Theme</h1>
+            <p>Material You theme dành cho Hako/DocLN</p>
+            <div class="badges">
+                <span class="badge">Material You</span>
+                <span class="badge">Dynamic Colors</span>
+                <span class="badge">Responsive</span>
+            </div>
+            <a href="https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js" class="button">Cài đặt ngay</a>
+            <a href="https://github.com/sang765/HakoMonetTheme" class="button secondary">GitHub Repository</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <section>
+            <h2>Giới thiệu</h2>
+            <div class="card">
+                <p>Hako: Monet Theme là userscript tự động áp dụng Material You color scheme cho trang web Hako và DocLN dựa trên màu sắc từ ảnh bìa truyện. Script phân tích màu sắc ưu tiên màu tóc nhân vật để tạo ra trải nghiệm cá nhân hóa và đẹp mắt.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Tính năng nổi bật</h2>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Phân tích màu tự động</h3>
+                    <p>Tự động phân tích màu sắc từ ảnh bìa truyện để tạo palette màu phù hợp</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📱</div>
+                    <h3>Giao diện responsive</h3>
+                    <p>Thiết kế hiện đại, tương thích với mọi thiết bị và độ phân giải</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🌙</div>
+                    <h3>Dark Mode</h3>
+                    <p>Hỗ trợ chế độ tối, giảm mỏi mắt khi đọc truyện ban đêm</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Tối ưu hiệu suất</h3>
+                    <p>Được tối ưu hóa để hoạt động mượt mà, không ảnh hưởng trải nghiệm</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Cài đặt</h2>
+            <div class="card">
+                <ol class="step-list">
+                    <li>Cài đặt extension userscript manager: <a href="https://www.tampermonkey.net/" target="_blank">Tampermonkey</a> hoặc <a href="https://violentmonkey.github.io/get-it/" target="_blank">Violentmonkey</a></li>
+                    <li>Cài đặt extension CORS: <a href="https://chromewebstore.google.com/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf" target="_blank">Chromium</a> hoặc <a href="https://addons.mozilla.org/en-US/firefox/addon/cors-everywhere/" target="_blank">Firefox</a></li>
+                    <li>Nhấp vào nút "Cài đặt ngay" phía trên để cài đặt script</li>
+                    <li>Bật extension CORS và thêm các domain Hako/DocLN vào whitelist</li>
+                    <li>Truy cập trang Hako/DocLN và tận hưởng trải nghiệm mới!</li>
+                </ol>
+            </div>
+        </section>
+
+        <section>
+            <h2>Hình ảnh</h2>
+            <div class="card">
+                <p>Script đang được phát triển, hình ảnh minh họa sẽ được cập nhật sớm.</p>
+                <!-- Thêm screenshot sau khi có -->
+            </div>
+        </section>
+
+        <section>
+            <h2>Hỗ trợ</h2>
+            <div class="card">
+                <p>Nếu bạn gặp vấn đề hoặc có đề xuất, vui lòng:</p>
+                <a href="https://github.com/sang765/HakoMonetTheme/issues" class="button">Báo cáo lỗi</a>
+                <a href="https://github.com/sang765/HakoMonetTheme/discussions" class="button secondary">Thảo luận</a>
+            </div>
+        </section>
+
+        <section>
+            <h2>Contributing</h2>
+            <div class="card">
+                <p>Đóng góp của bạn luôn được chào đón! Vui lòng đọc <a href="https://github.com/sang765/HakoMonetTheme/blob/main/CONTRIBUTING.md">hướng dẫn đóng góp</a> trước khi tạo pull request.</p>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>© 2023 Hako: Monet Theme. MIT License.</p>
+            <p>
+                <a href="https://github.com/sang765/HakoMonetTheme" class="button">GitHub</a>
+                <a href="https://github.com/sang765/HakoMonetTheme/issues" class="button secondary">Issues</a>
+                <a href="https://github.com/sang765/HakoMonetTheme/discussions" class="button accent">Discussions</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Thêm counter cho step list
+        document.addEventListener('DOMContentLoaded', function() {
+            const stepList = document.querySelector('.step-list');
+            if (stepList) {
+                stepList.style.counterReset = 'step';
+            }
+        });
+    </script>
 </body>
 </html>
