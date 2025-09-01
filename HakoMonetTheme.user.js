@@ -12,6 +12,7 @@
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
 // @grant        GM_xmlhttpRequest
+// @grant        GM_info
 // @connect      *
 // @run-at       document-end
 // @require      https://greasyfork.org/scripts/447115-gm-config/code/GM_config.js?version=1060849
@@ -22,6 +23,11 @@
 // @resource     animationJS ./class/animation.js
 // @resource     monetClassJS ./class/monet.js
 // @resource     tagColorJS ./class/tag-color.js
+// @supportURL   https://github.com/sang765/HakoMonetTheme/issues
+// @updateURL    https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js
+// @downloadURL  https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js
+// @homepageURL  https://github.com/sang765/HakoMonetTheme
+// @license      MIT
 // ==/UserScript==
 
 (function() {
