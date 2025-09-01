@@ -74,7 +74,9 @@ Màu sắc chủ đề sẽ được tự động điều chỉnh dựa trên �
 
 ## 🖼️ Hình ảnh
 
-*(Sẽ update sau...)*
+![Novel 1](/.github/assets/Novel-1.png)![Novel 2](/.github/assets/Novel-2.png)![Novel 3](/.github/assets/Novel-3.png)  
+![Novel 3-1](/.github/assets/3-1.png)![Novel 3-2](/.github/assets/3-2.png)![Novel 3-3](/.github/assets/3-3.png)  
+![Menu](/.github/assets/menu.png)![Notification](/.github/assets/notification.png)![Account](/.github/assets/account.png)
 
 ## 🔧 Technical Details
 
