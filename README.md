@@ -37,7 +37,7 @@ Material You theme dành cho Hako/DocLN.
 - **Firefox**: [CORS Everywhere](https://addons.mozilla.org/en-US/firefox/addon/cors-everywhere/)
 
 ### Bước 3: Cài đặt script
-Truy cập [trang script](https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js) và nhấn "Install"
+Chọn bản [Stable](https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js) hoặc bản [Nightly](https://github.com/sang765/HakoMonetTheme/raw/dev/HakoMonetTheme.user.js) và nhấn "Install"
 
 ### Bước 4: Thiết lập CORS extension
 Sau khi cài đặt extension CORS, hãy bật nó lên và thêm các domain sau vào whitelist:
