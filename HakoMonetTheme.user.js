@@ -37,8 +37,8 @@
 // @resource     storageJS ./module/storage.js
 // @resource     settingsJS ./module/settings.js
 // @supportURL   https://github.com/sang765/HakoMonetTheme/issues
-// @updateURL    https://github.com/sang765/HakoMonetTheme/raw/dev/HakoMonetTheme.user.js
-// @downloadURL  https://github.com/sang765/HakoMonetTheme/raw/dev/HakoMonetTheme.user.js
+// @updateURL    https://github.com/sang765/HakoMonetTheme/raw/nightly/HakoMonetTheme.user.js
+// @downloadURL  https://github.com/sang765/HakoMonetTheme/raw/nightly/HakoMonetTheme.user.js
 // @homepageURL  https://github.com/sang765/HakoMonetTheme
 // @license      MIT
 // ==/UserScript==
@@ -49,7 +49,7 @@
     const DEBUG = true;
     const SCRIPT_NAME = 'Hako: Monet Theme';
     const GITHUB_REPO = 'https://github.com/sang765/HakoMonetTheme';
-    const RAW_GITHUB_URL = 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/dev/';
+    const RAW_GITHUB_URL = 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/nightly/';
     
     function debugLog(...args) {
         if (DEBUG) {
