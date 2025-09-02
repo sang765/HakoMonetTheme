@@ -30,7 +30,14 @@ Material You theme dành cho Hako/DocLN.
 
 ### Bước 1: Cài đặt extension userscript
 - [Tampermonkey](https://www.tampermonkey.net/) (Khuyến nghị)
-- Hoặc [Violentmonkey](https://violentmonkey.github.io/get-it/)
+- Hoặc [Violentmonkey](https://violentmonkey.github.io/get-it/) (Ưu tiên cho chromium từ phiên bản 138 trở lên)
+
+> Nếu bạn sử dụng Tampermonkey `(Manifest V3)` trên **Chromium 138** trở lên. Bạn sẽ cần phải vào trang [extension](chrome://extensions) để bật developer mode sau vào chi tiết của Tampermonkey để cấp quyền "Cho phép sử dụng các tập tin thực thi" như vậy sẽ mất nhiều thời gian và **rất phức tạp** với những **người dùng cơ bản** nên Violentmonkey sẽ là giải pháp ưu tiên hơn cho Chromium 138.
+> ![SS 1](https://www.tampermonkey.net/images/chrome_extensions.jpg)  
+> ![SS 2](https://www.tampermonkey.net/images/developer_mode.jpg)
+> ![SS 3](https://www.tampermonkey.net/images/userscripts_toggle.png)
+> ![Mobile](https://www.tampermonkey.net/images/edge_dev_mode.jpg)  
+> Chi tiết bạn có thể đọc [Tampermonkey FAQ #209](https://www.tampermonkey.net/faq.php?locale=en#Q209) nếu bạn biết Tiếng Anh.
 
 ### Bước 2: Cài đặt extension CORS (Quan trọng)
 - **Allow CORS: Access-Control-Allow-Origin**: [Chromium](https://chromewebstore.google.com/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf) hoặc [Firefox](https://addons.mozilla.org/firefox/addon/access-control-allow-origin/)
