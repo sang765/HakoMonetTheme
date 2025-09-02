@@ -36,7 +36,6 @@
 // @resource     storageJS ./module/storage.js
 // @resource     settingsJS ./module/settings.js
 // @resource     colorinfotruyen ./colors/page-info-truyen.js
-// @resource     adblockJS ./module/ad-block.js
 // @supportURL   https://github.com/sang765/HakoMonetTheme/issues
 // @updateURL    https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js
 // @downloadURL  https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js
