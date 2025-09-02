@@ -20,7 +20,7 @@
     
     const DEBUG = true;
     const CHECK_UPDATE_INTERVAL = 30 * 60 * 1000; // 30 phút
-    const VERSION = 'N20250901';
+    const VERSION = '2.9.7';
     const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/nightly/HakoMonetTheme.user.js';
     
     function debugLog(...args) {
