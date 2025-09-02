@@ -9,13 +9,9 @@
         }
     }
     
-    function initPageInfoTruyen() {
-        // Kiểm tra xem có phải trang chi tiết truyện không
-        const pathParts = window.location.pathname.split('/').filter(part => part !== '');
-        if (pathParts.length < 2 || !['truyen', 'sang-tac', 'ai-dich'].includes(pathParts[0])) {
-            debugLog('Đây không phải trang chi tiết truyện, bỏ qua tính năng đổi màu.');
-            return;
-        }
+    // Hàm khởi tạo công khai để có thể gọi từ bên ngoài
+    window.initPageInfoTruyen = function() {
+        debugLog('Đang khởi tạo PageInfoTruyen...');
         
         const coverElement = document.querySelector('.series-cover .img-in-ratio');
         if (!coverElement) {
@@ -63,7 +59,7 @@
                 debugLog('Lỗi khi phân tích ảnh:', error);
                 applyDefaultColorScheme();
             });
-    }
+    };
     
     function isValidColor(color) {
         return MonetAPI.isValidColor(color);
@@ -700,8 +696,8 @@
     
     // Khởi chạy module
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initPageInfoTruyen);
+        document.addEventListener('DOMContentLoaded', window.initPageInfoTruyen);
     } else {
-        initPageInfoTruyen();
+        window.initPageInfoTruyen();
     }
 })();
