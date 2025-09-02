@@ -1,20 +1,3 @@
-// ==UserScript==
-// @name         HakoMonetTheme Main Loader
-// @namespace    https://github.com/sang765
-// @description  Main loader for HakoMonetTheme
-// @author       SangsDayy
-// @match        https://docln.sbs/*
-// @match        https://docln.net/*
-// @match        https://ln.hako.vn/*
-// @grant        GM_getResourceText
-// @grant        GM_info
-// @grant        GM_xmlhttpRequest
-// @grant        GM_notification
-// @grant        GM_setValue
-// @grant        GM_getValue
-// @run-at       document-end
-// ==/UserScript==
-
 (function() {
     'use strict';
     
