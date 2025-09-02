@@ -24,11 +24,9 @@
 // @run-at       document-end
 // @require      https://greasyfork.org/scripts/447115-gm-config/code/GM_config.js?version=1060849
 // @resource     mainJS ./main.js
-// @resource     monetJS ./module/monet.js
 // @resource     crosUnblockJS ./module/cros-unblock.js
 // @resource     infoTruyenJS ./class/info-truyen.js
 // @resource     animationJS ./class/animation.js
-// @resource     monetClassJS ./class/monet.js
 // @resource     tagColorJS ./class/tag-color.js
 // @resource     configJS ./config.js
 // @resource     utilsJS ./utils.js
