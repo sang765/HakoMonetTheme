@@ -40,6 +40,8 @@
         // Monitor dynamic content loading
         setupDynamicContentMonitor();
         
+        // Đánh dấu module đã được tải xong
+        window.__corsModuleLoaded = true;
         debugLog('CROS Unblock đã được áp dụng đầy đủ');
     }
     
