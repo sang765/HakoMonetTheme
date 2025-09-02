@@ -15,12 +15,6 @@
         // Kiểm tra xem có phải là trang truyện không
         const pathParts = window.location.pathname.split('/').filter(part => part !== '');
         
-        // Không hoạt động với trang đánh giá (match/*/*/danh-gia)
-        if (window.location.pathname.includes('/danh-gia')) {
-            debugLog('Đây là trang đánh giá, bỏ qua tính năng InfoTruyen.');
-            return;
-        }
-        
         if (pathParts.length < 2 || !['truyen', 'sang-tac', 'ai-dich'].includes(pathParts[0])) {
             debugLog('Đây không phải trang chi tiết truyện, bỏ qua tính năng InfoTruyen.');
             return;
