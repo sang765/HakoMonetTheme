@@ -142,7 +142,6 @@
             const monetAPIJS = GM_getResourceText('monetAPIJS');
             const tagColorJS = GM_getResourceText('tagColorJS');
             const colorinfotruyen = GM_getResourceText('colorinfotruyen');
-            const adblockJS = GM_getResourceText('adblockJS')
             
             // Load các module theo thứ tự
             loadScript(crosUnblockJS, 'cros-unblock.js');
@@ -152,7 +151,6 @@
             loadScript(animationJS, 'animation.js');
             loadScript(monetJS, 'monet.js');
             loadScript(colorinfotruyen, 'page-info-truyen.js');
-            loadscript(adblockJS, 'ad-block.js');
             
             debugLog('Tất cả module đã được tải');
             
