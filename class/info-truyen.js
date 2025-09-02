@@ -14,6 +14,13 @@
         
         // Kiểm tra xem có phải là trang truyện không
         const pathParts = window.location.pathname.split('/').filter(part => part !== '');
+        
+        // Không hoạt động với trang đánh giá (match/*/*/danh-gia)
+        if (window.location.pathname.includes('/danh-gia/')) {
+            debugLog('Đây là trang đánh giá, bỏ qua tính năng InfoTruyen.');
+            return;
+        }
+        
         if (pathParts.length < 2 || !['truyen', 'sang-tac', 'ai-dich'].includes(pathParts[0])) {
             debugLog('Đây không phải trang chi tiết truyện, bỏ qua tính năng InfoTruyen.');
             return;
@@ -24,6 +31,39 @@
         
         // Thêm các tính năng khác cho trang truyện
         enhanceSeriesPage();
+        
+        // Khởi tạo colors/page-info-truyen.js
+        initPageInfoTruyen();
+    }
+    
+    function initPageInfoTruyen() {
+        // Kiểm tra xem colors/page-info-truyen.js đã được tải chưa
+        if (typeof window.initPageInfoTruyen === 'function') {
+            window.initPageInfoTruyen();
+            debugLog('Đã khởi tạo colors/page-info-truyen.js');
+        } else {
+            debugLog('colors/page-info-truyen.js chưa được tải');
+            
+            // Thử tải động nếu chưa có
+            loadPageInfoTruyen();
+        }
+    }
+    
+    function loadPageInfoTruyen() {
+        // Tạo script element để tải colors/page-info-truyen.js
+        const script = document.createElement('script');
+        script.src = 'https://your-domain.com/path/to/colors/page-info-truyen.js'; // Thay đổi đường dẫn phù hợp
+        script.onload = function() {
+            debugLog('Đã tải colors/page-info-truyen.js thành công');
+            if (typeof window.initPageInfoTruyen === 'function') {
+                window.initPageInfoTruyen();
+            }
+        };
+        script.onerror = function() {
+            debugLog('Lỗi khi tải colors/page-info-truyen.js');
+        };
+        
+        document.head.appendChild(script);
     }
     
     function addCSSEditor() {
