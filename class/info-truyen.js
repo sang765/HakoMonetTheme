@@ -16,7 +16,7 @@
         const pathParts = window.location.pathname.split('/').filter(part => part !== '');
         
         // Không hoạt động với trang đánh giá (match/*/*/danh-gia)
-        if (window.location.pathname.includes('/danh-gia/')) {
+        if (window.location.pathname.includes('/danh-gia')) {
             debugLog('Đây là trang đánh giá, bỏ qua tính năng InfoTruyen.');
             return;
         }
