@@ -139,14 +139,14 @@
             const crosUnblockJS = GM_getResourceText('crosUnblockJS');
             const infoTruyenJS = GM_getResourceText('infoTruyenJS');
             const animationJS = GM_getResourceText('animationJS');
-            const monetClassJS = GM_getResourceText('monetClassJS');
+            const monetAPIJS = GM_getResourceText('monetAPIJS');
             const tagColorJS = GM_getResourceText('tagColorJS');
             
             // Load các module theo thứ tự
             loadScript(crosUnblockJS, 'cros-unblock.js');
             loadScript(infoTruyenJS, 'info-truyen.js');
             loadScript(tagColorJS, 'tag-color.js');
-            loadScript(monetClassJS, 'monet.js');
+            loadScript(monetAPIJS, 'monet.js');
             loadScript(animationJS, 'animation.js');
             loadScript(monetJS, 'monet.js');
             
