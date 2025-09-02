@@ -43,7 +43,7 @@ Material You theme dành cho Hako/DocLN.
 - **Allow CORS: Access-Control-Allow-Origin**: [Chromium](https://chromewebstore.google.com/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf) hoặc [Firefox](https://addons.mozilla.org/firefox/addon/access-control-allow-origin/)
 
 ### Bước 3: Cài đặt script
-Chọn bản [Stable](https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js) hoặc bản [Nightly](https://github.com/sang765/HakoMonetTheme/raw/nightly/HakoMonetTheme.user.js) và nhấn "Install"  
+Nhấp vào [raw userscript](https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js) và nhấn "Install"  
 ![Install Userscript](/.github/assets/Install_us.jpg)
 
 ### Bước 4: Thiết lập CORS extension
