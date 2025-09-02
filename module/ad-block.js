@@ -14,7 +14,7 @@
         
         // Block các element theo selector
         blockElementsBySelector('img[src^="https://i2.hako.vip/ln/series/chapter-banners/"]');
-        blockElementsBySelector('.d-lg-none.index-background');
+        blockElementsBySelector('.index-background');
         
         // Thiết lập MutationObserver để theo dõi các element mới được thêm vào DOM
         setupMutationObserver();
@@ -37,7 +37,7 @@
     function hideElement(element) {
         if (element && element.parentNode) {
             // Ẩn element bằng CSS
-            element.style.display = 'none';
+            element.style.display = 'none !important';
             element.style.visibility = 'hidden';
             element.style.opacity = '0';
             element.style.position = 'absolute';
