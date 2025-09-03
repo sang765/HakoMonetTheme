@@ -2,11 +2,64 @@
     'use strict';
     
     const DEBUG = true;
-    
+    const TARGET_DOMAINS = ['docln', 'hako', 'i2.hako.vip', 'docln.sbs', 'docln.net', 'ln.hako.vn'];
+
     function debugLog(...args) {
         if (DEBUG) {
             console.log('[PageInfoTruyen]', ...args);
         }
+    }
+
+    function isTargetDomain(url) {
+        if (!url) return false;
+        return TARGET_DOMAINS.some(domain => url.includes(domain));
+    }
+
+    function loadCrosUnblockModule() {
+        return new Promise((resolve, reject) => {
+            if (window.__corsModuleLoaded) {
+                debugLog('CROS Unblock module đã được tải trước đó');
+                resolve();
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.src = chrome.runtime.getURL ? chrome.runtime.getURL('module/cros-unblock.js') :
+                       GM_getResourceURL ? GM_getResourceURL('cros-unblock') :
+                       'module/cros-unblock.js'; // Fallback for direct file access
+
+            script.onload = function() {
+                debugLog('CROS Unblock module đã được tải thành công');
+                resolve();
+            };
+
+            script.onerror = function() {
+                debugLog('Không thể tải CROS Unblock module, thử eval trực tiếp');
+                // Fallback: try to load via GM_xmlhttpRequest if available
+                if (typeof GM_xmlhttpRequest !== 'undefined') {
+                    GM_xmlhttpRequest({
+                        method: 'GET',
+                        url: script.src,
+                        onload: function(response) {
+                            try {
+                                eval(response.responseText);
+                                debugLog('CROS Unblock module đã được eval thành công');
+                                resolve();
+                            } catch (error) {
+                                reject('Lỗi khi eval CROS Unblock module: ' + error);
+                            }
+                        },
+                        onerror: function() {
+                            reject('Không thể tải CROS Unblock module');
+                        }
+                    });
+                } else {
+                    reject('Không thể tải CROS Unblock module');
+                }
+            };
+
+            document.head.appendChild(script);
+        });
     }
     
     function initPageInfoTruyen() {
@@ -172,10 +225,21 @@
     
     // Hàm phân tích ảnh với focus vào màu tóc
     function analyzeImageColorWithHairFocus(imageUrl) {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
+            // Kiểm tra xem URL có phải từ domain target không
+            if (isTargetDomain(imageUrl)) {
+                debugLog('Ảnh từ domain target, đang tải CROS Unblock module');
+                try {
+                    await loadCrosUnblockModule();
+                } catch (error) {
+                    debugLog('Lỗi khi tải CROS Unblock module:', error);
+                    // Tiếp tục mà không có module, có thể vẫn hoạt động với crossOrigin
+                }
+            }
+
             const img = new Image();
             img.crossOrigin = 'Anonymous';
-            
+
             img.onload = function() {
                 debugLog('Ảnh đã tải xong, kích thước:', img.width, 'x', img.height);
                 try {
@@ -185,11 +249,11 @@
                     reject('Lỗi khi phân tích ảnh: ' + error);
                 }
             };
-            
+
             img.onerror = function() {
                 reject('Không thể tải ảnh');
             };
-            
+
             img.src = imageUrl;
         });
     }
