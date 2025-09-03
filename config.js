@@ -1,6 +1,6 @@
 /**
  * Centralized configuration for HakoMonetTheme
- * @version 2.9.9
+ * @version 3.0
  */
 (function() {
     'use strict';
