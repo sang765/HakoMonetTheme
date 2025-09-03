@@ -7,8 +7,8 @@
 
     // Script metadata
     const SCRIPT_CONFIG = {
-        name: 'Hako: Monet Theme',
-        version: '2.9.9',
+        name: 'Hako: Monet Theme [Tested]',
+        version: '3.0',
         author: 'SangsDayy',
         description: 'Material You theme for Hako/DocLN',
         namespace: 'https://github.com/sang765',
@@ -28,7 +28,7 @@
         checkInterval: 30 * 60 * 1000, // 30 minutes
         autoCheck: true,
         githubRepo: 'https://github.com/sang765/HakoMonetTheme',
-        rawUrl: 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/'
+        rawUrl: 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/b3.0/'
     };
 
     // Feature flags
