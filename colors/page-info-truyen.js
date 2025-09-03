@@ -1,10 +1,8 @@
 (function() {
     'use strict';
-    
-    const DEBUG = true;
-    
+
     function debugLog(...args) {
-        if (DEBUG) {
+        if (window.HakoMonetConfig && window.HakoMonetConfig.isDebugEnabled()) {
             console.log('[PageInfoTruyen]', ...args);
         }
     }
@@ -194,99 +192,106 @@
         });
     }
     
-    // Hàm lấy màu tóc từ ảnh
+    // Hàm lấy màu tóc từ ảnh (tối ưu hóa performance)
     function getHairColorFromImage(img) {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        
-        // Thiết lập kích thước canvas
-        const width = 200;
-        const height = 200;
+
+        // Giảm kích thước canvas để tăng performance
+        const maxSize = 150; // Giảm từ 200 xuống 150
+        const scale = Math.min(maxSize / img.width, maxSize / img.height);
+        const width = Math.floor(img.width * scale);
+        const height = Math.floor(img.height * scale);
+
         canvas.width = width;
         canvas.height = height;
-        
-        // Vẽ ảnh với kích thước nhỏ
+
+        // Vẽ ảnh với kích thước đã scale
         ctx.drawImage(img, 0, 0, width, height);
-        
+
         // Xác định vùng quan tâm (ROI) - tập trung vào phần trên của ảnh (nơi có tóc)
         const roi = {
-            x: width * 0.25,      // Bắt đầu từ 25% chiều rộng
-            y: height * 0.1,      // Bắt đầu từ 10% chiều cao (phía trên)
-            width: width * 0.5,   // Lấy 50% chiều rộng ở giữa
-            height: height * 0.4  // Lấy 40% chiều cao (tập trung vào đầu/tóc)
+            x: Math.floor(width * 0.25),      // Bắt đầu từ 25% chiều rộng
+            y: Math.floor(height * 0.1),      // Bắt đầu từ 10% chiều cao (phía trên)
+            width: Math.floor(width * 0.5),   // Lấy 50% chiều rộng ở giữa
+            height: Math.floor(height * 0.4)  // Lấy 40% chiều cao (tập trung vào đầu/tóc)
         };
-        
+
         // Lấy dữ liệu pixel từ vùng quan tâm
         const imageData = ctx.getImageData(roi.x, roi.y, roi.width, roi.height);
         const data = imageData.data;
-        
+
         debugLog('Phân tích vùng quan tâm (ROI) cho màu tóc:');
         debugLog(`  - Vùng: x=${roi.x}, y=${roi.y}, width=${roi.width}, height=${roi.height}`);
         debugLog('  - Tổng pixel trong ROI:', data.length / 4);
-        
-        // Đếm màu với trọng số ưu tiên màu tóc
-        const colorCount = {};
+
+        // Sử dụng Map để tăng performance thay vì object
+        const colorCount = new Map();
         let maxCount = 0;
         let dominantColor = '#6c5ce7';
-        
-        // Danh sách màu tóc phổ biến (RGB ranges)
+
+        // Danh sách màu tóc phổ biến (RGB ranges) - tối ưu hóa
         const commonHairColors = [
-            {min: [0, 0, 0], max: [50, 50, 50], weight: 1.5},     // Đen
-            {min: [80, 40, 0], max: [150, 100, 60], weight: 1.8}, // Nâu
-            {min: [150, 100, 50], max: [200, 150, 100], weight: 1.7}, // Nâu sáng
-            {min: [200, 150, 80], max: [255, 220, 180], weight: 1.6}, // Vàng
-            {min: [200, 80, 80], max: [255, 150, 150], weight: 1.9}, // Đỏ/hồng
-            {min: [100, 100, 150], max: [180, 180, 220], weight: 1.8}, // Xanh
-            {min: [150, 100, 150], max: [220, 180, 220], weight: 1.8}, // Tím
-            {min: [180, 180, 180], max: [255, 255, 255], weight: 1.4}  // Bạch kim
+            {minR: 0, maxR: 50, minG: 0, maxG: 50, minB: 0, maxB: 50, weight: 1.5},     // Đen
+            {minR: 80, maxR: 150, minG: 40, maxG: 100, minB: 0, maxB: 60, weight: 1.8}, // Nâu
+            {minR: 150, maxR: 200, minG: 100, maxG: 150, minB: 50, maxB: 100, weight: 1.7}, // Nâu sáng
+            {minR: 200, maxR: 255, minG: 150, maxG: 220, minB: 80, maxB: 180, weight: 1.6}, // Vàng
+            {minR: 200, maxR: 255, minG: 80, maxG: 150, minB: 80, maxB: 150, weight: 1.9}, // Đỏ/hồng
+            {minR: 100, maxR: 180, minG: 100, maxG: 180, minB: 150, maxB: 220, weight: 1.8}, // Xanh
+            {minR: 150, maxR: 220, minG: 100, maxG: 180, minB: 150, maxB: 220, weight: 1.8}, // Tím
+            {minR: 180, maxR: 255, minG: 180, maxG: 255, minB: 180, maxB: 255, weight: 1.4}  // Bạch kim
         ];
-        
-        for (let i = 0; i < data.length; i += 4) {
+
+        // Sampling: chỉ xử lý 1/4 pixel để tăng performance
+        const step = 8; // Mỗi bước 8 pixel (4 RGBA values)
+        const totalPixels = data.length / 4;
+        const sampleSize = Math.floor(totalPixels / 4); // 25% sampling
+
+        for (let i = 0; i < data.length; i += step) {
             const r = data[i];
             const g = data[i + 1];
             const b = data[i + 2];
             const a = data[i + 3];
-            
+
             // Bỏ qua pixel trong suốt
             if (a < 128) continue;
-            
-            // Bỏ qua pixel quá sáng hoặc quá tối (cá thể là nền)
+
+            // Bỏ qua pixel quá sáng hoặc quá tối (có thể là nền)
             if ((r > 240 && g > 240 && b > 240) || (r < 15 && g < 15 && b < 15)) {
                 continue;
             }
-            
-            // Nhóm màu
-            const roundedR = Math.round(r / 8) * 8;
-            const roundedG = Math.round(g / 8) * 8;
-            const roundedB = Math.round(b / 8) * 8;
-            
-            const colorGroup = `${roundedR},${roundedG},${roundedB}`;
-            
-            // Tính trọng số dựa trên màu tóc phổ biến
+
+            // Nhóm màu với quantization tốt hơn
+            const roundedR = (r >> 3) << 3; // Bit shifting nhanh hơn Math.round
+            const roundedG = (g >> 3) << 3;
+            const roundedB = (b >> 3) << 3;
+
+            // Tạo key hiệu quả hơn
+            const colorKey = (roundedR << 16) | (roundedG << 8) | roundedB;
+
+            // Tính trọng số dựa trên màu tóc phổ biến (tối ưu hóa)
             let weight = 1.0;
             for (const hairColor of commonHairColors) {
-                if (roundedR >= hairColor.min[0] && roundedR <= hairColor.max[0] &&
-                    roundedG >= hairColor.min[1] && roundedG <= hairColor.max[1] &&
-                    roundedB >= hairColor.min[2] && roundedB <= hairColor.max[2]) {
+                if (roundedR >= hairColor.minR && roundedR <= hairColor.maxR &&
+                    roundedG >= hairColor.minG && roundedG <= hairColor.maxG &&
+                    roundedB >= hairColor.minB && roundedB <= hairColor.maxB) {
                     weight = hairColor.weight;
                     break;
                 }
             }
-            
+
             const weightedCount = Math.round(weight);
-            
-            if (colorCount[colorGroup]) {
-                colorCount[colorGroup] += weightedCount;
-            } else {
-                colorCount[colorGroup] = weightedCount;
-            }
-            
-            if (colorCount[colorGroup] > maxCount) {
-                maxCount = colorCount[colorGroup];
+            const currentCount = colorCount.get(colorKey) || 0;
+            const newCount = currentCount + weightedCount;
+
+            colorCount.set(colorKey, newCount);
+
+            if (newCount > maxCount) {
+                maxCount = newCount;
                 dominantColor = MonetAPI.rgbToHex(roundedR, roundedG, roundedB);
             }
         }
-        
+
         debugLog('Màu tóc ưu tiên được chọn:', dominantColor);
         return dominantColor;
     }

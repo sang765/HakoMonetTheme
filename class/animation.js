@@ -1,10 +1,8 @@
 (function() {
     'use strict';
-    
-    const DEBUG = true;
-    
+
     function debugLog(...args) {
-        if (DEBUG) {
+        if (window.HakoMonetConfig && window.HakoMonetConfig.isDebugEnabled()) {
             console.log('[Animation]', ...args);
         }
     }
