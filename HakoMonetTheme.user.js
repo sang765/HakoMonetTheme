@@ -37,8 +37,8 @@
 // @resource     settingsJS ./module/settings.js
 // @resource     colorinfotruyen ./colors/page-info-truyen.js
 // @supportURL   https://github.com/sang765/HakoMonetTheme/issues
-// @updateURL    https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js
-// @downloadURL  https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js
+// @updateURL    https://github.com/sang765/HakoMonetTheme/raw/b3.0/HakoMonetTheme.user.js
+// @downloadURL  https://github.com/sang765/HakoMonetTheme/raw/b3.0/HakoMonetTheme.user.js
 // @homepageURL  https://github.com/sang765/HakoMonetTheme
 // @license      MIT
 // ==/UserScript==
