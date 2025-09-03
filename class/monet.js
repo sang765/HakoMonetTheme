@@ -1,8 +1,10 @@
 (function() {
     'use strict';
-
+    
+    const DEBUG = true;
+    
     function debugLog(...args) {
-        if (window.HakoMonetConfig && window.HakoMonetConfig.isDebugEnabled()) {
+        if (DEBUG) {
             console.log('[MonetClass]', ...args);
         }
     }

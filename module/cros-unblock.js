@@ -1,10 +1,11 @@
 (function() {
     'use strict';
     
+    const DEBUG = true;
     const TARGET_DOMAINS = ['docln', 'hako', 'i2.hako.vip', 'docln.sbs', 'docln.net', 'ln.hako.vn'];
-
+    
     function debugLog(...args) {
-        if (window.HakoMonetConfig && window.HakoMonetConfig.isDebugEnabled()) {
+        if (DEBUG) {
             console.log('[CrosUnblock]', ...args);
         }
     }
