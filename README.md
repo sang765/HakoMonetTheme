@@ -6,6 +6,7 @@ Material You theme dành cho Hako/DocLN.
 
 ![Tampermonkey](https://img.shields.io/badge/Tampermonkey-Supported-green.svg)
 ![Violentmonkey](https://img.shields.io/badge/Violentmonkey-Supported-green.svg)
+![Version](https://img.shields.io/github/package-json/v/sang765/HakoMonetTheme?color=blue&label=Version)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 ## 🌟 Tính năng 🌟
