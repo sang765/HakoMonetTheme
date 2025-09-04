@@ -41,6 +41,10 @@
                 overflow: hidden;
             }
             
+            .basic-section, .board-list, .board_categ-list, .detail-list, .feature-section, .index-top_notification, .mail-page .mail-detail-list, .modal-content, .page-breadcrumb, .private-tabs, .profile-feature, .series-users, .showcase-item, .sub-index-style {
+                botder-radius: 15px;
+            }
+
             .feature-section {
                 border-radius: 12px;
                 overflow: hidden;
