@@ -427,28 +427,15 @@
                         }
                     }
                 }
-
-                // Also check for style changes that might add background images
-                if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-                    const target = mutation.target;
-                    if (target && target.style && target.style.backgroundImage) {
-                        processBackgroundImage(target);
-                    }
-                }
             });
         });
 
         observer.observe(document, {
             childList: true,
-            subtree: true,
-            attributes: true,
-            attributeFilter: ['style', 'src', 'href']
+            subtree: true
         });
 
-        debugLog('MutationObserver đã được thiết lập với style monitoring');
-
-        // Also monitor existing elements with background images
-        setupBackgroundImageMonitor();
+        debugLog('MutationObserver đã được thiết lập');
     }
 
     function processNewElement(element) {
@@ -470,11 +457,6 @@
         // Process links
         if (element.tagName === 'LINK' && isTargetDomain(element.href)) {
             loadLinkViaGM(element, element.href);
-        }
-
-        // Process background images
-        if (element.style && element.style.backgroundImage) {
-            processBackgroundImage(element);
         }
 
         // Process nested elements
@@ -505,84 +487,6 @@
                 loadLinkViaGM(link, link.href);
             }
         });
-
-        // Process nested background images
-        const allElements = element.querySelectorAll('*');
-        allElements.forEach(el => {
-            if (el.style && el.style.backgroundImage) {
-                processBackgroundImage(el);
-            }
-        });
-    }
-
-    function processBackgroundImage(element) {
-        const backgroundImage = element.style.backgroundImage;
-        if (!backgroundImage || backgroundImage === 'none') return;
-
-        // Extract URL from background-image style
-        const urlMatch = backgroundImage.match(/url\(['"]?(.*?)['"]?\)/i);
-        if (!urlMatch) return;
-
-        const imageUrl = urlMatch[1];
-        if (isTargetDomain(imageUrl)) {
-            debugLog('Processing background image for element:', element.className || element.id, imageUrl);
-            loadBackgroundImageViaGM(element, imageUrl);
-        }
-    }
-
-    function loadBackgroundImageViaGM(element, url) {
-        GM_xmlhttpRequest({
-            method: 'GET',
-            url: url,
-            responseType: 'blob',
-            headers: {
-                'Origin': window.location.origin,
-                'Referer': window.location.href
-            },
-            onload: (response) => {
-                if (response.status === 200) {
-                    const blob = response.response;
-                    const objectURL = URL.createObjectURL(blob);
-                    element.style.backgroundImage = `url('${objectURL}')`;
-                    debugLog('Updated background image for element:', element.className || element.id);
-
-                    // Clean up the object URL when element is removed
-                    const observer = new MutationObserver(() => {
-                        if (!document.contains(element)) {
-                            URL.revokeObjectURL(objectURL);
-                            observer.disconnect();
-                        }
-                    });
-                    observer.observe(document.body, { childList: true, subtree: true });
-                } else {
-                    debugLog('Failed to load background image:', url, response.status);
-                }
-            },
-            onerror: (error) => {
-                debugLog('Error loading background image:', url, error);
-            }
-        });
-    }
-
-    function setupBackgroundImageMonitor() {
-        // Monitor existing elements with background images
-        const elementsWithBackground = document.querySelectorAll('[style*="background-image"]');
-        elementsWithBackground.forEach(element => {
-            processBackgroundImage(element);
-        });
-
-        // Also monitor specific classes that commonly have background images
-        const commonClasses = ['.img-in-ratio', '.content', '.series-cover', '[class*="img"]', '[class*="cover"]'];
-        commonClasses.forEach(selector => {
-            const elements = document.querySelectorAll(selector);
-            elements.forEach(element => {
-                if (element.style && element.style.backgroundImage) {
-                    processBackgroundImage(element);
-                }
-            });
-        });
-
-        debugLog('Background image monitor setup complete');
     }
 
     // Khởi chạy module
