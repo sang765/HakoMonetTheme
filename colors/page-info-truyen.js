@@ -15,61 +15,8 @@
         return TARGET_DOMAINS.some(domain => url.includes(domain));
     }
 
-    // Integrated CORS handling for images
-    function setupImageCorsHandling() {
-        if (window.__imageCorsSetup) return;
-
-        debugLog('Setting up integrated CORS handling for images');
-
-        // Patch Image constructor
-        const originalImage = window.Image;
-        window.Image = function(width, height) {
-            const img = new originalImage(width, height);
-            // Patch the src setter
-            const originalSrcDescriptor = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
-            if (originalSrcDescriptor && originalSrcDescriptor.set) {
-                Object.defineProperty(img, 'src', {
-                    set: function(value) {
-                        if (isTargetDomain(value)) {
-                            this.crossOrigin = 'anonymous';
-                            debugLog('Set crossOrigin for image:', value);
-                        }
-                        return originalSrcDescriptor.set.call(this, value);
-                    },
-                    get: originalSrcDescriptor.get,
-                    configurable: true,
-                    enumerable: true
-                });
-            }
-            return img;
-        };
-
-        // Copy static properties
-        Object.keys(originalImage).forEach(key => {
-            window.Image[key] = originalImage[key];
-        });
-
-        // Also patch existing Image prototype for direct property access
-        const protoDescriptor = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
-        if (protoDescriptor && protoDescriptor.set) {
-            const originalSet = protoDescriptor.set;
-            Object.defineProperty(HTMLImageElement.prototype, 'src', {
-                set: function(value) {
-                    if (isTargetDomain(value)) {
-                        this.crossOrigin = 'anonymous';
-                        debugLog('Set crossOrigin for existing image:', value);
-                    }
-                    return originalSet.call(this, value);
-                },
-                get: protoDescriptor.get,
-                configurable: true,
-                enumerable: true
-            });
-        }
-
-        window.__imageCorsSetup = true;
-        debugLog('Integrated CORS handling for images is ready');
-    }
+    // CORS handling is now managed by the centralized cros-unblock.js module
+    // No need for custom image CORS setup here
     
     function initPageInfoTruyen() {
         // Kiểm tra xem có phải trang chi tiết truyện không
@@ -235,19 +182,10 @@
     // Hàm phân tích ảnh với focus vào màu tóc
     function analyzeImageColorWithHairFocus(imageUrl) {
         return new Promise((resolve, reject) => {
-            // Setup CORS handling for images if needed
-            if (isTargetDomain(imageUrl)) {
-                debugLog('Ảnh từ domain target, thiết lập CORS handling');
-                setupImageCorsHandling();
-            }
+            // CORS handling is now managed by the centralized cros-unblock.js module
+            debugLog('Đang tải ảnh để phân tích màu:', imageUrl);
 
             const img = new Image();
-
-            // Always set crossOrigin for safety
-            if (isTargetDomain(imageUrl)) {
-                img.crossOrigin = 'anonymous';
-                debugLog('Đã set crossOrigin cho ảnh từ domain target');
-            }
 
             img.onload = function() {
                 debugLog('Ảnh đã tải xong, kích thước:', img.width, 'x', img.height);
@@ -260,66 +198,15 @@
             };
 
             img.onerror = function(error) {
-                debugLog('Lỗi tải ảnh với Image API:', imageUrl, error);
-
-                // Fallback: try using XMLHttpRequest with CORS headers
-                if (isTargetDomain(imageUrl)) {
-                    debugLog('Thử tải ảnh bằng XMLHttpRequest với CORS headers');
-                    loadImageWithXHR(imageUrl)
-                        .then(img => {
-                            try {
-                                const dominantColor = getHairColorFromImage(img);
-                                resolve(dominantColor);
-                            } catch (error) {
-                                reject('Lỗi khi phân tích ảnh từ XHR: ' + error);
-                            }
-                        })
-                        .catch(xhrError => {
-                            debugLog('XMLHttpRequest cũng thất bại:', xhrError);
-                            reject('Không thể tải ảnh bằng cả Image API và XMLHttpRequest');
-                        });
-                } else {
-                    reject('Không thể tải ảnh');
-                }
+                debugLog('Lỗi tải ảnh:', imageUrl, error);
+                reject('Không thể tải ảnh: ' + error);
             };
 
             img.src = imageUrl;
         });
     }
 
-    // Fallback function to load image using XMLHttpRequest with CORS headers
-    function loadImageWithXHR(imageUrl) {
-        return new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', imageUrl, true);
-            xhr.responseType = 'blob';
-
-            // Add CORS headers for target domains
-            if (isTargetDomain(imageUrl)) {
-                xhr.setRequestHeader('Origin', window.location.origin);
-                xhr.setRequestHeader('Referer', window.location.href);
-                xhr.setRequestHeader('Access-Control-Request-Method', 'GET');
-            }
-
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    const blob = xhr.response;
-                    const img = new Image();
-                    img.onload = () => resolve(img);
-                    img.onerror = () => reject('Không thể tạo ảnh từ blob');
-                    img.src = URL.createObjectURL(blob);
-                } else {
-                    reject('XHR failed with status: ' + xhr.status);
-                }
-            };
-
-            xhr.onerror = function() {
-                reject('XHR network error');
-            };
-
-            xhr.send();
-        });
-    }
+    // Image loading with CORS handling is now managed by the centralized cros-unblock.js module
     
     // Hàm lấy màu tóc từ ảnh
     function getHairColorFromImage(img) {
