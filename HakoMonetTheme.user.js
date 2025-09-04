@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Hako: Monet Theme
 // @namespace    https://github.com/sang765
-// @version      3.0.4
+// @version      3.0.5
 // @description  Material You theme for Hako/DocLN.
 // @description:vi Material You theme dành cho Hako/DocLN.
 // @icon         https://docln.sbs/img/logo-9.png
@@ -50,6 +50,8 @@
     const SCRIPT_NAME = 'Hako: Monet Theme';
     const GITHUB_REPO = 'https://github.com/sang765/HakoMonetTheme';
     const RAW_GITHUB_URL = 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/';
+    
+    let isCheckingForUpdate = false;
     
     function debugLog(...args) {
         if (DEBUG) {
@@ -113,6 +115,11 @@
     }
     
     function checkForUpdatesManual() {
+        if (isCheckingForUpdate) {
+            showNotification('Thông tin', 'Đang kiểm tra cập nhật...', 3000);
+            return;
+        }
+        isCheckingForUpdate = true;
         showNotification('Kiểm tra cập nhật', 'Đang kiểm tra phiên bản mới...', 3000);
         
         GM_xmlhttpRequest({
@@ -130,7 +137,7 @@
                         
                         if (isNewerVersion(latestVersion, currentVersion)) {
                             showNotification(
-                                'Có bản cập nhật mới!', 
+                                'Có bản cập nhật mới!',
                                 `Phiên bản ${latestVersion} đã có sẵn. Nhấp để cập nhật.`,
                                 8000
                             );
@@ -143,13 +150,16 @@
                         }
                     }
                 }
+                isCheckingForUpdate = false;
             },
             onerror: function(error) {
                 showNotification('Lỗi', 'Không thể kiểm tra cập nhật. Vui lòng thử lại sau.', 5000);
                 debugLog('Lỗi khi kiểm tra cập nhật:', error);
+                isCheckingForUpdate = false;
             },
             ontimeout: function() {
                 showNotification('Lỗi', 'Hết thời gian kiểm tra cập nhật.', 5000);
+                isCheckingForUpdate = false;
             }
         });
     }
