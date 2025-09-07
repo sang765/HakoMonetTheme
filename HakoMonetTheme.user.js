@@ -36,6 +36,7 @@
 // @resource     storageJS ./module/storage.js
 // @resource     settingsJS ./module/settings.js
 // @resource     colorinfotruyen ./colors/page-info-truyen.js
+// @resource     imageAnalyzerJS ./module/image-analyzer.js
 // @supportURL   https://github.com/sang765/HakoMonetTheme/issues
 // @updateURL    https://github.com/sang765/HakoMonetTheme/raw/nightly/HakoMonetTheme.user.js
 // @downloadURL  https://github.com/sang765/HakoMonetTheme/raw/nightly/HakoMonetTheme.user.js
