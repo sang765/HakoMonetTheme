@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Hako: Monet Theme
+// @name         Hako: Monet Theme [Nightly]
 // @namespace    https://github.com/sang765
-// @version      3.0.5
+// @version      N250907 - 1
 // @description  Material You theme for Hako/DocLN.
 // @description:vi Material You theme dành cho Hako/DocLN.
 // @icon         https://docln.sbs/img/logo-9.png
@@ -37,8 +37,8 @@
 // @resource     settingsJS ./module/settings.js
 // @resource     colorinfotruyen ./colors/page-info-truyen.js
 // @supportURL   https://github.com/sang765/HakoMonetTheme/issues
-// @updateURL    https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js
-// @downloadURL  https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js
+// @updateURL    https://github.com/sang765/HakoMonetTheme/raw/nightly/HakoMonetTheme.user.js
+// @downloadURL  https://github.com/sang765/HakoMonetTheme/raw/nightly/HakoMonetTheme.user.js
 // @homepageURL  https://github.com/sang765/HakoMonetTheme
 // @license      MIT
 // ==/UserScript==
@@ -47,9 +47,9 @@
     'use strict';
     
     const DEBUG = true;
-    const SCRIPT_NAME = 'Hako: Monet Theme';
+    const SCRIPT_NAME = 'Hako: Monet Theme [Nightly]';
     const GITHUB_REPO = 'https://github.com/sang765/HakoMonetTheme';
-    const RAW_GITHUB_URL = 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/';
+    const RAW_GITHUB_URL = 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/nightly/';
     
     let isCheckingForUpdate = false;
     
