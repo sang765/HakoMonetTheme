@@ -25,6 +25,63 @@
         return /^#([0-9A-F]{3}){1,2}$/i.test(color);
     }
     
+    // Hàm HSL to RGB
+    function hslToRgb(h, s, l) {
+        let r, g, b;
+        
+        if (s === 0) {
+            r = g = b = l;
+        } else {
+            const hue2rgb = (p, q, t) => {
+                if (t < 0) t += 1;
+                if (t > 1) t -= 1;
+                if (t < 1/6) return p + (q - p) * 6 * t;
+                if (t < 1/2) return q;
+                if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                return p;
+            };
+            
+            const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            const p = 2 * l - q;
+            
+            r = hue2rgb(p, q, h + 1/3);
+            g = hue2rgb(p, q, h);
+            b = hue2rgb(p, q, h - 1/3);
+        }
+        
+        return [
+            Math.round(r * 255),
+            Math.round(g * 255),
+            Math.round(b * 255)
+        ];
+    }
+    
+    // Hàm RGB to HSL
+    function rgbToHsl(r, g, b) {
+        r /= 255; g /= 255; b /= 255;
+        
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
+        let h, s, l = (max + min) / 2;
+        
+        if (max === min) {
+            h = s = 0;
+        } else {
+            const d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+            
+            h /= 6;
+        }
+        
+        return [h, s, l];
+    }
+    
     // Hàm tạo Monet palette từ màu chủ đạo với hỗ trợ theme
     function generateMonetPalette(baseColor, theme = 'dark') {
         if (!isValidColor(baseColor)) {
@@ -38,42 +95,51 @@
         const tones = [0, 10, 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
         const palette = {};
         
+        // Chuyển base color sang HSL để dễ điều chỉnh
+        const [h, s, l] = rgbToHsl(baseRgb.r, baseRgb.g, baseRgb.b);
+        
         tones.forEach(tone => {
-            let r, g, b;
+            let newL, newS;
             
             if (isDarkTheme) {
-                // Dark mode: tone thấp = sáng hơn, tone cao = tối hơn
-                if (tone <= 500) {
-                    const factor = tone / 500;
-                    r = Math.round(baseRgb.r + (255 - baseRgb.r) * factor);
-                    g = Math.round(baseRgb.g + (255 - baseRgb.g) * factor);
-                    b = Math.round(baseRgb.b + (255 - baseRgb.b) * factor);
-                } else {
-                    const darkenFactor = (tone - 500) / 500;
-                    r = Math.round(baseRgb.r * (1 - darkenFactor * 0.6));
-                    g = Math.round(baseRgb.g * (1 - darkenFactor * 0.6));
-                    b = Math.round(baseRgb.b * (1 - darkenFactor * 0.6));
+                // Dark mode palette
+                switch(tone) {
+                    case 0:   newL = 0.98; newS = s * 0.1; break;
+                    case 10:  newL = 0.95; newS = s * 0.2; break;
+                    case 50:  newL = 0.90; newS = s * 0.3; break;
+                    case 100: newL = 0.85; newS = s * 0.4; break;
+                    case 200: newL = 0.75; newS = s * 0.5; break;
+                    case 300: newL = 0.65; newS = s * 0.6; break;
+                    case 400: newL = 0.55; newS = s * 0.7; break;
+                    case 500: newL = 0.45; newS = s * 0.8; break; // Base color
+                    case 600: newL = 0.35; newS = s * 0.9; break;
+                    case 700: newL = 0.25; newS = s * 0.8; break;
+                    case 800: newL = 0.15; newS = s * 0.7; break;
+                    case 900: newL = 0.10; newS = s * 0.6; break;
+                    case 1000: newL = 0.05; newS = s * 0.5; break;
+                    default:  newL = l; newS = s;
                 }
             } else {
-                // Light mode: tone thấp = nhạt hơn, tone cao = đậm hơn
-                if (tone <= 500) {
-                    const lightenFactor = (500 - tone) / 500;
-                    r = Math.round(baseRgb.r + (255 - baseRgb.r) * lightenFactor * 0.8);
-                    g = Math.round(baseRgb.g + (255 - baseRgb.g) * lightenFactor * 0.8);
-                    b = Math.round(baseRgb.b + (255 - baseRgb.b) * lightenFactor * 0.8);
-                } else {
-                    const factor = (tone - 500) / 500;
-                    r = Math.round(baseRgb.r * (0.8 + factor * 0.2));
-                    g = Math.round(baseRgb.g * (0.8 + factor * 0.2));
-                    b = Math.round(baseRgb.b * (0.8 + factor * 0.2));
+                // Light mode palette
+                switch(tone) {
+                    case 0:   newL = 0.99; newS = s * 0.1; break;
+                    case 10:  newL = 0.97; newS = s * 0.2; break;
+                    case 50:  newL = 0.95; newS = s * 0.3; break;
+                    case 100: newL = 0.90; newS = s * 0.4; break;
+                    case 200: newL = 0.85; newS = s * 0.5; break;
+                    case 300: newL = 0.75; newS = s * 0.6; break;
+                    case 400: newL = 0.65; newS = s * 0.7; break;
+                    case 500: newL = 0.55; newS = s * 0.8; break; // Base color
+                    case 600: newL = 0.45; newS = s * 0.9; break;
+                    case 700: newL = 0.35; newS = s * 0.8; break;
+                    case 800: newL = 0.25; newS = s * 0.7; break;
+                    case 900: newL = 0.15; newS = s * 0.6; break;
+                    case 1000: newL = 0.10; newS = s * 0.5; break;
+                    default:  newL = l; newS = s;
                 }
             }
             
-            // Đảm bảo giá trị trong khoảng 0-255
-            r = Math.max(0, Math.min(255, r));
-            g = Math.max(0, Math.min(255, g));
-            b = Math.max(0, Math.min(255, b));
-            
+            const [r, g, b] = hslToRgb(h, newS, newL);
             palette[tone] = rgbToHex(r, g, b);
         });
         
@@ -99,13 +165,27 @@
         return generateMonetPalette(baseColor, currentTheme);
     }
     
+    // Lấy màu phù hợp với theme cho text
+    function getThemeAwareTextColor(backgroundColor) {
+        const isDark = window.ThemeDetector ? window.ThemeDetector.isDarkMode() : true;
+        const bgRgb = hexToRgb(backgroundColor);
+        
+        if (!bgRgb) return isDark ? '#ffffff' : '#000000';
+        
+        const brightness = (bgRgb.r * 299 + bgRgb.g * 587 + bgRgb.b * 114) / 1000;
+        return brightness > 128 ? '#000000' : '#ffffff';
+    }
+    
     // Xuất API công khai
     window.MonetAPI = {
         generateMonetPalette,
         generateThemeAwarePalette,
+        getThemeAwareTextColor,
         isValidColor,
         isColorLight,
         rgbToHex,
-        hexToRgb
+        hexToRgb,
+        rgbToHsl,
+        hslToRgb
     };
 })();
