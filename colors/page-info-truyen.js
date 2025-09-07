@@ -39,6 +39,9 @@
         // Thêm CSS cho phần trên của feature-section trong suốt
         addTransparentTopCSS();
         
+        // Thiết lập lắng nghe thay đổi theme
+        setupThemeChangeListener();
+        
         // Phân tích màu từ ảnh bìa bằng module ImageAnalyzer
         ImageAnalyzer.analyzeImageColorWithHairFocus(coverUrl)
             .then(dominantColor => {
@@ -50,14 +53,14 @@
                     return;
                 }
                 
-                // Gọi API Monet để tạo palette
+                // Gọi API Monet để tạo palette với theme awareness
                 const monetPalette = MonetAPI.generateThemeAwarePalette(dominantColor);
                 debugLog('Monet Palette:', monetPalette);
                 
-                const isLightColor = MonetAPI.isColorLight(dominantColor);
-                debugLog('Màu sáng?', isLightColor);
+                // Thêm CSS override cho theme
+                addThemeOverrideCSS(monetPalette);
                 
-                applyMonetColorScheme(monetPalette, isLightColor);
+                applyMonetColorScheme(monetPalette);
             })
             .catch(error => {
                 debugLog('Lỗi khi phân tích ảnh:', error);
@@ -170,14 +173,78 @@
         }
     }
     
+    // Thiết lập lắng nghe thay đổi theme
+    function setupThemeChangeListener() {
+        if (window.ThemeDetector && typeof ThemeDetector.watchThemeChange === 'function') {
+            ThemeDetector.watchThemeChange((newTheme) => {
+                debugLog(`Theme changed to: ${newTheme}`);
+                // Reload để áp dụng palette mới
+                setTimeout(() => {
+                    window.location.reload();
+                }, 300);
+            });
+            debugLog('Đã thiết lập lắng nghe thay đổi theme');
+        }
+    }
+    
+    // Thêm CSS override cho theme
+    function addThemeOverrideCSS(palette) {
+        if (!palette) return;
+        
+        GM_addStyle(`
+            /* Light mode overrides */
+            body:not(.dark) {
+                --monet-bg-primary: ${palette[50]} !important;
+                --monet-bg-secondary: ${palette[100]} !important;
+                --monet-text-primary: #000000 !important;
+                --monet-text-secondary: #333333 !important;
+            }
+            
+            body:not(.dark) .basic-section,
+            body:not(.dark) .board-list,
+            body:not(.dark) .feature-section,
+            body:not(.dark) .detail-list {
+                background-color: var(--monet-bg-secondary) !important;
+                color: var(--monet-text-primary) !important;
+                border-color: var(--monet-bg-primary) !important;
+            }
+            
+            body:not(.dark) .series-title,
+            body:not(.dark) .series-authors,
+            body:not(.dark) .series-artists,
+            body:not(.dark) .series-description {
+                color: var(--monet-text-primary) !important;
+            }
+            
+            body:not(.dark) .tag-item {
+                background-color: ${palette[200]} !important;
+                color: var(--monet-text-primary) !important;
+            }
+            
+            body:not(.dark) .text-slate-500 {
+                color: ${palette[600]} !important;
+            }
+            
+            /* Dark mode overrides */
+            body.dark {
+                --monet-text-primary: #ffffff !important;
+                --monet-text-secondary: #cccccc !important;
+            }
+        `);
+        
+        debugLog('Đã thêm CSS override cho theme');
+    }
+    
     // Hàm áp dụng Monet color scheme
-    function applyMonetColorScheme(palette, isLight) {
+    function applyMonetColorScheme(palette) {
         if (!palette) {
             applyDefaultColorScheme();
             return;
         }
         
-        const textColor = isLight ? '#000' : '#fff';
+        // Xác định màu text dựa trên theme
+        const textColor = MonetAPI.getThemeAwareTextColor(palette[500]);
+        const isDarkMode = window.ThemeDetector ? window.ThemeDetector.isDarkMode() : true;
         
         const css = `
             :root {
@@ -190,6 +257,11 @@
                 --monet-background-dark: ${palette[100]};
                 --monet-elevated: ${palette[0]};
                 --monet-elevated-dark: ${palette[100]};
+                --monet-text-primary: ${textColor};
+            }
+            
+            body {
+                color: var(--monet-text-primary) !important;
             }
             
             a:hover,
@@ -199,7 +271,7 @@
             
             .text-slate-500,
             .long-text a {
-            	color: ${palette[300]} !important;
+                color: ${palette[300]} !important;
             }
             
             .paging_item.paging_prevnext.next,
@@ -211,7 +283,7 @@
             .paging_item.paging_prevnext.next:hover,
             .paging_item.paging_prevnext.prev:hover {
                 background-color: ${palette[500]} !important;
-                color: ${isLight ? '#000' : '#fff'} !important;
+                color: var(--monet-text-primary) !important;
             }
             
             .series-type,
@@ -222,7 +294,7 @@
             
             .series-type,
             .ln-comment-form input.button {
-                color: ${textColor} !important;
+                color: var(--monet-text-primary) !important;
             }
             
             .feature-section .series-type:before {
@@ -382,15 +454,26 @@
     }
     
     function applyDefaultColorScheme() {
-        const defaultColor = '#ff0000';
-        const defaultPalette = MonetAPI.generateMonetPalette(defaultColor);
+        const defaultColor = '#6c5ce7';
+        const defaultPalette = MonetAPI.generateThemeAwarePalette(defaultColor);
         
         if (!defaultPalette) {
             debugLog('Không thể tạo palette mặc định');
             return;
         }
         
+        const textColor = MonetAPI.getThemeAwareTextColor(defaultColor);
+        
         const css = `
+            :root {
+                --monet-primary: ${defaultColor};
+                --monet-text-primary: ${textColor};
+            }
+            
+            body {
+                color: var(--monet-text-primary) !important;
+            }
+            
             a:hover,
             .text-slate-500,
             .long-text a:hover, 
@@ -407,7 +490,7 @@
             .paging_item.paging_prevnext.next:hover,
             .paging_item.paging_prevnext.prev:hover {
                 background-color: ${defaultColor} !important;
-                color: #fff !important;
+                color: var(--monet-text-primary) !important;
             }
             
             .series-type,
@@ -418,7 +501,7 @@
             
             .series-type,
             .ln-comment-form input.button {
-                color: #fff !important;
+                color: var(--monet-text-primary) !important;
             }
             
             .feature-section .series-type:before {
