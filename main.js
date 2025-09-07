@@ -125,9 +125,11 @@
             const monetAPIJS = GM_getResourceText('monetAPIJS');
             const tagColorJS = GM_getResourceText('tagColorJS');
             const colorinfotruyen = GM_getResourceText('colorinfotruyen');
+            const imageAnalyzerJS = GM_getResourceText('imageAnalyzerJS');
             
             // Load các module theo thứ tự
             loadScript(crosUnblockJS, 'cros-unblock.js');
+            loadScript(imageAnalyzerJS, 'image-analyzer.js');
             loadScript(infoTruyenJS, 'info-truyen.js');
             loadScript(tagColorJS, 'tag-color.js');
             loadScript(monetAPIJS, 'monet.js');
