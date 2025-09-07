@@ -25,8 +25,8 @@
         return /^#([0-9A-F]{3}){1,2}$/i.test(color);
     }
     
-    // Hàm tạo Monet palette từ màu chủ đạo
-    function generateMonetPalette(baseColor) {
+    // Hàm tạo Monet palette từ màu chủ đạo với hỗ trợ theme
+    function generateMonetPalette(baseColor, theme = 'dark') {
         if (!isValidColor(baseColor)) {
             throw new Error('Màu cơ sở không hợp lệ');
         }
@@ -34,28 +34,47 @@
         const baseRgb = hexToRgb(baseColor);
         if (!baseRgb) return null;
         
-        // Tạo các tone màu theo Material You guidelines
+        const isDarkTheme = theme === 'dark';
         const tones = [0, 10, 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
         const palette = {};
         
         tones.forEach(tone => {
-            // Tính toán màu dựa trên tone
-            const factor = tone / 1000;
+            let r, g, b;
             
-            if (tone <= 500) {
-                // Màu sáng hơn (tone thấp)
-                const r = Math.round(baseRgb.r + (255 - baseRgb.r) * (1 - factor));
-                const g = Math.round(baseRgb.g + (255 - baseRgb.g) * (1 - factor));
-                const b = Math.round(baseRgb.b + (255 - baseRgb.b) * (1 - factor));
-                palette[tone] = rgbToHex(r, g, b);
+            if (isDarkTheme) {
+                // Dark mode: tone thấp = sáng hơn, tone cao = tối hơn
+                if (tone <= 500) {
+                    const factor = tone / 500;
+                    r = Math.round(baseRgb.r + (255 - baseRgb.r) * factor);
+                    g = Math.round(baseRgb.g + (255 - baseRgb.g) * factor);
+                    b = Math.round(baseRgb.b + (255 - baseRgb.b) * factor);
+                } else {
+                    const darkenFactor = (tone - 500) / 500;
+                    r = Math.round(baseRgb.r * (1 - darkenFactor * 0.6));
+                    g = Math.round(baseRgb.g * (1 - darkenFactor * 0.6));
+                    b = Math.round(baseRgb.b * (1 - darkenFactor * 0.6));
+                }
             } else {
-                // Màu tối hơn (tone cao)
-                const darkenFactor = (tone - 500) / 500;
-                const r = Math.round(baseRgb.r * (1 - darkenFactor * 0.7));
-                const g = Math.round(baseRgb.g * (1 - darkenFactor * 0.7));
-                const b = Math.round(baseRgb.b * (1 - darkenFactor * 0.7));
-                palette[tone] = rgbToHex(r, g, b);
+                // Light mode: tone thấp = nhạt hơn, tone cao = đậm hơn
+                if (tone <= 500) {
+                    const lightenFactor = (500 - tone) / 500;
+                    r = Math.round(baseRgb.r + (255 - baseRgb.r) * lightenFactor * 0.8);
+                    g = Math.round(baseRgb.g + (255 - baseRgb.g) * lightenFactor * 0.8);
+                    b = Math.round(baseRgb.b + (255 - baseRgb.b) * lightenFactor * 0.8);
+                } else {
+                    const factor = (tone - 500) / 500;
+                    r = Math.round(baseRgb.r * (0.8 + factor * 0.2));
+                    g = Math.round(baseRgb.g * (0.8 + factor * 0.2));
+                    b = Math.round(baseRgb.b * (0.8 + factor * 0.2));
+                }
             }
+            
+            // Đảm bảo giá trị trong khoảng 0-255
+            r = Math.max(0, Math.min(255, r));
+            g = Math.max(0, Math.min(255, g));
+            b = Math.max(0, Math.min(255, b));
+            
+            palette[tone] = rgbToHex(r, g, b);
         });
         
         return palette;
@@ -67,17 +86,23 @@
             return false;
         }
         
-        const r = parseInt(color.slice(1, 3), 16);
-        const g = parseInt(color.slice(3, 5), 16);
-        const b = parseInt(color.slice(5, 7), 16);
+        const rgb = hexToRgb(color);
+        if (!rgb) return false;
         
-        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
         return brightness > 128;
+    }
+    
+    // Tạo palette phù hợp với theme hiện tại
+    function generateThemeAwarePalette(baseColor) {
+        const currentTheme = window.ThemeDetector ? window.ThemeDetector.detectTheme() : 'dark';
+        return generateMonetPalette(baseColor, currentTheme);
     }
     
     // Xuất API công khai
     window.MonetAPI = {
         generateMonetPalette,
+        generateThemeAwarePalette,
         isValidColor,
         isColorLight,
         rgbToHex,
