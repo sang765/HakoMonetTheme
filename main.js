@@ -3,8 +3,8 @@
     
     const DEBUG = true;
     const CHECK_UPDATE_INTERVAL = 30 * 60 * 1000; // 30 phút
-    const VERSION = '3.0.5';
-    const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/HakoMonetTheme.user.js';
+    const VERSION = 'N250907 - 1';
+    const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/nightly/HakoMonetTheme.user.js';
     
     function debugLog(...args) {
         if (DEBUG) {
@@ -82,13 +82,13 @@
                 text: `Phiên bản ${latestVersion} đã có sẵn. Nhấn để cập nhật.`,
                 timeout: 10000,
                 onclick: function() {
-                    window.open('https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js', '_blank');
+                    window.open('https://github.com/sang765/HakoMonetTheme/raw/nightly/HakoMonetTheme.user.js', '_blank');
                 }
             });
         } else {
             // Fallback cho các userscript manager không hỗ trợ GM_notification
             if (confirm(`HakoMonetTheme phiên bản ${latestVersion} đã có sẵn. Bạn có muốn cập nhật ngay bây giờ không?`)) {
-                window.open('https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js', '_blank');
+                window.open('https://github.com/sang765/HakoMonetTheme/raw/nightly/HakoMonetTheme.user.js', '_blank');
             }
         }
     }
@@ -228,7 +228,7 @@
         const notification = document.createElement('div');
         notification.className = 'hmt-update-notification';
         notification.onclick = function() {
-            window.open('https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js', '_blank');
+            window.open('https://github.com/sang765/HakoMonetTheme/raw/nightly/HakoMonetTheme.user.js', '_blank');
             this.remove();
         };
         
