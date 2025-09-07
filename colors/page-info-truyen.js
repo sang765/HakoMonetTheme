@@ -51,7 +51,7 @@
                 }
                 
                 // Gọi API Monet để tạo palette
-                const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
+                const monetPalette = MonetAPI.generateThemeAwarePalette(dominantColor);
                 debugLog('Monet Palette:', monetPalette);
                 
                 const isLightColor = MonetAPI.isColorLight(dominantColor);
