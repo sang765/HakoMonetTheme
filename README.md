@@ -44,6 +44,7 @@ Material You theme dành cho Hako/DocLN.
 
 ### Bước 3: Cài đặt script
 Nhấp vào [raw userscript](https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js) và nhấn "Install"  
+-# [Nightly Build](https://github.com/sang765/HakoMonetTheme/raw/nightly/HakoMonetTheme.user.js) dành cho tester.
 ![Install Userscript](/.github/assets/Install_us.jpg)
 
 ### Bước 4: Thiết lập CORS extension
