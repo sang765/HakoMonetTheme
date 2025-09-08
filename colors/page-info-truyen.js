@@ -226,10 +226,36 @@
                 color: ${palette[700]} !important;  /* Use darker tone for better contrast */
             }
 
-            /* Dark mode overrides - less aggressively dark */
+            /* Dark mode overrides - ensure text stays light */
             body.dark {
                 --monet-text-primary: #ffffff !important;
                 --monet-text-secondary: #cccccc !important;
+                color: #ffffff !important;
+            }
+
+            /* Force light text on dark backgrounds in dark mode */
+            body.dark * {
+                color: inherit;
+            }
+
+            body.dark .series-title,
+            body.dark .series-authors,
+            body.dark .series-artists,
+            body.dark .series-description,
+            body.dark .tag-item,
+            body.dark .text-slate-500,
+            body.dark .long-text a,
+            body.dark .paging_item,
+            body.dark .ln-comment-form input.button,
+            body.dark .feature-section .series-type,
+            body.dark .navbar-logo-wrapper .navbar-logo {
+                color: #ffffff !important;
+            }
+
+            /* Ensure links stay visible in dark mode */
+            body.dark a:hover,
+            body.dark .long-text a:hover {
+                color: ${palette[300]} !important;
             }
         `);
         
@@ -443,10 +469,31 @@
                 filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#002a2a2a",endColorstr="${palette[800]}",GradientType=0) !important;
             }
             
-            .visible-toolkit .visible-toolkit-item.do-like.liked { 
-                border-bottom-color: ${palette[500]} !important; 
-                color: ${palette[500]} !important; 
-                font-weight: 700 !important; 
+            .visible-toolkit .visible-toolkit-item.do-like.liked {
+                border-bottom-color: ${palette[500]} !important;
+                color: ${palette[500]} !important;
+                font-weight: 700 !important;
+            }
+
+            /* Additional dark mode text color fixes */
+            body.dark .series-title,
+            body.dark .series-authors,
+            body.dark .series-artists,
+            body.dark .series-description,
+            body.dark .tag-item,
+            body.dark .text-slate-500,
+            body.dark .long-text a,
+            body.dark .paging_item,
+            body.dark .ln-comment-form input.button,
+            body.dark .feature-section .series-type,
+            body.dark .navbar-logo-wrapper .navbar-logo {
+                color: #ffffff !important;
+            }
+
+            /* Ensure all text elements are visible in dark mode */
+            body.dark h1, body.dark h2, body.dark h3, body.dark h4, body.dark h5, body.dark h6,
+            body.dark p, body.dark span, body.dark div, body.dark li, body.dark td, body.dark th {
+                color: inherit !important;
             }
         `;
         
@@ -650,10 +697,31 @@
                 filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#002a2a2a",endColorstr="${defaultPalette[800]}",GradientType=0) !important;
             }
             
-            .visible-toolkit .visible-toolkit-item.do-like.liked { 
-                border-bottom-color: ${defaultColor} !important; 
-                color: ${defaultColor} !important; 
-                font-weight: 700 !important; 
+            .visible-toolkit .visible-toolkit-item.do-like.liked {
+                border-bottom-color: ${defaultColor} !important;
+                color: ${defaultColor} !important;
+                font-weight: 700 !important;
+            }
+
+            /* Additional dark mode text color fixes for default scheme */
+            body.dark .series-title,
+            body.dark .series-authors,
+            body.dark .series-artists,
+            body.dark .series-description,
+            body.dark .tag-item,
+            body.dark .text-slate-500,
+            body.dark .long-text a,
+            body.dark .paging_item,
+            body.dark .ln-comment-form input.button,
+            body.dark .feature-section .series-type,
+            body.dark .navbar-logo-wrapper .navbar-logo {
+                color: #ffffff !important;
+            }
+
+            /* Ensure all text elements are visible in dark mode for default scheme */
+            body.dark h1, body.dark h2, body.dark h3, body.dark h4, body.dark h5, body.dark h6,
+            body.dark p, body.dark span, body.dark div, body.dark li, body.dark td, body.dark th {
+                color: inherit !important;
             }
         `;
         

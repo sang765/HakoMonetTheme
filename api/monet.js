@@ -167,13 +167,22 @@
     
     // Lấy màu phù hợp với theme cho text
     function getThemeAwareTextColor(backgroundColor) {
+        // Always prioritize theme detection over background color calculation
         const isDark = window.ThemeDetector ? window.ThemeDetector.isDarkMode() : true;
+
+        // In dark mode, always use white/light text for better readability
+        if (isDark) {
+            return '#ffffff';
+        }
+
+        // In light mode, check background brightness but with more conservative threshold
         const bgRgb = hexToRgb(backgroundColor);
-        
-        if (!bgRgb) return isDark ? '#ffffff' : '#000000';
-        
+        if (!bgRgb) return '#000000'; // Default to black if can't parse
+
         const brightness = (bgRgb.r * 299 + bgRgb.g * 587 + bgRgb.b * 114) / 1000;
-        return brightness > 128 ? '#000000' : '#ffffff';
+
+        // Use a more conservative threshold to avoid dark text on light backgrounds
+        return brightness > 180 ? '#000000' : '#ffffff';
     }
     
     // Xuất API công khai
