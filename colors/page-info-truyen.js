@@ -192,40 +192,41 @@
         if (!palette) return;
         
         GM_addStyle(`
-            /* Light mode overrides */
+            /* Light mode overrides - white base with subtle tint */
             body:not(.dark) {
-                --monet-bg-primary: ${palette[50]} !important;
-                --monet-bg-secondary: ${palette[100]} !important;
+                --monet-bg-primary: ${palette[50]} !important;    /* Subtle tinted surface */
+                --monet-bg-secondary: ${palette[100]} !important;  /* Slightly more tinted */
                 --monet-text-primary: #000000 !important;
                 --monet-text-secondary: #333333 !important;
             }
-            
+
             body:not(.dark) .basic-section,
             body:not(.dark) .board-list,
             body:not(.dark) .feature-section,
             body:not(.dark) .detail-list {
-                background-color: var(--monet-bg-secondary) !important;
+                background-color: var(--monet-bg-primary) !important;  /* Use more subtle tint */
                 color: var(--monet-text-primary) !important;
-                border-color: var(--monet-bg-primary) !important;
+                border-color: ${palette[200]} !important;  /* Lighter border */
             }
-            
+
             body:not(.dark) .series-title,
             body:not(.dark) .series-authors,
             body:not(.dark) .series-artists,
             body:not(.dark) .series-description {
                 color: var(--monet-text-primary) !important;
             }
-            
+
             body:not(.dark) .tag-item {
                 background-color: ${palette[200]} !important;
                 color: var(--monet-text-primary) !important;
+                border-color: ${palette[300]} !important;
             }
-            
+
             body:not(.dark) .text-slate-500 {
-                color: ${palette[600]} !important;
+                color: ${palette[700]} !important;  /* Use darker tone for better contrast */
             }
-            
-            /* Dark mode overrides */
+
+            /* Dark mode overrides - less aggressively dark */
             body.dark {
                 --monet-text-primary: #ffffff !important;
                 --monet-text-secondary: #cccccc !important;
@@ -249,14 +250,14 @@
         const css = `
             :root {
                 --monet-primary: ${palette[500]};
-                --monet-primary-light: ${palette[300]};
-                --monet-primary-dark: ${palette[700]};
-                --monet-surface: ${palette[100]};
-                --monet-surface-dark: ${palette[200]};
-                --monet-background: ${palette[50]};
-                --monet-background-dark: ${palette[100]};
+                --monet-primary-light: ${palette[400]};
+                --monet-primary-dark: ${palette[600]};
+                --monet-surface: ${palette[50]};
+                --monet-surface-dark: ${palette[100]};
+                --monet-background: ${palette[10]};
+                --monet-background-dark: ${palette[50]};
                 --monet-elevated: ${palette[0]};
-                --monet-elevated-dark: ${palette[100]};
+                --monet-elevated-dark: ${palette[50]};
                 --monet-text-primary: ${textColor};
             }
             
@@ -340,9 +341,9 @@
             
             #mainpart,
             #mainpart.at-index {
-                background-color: ${palette[1000]} !important;
+                background-color: ${palette[900]} !important;  /* Less dark background */
             }
-            
+
             .basic-section,
             .board-list,
             .board_categ-list,
@@ -357,8 +358,8 @@
             .series-users,
             .showcase-item,
             .sub-index-style {
-                background-color: ${palette[900]} !important;
-                border-color: ${palette[900]} ${palette[1000]} ${palette[1000]} !important;
+                background-color: ${palette[800]} !important;  /* Lighter surface */
+                border-color: ${palette[800]} ${palette[900]} ${palette[900]} !important;
             }
             
             #licensed-list header.section-title,
@@ -547,9 +548,9 @@
             
             #mainpart,
             #mainpart.at-index {
-                background-color: ${defaultPalette[1000]} !important;
+                background-color: ${defaultPalette[900]} !important;  /* Less dark background */
             }
-            
+
             .basic-section,
             .board-list,
             .board_categ-list,
@@ -564,8 +565,8 @@
             .series-users,
             .showcase-item,
             .sub-index-style {
-                background-color: ${defaultPalette[900]} !important;
-                border-color: ${defaultPalette[900]} ${defaultPalette[1000]} ${defaultPalette[1000]} !important;
+                background-color: ${defaultPalette[800]} !important;  /* Lighter surface */
+                border-color: ${defaultPalette[800]} ${defaultPalette[900]} ${defaultPalette[900]} !important;
             }
             
             #licensed-list header.section-title,

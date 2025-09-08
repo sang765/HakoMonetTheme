@@ -100,41 +100,41 @@
         
         tones.forEach(tone => {
             let newL, newS;
-            
+
             if (isDarkTheme) {
-                // Dark mode palette
+                // Dark mode palette - less aggressively dark, better balance
                 switch(tone) {
-                    case 0:   newL = 0.98; newS = s * 0.1; break;
-                    case 10:  newL = 0.95; newS = s * 0.2; break;
-                    case 50:  newL = 0.90; newS = s * 0.3; break;
-                    case 100: newL = 0.85; newS = s * 0.4; break;
-                    case 200: newL = 0.75; newS = s * 0.5; break;
-                    case 300: newL = 0.65; newS = s * 0.6; break;
-                    case 400: newL = 0.55; newS = s * 0.7; break;
-                    case 500: newL = 0.45; newS = s * 0.8; break; // Base color
-                    case 600: newL = 0.35; newS = s * 0.9; break;
-                    case 700: newL = 0.25; newS = s * 0.8; break;
-                    case 800: newL = 0.15; newS = s * 0.7; break;
-                    case 900: newL = 0.10; newS = s * 0.6; break;
-                    case 1000: newL = 0.05; newS = s * 0.5; break;
+                    case 0:   newL = 0.96; newS = s * 0.15; break;  // Lighter surface
+                    case 10:  newL = 0.92; newS = s * 0.25; break;
+                    case 50:  newL = 0.85; newS = s * 0.35; break;
+                    case 100: newL = 0.78; newS = s * 0.45; break;
+                    case 200: newL = 0.68; newS = s * 0.55; break;
+                    case 300: newL = 0.58; newS = s * 0.65; break;
+                    case 400: newL = 0.48; newS = s * 0.75; break;
+                    case 500: newL = 0.40; newS = s * 0.85; break; // Base color - slightly lighter
+                    case 600: newL = 0.32; newS = s * 0.90; break;
+                    case 700: newL = 0.24; newS = s * 0.80; break;
+                    case 800: newL = 0.18; newS = s * 0.70; break;
+                    case 900: newL = 0.12; newS = s * 0.60; break;
+                    case 1000: newL = 0.08; newS = s * 0.50; break; // Less dark background
                     default:  newL = l; newS = s;
                 }
             } else {
-                // Light mode palette
+                // Light mode palette - white base with subtle color tint
                 switch(tone) {
-                    case 0:   newL = 0.99; newS = s * 0.1; break;
-                    case 10:  newL = 0.97; newS = s * 0.2; break;
-                    case 50:  newL = 0.95; newS = s * 0.3; break;
-                    case 100: newL = 0.90; newS = s * 0.4; break;
-                    case 200: newL = 0.85; newS = s * 0.5; break;
-                    case 300: newL = 0.75; newS = s * 0.6; break;
-                    case 400: newL = 0.65; newS = s * 0.7; break;
-                    case 500: newL = 0.55; newS = s * 0.8; break; // Base color
-                    case 600: newL = 0.45; newS = s * 0.9; break;
-                    case 700: newL = 0.35; newS = s * 0.8; break;
-                    case 800: newL = 0.25; newS = s * 0.7; break;
-                    case 900: newL = 0.15; newS = s * 0.6; break;
-                    case 1000: newL = 0.10; newS = s * 0.5; break;
+                    case 0:   newL = 0.99; newS = s * 0.05; break;  // Near white with minimal tint
+                    case 10:  newL = 0.97; newS = s * 0.08; break;
+                    case 50:  newL = 0.95; newS = s * 0.12; break;  // Subtle tint for surface
+                    case 100: newL = 0.92; newS = s * 0.18; break;
+                    case 200: newL = 0.88; newS = s * 0.25; break;
+                    case 300: newL = 0.82; newS = s * 0.35; break;
+                    case 400: newL = 0.75; newS = s * 0.45; break;
+                    case 500: newL = 0.65; newS = s * 0.55; break; // Base color - balanced
+                    case 600: newL = 0.55; newS = s * 0.65; break;
+                    case 700: newL = 0.45; newS = s * 0.70; break;
+                    case 800: newL = 0.35; newS = s * 0.75; break;
+                    case 900: newL = 0.25; newS = s * 0.70; break;
+                    case 1000: newL = 0.18; newS = s * 0.60; break;
                     default:  newL = l; newS = s;
                 }
             }
