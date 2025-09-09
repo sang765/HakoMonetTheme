@@ -239,8 +239,7 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
     function loadAllResources() {
         const resources = [
             'mainJS', 'monetJS', 'crosUnblockJS', 'infoTruyenJS', 
-            'animationJS', 'monetClassJS', 'tagColorJS', 'configJS',
-            'utilsJS', 'colorUtilsJS', 'domUtilsJS', 'storageJS', 'settingsJS'
+            'animationJS', 'monetClassJS', 'tagColorJS'
         ];
         
         let loadedCount = 0;
