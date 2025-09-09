@@ -190,6 +190,46 @@
         return MonetAPI.isValidColor(color);
     }
     
+    // Hàm thêm CSS cho phần trên của feature-section trong suốt
+    function addTransparentTopCSS(isDarkMode) {
+        const gradientColors = isDarkMode
+            ? 'rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.7) 50%, rgba(0, 0, 0, 0.9) 100%'
+            : 'rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.7) 50%, rgba(255, 255, 255, 0.9) 100%';
+
+        GM_addStyle(`
+            /*
+            .feature-section.at-series {
+                background: transparent !important;
+                border: none !important;
+            }
+
+            .feature-section.at-series.clear {
+                background: transparent !important;
+                background-image: none !important;
+            }
+
+            .feature-section > * {
+                position: relative;
+                z-index: 2;
+            }
+
+            .feature-section::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 200px;
+                background: linear-gradient(to bottom, ${gradientColors});
+                pointer-events: none;
+                z-index: 1;
+            }
+            */
+        `);
+
+        debugLog('Đã thêm CSS phần trên trong suốt cho theme:', isDarkMode ? 'dark' : 'light');
+    }
+    
     // Hàm thêm hiệu ứng thumbnail mờ dần
     function addThumbnailFadeEffect(coverUrl, isDarkMode) {
         // Tạo phần tử cho hiệu ứng nền
@@ -202,29 +242,29 @@
         // Thêm styles
         GM_addStyle(`
             .betterhako-bg-overlay {
-                position: absolute !important;
-                top: 0 !important;
-                left: 0 !important;
-                right: 0 !important;
-                height: 350px !important;
-                z-index: -1 !important;
-                background-image: url('${coverUrl}') !important;
-                background-size: cover !important;
-                background-position: center !important;
-                filter: blur(12px) brightness(${brightness}) !important;
-                mask-image: linear-gradient(to bottom, black 0%, transparent 100%) !important;
-                -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%) !important;
-                pointer-events: none !important;
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 350px;
+                z-index: -1;
+                background-image: url('${coverUrl}');
+                background-size: cover;
+                background-position: center;
+                filter: blur(12px) brightness(${brightness});
+                mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+                -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+                pointer-events: none;
             }
 
             #mainpart {
-                position: relative !important;
-                isolation: isolate !important;
+                position: relative;
+                isolation: isolate;
             }
 
             #mainpart > .container {
-                position: relative !important;
-                z-index: 1 !important;
+                position: relative;
+                z-index: 1;
             }
         `);
 
