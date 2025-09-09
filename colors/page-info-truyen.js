@@ -243,29 +243,29 @@
         // Thêm styles
         GM_addStyle(`
             .betterhako-bg-overlay {
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 350px;
-                z-index: -1;
-                background-image: url('${coverUrl}');
-                background-size: cover;
-                background-position: center;
-                filter: blur(12px) brightness(${brightness});
-                mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
-                -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
-                pointer-events: none;
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                height: 350px !important;
+                z-index: -1 !important;
+                background-image: url('${coverUrl}') !important;
+                background-size: cover !important;
+                background-position: center !important;
+                filter: blur(12px) brightness(${brightness}) !important;
+                mask-image: linear-gradient(to bottom, black 0%, transparent 100%) !important;
+                -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%) !important;
+                pointer-events: none !important;
             }
 
             #mainpart {
-                position: relative;
-                isolation: isolate;
+                position: relative !important;
+                isolation: isolate !important;
             }
 
             #mainpart > .container {
-                position: relative;
-                z-index: 1;
+                position: relative !important;
+                z-index: 1 !important;
             }
         `);
 
