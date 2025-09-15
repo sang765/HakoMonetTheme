@@ -1,6 +1,6 @@
 (function() {
     'use strict';
-
+    
     const DEBUG = true;
     const TARGET_DOMAINS = ['docln', 'hako', 'i2.hako.vip', 'docln.sbs', 'docln.net', 'ln.hako.vn'];
 
@@ -10,40 +10,16 @@
         }
     }
 
-    // Chờ theme detector có sẵn
-    function waitForThemeDetector() {
-        return new Promise((resolve) => {
-            if (window.ThemeDetector) {
-                resolve();
-                return;
-            }
-
-            const checkInterval = setInterval(() => {
-                if (window.ThemeDetector) {
-                    clearInterval(checkInterval);
-                    resolve();
-                }
-            }, 100);
-
-            // Timeout sau 5 giây
-            setTimeout(() => {
-                clearInterval(checkInterval);
-                debugLog('Theme detector không khả dụng, tiếp tục mà không có nó');
-                resolve();
-            }, 5000);
-        });
-    }
-
     function isTargetDomain(url) {
         if (!url) return false;
         return TARGET_DOMAINS.some(domain => url.includes(domain));
     }
 
-    // Xử lý CORS tích hợp cho hình ảnh
+    // Integrated CORS handling for images
     function setupImageCorsHandling() {
         if (window.__imageCorsSetup) return;
 
-        debugLog('Thiết lập xử lý CORS tích hợp cho hình ảnh');
+        debugLog('Setting up integrated CORS handling for images');
 
         // Patch Image constructor
         const originalImage = window.Image;
@@ -56,7 +32,7 @@
                     set: function(value) {
                         if (isTargetDomain(value)) {
                             this.crossOrigin = 'anonymous';
-                            debugLog('Đã set crossOrigin cho hình ảnh:', value);
+                            debugLog('Set crossOrigin for image:', value);
                         }
                         return originalSrcDescriptor.set.call(this, value);
                     },
@@ -81,7 +57,7 @@
                 set: function(value) {
                     if (isTargetDomain(value)) {
                         this.crossOrigin = 'anonymous';
-                        debugLog('Đã set crossOrigin cho hình ảnh hiện có:', value);
+                        debugLog('Set crossOrigin for existing image:', value);
                     }
                     return originalSet.call(this, value);
                 },
@@ -92,98 +68,63 @@
         }
 
         window.__imageCorsSetup = true;
-        debugLog('Xử lý CORS tích hợp cho hình ảnh đã sẵn sàng');
+        debugLog('Integrated CORS handling for images is ready');
     }
     
-    async function initPageInfoTruyen() {
+    function initPageInfoTruyen() {
         // Kiểm tra xem có phải trang chi tiết truyện không
         const pathParts = window.location.pathname.split('/').filter(part => part !== '');
         if (pathParts.length < 2 || !['truyen', 'sang-tac', 'ai-dich'].includes(pathParts[0])) {
             debugLog('Đây không phải trang chi tiết truyện, bỏ qua tính năng đổi màu.');
             return;
         }
-
-        // Chờ theme detector có sẵn
-        await waitForThemeDetector();
-
-        // Phát hiện theme hiện tại
-        const currentTheme = window.ThemeDetector ? window.ThemeDetector.getCurrentTheme() : 'light';
-        const isDarkMode = currentTheme === 'dark';
-        debugLog('Đã phát hiện theme website:', currentTheme);
-
+        
         const coverElement = document.querySelector('.series-cover .img-in-ratio');
         if (!coverElement) {
             debugLog('Không tìm thấy ảnh bìa.');
             return;
         }
-
+        
         const coverStyle = coverElement.style.backgroundImage;
         const coverUrl = coverStyle.replace(/url\(['"]?(.*?)['"]?\)/i, '$1');
-
+        
         if (!coverUrl) {
             debugLog('Không thể lấy URL ảnh bìa.');
             return;
         }
-
+        
         debugLog('Đang phân tích màu từ ảnh bìa:', coverUrl);
-
-        // Thêm hiệu ứng thumbnail mờ dần với khả năng nhận biết theme
-        addThumbnailFadeEffect(coverUrl, isDarkMode);
-
-        // Thêm CSS cho phần trên của feature-section trong suốt với khả năng nhận biết theme
-        addTransparentTopCSS(isDarkMode);
-
-        // Lưu trữ phân tích màu hiện tại để chuyển đổi theme
-        let currentDominantColor = null;
-        let currentPalette = null;
-        let currentIsLightColor = null;
-
+        
+        // Thêm hiệu ứng thumbnail mờ dần
+        addThumbnailFadeEffect(coverUrl);
+        
+        // Thêm CSS cho phần trên của feature-section trong suốt
+        addTransparentTopCSS();
+        
         // Phân tích màu từ ảnh bìa
         analyzeImageColorWithHairFocus(coverUrl)
             .then(dominantColor => {
                 debugLog('Màu chủ đạo (ưu tiên tóc):', dominantColor);
-                currentDominantColor = dominantColor;
-
+                
                 if (!isValidColor(dominantColor)) {
                     debugLog('Màu không hợp lệ, sử dụng màu mặc định');
-                    applyDefaultColorScheme(isDarkMode);
+                    applyDefaultColorScheme();
                     return;
                 }
-
+                
                 // Gọi API Monet để tạo palette
                 const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
                 debugLog('Monet Palette:', monetPalette);
-                currentPalette = monetPalette;
-
+                
                 const isLightColor = MonetAPI.isColorLight(dominantColor);
                 debugLog('Màu sáng?', isLightColor);
-                currentIsLightColor = isLightColor;
-
-                applyMonetColorScheme(monetPalette, isLightColor, isDarkMode);
+                
+                applyMonetColorScheme(monetPalette, isLightColor);
             })
             .catch(error => {
                 debugLog('Lỗi khi phân tích ảnh:', error);
-                applyDefaultColorScheme(isDarkMode);
+                applyDefaultColorScheme();
             });
-
-        // Lắng nghe thay đổi theme nếu theme detector có sẵn
-        if (window.ThemeDetector) {
-            window.ThemeDetector.onThemeChange((newTheme) => {
-                debugLog('Theme đã thay đổi thành:', newTheme);
-                const newIsDarkMode = newTheme === 'dark';
-
-                // Áp dụng lại hiệu ứng với theme mới
-                addThumbnailFadeEffect(coverUrl, newIsDarkMode);
-                addTransparentTopCSS(newIsDarkMode);
-
-                // Áp dụng lại color scheme nếu có dữ liệu
-                if (currentPalette && currentIsLightColor !== null) {
-                    applyMonetColorScheme(currentPalette, currentIsLightColor, newIsDarkMode);
-                } else {
-                    applyDefaultColorScheme(newIsDarkMode);
-                }
-            });
-        }
     }
     
     function isValidColor(color) {
@@ -191,28 +132,26 @@
     }
     
     // Hàm thêm CSS cho phần trên của feature-section trong suốt
-    function addTransparentTopCSS(isDarkMode) {
-        const gradientColors = isDarkMode
-            ? 'rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.7) 50%, rgba(0, 0, 0, 0.9) 100%'
-            : 'rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.7) 50%, rgba(255, 255, 255, 0.9) 100%';
-
+    function addTransparentTopCSS() {
         GM_addStyle(`
-            /*
             .feature-section.at-series {
                 background: transparent !important;
                 border: none !important;
             }
-
+            
+            /* Xóa gradient mặc định của dark mode */
             .feature-section.at-series.clear {
                 background: transparent !important;
                 background-image: none !important;
             }
-
+            
+            /* Đảm bảo nội dung vẫn hiển thị bình thường */
             .feature-section > * {
                 position: relative;
                 z-index: 2;
             }
-
+            
+            /* Tạo lớp phủ gradient để phần trên trong suốt */
             .feature-section::before {
                 content: '';
                 position: absolute;
@@ -220,25 +159,32 @@
                 left: 0;
                 right: 0;
                 height: 200px;
-                background: linear-gradient(to bottom, ${gradientColors});
+                background: linear-gradient(to bottom, 
+                    rgba(0, 0, 0, 0.3) 0%, 
+                    rgba(0, 0, 0, 0.7) 50%,
+                    rgba(0, 0, 0, 0.9) 100%);
                 pointer-events: none;
                 z-index: 1;
             }
-            */
+            
+            /* Light mode support */
+            body:not(.dark) .feature-section::before {
+                background: linear-gradient(to bottom, 
+                    rgba(255, 255, 255, 0.3) 0%, 
+                    rgba(255, 255, 255, 0.7) 50%,
+                    rgba(255, 255, 255, 0.9) 100%);
+            }
         `);
-
-        debugLog('Đã thêm CSS phần trên trong suốt cho theme:', isDarkMode ? 'dark' : 'light');
+        
+        debugLog('Đã thêm CSS phần trên trong suốt');
     }
     
     // Hàm thêm hiệu ứng thumbnail mờ dần
-    function addThumbnailFadeEffect(coverUrl, isDarkMode) {
+    function addThumbnailFadeEffect(coverUrl) {
         // Tạo phần tử cho hiệu ứng nền
         const bgOverlay = document.createElement('div');
         bgOverlay.className = 'betterhako-bg-overlay';
-
-        // Điều chỉnh độ sáng dựa trên theme
-        const brightness = isDarkMode ? 0.5 : 0.7;
-
+        
         // Thêm styles
         GM_addStyle(`
             .betterhako-bg-overlay {
@@ -251,30 +197,35 @@
                 background-image: url('${coverUrl}');
                 background-size: cover;
                 background-position: center;
-                filter: blur(12px) brightness(${brightness});
+                filter: blur(12px) brightness(0.5);
                 mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
                 -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
                 pointer-events: none;
             }
-
+            
             #mainpart {
                 position: relative;
                 isolation: isolate;
             }
-
+            
             #mainpart > .container {
                 position: relative;
                 z-index: 1;
             }
+            
+            /* Điều chỉnh cho light mode */
+            body:not(.dark) .betterhako-bg-overlay {
+                filter: blur(12px) brightness(0.7);
+            }
         `);
-
+        
         // Thêm phần tử vào DOM
         const mainPart = document.getElementById('mainpart');
         if (mainPart) {
             // Kiểm tra xem overlay đã tồn tại chưa để tránh thêm nhiều lần
             if (!document.querySelector('.betterhako-bg-overlay')) {
                 mainPart.prepend(bgOverlay);
-                debugLog('Đã thêm hiệu ứng thumbnail mờ dần cho theme:', isDarkMode ? 'dark' : 'light');
+                debugLog('Đã thêm hiệu ứng thumbnail mờ dần');
             }
         } else {
             debugLog('Không tìm thấy #mainpart');
@@ -284,7 +235,7 @@
     // Hàm phân tích ảnh với focus vào màu tóc
     function analyzeImageColorWithHairFocus(imageUrl) {
         return new Promise((resolve, reject) => {
-            // Thiết lập xử lý CORS cho hình ảnh nếu cần
+            // Setup CORS handling for images if needed
             if (isTargetDomain(imageUrl)) {
                 debugLog('Ảnh từ domain target, thiết lập CORS handling');
                 setupImageCorsHandling();
@@ -292,7 +243,7 @@
 
             const img = new Image();
 
-            // Luôn set crossOrigin để đảm bảo an toàn
+            // Always set crossOrigin for safety
             if (isTargetDomain(imageUrl)) {
                 img.crossOrigin = 'anonymous';
                 debugLog('Đã set crossOrigin cho ảnh từ domain target');
@@ -311,7 +262,7 @@
             img.onerror = function(error) {
                 debugLog('Lỗi tải ảnh với Image API:', imageUrl, error);
 
-                // Fallback: thử sử dụng XMLHttpRequest với CORS headers
+                // Fallback: try using XMLHttpRequest with CORS headers
                 if (isTargetDomain(imageUrl)) {
                     debugLog('Thử tải ảnh bằng XMLHttpRequest với CORS headers');
                     loadImageWithXHR(imageUrl)
@@ -336,14 +287,14 @@
         });
     }
 
-    // Hàm dự phòng để tải hình ảnh bằng XMLHttpRequest với CORS headers
+    // Fallback function to load image using XMLHttpRequest with CORS headers
     function loadImageWithXHR(imageUrl) {
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
             xhr.open('GET', imageUrl, true);
             xhr.responseType = 'blob';
 
-            // Thêm CORS headers cho target domains
+            // Add CORS headers for target domains
             if (isTargetDomain(imageUrl)) {
                 xhr.setRequestHeader('Origin', window.location.origin);
                 xhr.setRequestHeader('Referer', window.location.href);
@@ -380,10 +331,10 @@
         const height = 200;
         canvas.width = width;
         canvas.height = height;
-
+        
         // Vẽ ảnh với kích thước nhỏ
         ctx.drawImage(img, 0, 0, width, height);
-
+        
         // Xác định vùng quan tâm (ROI) - tập trung vào phần trên của ảnh (nơi có tóc)
         const roi = {
             x: width * 0.25,      // Bắt đầu từ 25% chiều rộng
@@ -391,20 +342,20 @@
             width: width * 0.5,   // Lấy 50% chiều rộng ở giữa
             height: height * 0.4  // Lấy 40% chiều cao (tập trung vào đầu/tóc)
         };
-
+        
         // Lấy dữ liệu pixel từ vùng quan tâm
         const imageData = ctx.getImageData(roi.x, roi.y, roi.width, roi.height);
         const data = imageData.data;
-
+        
         debugLog('Phân tích vùng quan tâm (ROI) cho màu tóc:');
         debugLog(`  - Vùng: x=${roi.x}, y=${roi.y}, width=${roi.width}, height=${roi.height}`);
         debugLog('  - Tổng pixel trong ROI:', data.length / 4);
-
+        
         // Đếm màu với trọng số ưu tiên màu tóc
         const colorCount = {};
         let maxCount = 0;
         let dominantColor = '#6c5ce7';
-
+        
         // Danh sách màu tóc phổ biến (RGB ranges)
         const commonHairColors = [
             {min: [0, 0, 0], max: [50, 50, 50], weight: 1.5},     // Đen
@@ -425,19 +376,19 @@
             
             // Bỏ qua pixel trong suốt
             if (a < 128) continue;
-
-            // Bỏ qua pixel quá sáng hoặc quá tối (có thể là nền)
+            
+            // Bỏ qua pixel quá sáng hoặc quá tối (cá thể là nền)
             if ((r > 240 && g > 240 && b > 240) || (r < 15 && g < 15 && b < 15)) {
                 continue;
             }
-
+            
             // Nhóm màu
             const roundedR = Math.round(r / 8) * 8;
             const roundedG = Math.round(g / 8) * 8;
             const roundedB = Math.round(b / 8) * 8;
-
+            
             const colorGroup = `${roundedR},${roundedG},${roundedB}`;
-
+            
             // Tính trọng số dựa trên màu tóc phổ biến
             let weight = 1.0;
             for (const hairColor of commonHairColors) {
@@ -448,15 +399,15 @@
                     break;
                 }
             }
-
+            
             const weightedCount = Math.round(weight);
-
+            
             if (colorCount[colorGroup]) {
                 colorCount[colorGroup] += weightedCount;
             } else {
                 colorCount[colorGroup] = weightedCount;
             }
-
+            
             if (colorCount[colorGroup] > maxCount) {
                 maxCount = colorCount[colorGroup];
                 dominantColor = MonetAPI.rgbToHex(roundedR, roundedG, roundedB);
@@ -468,14 +419,13 @@
     }
     
     // Hàm áp dụng Monet color scheme
-    function applyMonetColorScheme(palette, isLight, isDarkMode) {
+    function applyMonetColorScheme(palette, isLight) {
         if (!palette) {
-            applyDefaultColorScheme(isDarkMode);
+            applyDefaultColorScheme();
             return;
         }
-
+        
         const textColor = isLight ? '#000' : '#fff';
-        const hoverTextColor = isDarkMode ? '#fff' : '#000';
         
         const css = `
             :root {
@@ -509,7 +459,7 @@
             .paging_item.paging_prevnext.next:hover,
             .paging_item.paging_prevnext.prev:hover {
                 background-color: ${palette[500]} !important;
-                color: ${hoverTextColor} !important;
+                color: ${isLight ? '#000' : '#fff'} !important;
             }
             
             .series-type,
@@ -679,16 +629,14 @@
         debugLog('Đã áp dụng Monet theme với màu chủ đạo:', palette[500]);
     }
     
-    function applyDefaultColorScheme(isDarkMode) {
+    function applyDefaultColorScheme() {
         const defaultColor = '#ff0000';
         const defaultPalette = MonetAPI.generateMonetPalette(defaultColor);
-
+        
         if (!defaultPalette) {
             debugLog('Không thể tạo palette mặc định');
             return;
         }
-
-        const hoverTextColor = isDarkMode ? '#fff' : '#000';
         
         const css = `
             a:hover,
@@ -707,7 +655,7 @@
             .paging_item.paging_prevnext.next:hover,
             .paging_item.paging_prevnext.prev:hover {
                 background-color: ${defaultColor} !important;
-                color: ${hoverTextColor} !important;
+                color: #fff !important;
             }
             
             .series-type,
@@ -879,7 +827,7 @@
     
     // Khởi chạy module
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => initPageInfoTruyen());
+        document.addEventListener('DOMContentLoaded', initPageInfoTruyen);
     } else {
         initPageInfoTruyen();
     }
