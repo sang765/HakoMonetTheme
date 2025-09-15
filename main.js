@@ -3,8 +3,8 @@
     
     const DEBUG = true;
     const CHECK_UPDATE_INTERVAL = 30 * 60 * 1000; // 30 phút
-    const VERSION = '3.0.6';
-    const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/HakoMonetTheme.user.js';
+    const VERSION = '3.0.7';
+    const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/nightly/HakoMonetTheme.user.js';
     
     function debugLog(...args) {
         if (DEBUG) {
@@ -120,14 +120,18 @@
         try {
             const monetJS = GM_getResourceText('monetJS');
             const crosUnblockJS = GM_getResourceText('crosUnblockJS');
+            const themeDetectorJS = GM_getResourceText('themeDetectorJS');
             const infoTruyenJS = GM_getResourceText('infoTruyenJS');
             const animationJS = GM_getResourceText('animationJS');
             const monetAPIJS = GM_getResourceText('monetAPIJS');
             const tagColorJS = GM_getResourceText('tagColorJS');
             const colorinfotruyen = GM_getResourceText('colorinfotruyen');
+            const imageAnalyzerJS = GM_getResourceText('imageAnalyzerJS');
             
             // Load các module theo thứ tự
             loadScript(crosUnblockJS, 'cros-unblock.js');
+            loadScript(themeDetectorJS, 'theme-detector.js');
+            loadScript(imageAnalyzerJS, 'image-analyzer.js');
             loadScript(infoTruyenJS, 'info-truyen.js');
             loadScript(tagColorJS, 'tag-color.js');
             loadScript(monetAPIJS, 'monet.js');
