@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Hako: Monet Theme
 // @namespace    https://github.com/sang765
-// @version      3.0.6
+// @version      3.0.7
 // @description  Material You theme for Hako/DocLN.
 // @description:vi Material You theme dành cho Hako/DocLN.
 // @icon         https://docln.sbs/img/logo-9.png
@@ -29,7 +29,15 @@
 // @resource     infoTruyenJS ./class/info-truyen.js
 // @resource     animationJS ./class/animation.js
 // @resource     tagColorJS ./class/tag-color.js
+// @resource     configJS ./config.js
+// @resource     utilsJS ./utils.js
+// @resource     colorUtilsJS ./module/color-utils.js
+// @resource     domUtilsJS ./module/dom-utils.js
+// @resource     storageJS ./module/storage.js
+// @resource     settingsJS ./module/settings.js
 // @resource     colorinfotruyen ./colors/page-info-truyen.js
+// @resource     imageAnalyzerJS ./module/image-analyzer.js
+// @resource     themeDetectorJS ./module/theme-detector.js
 // @supportURL   https://github.com/sang765/HakoMonetTheme/issues
 // @updateURL    https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js
 // @downloadURL  https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js
@@ -239,7 +247,8 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
     function loadAllResources() {
         const resources = [
             'mainJS', 'monetJS', 'crosUnblockJS', 'infoTruyenJS', 
-            'animationJS', 'monetClassJS', 'tagColorJS'
+            'animationJS', 'monetClassJS', 'tagColorJS', 'configJS',
+            'utilsJS', 'colorUtilsJS', 'domUtilsJS', 'storageJS', 'settingsJS'
         ];
         
         let loadedCount = 0;
