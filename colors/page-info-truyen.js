@@ -528,8 +528,8 @@
             }
             
             .series-type,
-            .series-users .series-owner_name a,
-            .ln-comment-form input.button {
+            .ln-comment-form input.button,
+            .series-users .series-owner_name a {
                 color: ${textColor} !important;
             }
             
@@ -725,8 +725,8 @@
             }
             
             .series-type,
-            .series-users .series-owner_name a,
-            .ln-comment-form input.button {
+            .ln-comment-form input.button,
+            .series-users .series-owner_name a {
                 color: #fff !important;
             }
             
