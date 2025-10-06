@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="./.github/assets/logo.png" width="100" height="100">
+
 # Hako: Monet Theme
 
 Material You theme dành cho Hako/DocLN.
