@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./.github/assets/logo.png" width="100" height="100">
+<img src="./.github/assets/logo.png" width="300" height="300">
 
 # Hako: Monet Theme
 
