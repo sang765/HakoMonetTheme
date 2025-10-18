@@ -45,7 +45,17 @@
             <div class="hmt-config-overlay">
                 <div class="hmt-config-content">
                     <div class="hmt-config-header">
-                        <h3>HakoMonetTheme - Cài đặt màu sắc</h3>
+                        <div class="hmt-header-content">
+                            <div class="hmt-logo-section">
+                                <img src="https://github.com/sang765/HakoMonetTheme/blob/main/.github/assets/logo.png?raw=true"
+                                     alt="HakoMonetTheme Logo"
+                                     class="hmt-logo">
+                                <div class="hmt-title-section">
+                                    <h3>HakoMonetTheme</h3>
+                                    <span class="hmt-subtitle">Cài đặt màu sắc</span>
+                                </div>
+                            </div>
+                        </div>
                         <button class="hmt-config-close">&times;</button>
                     </div>
                     <div class="hmt-config-body">
@@ -134,10 +144,61 @@
                 color: white;
             }
 
-            .hmt-config-header h3 {
+            .hmt-header-content {
+                display: flex;
+                align-items: center;
+            }
+
+            .hmt-logo-section {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+            }
+
+            .hmt-logo {
+                width: 48px;
+                height: 48px;
+                border-radius: 12px;
+                object-fit: cover;
+                border: 2px solid rgba(255, 255, 255, 0.2);
+                transition: transform 0.3s ease;
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .hmt-logo:hover {
+                transform: scale(1.05);
+            }
+
+            .hmt-logo:not([src]),
+            .hmt-logo[src=""] {
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+                font-size: 16px;
+                color: white;
+            }
+
+            .hmt-logo:not([src])::after,
+            .hmt-logo[src=""]::after {
+                content: "🎨";
+                font-size: 20px;
+            }
+
+            .hmt-title-section h3 {
                 margin: 0;
-                font-size: 18px;
-                font-weight: 600;
+                font-size: 20px;
+                font-weight: 700;
+                letter-spacing: -0.5px;
+            }
+
+            .hmt-subtitle {
+                font-size: 14px;
+                opacity: 0.9;
+                font-weight: 400;
+                margin-top: 2px;
+                display: block;
             }
 
             .hmt-config-close {
@@ -413,6 +474,16 @@
                 color: #764ba2;
             }
 
+            /* Dark mode logo styling */
+            body.dark .hmt-logo {
+                border-color: rgba(255, 255, 255, 0.3);
+            }
+
+            body.dark .hmt-logo:not([src]),
+            body.dark .hmt-logo[src=""] {
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+            }
+
             body.dark .hmt-config-preview {
                 background: #1a202c;
             }
@@ -437,6 +508,15 @@
 
         // Event listeners
         setupConfigEventListeners(dialog);
+
+        // Xử lý lỗi load logo
+        const logo = dialog.querySelector('.hmt-logo');
+        if (logo) {
+            logo.onerror = function() {
+                this.src = '';
+                this.onerror = null;
+            };
+        }
 
         debugLog('Đã tạo config dialog');
     }
