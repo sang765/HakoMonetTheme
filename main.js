@@ -3,7 +3,7 @@
     
     const DEBUG = true;
     const CHECK_UPDATE_INTERVAL = 30 * 60 * 1000; // 30 phút
-    const VERSION = '3.1.0';
+    const VERSION = '3.1.1';
     const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/HakoMonetTheme.user.js';
     
     function debugLog(...args) {
@@ -119,7 +119,7 @@
         // Load các module
         try {
             const monetJS = GM_getResourceText('monetJS');
-            const serviceWorkerCORSJS = GM_getResourceText('serviceWorkerCORSJS');
+            const simpleCORSJS = GM_getResourceText('simpleCORSJS');
             const themeDetectorJS = GM_getResourceText('themeDetectorJS');
             const infoTruyenJS = GM_getResourceText('infoTruyenJS');
             const animationJS = GM_getResourceText('animationJS');
@@ -129,7 +129,7 @@
             const imageAnalyzerJS = GM_getResourceText('imageAnalyzerJS');
             
             // Load các module theo thứ tự
-            loadScript(serviceWorkerCORSJS, 'service-worker-cors.js');
+            loadScript(simpleCORSJS, 'simple-cors.js');
             loadScript(themeDetectorJS, 'theme-detector.js');
             loadScript(imageAnalyzerJS, 'image-analyzer.js');
             loadScript(infoTruyenJS, 'info-truyen.js');
