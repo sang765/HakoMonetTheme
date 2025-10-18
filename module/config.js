@@ -88,7 +88,7 @@
                      data-preset-id="${color.id}"
                      style="background-color: ${color.value}; position: relative;">
                     <span class="hmt-color-name">${color.name}</span>
-                    <button class="hmt-delete-preset" onclick="event.stopPropagation(); deleteCustomPreset('${color.id}')" title="Xóa preset này">×</button>
+                    <button class="hmt-delete-preset" data-preset-id="${color.id}" title="Xóa preset này">×</button>
                 </div>
             `).join('');
         } else {
@@ -142,6 +142,51 @@
             } else {
                 saveBtn.disabled = true;
             }
+        }
+    }
+
+    function deletePresetWithAnimation(deleteBtn, presetId, dialog) {
+        const presetElement = deleteBtn.closest('.hmt-color-preset');
+
+        // Thêm loading state
+        deleteBtn.classList.add('deleting');
+        deleteBtn.textContent = '⋯';
+
+        // Thử xóa preset
+        try {
+            removeCustomPreset(presetId);
+
+            // Animation fade out
+            if (presetElement) {
+                presetElement.style.transition = 'all 0.3s ease';
+                presetElement.style.opacity = '0';
+                presetElement.style.transform = 'scale(0.8)';
+
+                setTimeout(() => {
+                    refreshCustomPresets(dialog);
+
+                    // Kiểm tra xem còn custom presets không
+                    const customColors = getCustomColors();
+                    const customSection = dialog.querySelector('#customPresetsSection');
+
+                    if (customColors.length === 0 && customSection) {
+                        customSection.style.display = 'none';
+                    }
+
+                    showNotification('Đã xóa preset!', 3000);
+                }, 300);
+            } else {
+                refreshCustomPresets(dialog);
+                showNotification('Đã xóa preset!', 3000);
+            }
+
+        } catch (error) {
+            debugLog('Lỗi khi xóa preset:', error);
+            showNotification('Lỗi khi xóa preset. Vui lòng thử lại.', 5000);
+
+            // Reset button state
+            deleteBtn.classList.remove('deleting');
+            deleteBtn.textContent = '×';
         }
     }
 
@@ -637,8 +682,28 @@
                 align-items: center;
                 justify-content: center;
                 opacity: 0;
-                transition: opacity 0.2s;
+                transition: all 0.2s ease;
                 z-index: 10;
+                box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+            }
+
+            .hmt-delete-preset:hover {
+                background: #c82333;
+                transform: scale(1.1);
+                box-shadow: 0 4px 8px rgba(220, 53, 69, 0.4);
+            }
+
+            .hmt-delete-preset.deleting {
+                opacity: 1 !important;
+                background: #6c757d;
+                cursor: not-allowed;
+                animation: hmtDeletingPulse 1s infinite;
+            }
+
+            @keyframes hmtDeletingPulse {
+                0% { opacity: 0.6; }
+                50% { opacity: 1; }
+                100% { opacity: 0.6; }
             }
 
             .hmt-color-preset:hover .hmt-delete-preset {
@@ -909,6 +974,31 @@
 
         // Update save button state
         updateSavePresetButton(dialog);
+
+        // Xử lý xóa custom presets
+        const deleteBtns = dialog.querySelectorAll('.hmt-delete-preset');
+        deleteBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const presetId = this.dataset.presetId;
+
+                if (!presetId) {
+                    showNotification('Lỗi: Không tìm thấy ID preset!', 5000);
+                    return;
+                }
+
+                if (this.classList.contains('deleting')) {
+                    return; // Đang xóa, bỏ qua click
+                }
+
+                const presetElement = this.closest('.hmt-color-preset');
+                const presetName = presetElement ? presetElement.querySelector('.hmt-color-name').textContent : 'Unknown';
+
+                if (confirm(`Bạn có chắc chắn muốn xóa preset "${presetName}"?`)) {
+                    deletePresetWithAnimation(this, presetId, dialog);
+                }
+            });
+        });
 
         // Khôi phục mặc định
         resetBtn.addEventListener('click', function() {
