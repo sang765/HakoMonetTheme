@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Hako: Monet Theme
 // @namespace    https://github.com/sang765
-// @version      3.1.7
+// @version      3.1.8
 // @description  Material You theme for Hako/DocLN.
 // @description:vi Material You theme dành cho Hako/DocLN.
 // @icon         https://docln.sbs/img/logo-9.png
@@ -105,7 +105,7 @@
             GM_registerMenuCommand('📊 Thông tin script', showScriptInfo, 'i');
             GM_registerMenuCommand('🎨 Cài đặt màu sắc', openColorConfig, 'c');
             GM_registerMenuCommand('🚫 Ad Blocker', openAdBlockerConfig, 'a');
-            GM_registerMenuCommand(' Báo cáo lỗi', reportBug, 'b');
+            GM_registerMenuCommand('🐛 Báo cáo lỗi', reportBug, 'b');
             GM_registerMenuCommand('💡 Đề xuất tính năng', suggestFeature, 'f');
             GM_registerMenuCommand('🔧 Debug Mode', toggleDebugMode, 'd');
 
