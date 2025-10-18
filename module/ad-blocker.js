@@ -2,7 +2,10 @@
     'use strict';
 
     const DEBUG = true;
-    const SELECTOR = 'div.page-top-group > a';
+    const SELECTORS = [
+        'div.page-top-group > a',
+        'div#chapter-content.long-text.no-select.text-justify > a'
+    ];
     const STORAGE_KEY = 'ad_blocker_enabled';
 
     function debugLog(...args) {
@@ -28,15 +31,17 @@
 
     function blockAds() {
         try {
-            const ads = document.querySelectorAll(SELECTOR);
             let blockedCount = 0;
 
-            ads.forEach(ad => {
-                if (ad.style.display !== 'none') {
-                    ad.style.display = 'none';
-                    blockedCount++;
-                    debugLog('Blocked ad element:', ad);
-                }
+            SELECTORS.forEach(selector => {
+                const ads = document.querySelectorAll(selector);
+                ads.forEach(ad => {
+                    if (ad.style.display !== 'none') {
+                        ad.style.display = 'none';
+                        blockedCount++;
+                        debugLog('Blocked ad element:', selector, ad);
+                    }
+                });
             });
 
             if (blockedCount > 0) {
@@ -53,15 +58,17 @@
 
     function unblockAds() {
         try {
-            const ads = document.querySelectorAll(SELECTOR);
             let unblockedCount = 0;
 
-            ads.forEach(ad => {
-                if (ad.style.display === 'none') {
-                    ad.style.display = '';
-                    unblockedCount++;
-                    debugLog('Unblocked ad element:', ad);
-                }
+            SELECTORS.forEach(selector => {
+                const ads = document.querySelectorAll(selector);
+                ads.forEach(ad => {
+                    if (ad.style.display === 'none') {
+                        ad.style.display = '';
+                        unblockedCount++;
+                        debugLog('Unblocked ad element:', selector, ad);
+                    }
+                });
             });
 
             if (unblockedCount > 0) {
@@ -123,8 +130,10 @@
                                     </span>
                                 </div>
                                 <div class="hmt-status-item">
-                                    <span class="hmt-status-label">Selector:</span>
-                                    <span class="hmt-status-value">${SELECTOR}</span>
+                                    <span class="hmt-status-label">Selectors:</span>
+                                    <span class="hmt-status-value" style="font-family: monospace; font-size: 11px; line-height: 1.3;">
+                                        ${SELECTORS.join('<br>')}
+                                    </span>
                                 </div>
                             </div>
 
@@ -145,7 +154,8 @@
                         <div class="hmt-adblocker-info">
                             <h4>Thông tin</h4>
                             <div class="hmt-info-content">
-                                <p><strong>Hoạt động:</strong> Tính năng này sẽ ẩn các phần tử DOM phù hợp với selector CSS được chỉ định.</p>
+                                <p><strong>Hoạt động:</strong> Tính năng này sẽ ẩn các phần tử DOM phù hợp với các selector CSS được chỉ định.</p>
+                                <p><strong>Đối tượng:</strong> Chặn banner quảng cáo và các liên kết không mong muốn trong nội dung chương truyện.</p>
                                 <p><strong>Lưu ý:</strong> Thay đổi cài đặt sẽ được áp dụng ngay lập tức và được lưu lại cho các lần truy cập sau.</p>
                             </div>
                         </div>
@@ -631,19 +641,21 @@
             if (isAdBlockerEnabled()) {
                 mutations.forEach(function(mutation) {
                     if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-                        // Check if any added nodes match our selector
+                        // Check if any added nodes match our selectors
                         mutation.addedNodes.forEach(function(node) {
                             if (node.nodeType === Node.ELEMENT_NODE) {
-                                if (node.matches && node.matches(SELECTOR)) {
-                                    node.style.display = 'none';
-                                    debugLog('Blocked dynamically added ad:', node);
-                                } else if (node.querySelectorAll) {
-                                    const ads = node.querySelectorAll(SELECTOR);
-                                    ads.forEach(ad => {
-                                        ad.style.display = 'none';
-                                        debugLog('Blocked dynamically added ad:', ad);
-                                    });
-                                }
+                                SELECTORS.forEach(selector => {
+                                    if (node.matches && node.matches(selector)) {
+                                        node.style.display = 'none';
+                                        debugLog('Blocked dynamically added ad:', selector, node);
+                                    } else if (node.querySelectorAll) {
+                                        const ads = node.querySelectorAll(selector);
+                                        ads.forEach(ad => {
+                                            ad.style.display = 'none';
+                                            debugLog('Blocked dynamically added ad:', selector, ad);
+                                        });
+                                    }
+                                });
                             }
                         });
                     }
