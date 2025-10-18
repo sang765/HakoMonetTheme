@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Hako: Monet Theme
 // @namespace    https://github.com/sang765
-// @version      3.1.3
+// @version      3.1.4
 // @description  Material You theme for Hako/DocLN.
 // @description:vi Material You theme dành cho Hako/DocLN.
 // @icon         https://docln.sbs/img/logo-9.png
@@ -33,6 +33,7 @@
 // @resource     imageAnalyzerJS ./module/image-analyzer.js
 // @resource     themeDetectorJS ./module/theme-detector.js
 // @resource     configJS ./module/config.js
+// @resource     adBlockerJS ./module/ad-blocker.js
 // @supportURL   https://github.com/sang765/HakoMonetTheme/issues
 // @updateURL    https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js
 // @downloadURL  https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js
@@ -103,7 +104,8 @@
             GM_registerMenuCommand('🔄 Kiểm tra cập nhật', checkForUpdatesManual, 'u');
             GM_registerMenuCommand('📊 Thông tin script', showScriptInfo, 'i');
             GM_registerMenuCommand('🎨 Cài đặt màu sắc', openColorConfig, 'c');
-            GM_registerMenuCommand('🐛 Báo cáo lỗi', reportBug, 'b');
+            GM_registerMenuCommand('🚫 Ad Blocker', openAdBlockerConfig, 'a');
+            GM_registerMenuCommand(' Báo cáo lỗi', reportBug, 'b');
             GM_registerMenuCommand('💡 Đề xuất tính năng', suggestFeature, 'f');
             GM_registerMenuCommand('🔧 Debug Mode', toggleDebugMode, 'd');
 
@@ -201,6 +203,17 @@
             debugLog('Config module chưa được tải');
         }
     }
+
+    function openAdBlockerConfig() {
+        // Đảm bảo ad blocker module đã được tải
+        if (typeof window.HMTAdBlocker !== 'undefined' && typeof window.HMTAdBlocker.openDialog === 'function') {
+            window.HMTAdBlocker.openDialog();
+            showNotification('Ad Blocker', 'Mở bảng cài đặt Ad Blocker...', 3000);
+        } else {
+            showNotification('Lỗi', 'Module Ad Blocker chưa được tải. Vui lòng làm mới trang.', 5000);
+            debugLog('Ad Blocker module chưa được tải');
+        }
+    }
     
     function showScriptInfo() {
         const info = `
@@ -253,7 +266,7 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
     function loadAllResources() {
         const resources = [
             'mainJS', 'monetJS', 'simpleCORSJS', 'infoTruyenJS',
-            'animationJS', 'tagColorJS', 'colorinfotruyen', 'imageAnalyzerJS', 'themeDetectorJS', 'configJS'
+            'animationJS', 'tagColorJS', 'colorinfotruyen', 'imageAnalyzerJS', 'themeDetectorJS', 'configJS', 'adBlockerJS'
         ];
         
         let loadedCount = 0;
