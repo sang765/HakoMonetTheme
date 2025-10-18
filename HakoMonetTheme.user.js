@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Hako: Monet Theme
 // @namespace    https://github.com/sang765
-// @version      3.1.1
+// @version      3.1.2
 // @description  Material You theme for Hako/DocLN.
 // @description:vi Material You theme dành cho Hako/DocLN.
 // @icon         https://docln.sbs/img/logo-9.png
@@ -32,6 +32,7 @@
 // @resource     colorinfotruyen ./colors/page-info-truyen.js
 // @resource     imageAnalyzerJS ./module/image-analyzer.js
 // @resource     themeDetectorJS ./module/theme-detector.js
+// @resource     configJS ./module/config.js
 // @supportURL   https://github.com/sang765/HakoMonetTheme/issues
 // @updateURL    https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js
 // @downloadURL  https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js
@@ -101,10 +102,11 @@
         if (typeof GM_registerMenuCommand === 'function') {
             GM_registerMenuCommand('🔄 Kiểm tra cập nhật', checkForUpdatesManual, 'u');
             GM_registerMenuCommand('📊 Thông tin script', showScriptInfo, 'i');
+            GM_registerMenuCommand('🎨 Cài đặt màu sắc', openColorConfig, 'c');
             GM_registerMenuCommand('🐛 Báo cáo lỗi', reportBug, 'b');
             GM_registerMenuCommand('💡 Đề xuất tính năng', suggestFeature, 'f');
             GM_registerMenuCommand('🔧 Debug Mode', toggleDebugMode, 'd');
-            
+
             debugLog('Đã đăng ký menu commands');
         }
     }
@@ -178,7 +180,7 @@
         // Mở trang cài đặt hoặc tạo dialog settings
         showNotification('Cài đặt', 'Tính năng cài đặt đang được phát triển.', 3000);
         debugLog('Mở cài đặt');
-        
+
         // Có thể tích hợp với GM_config sau này
         try {
             if (typeof GM_config !== 'undefined') {
@@ -186,6 +188,17 @@
             }
         } catch (e) {
             debugLog('GM_config không khả dụng:', e);
+        }
+    }
+
+    function openColorConfig() {
+        // Đảm bảo config module đã được tải
+        if (typeof window.HMTConfig !== 'undefined' && typeof window.HMTConfig.openConfigDialog === 'function') {
+            window.HMTConfig.openConfigDialog();
+            showNotification('Cài đặt màu sắc', 'Mở bảng cài đặt màu sắc...', 3000);
+        } else {
+            showNotification('Lỗi', 'Module cài đặt màu sắc chưa được tải. Vui lòng làm mới trang.', 5000);
+            debugLog('Config module chưa được tải');
         }
     }
     
@@ -240,7 +253,7 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
     function loadAllResources() {
         const resources = [
             'mainJS', 'monetJS', 'simpleCORSJS', 'infoTruyenJS',
-            'animationJS', 'tagColorJS', 'colorinfotruyen', 'imageAnalyzerJS', 'themeDetectorJS'
+            'animationJS', 'tagColorJS', 'colorinfotruyen', 'imageAnalyzerJS', 'themeDetectorJS', 'configJS'
         ];
         
         let loadedCount = 0;

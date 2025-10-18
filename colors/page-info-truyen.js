@@ -690,7 +690,9 @@
     }
     
     function applyDefaultColorScheme() {
-        const defaultColor = '#6c5ce7';
+        // Lấy màu mặc định từ config, fallback về màu cũ nếu không có
+        const defaultColor = (window.HMTConfig && window.HMTConfig.getDefaultColor) ?
+            window.HMTConfig.getDefaultColor() : '#6c5ce7';
         const defaultPalette = MonetAPI.generateMonetPalette(defaultColor);
         
         if (!defaultPalette) {
@@ -883,7 +885,7 @@
         `;
         
         GM_addStyle(css);
-        debugLog('Đã áp dụng màu mặc định:', defaultColor);
+        debugLog('Đã áp dụng màu mặc định từ config:', defaultColor);
     }
     
     // Khởi chạy module
