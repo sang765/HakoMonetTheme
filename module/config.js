@@ -3,14 +3,14 @@
 
     const DEBUG = true;
     const DEFAULT_COLORS = [
-        { name: 'Purple (Mặc định)', value: '#6c5ce7' },
-        { name: 'Blue', value: '#2196F3' },
-        { name: 'Green', value: '#4CAF50' },
-        { name: 'Orange', value: '#FF9800' },
-        { name: 'Red', value: '#F44336' },
-        { name: 'Pink', value: '#E91E63' },
-        { name: 'Teal', value: '#009688' },
-        { name: 'Indigo', value: '#3F51B5' }
+        { name: 'Purple (Mặc định)', value: '#6c5ce7', type: 'default' },
+        { name: 'Blue', value: '#2196F3', type: 'default' },
+        { name: 'Green', value: '#4CAF50', type: 'default' },
+        { name: 'Orange', value: '#FF9800', type: 'default' },
+        { name: 'Red', value: '#F44336', type: 'default' },
+        { name: 'Pink', value: '#E91E63', type: 'default' },
+        { name: 'Teal', value: '#009688', type: 'default' },
+        { name: 'Indigo', value: '#3F51B5', type: 'default' }
     ];
 
     function debugLog(...args) {
@@ -29,9 +29,135 @@
     }
 
     function getColorName(colorValue) {
-        const color = DEFAULT_COLORS.find(c => c.value === colorValue);
+        const allColors = getAllColors();
+        const color = allColors.find(c => c.value === colorValue);
         return color ? color.name : 'Custom';
     }
+
+    function getAllColors() {
+        const customColors = getCustomColors();
+        return [...DEFAULT_COLORS, ...customColors];
+    }
+
+    function getCustomColors() {
+        const custom = GM_getValue('custom_presets', []);
+        return custom.map(preset => ({ ...preset, type: 'custom' }));
+    }
+
+    function saveCustomPreset(colorValue, name) {
+        const customColors = getCustomColors();
+        const newPreset = {
+            id: Date.now().toString(),
+            name: name || `Custom ${customColors.length + 1}`,
+            value: colorValue,
+            dateAdded: new Date().toISOString()
+        };
+
+        customColors.push(newPreset);
+        GM_setValue('custom_presets', customColors);
+        debugLog('Đã lưu custom preset:', newPreset);
+        return newPreset;
+    }
+
+    function removeCustomPreset(presetId) {
+        const customColors = getCustomColors();
+        const filtered = customColors.filter(preset => preset.id !== presetId);
+        GM_setValue('custom_presets', filtered);
+        debugLog('Đã xóa custom preset:', presetId);
+    }
+
+    function generateColorName(colorValue) {
+        const customColors = getCustomColors();
+        const existingCount = customColors.filter(preset =>
+            preset.name.startsWith('Custom')
+        ).length;
+        return `Custom ${existingCount + 1}`;
+    }
+
+    function loadCustomPresets(dialog) {
+        const customSection = dialog.querySelector('#customPresetsSection');
+        const customGrid = dialog.querySelector('#customPresetsGrid');
+        const customColors = getCustomColors();
+
+        if (customColors.length > 0) {
+            customSection.style.display = 'block';
+            customGrid.innerHTML = customColors.map(color => `
+                <div class="hmt-color-preset ${getDefaultColor() === color.value ? 'active' : ''}"
+                     data-color="${color.value}"
+                     data-type="${color.type}"
+                     data-preset-id="${color.id}"
+                     style="background-color: ${color.value}; position: relative;">
+                    <span class="hmt-color-name">${color.name}</span>
+                    <button class="hmt-delete-preset" onclick="event.stopPropagation(); deleteCustomPreset('${color.id}')" title="Xóa preset này">×</button>
+                </div>
+            `).join('');
+        } else {
+            customSection.style.display = 'none';
+        }
+    }
+
+    function refreshCustomPresets(dialog) {
+        loadCustomPresets(dialog);
+    }
+
+    function saveCurrentColorToPreset(dialog) {
+        const currentColor = dialog.querySelector('.hmt-color-text').value.trim();
+        const colorPicker = dialog.querySelector('.hmt-color-picker').value;
+
+        // Ưu tiên màu từ text input, fallback về color picker
+        const colorToSave = currentColor || colorPicker;
+
+        if (!isValidHexColor(colorToSave)) {
+            showNotification('Màu không hợp lệ! Vui lòng chọn màu trước khi lưu.', 5000);
+            return;
+        }
+
+        // Kiểm tra xem màu đã tồn tại trong default presets chưa
+        const allColors = getAllColors();
+        const existingColor = allColors.find(c => c.value.toLowerCase() === colorToSave.toLowerCase());
+
+        if (existingColor && existingColor.type === 'default') {
+            showNotification('Màu này đã có trong danh sách mặc định!', 3000);
+            return;
+        }
+
+        // Tạo dialog nhập tên
+        const name = generateColorName(colorToSave);
+        const customName = prompt('Nhập tên cho màu preset này:', name);
+
+        if (customName !== null && customName.trim() !== '') {
+            saveCustomPreset(colorToSave, customName.trim());
+            refreshCustomPresets(dialog);
+            showNotification(`Đã lưu màu "${customName.trim()}" vào preset!`, 3000);
+        }
+    }
+
+    function updateSavePresetButton(dialog) {
+        const saveBtn = dialog.querySelector('#saveToPresetBtn');
+        const currentColor = dialog.querySelector('.hmt-color-text').value.trim();
+
+        if (saveBtn) {
+            if (currentColor && isValidHexColor(currentColor)) {
+                saveBtn.disabled = false;
+            } else {
+                saveBtn.disabled = true;
+            }
+        }
+    }
+
+    // Global function để xóa custom preset (được gọi từ onclick)
+    window.deleteCustomPreset = function(presetId) {
+        if (confirm('Bạn có chắc chắn muốn xóa preset này?')) {
+            removeCustomPreset(presetId);
+
+            // Refresh tất cả dialogs đang mở
+            document.querySelectorAll('.hmt-config-dialog').forEach(dialog => {
+                refreshCustomPresets(dialog);
+            });
+
+            showNotification('Đã xóa preset!', 3000);
+        }
+    };
 
     function createConfigDialog() {
         // Kiểm tra xem dialog đã tồn tại chưa
@@ -64,13 +190,40 @@
                             <p>Chọn màu sẽ được sử dụng khi không thể lấy màu từ ảnh bìa truyện. Bạn có thể chọn từ các màu preset hoặc sử dụng color picker để chọn màu tùy chỉnh.</p>
 
                             <div class="hmt-color-presets">
-                                ${DEFAULT_COLORS.map(color => `
-                                    <div class="hmt-color-preset ${getDefaultColor() === color.value ? 'active' : ''}"
-                                         data-color="${color.value}"
-                                         style="background-color: ${color.value}">
-                                        <span class="hmt-color-name">${color.name}</span>
+                                <div class="hmt-presets-section">
+                                    <h5>Màu mặc định</h5>
+                                    <div class="hmt-presets-grid">
+                                        ${DEFAULT_COLORS.map(color => `
+                                            <div class="hmt-color-preset ${getDefaultColor() === color.value ? 'active' : ''}"
+                                                 data-color="${color.value}"
+                                                 data-type="${color.type}"
+                                                 style="background-color: ${color.value}">
+                                                <span class="hmt-color-name">${color.name}</span>
+                                            </div>
+                                        `).join('')}
                                     </div>
-                                `).join('')}
+                                </div>
+
+                                <div class="hmt-custom-presets-section" id="customPresetsSection" style="display: none;">
+                                    <div class="hmt-section-header">
+                                        <h5>Màu tùy chỉnh</h5>
+                                        <button class="hmt-toggle-custom-btn" onclick="this.classList.toggle('collapsed')">
+                                            <span class="hmt-toggle-icon">−</span>
+                                        </button>
+                                    </div>
+                                    <div class="hmt-presets-grid hmt-custom-grid" id="customPresetsGrid">
+                                        <!-- Custom presets will be loaded here -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="hmt-preset-actions">
+                                <button class="hmt-save-preset-btn" id="saveToPresetBtn">
+                                    💾 Lưu vào Preset
+                                </button>
+                                <div class="hmt-preset-info">
+                                    <small>Lưu màu hiện tại vào danh sách preset để sử dụng nhanh lần sau</small>
+                                </div>
                             </div>
 
                             <div class="hmt-custom-color">
@@ -245,10 +398,77 @@
             }
 
             .hmt-color-presets {
+                margin-bottom: 20px;
+            }
+
+            .hmt-presets-section {
+                margin-bottom: 20px;
+            }
+
+            .hmt-presets-section h5 {
+                margin: 0 0 12px 0;
+                color: #495057;
+                font-size: 14px;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .hmt-presets-grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
                 gap: 12px;
-                margin-bottom: 20px;
+            }
+
+            .hmt-section-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 12px;
+            }
+
+            .hmt-section-header h5 {
+                margin: 0;
+                color: #495057;
+                font-size: 14px;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .hmt-toggle-custom-btn {
+                background: none;
+                border: none;
+                color: #667eea;
+                cursor: pointer;
+                font-size: 18px;
+                width: 24px;
+                height: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                transition: background-color 0.2s;
+            }
+
+            .hmt-toggle-custom-btn:hover {
+                background: rgba(102, 126, 234, 0.1);
+            }
+
+            .hmt-toggle-icon {
+                transition: transform 0.3s ease;
+            }
+
+            .hmt-toggle-custom-btn.collapsed .hmt-toggle-icon {
+                transform: rotate(45deg);
+            }
+
+            .hmt-custom-grid {
+                transition: all 0.3s ease;
+            }
+
+            .hmt-toggle-custom-btn.collapsed + .hmt-custom-grid {
+                display: none;
             }
 
             .hmt-color-preset {
@@ -353,6 +573,84 @@
                 margin-top: 4px;
                 display: block;
                 line-height: 1.4;
+            }
+
+            .hmt-preset-actions {
+                background: #f8f9fa;
+                border-radius: 8px;
+                padding: 16px;
+                margin-top: 16px;
+            }
+
+            .hmt-save-preset-btn {
+                background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                color: white;
+                border: none;
+                padding: 10px 16px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                transition: all 0.2s;
+                margin-bottom: 8px;
+            }
+
+            .hmt-save-preset-btn:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+            }
+
+            .hmt-save-preset-btn:disabled {
+                background: #6c757d;
+                cursor: not-allowed;
+                transform: none;
+                box-shadow: none;
+            }
+
+            .hmt-preset-info {
+                margin-top: 8px;
+            }
+
+            .hmt-preset-info small {
+                color: #6c757d;
+                font-size: 12px;
+                line-height: 1.4;
+            }
+
+            .hmt-delete-preset {
+                position: absolute;
+                top: -6px;
+                right: -6px;
+                background: #dc3545;
+                color: white;
+                border: none;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                font-size: 14px;
+                font-weight: bold;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0;
+                transition: opacity 0.2s;
+                z-index: 10;
+            }
+
+            .hmt-color-preset:hover .hmt-delete-preset {
+                opacity: 1;
+            }
+
+            .hmt-color-preset.custom .hmt-delete-preset {
+                opacity: 0.7;
+            }
+
+            .hmt-color-preset.custom:hover .hmt-delete-preset {
+                opacity: 1;
             }
 
             .hmt-config-preview {
@@ -506,6 +804,9 @@
 
         document.body.appendChild(dialog);
 
+        // Load custom presets
+        loadCustomPresets(dialog);
+
         // Event listeners
         setupConfigEventListeners(dialog);
 
@@ -568,6 +869,9 @@
 
             // Bỏ active cho tất cả presets nếu đang chọn màu tùy chỉnh
             colorPresets.forEach(p => p.classList.remove('active'));
+
+            // Cập nhật trạng thái nút save
+            updateSavePresetButton(dialog);
         });
 
         // Xử lý text input
@@ -578,6 +882,9 @@
                 previewBox.style.backgroundColor = color;
                 colorPresets.forEach(p => p.classList.remove('active'));
             }
+
+            // Cập nhật trạng thái nút save
+            updateSavePresetButton(dialog);
         });
 
         // Lưu cài đặt
@@ -591,6 +898,17 @@
                 showNotification('Màu không hợp lệ! Vui lòng nhập mã màu HEX đúng định dạng.', 5000);
             }
         });
+
+        // Save to preset
+        const saveToPresetBtn = dialog.querySelector('#saveToPresetBtn');
+        if (saveToPresetBtn) {
+            saveToPresetBtn.addEventListener('click', function() {
+                saveCurrentColorToPreset(dialog);
+            });
+        }
+
+        // Update save button state
+        updateSavePresetButton(dialog);
 
         // Khôi phục mặc định
         resetBtn.addEventListener('click', function() {
@@ -674,6 +992,10 @@
         getDefaultColor: getDefaultColor,
         setDefaultColor: setDefaultColor,
         getColorName: getColorName,
+        getAllColors: getAllColors,
+        getCustomColors: getCustomColors,
+        saveCustomPreset: saveCustomPreset,
+        removeCustomPreset: removeCustomPreset,
         openConfigDialog: openConfigDialog
     };
 
