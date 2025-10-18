@@ -660,7 +660,8 @@
                 background-color: ${palette[800]} !important;
             }
 
-            .summary-more.more-state:hover {
+            .summary-more.more-state:hover,
+            .mobile-more:hover {
                 color: ${palette[500]} !important;
             }
             
@@ -859,7 +860,8 @@
                 background-color: ${defaultPalette[800]} !important;
             }
 
-            .summary-more.more-state:hover {
+            .summary-more.more-state:hover,
+            .mobile-more:hover {
                 color: ${defaultColor} !important;
             }
             
