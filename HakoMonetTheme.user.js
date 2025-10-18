@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Hako: Monet Theme
 // @namespace    https://github.com/sang765
-// @version      3.0.8
+// @version      3.1.0
 // @description  Material You theme for Hako/DocLN.
 // @description:vi Material You theme dành cho Hako/DocLN.
 // @icon         https://docln.sbs/img/logo-9.png
@@ -25,16 +25,10 @@
 // @require      https://greasyfork.org/scripts/447115-gm-config/code/GM_config.js?version=1060849
 // @resource     mainJS ./main.js
 // @resource     monetAPIJS ./api/monet.js
-// @resource     crosUnblockJS ./module/cros-unblock.js
+// @resource     serviceWorkerCORSJS ./module/service-worker-cors.js
 // @resource     infoTruyenJS ./class/info-truyen.js
 // @resource     animationJS ./class/animation.js
 // @resource     tagColorJS ./class/tag-color.js
-// @resource     configJS ./config.js
-// @resource     utilsJS ./utils.js
-// @resource     colorUtilsJS ./module/color-utils.js
-// @resource     domUtilsJS ./module/dom-utils.js
-// @resource     storageJS ./module/storage.js
-// @resource     settingsJS ./module/settings.js
 // @resource     colorinfotruyen ./colors/page-info-truyen.js
 // @resource     imageAnalyzerJS ./module/image-analyzer.js
 // @resource     themeDetectorJS ./module/theme-detector.js
@@ -106,7 +100,6 @@
         // Command để kiểm tra cập nhật
         if (typeof GM_registerMenuCommand === 'function') {
             GM_registerMenuCommand('🔄 Kiểm tra cập nhật', checkForUpdatesManual, 'u');
-            GM_registerMenuCommand('⚙️ Cài đặt', openSettings, 's');
             GM_registerMenuCommand('📊 Thông tin script', showScriptInfo, 'i');
             GM_registerMenuCommand('🐛 Báo cáo lỗi', reportBug, 'b');
             GM_registerMenuCommand('💡 Đề xuất tính năng', suggestFeature, 'f');
@@ -246,9 +239,8 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
     
     function loadAllResources() {
         const resources = [
-            'mainJS', 'monetJS', 'crosUnblockJS', 'infoTruyenJS', 
-            'animationJS', 'monetClassJS', 'tagColorJS', 'configJS',
-            'utilsJS', 'colorUtilsJS', 'domUtilsJS', 'storageJS', 'settingsJS'
+            'mainJS', 'monetJS', 'serviceWorkerCORSJS', 'infoTruyenJS',
+            'animationJS', 'tagColorJS', 'colorinfotruyen', 'imageAnalyzerJS', 'themeDetectorJS'
         ];
         
         let loadedCount = 0;
