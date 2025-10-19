@@ -652,8 +652,6 @@
     function setupConfigEventListeners(dialog) {
         const closeBtn = dialog.querySelector('.hmt-config-close');
         const overlay = dialog.querySelector('.hmt-config-overlay');
-        const colorPresets = dialog.querySelectorAll('.hmt-color-preset');
-        const colorPicker = dialog.querySelector('.hmt-color-picker');
         const colorText = dialog.querySelector('.hmt-color-text');
         const previewBox = dialog.querySelector('.hmt-preview-box');
         const saveBtn = dialog.querySelector('.hmt-config-save');
@@ -772,15 +770,9 @@
              if (colorText) colorText.value = hex;
              if (previewBox) previewBox.style.backgroundColor = hex;
 
-             // Bỏ active cho tất cả presets nếu đang chọn màu tùy chỉnh
-             colorPresets.forEach(p => p.classList.remove('active'));
-
              // Áp dụng màu preview ngay lập tức
              previewColor = hex;
              applyPreviewColor(hex);
-
-             // Cập nhật trạng thái nút save
-             updateSavePresetButton(dialog);
 
              debugLog('Đã cập nhật UI từ HSL picker:', hex);
          }
@@ -919,9 +911,6 @@
                  if (colorPreview) colorPreview.style.backgroundColor = color;
                  if (colorValue) colorValue.textContent = color;
 
-                 // Bỏ active cho tất cả presets vì đang nhập màu tùy chỉnh
-                 colorPresets.forEach(p => p.classList.remove('active'));
-
                  // Áp dụng màu preview ngay lập tức
                  previewColor = color;
                  applyPreviewColor(color);
@@ -933,9 +922,6 @@
              } else {
                  debugLog('Màu không hợp lệ từ text input');
              }
-
-             // Cập nhật trạng thái nút save
-             updateSavePresetButton(dialog);
          });
 
         // Lưu cài đặt
@@ -968,11 +954,7 @@
                      colorPickerPanel.classList.remove('open');
                  }
 
-                 // Gắn lại sự kiện sau khi lỗi
-                 setTimeout(() => {
-                     attachPresetEvents();
-                     attachDeleteEvents();
-                 }, 100);
+                 // Không cần gắn lại sự kiện vì đã loại bỏ preset
              }
          });
 
