@@ -696,41 +696,6 @@
                 color: ${textColor} !important;
             }
 
-            .tox .tox-statusbar {
-                background-color: ${palette[800]} !important;
-                border-top: 1px solid ${palette[600]} !important;
-                color: ${palette[200]} !important;
-            }
-
-            #tinymce {
-                background-color: ${palette[800]} !important;
-            }
-
-            .tox:not(.tox-tinymce-inline) .tox-editor-header {
-                background-color: ${palette[800]} !important;
-                border-bottom: 1px solid ${palette[600]} !important;
-            }
-
-            .tox .tox-tbtn {
-                background: ${palette[800]} !important;
-                color: ${textColor} !important;
-            }
-
-            .tox .tox-tbtn:hover {
-                background: ${palette[700]} !important;
-                color: ${textColor} !important;
-            }
-
-            .tox .tox-tbtn--active, .tox .tox-tbtn--enabled, .tox .tox-tbtn--enabled:focus, .tox .tox-tbtn--enabled:hover {
-                background: ${palette[500]} !important;
-                color: ${textColor} !important;
-            }
-
-            .tox .tox-tbtn--disabled, .tox .tox-tbtn--disabled:hover, .tox .tox-tbtn:disabled, .tox .tox-tbtn:disabled:hover {
-                background: ${palette[800]} !important;
-                color: ${palette[300]} !important;
-            }
-
             :is(.dark .dark\:ring-cyan-900) {
                 --tw-ring-color: ${palette[800]} !important;
             }
@@ -944,41 +909,6 @@
                 background-color: ${defaultPalette[400]} !important;
                 border-color: ${defaultPalette[600]} !important;
                 color: #fff !important;
-            }
-
-            .tox .tox-statusbar {
-                background-color: ${defaultPalette[800]} !important;
-                border-top: 1px solid ${defaultPalette[600]} !important;
-                color: ${defaultPalette[200]} !important;
-            }
-
-            #tinymce {
-                background-color: ${defaultPalette[800]} !important;
-            }
-
-            .tox:not(.tox-tinymce-inline) .tox-editor-header {
-                background-color: ${defaultPalette[800]} !important;
-                border-bottom: 1px solid ${defaultPalette[600]} !important;
-            }
-
-            .tox .tox-tbtn {
-                background: ${defaultPalette[800]} !important;
-                color: #fff !important;
-            }
-
-            .tox .tox-tbtn:hover {
-                background: ${defaultPalette[700]} !important;
-                color: #fff !important;
-            }
-
-            .tox .tox-tbtn--active, .tox .tox-tbtn--enabled, .tox .tox-tbtn--enabled:focus, .tox .tox-tbtn--enabled:hover {
-                background: ${defaultColor} !important;
-                color: #fff !important;
-            }
-
-            .tox .tox-tbtn--disabled, .tox .tox-tbtn--disabled:hover, .tox .tox-tbtn:disabled, .tox .tox-tbtn:disabled:hover {
-                background: ${defaultPalette[800]} !important;
-                color: ${defaultPalette[300]} !important;
             }
 
             :is(.dark .dark\:ring-cyan-900) {
