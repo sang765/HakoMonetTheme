@@ -119,7 +119,8 @@ Màu sắc chủ đề sẽ được tự động điều chỉnh dựa trên �
 <div align="left">
 
 - Sử dụng Canvas API để phân tích màu sắc ảnh
-- ~~Ưu tiên màu tóc nhân vật để tạo palette~~ Sử dụng pick màu truyền thống nhưng không pick màu quá sáng và quá tối.
+- ~~Ưu tiên màu tóc nhân vật để tạo palette~~  
+Sử dụng pick màu truyền thống nhưng không pick màu quá sáng và quá tối.
 - Material You color scheme algorithm
 - Modular architecture dễ bảo trì và mở rộng
 
