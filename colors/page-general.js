@@ -340,40 +340,8 @@
                 --tw-ring-color: ${palette[800]} !important;
             }
 
-            .tox .tox-statusbar {
-                background-color: ${palette[800]} !important;
-                border-top: 1px solid ${palette[600]} !important;
-                color: ${palette[200]} !important;
-            }
-
-            #tinymce {
-                background-color: ${palette[800]} !important;
-            }
-
             #mainpart.custome-page, #mainpart.page-board {
                 background-color: ${palette[900]} !important;
-            }
-
-            .tox .tox-toolbar, .tox .tox-toolbar__overflow, .tox .tox-toolbar__primary {
-                background-color: ${palette[800]} !important;
-            }
-
-            .tox:not(.tox-tinymce-inline) .tox-editor-header {
-                background-color: ${palette[800]} !important;
-                border-bottom: 1px solid ${palette[600]} !important;
-            }
-
-            .tox .tox-tbtn:hover {
-                background: ${palette[700]} !important;
-            }
-
-            .tox .tox-tbtn {
-                background: ${palette[800]} !important;
-            }
-
-            .tox .tox-tbtn--active, .tox .tox-tbtn--enabled, .tox .tox-tbtn--enabled:focus, .tox .tox-tbtn--enabled:hover {
-                background: ${palette[500]} !important;
-                color: ${textColor} !important;
             }
 
             .button-green {
@@ -409,6 +377,23 @@
             body {
                 background-color: ${palette[900]} !important;
                 color: ${palette[100]} !important;
+            }
+
+            table.listext-table tr th {
+                background-color: ${palette[700]} !important;
+                color: ${palette[300]} !important;
+            }
+
+            .user-private-tabs li:hover {
+                background-color: ${palette[700]} !important;
+            }
+
+            table.listext-table tr:hover {
+                background-color: ${palette[600]} !important;
+            }
+
+            .action-link {
+                color: ${palette[500]} !important;
             }
         `;
 
@@ -692,42 +677,6 @@
                 --tw-ring-color: ${defaultPalette[800]} !important;
             }
 
-            .tox .tox-statusbar {
-                background-color: ${defaultPalette[800]} !important;
-                border-top: 1px solid ${defaultPalette[600]} !important;
-                color: ${defaultPalette[200]} !important;
-            }
-
-            #tinymce {
-                background-color: ${defaultPalette[800]} !important;
-            }
-
-            #mainpart.custome-page, #mainpart.page-board {
-                background-color: ${defaultPalette[900]} !important;
-            }
-
-            .tox .tox-toolbar, .tox .tox-toolbar__overflow, .tox .tox-toolbar__primary {
-                background-color: ${defaultPalette[800]} !important;
-            }
-
-            .tox:not(.tox-tinymce-inline) .tox-editor-header {
-                background-color: ${defaultPalette[800]} !important;
-                border-bottom: 1px solid ${defaultPalette[600]} !important;
-            }
-
-            .tox .tox-tbtn:hover {
-                background: ${defaultPalette[700]} !important;
-            }
-
-            .tox .tox-tbtn {
-                background: ${defaultPalette[800]} !important;
-            }
-
-            .tox .tox-tbtn--active, .tox .tox-tbtn--enabled, .tox .tox-tbtn--enabled:focus, .tox .tox-tbtn--enabled:hover {
-                background: ${defaultColor} !important;
-                color: #fff !important;
-            }
-
             .button-green {
                 background-color: ${defaultPalette[400]} !important;
                 border-color: ${defaultPalette[600]} !important;
@@ -761,6 +710,23 @@
             body {
                 background-color: ${defaultPalette[900]} !important;
                 color: ${defaultPalette[100]} !important;
+            }
+
+            table.listext-table tr th {
+                background-color: ${defaultPalette[700]} !important;
+                color: ${defaultPalette[300]} !important;
+            }
+
+            .user-private-tabs li:hover {
+                background-color: ${defaultPalette[700]} !important;
+            }
+
+            table.listext-table tr:hover {
+                background-color: ${defaultPalette[600]} !important;
+            }
+
+            .action-link {
+                color: ${defaultColor} !important;
             }
         `;
 
