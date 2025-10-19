@@ -50,9 +50,23 @@
         return TARGET_DOMAINS.some(domain => url.includes(domain));
     }
 
+    function shouldHideDomainWarning() {
+        // Kiểm tra config ẩn cảnh báo tên miền
+        if (typeof window.HMTConfig !== 'undefined' && typeof window.HMTConfig.getHideDomainWarning === 'function') {
+            return window.HMTConfig.getHideDomainWarning();
+        }
+        return false;
+    }
+
     // Integrated CORS handling for images
     function setupImageCorsHandling() {
         if (window.__imageCorsSetup) return;
+
+        // Kiểm tra xem người dùng có muốn ẩn cảnh báo tên miền không
+        if (shouldHideDomainWarning()) {
+            debugLog('Ẩn cảnh báo tên miền được bật, bỏ qua CORS handling');
+            return;
+        }
 
         debugLog('Setting up integrated CORS handling for images');
 
@@ -138,7 +152,14 @@
         }
         
         debugLog('Đang phân tích màu từ ảnh bìa:', coverUrl);
-        
+
+        // Kiểm tra xem có nên ẩn cảnh báo tên miền không
+        if (shouldHideDomainWarning()) {
+            debugLog('Ẩn cảnh báo tên miền được bật, sử dụng màu mặc định thay vì phân tích ảnh');
+            applyDefaultColorScheme();
+            return;
+        }
+
         // Thêm hiệu ứng thumbnail mờ dần
         addThumbnailFadeEffect(coverUrl);
         
@@ -339,17 +360,21 @@
     function analyzeImageColorTraditionalAccent(imageUrl) {
         return new Promise((resolve, reject) => {
             // Setup CORS handling for images if needed
-            if (isTargetDomain(imageUrl)) {
+            if (isTargetDomain(imageUrl) && !shouldHideDomainWarning()) {
                 debugLog('Ảnh từ domain target, thiết lập CORS handling');
                 setupImageCorsHandling();
+            } else if (isTargetDomain(imageUrl) && shouldHideDomainWarning()) {
+                debugLog('Ảnh từ domain target nhưng ẩn cảnh báo được bật, bỏ qua CORS handling');
             }
 
             const img = new Image();
 
-            // Always set crossOrigin for safety
-            if (isTargetDomain(imageUrl)) {
+            // Always set crossOrigin for safety (trừ khi ẩn cảnh báo được bật)
+            if (isTargetDomain(imageUrl) && !shouldHideDomainWarning()) {
                 img.crossOrigin = 'anonymous';
                 debugLog('Đã set crossOrigin cho ảnh từ domain target');
+            } else if (isTargetDomain(imageUrl) && shouldHideDomainWarning()) {
+                debugLog('Ảnh từ domain target nhưng ẩn cảnh báo được bật, bỏ qua crossOrigin');
             }
 
             img.onload = function() {
@@ -397,11 +422,14 @@
             xhr.open('GET', imageUrl, true);
             xhr.responseType = 'blob';
 
-            // Add CORS headers for target domains
-            if (isTargetDomain(imageUrl)) {
+            // Add CORS headers for target domains (trừ khi ẩn cảnh báo được bật)
+            if (isTargetDomain(imageUrl) && !shouldHideDomainWarning()) {
                 xhr.setRequestHeader('Origin', window.location.origin);
                 xhr.setRequestHeader('Referer', window.location.href);
                 xhr.setRequestHeader('Access-Control-Request-Method', 'GET');
+                debugLog('Đã thêm CORS headers cho target domain');
+            } else if (isTargetDomain(imageUrl) && shouldHideDomainWarning()) {
+                debugLog('Target domain nhưng ẩn cảnh báo được bật, bỏ qua CORS headers');
             }
 
             xhr.onload = function() {

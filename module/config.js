@@ -23,6 +23,15 @@
         return GM_getValue('default_color', '#6c5ce7');
     }
 
+    function getHideDomainWarning() {
+        return GM_getValue('hide_domain_warning', false);
+    }
+
+    function setHideDomainWarning(hide) {
+        GM_setValue('hide_domain_warning', hide);
+        debugLog('Đã lưu thiết lập ẩn cảnh báo tên miền:', hide);
+    }
+
     function setDefaultColor(color) {
         GM_setValue('default_color', color);
         debugLog('Đã lưu màu mặc định:', color);
@@ -231,6 +240,18 @@
                     </div>
                     <div class="hmt-config-body">
                         <div class="hmt-config-section">
+                            <h4>Cài đặt chung</h4>
+                            <div class="hmt-setting-item">
+                                <label class="hmt-setting-label">
+                                    <input type="checkbox" id="hideDomainWarning" ${getHideDomainWarning() ? 'checked' : ''}>
+                                    <span class="hmt-checkbox-custom"></span>
+                                    <span class="hmt-setting-text">Ẩn cảnh báo tên miền</span>
+                                </label>
+                                <p class="hmt-setting-description">Tự động xử lý quyền truy cập cross-origin mà không hiển thị cảnh báo. Có thể làm giảm chức năng phân tích màu sắc từ ảnh bìa.</p>
+                            </div>
+                        </div>
+
+                        <div class="hmt-config-section">
                             <h4>Màu mặc định</h4>
                             <p>Chọn màu sẽ được sử dụng khi không thể lấy màu từ ảnh bìa truyện. Bạn có thể chọn từ các màu preset hoặc sử dụng color picker để chọn màu tùy chỉnh.</p>
 
@@ -306,7 +327,7 @@
             </div>
         `;
 
-        // Thêm CSS
+        // Thêm CSS với Material You design
         GM_addStyle(`
             .hmt-config-overlay {
                 position: fixed;
@@ -314,88 +335,109 @@
                 left: 0;
                 right: 0;
                 bottom: 0;
-                background: rgba(0, 0, 0, 0.5);
+                background: rgba(0, 0, 0, 0.32);
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 z-index: 10001;
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                backdrop-filter: blur(8px);
             }
 
             .hmt-config-content {
-                background: white;
-                border-radius: 12px;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                background: #fef7ff;
+                border-radius: 28px;
+                box-shadow:
+                    0 8px 32px rgba(0, 0, 0, 0.12),
+                    0 2px 8px rgba(0, 0, 0, 0.08);
                 width: 90%;
-                max-width: 600px;
+                max-width: 640px;
                 max-height: 90vh;
                 overflow: hidden;
-                animation: hmtConfigSlideIn 0.3s ease-out;
+                animation: hmtConfigSlideIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                border: 1px solid rgba(255, 255, 255, 0.8);
             }
 
             .hmt-config-header {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                padding: 20px 24px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                padding: 24px 32px;
+                background: linear-gradient(135deg, #6750a4 0%, #7b2cbf 100%);
                 color: white;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .hmt-config-header::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.02)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.02)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.03)"/><circle cx="10" cy="60" r="0.5" fill="rgba(255,255,255,0.03)"/><circle cx="90" cy="40" r="0.5" fill="rgba(255,255,255,0.03)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+                opacity: 0.3;
             }
 
             .hmt-header-content {
                 display: flex;
                 align-items: center;
+                position: relative;
+                z-index: 1;
             }
 
             .hmt-logo-section {
                 display: flex;
                 align-items: center;
-                gap: 16px;
+                gap: 20px;
             }
 
             .hmt-logo {
-                width: 48px;
-                height: 48px;
-                border-radius: 12px;
+                width: 56px;
+                height: 56px;
+                border-radius: 16px;
                 object-fit: cover;
-                border: 2px solid rgba(255, 255, 255, 0.2);
-                transition: transform 0.3s ease;
-                background: rgba(255, 255, 255, 0.1);
+                border: 3px solid rgba(255, 255, 255, 0.15);
+                transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                background: rgba(255, 255, 255, 0.08);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             }
 
             .hmt-logo:hover {
-                transform: scale(1.05);
+                transform: scale(1.05) rotate(2deg);
+                border-color: rgba(255, 255, 255, 0.25);
             }
 
             .hmt-logo:not([src]),
             .hmt-logo[src=""] {
-                background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-weight: bold;
-                font-size: 16px;
+                font-weight: 600;
+                font-size: 20px;
                 color: white;
             }
 
             .hmt-logo:not([src])::after,
             .hmt-logo[src=""]::after {
                 content: "🎨";
-                font-size: 20px;
+                font-size: 24px;
             }
 
             .hmt-title-section h3 {
                 margin: 0;
-                font-size: 20px;
-                font-weight: 700;
-                letter-spacing: -0.5px;
+                font-size: 24px;
+                font-weight: 600;
+                letter-spacing: -0.25px;
             }
 
             .hmt-subtitle {
-                font-size: 14px;
-                opacity: 0.9;
+                font-size: 15px;
+                opacity: 0.85;
                 font-weight: 400;
-                margin-top: 2px;
+                margin-top: 4px;
                 display: block;
             }
 
@@ -419,27 +461,106 @@
             }
 
             .hmt-config-body {
-                padding: 24px;
+                padding: 32px;
                 max-height: 60vh;
                 overflow-y: auto;
             }
 
             .hmt-config-section {
-                margin-bottom: 24px;
+                margin-bottom: 32px;
+                padding: 24px;
+                background: rgba(103, 80, 164, 0.02);
+                border-radius: 20px;
+                border: 1px solid rgba(103, 80, 164, 0.08);
+                position: relative;
+            }
+
+            .hmt-config-section::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 4px;
+                height: 100%;
+                background: linear-gradient(135deg, #6750a4 0%, #7b2cbf 100%);
+                border-radius: 2px;
             }
 
             .hmt-config-section h4 {
-                margin: 0 0 8px 0;
-                color: #333;
-                font-size: 16px;
+                margin: 0 0 12px 0;
+                color: #1c1b1f;
+                font-size: 18px;
                 font-weight: 600;
+                letter-spacing: -0.25px;
             }
 
             .hmt-config-section p {
-                margin: 0 0 16px 0;
-                color: #666;
+                margin: 0 0 20px 0;
+                color: #49454f;
+                font-size: 15px;
+                line-height: 1.6;
+            }
+
+            .hmt-setting-item {
+                margin-bottom: 20px;
+                padding: 16px;
+                background: #f8f9fa;
+                border-radius: 8px;
+                border-left: 4px solid #667eea;
+            }
+
+            .hmt-setting-label {
+                display: flex;
+                align-items: flex-start;
+                gap: 12px;
+                cursor: pointer;
+                font-weight: 500;
+                color: #333;
                 font-size: 14px;
-                line-height: 1.5;
+            }
+
+            .hmt-setting-label input[type="checkbox"] {
+                display: none;
+            }
+
+            .hmt-checkbox-custom {
+                width: 20px;
+                height: 20px;
+                border: 2px solid #667eea;
+                border-radius: 4px;
+                position: relative;
+                flex-shrink: 0;
+                margin-top: 2px;
+                transition: all 0.2s ease;
+            }
+
+            .hmt-setting-label input[type="checkbox"]:checked + .hmt-checkbox-custom {
+                background: #667eea;
+                border-color: #667eea;
+            }
+
+            .hmt-setting-label input[type="checkbox"]:checked + .hmt-checkbox-custom::after {
+                content: '✓';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: white;
+                font-size: 12px;
+                font-weight: bold;
+            }
+
+            .hmt-setting-text {
+                flex: 1;
+                line-height: 1.4;
+            }
+
+            .hmt-setting-description {
+                margin: 8px 0 0 32px !important;
+                color: #6c757d !important;
+                font-size: 12px !important;
+                line-height: 1.4 !important;
+                font-weight: 400 !important;
             }
 
             .hmt-color-presets {
@@ -517,32 +638,38 @@
             }
 
             .hmt-color-preset {
-                height: 60px;
-                border-radius: 8px;
+                height: 64px;
+                border-radius: 16px;
                 cursor: pointer;
                 display: flex;
                 align-items: flex-end;
-                padding: 8px;
-                transition: transform 0.2s, box-shadow 0.2s;
+                padding: 12px;
+                transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
                 position: relative;
-                border: 3px solid transparent;
+                border: 2px solid transparent;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             }
 
             .hmt-color-preset:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+                transform: translateY(-4px) scale(1.02);
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+                border-color: rgba(103, 80, 164, 0.2);
             }
 
             .hmt-color-preset.active {
-                border-color: #333;
-                box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
+                border-color: #6750a4;
+                box-shadow:
+                    0 0 0 3px rgba(103, 80, 164, 0.12),
+                    0 4px 16px rgba(103, 80, 164, 0.15);
+                transform: translateY(-2px) scale(1.01);
             }
 
             .hmt-color-name {
                 color: white;
-                font-size: 11px;
+                font-size: 12px;
                 font-weight: 600;
-                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                letter-spacing: 0.25px;
             }
 
             .hmt-custom-color {
@@ -572,44 +699,55 @@
             }
 
             .hmt-color-picker {
-                width: 80px;
-                height: 60px;
-                border: 3px solid #667eea;
-                border-radius: 12px;
+                width: 88px;
+                height: 64px;
+                border: 3px solid #6750a4;
+                border-radius: 16px;
                 cursor: pointer;
-                transition: all 0.3s ease;
-                box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+                transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                box-shadow: 0 4px 12px rgba(103, 80, 164, 0.15);
+                background: #fff;
             }
 
             .hmt-color-picker:hover {
-                transform: scale(1.05);
-                box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+                transform: scale(1.05) translateY(-2px);
+                box-shadow: 0 8px 24px rgba(103, 80, 164, 0.25);
+                border-color: #7b2cbf;
             }
 
             .hmt-color-picker-label {
-                font-size: 12px;
-                color: #667eea;
+                font-size: 13px;
+                color: #6750a4;
                 font-weight: 600;
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
+                margin-top: 8px;
             }
 
             .hmt-color-text {
                 flex: 1;
-                padding: 12px 16px;
-                border: 2px solid #e1e5e9;
-                border-radius: 8px;
-                font-size: 14px;
-                font-family: monospace;
-                background: #f8f9fa;
-                color: #495057;
+                padding: 16px 20px;
+                border: 2px solid #e7e0ec;
+                border-radius: 16px;
+                font-size: 15px;
+                font-family: 'Google Sans', monospace;
+                background: #fef7ff;
+                color: #1c1b1f;
                 font-weight: 500;
+                transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             }
 
             .hmt-color-text:focus {
                 outline: none;
-                border-color: #667eea;
+                border-color: #6750a4;
                 background: white;
+                box-shadow: 0 0 0 4px rgba(103, 80, 164, 0.08);
+                transform: translateY(-1px);
+            }
+
+            .hmt-color-text::placeholder {
+                color: #79747e;
+                opacity: 0.7;
             }
 
             .hmt-color-help {
@@ -628,31 +766,51 @@
             }
 
             .hmt-save-preset-btn {
-                background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                background: linear-gradient(135deg, #146c2e 0%, #1d7e3f 100%);
                 color: white;
                 border: none;
-                padding: 10px 16px;
-                border-radius: 6px;
+                padding: 14px 24px;
+                border-radius: 20px;
                 cursor: pointer;
-                font-size: 14px;
+                font-size: 15px;
                 font-weight: 600;
                 display: flex;
                 align-items: center;
                 gap: 8px;
-                transition: all 0.2s;
-                margin-bottom: 8px;
+                transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                margin-bottom: 12px;
+                box-shadow: 0 4px 12px rgba(20, 108, 46, 0.25);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .hmt-save-preset-btn::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+                transition: left 0.5s;
             }
 
             .hmt-save-preset-btn:hover {
-                transform: translateY(-1px);
-                box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+                transform: translateY(-2px) scale(1.02);
+                box-shadow: 0 8px 24px rgba(20, 108, 46, 0.35);
+                background: linear-gradient(135deg, #1d7e3f 0%, #146c2e 100%);
+            }
+
+            .hmt-save-preset-btn:hover::before {
+                left: 100%;
             }
 
             .hmt-save-preset-btn:disabled {
-                background: #6c757d;
+                background: #79747e;
                 cursor: not-allowed;
                 transform: none;
-                box-shadow: none;
+                box-shadow: 0 2px 8px rgba(121, 116, 126, 0.2);
+                color: rgba(255, 255, 255, 0.7);
             }
 
             .hmt-preset-info {
@@ -719,151 +877,262 @@
             }
 
             .hmt-config-preview {
-                margin-top: 24px;
-                padding: 16px;
-                background: #f8f9fa;
-                border-radius: 8px;
+                margin-top: 32px;
+                padding: 24px;
+                background: linear-gradient(135deg, #f7f2fa 0%, #fef7ff 100%);
+                border-radius: 20px;
+                border: 1px solid rgba(103, 80, 164, 0.08);
+                position: relative;
+            }
+
+            .hmt-config-preview::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 4px;
+                height: 100%;
+                background: linear-gradient(135deg, #6750a4 0%, #7b2cbf 100%);
+                border-radius: 2px;
             }
 
             .hmt-config-preview h4 {
-                margin: 0 0 12px 0;
-                color: #333;
-                font-size: 16px;
+                margin: 0 0 16px 0;
+                color: #1c1b1f;
+                font-size: 18px;
                 font-weight: 600;
+                letter-spacing: -0.25px;
             }
 
             .hmt-preview-box {
-                height: 80px;
-                border-radius: 8px;
+                height: 88px;
+                border-radius: 16px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 color: white;
                 font-weight: 600;
-                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-                transition: background-color 0.3s ease;
+                font-size: 16px;
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .hmt-preview-box::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+                transform: rotate(45deg);
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+
+            .hmt-preview-box:hover::before {
+                opacity: 1;
+                animation: shimmer 1.5s infinite;
+            }
+
+            @keyframes shimmer {
+                0% { transform: translateX(-100%) rotate(45deg); }
+                100% { transform: translateX(200%) rotate(45deg); }
             }
 
             .hmt-config-footer {
-                padding: 20px 24px;
-                background: #f8f9fa;
+                padding: 28px 32px;
+                background: linear-gradient(135deg, #f7f2fa 0%, #fef7ff 100%);
                 display: flex;
                 justify-content: space-between;
-                gap: 12px;
+                gap: 16px;
+                border-top: 1px solid rgba(103, 80, 164, 0.08);
             }
 
             .hmt-config-reset,
             .hmt-config-save {
-                padding: 10px 20px;
+                padding: 14px 28px;
                 border: none;
-                border-radius: 6px;
-                font-size: 14px;
+                border-radius: 20px;
+                font-size: 15px;
                 font-weight: 600;
                 cursor: pointer;
-                transition: all 0.2s;
+                transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                position: relative;
+                overflow: hidden;
+                min-width: 120px;
             }
 
             .hmt-config-reset {
-                background: #f8f9fa;
-                color: #666;
-                border: 1px solid #ddd;
+                background: #fef7ff;
+                color: #49454f;
+                border: 2px solid #e7e0ec;
+                box-shadow: 0 2px 8px rgba(73, 69, 79, 0.08);
             }
 
             .hmt-config-reset:hover {
-                background: #e9ecef;
-                color: #333;
+                background: #f4eff7;
+                color: #1c1b1f;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 16px rgba(73, 69, 79, 0.15);
+                border-color: #6750a4;
             }
 
             .hmt-config-save {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, #6750a4 0%, #7b2cbf 100%);
                 color: white;
+                box-shadow: 0 4px 12px rgba(103, 80, 164, 0.25);
             }
 
             .hmt-config-save:hover {
-                transform: translateY(-1px);
-                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+                transform: translateY(-2px) scale(1.02);
+                box-shadow: 0 8px 24px rgba(103, 80, 164, 0.35);
+                background: linear-gradient(135deg, #7b2cbf 0%, #6750a4 100%);
             }
 
             @keyframes hmtConfigSlideIn {
                 from {
                     opacity: 0;
-                    transform: scale(0.9) translateY(-20px);
+                    transform: scale(0.85) translateY(40px) rotate(-2deg);
+                    filter: blur(8px);
                 }
                 to {
                     opacity: 1;
-                    transform: scale(1) translateY(0);
+                    transform: scale(1) translateY(0) rotate(0deg);
+                    filter: blur(0px);
                 }
             }
 
-            /* Dark mode support */
+            /* Enhanced animations for Material You */
+            @keyframes hmtFadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes hmtScaleIn {
+                from {
+                    opacity: 0;
+                    transform: scale(0.9);
+                }
+                to {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+            }
+
+            .hmt-config-section {
+                animation: hmtFadeInUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s both;
+            }
+
+            .hmt-config-preview {
+                animation: hmtFadeInUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s both;
+            }
+
+            /* Dark mode support với Material You */
+            body.dark .hmt-config-overlay {
+                background: rgba(0, 0, 0, 0.6);
+                backdrop-filter: blur(12px);
+            }
+
             body.dark .hmt-config-content {
-                background: #2d3748;
-                color: #e2e8f0;
+                background: #1c1b1f;
+                color: #e6e1e5;
+                border-color: rgba(255, 255, 255, 0.1);
+            }
+
+            body.dark .hmt-config-header {
+                background: linear-gradient(135deg, #4a4458 0%, #5b5271 100%);
+            }
+
+            body.dark .hmt-config-section {
+                background: rgba(74, 68, 88, 0.3);
+                border-color: rgba(186, 180, 199, 0.12);
             }
 
             body.dark .hmt-config-section h4 {
-                color: #e2e8f0;
+                color: #e6e1e5;
             }
 
             body.dark .hmt-config-section p {
-                color: #a0aec0;
+                color: #cac4d0;
             }
 
             body.dark .hmt-color-text {
-                background: #2d3748;
-                border-color: #4a5568;
-                color: #e2e8f0;
+                background: #2b2930;
+                border-color: #938f99;
+                color: #e6e1e5;
             }
 
             body.dark .hmt-color-text:focus {
-                background: #1a202c;
-                border-color: #667eea;
+                background: #1c1b1f;
+                border-color: #d0bcff;
+                box-shadow: 0 0 0 4px rgba(208, 188, 255, 0.12);
+            }
+
+            body.dark .hmt-color-text::placeholder {
+                color: #938f99;
             }
 
             body.dark .hmt-color-help {
-                color: #a0aec0;
+                color: #cac4d0;
             }
 
             body.dark .hmt-color-picker {
-                border-color: #764ba2;
-                box-shadow: 0 2px 8px rgba(118, 75, 162, 0.2);
+                border-color: #d0bcff;
+                box-shadow: 0 4px 12px rgba(208, 188, 255, 0.15);
             }
 
             body.dark .hmt-color-picker:hover {
-                box-shadow: 0 4px 16px rgba(118, 75, 162, 0.3);
+                box-shadow: 0 8px 24px rgba(208, 188, 255, 0.25);
+                border-color: #e8def8;
             }
 
             body.dark .hmt-color-picker-label {
-                color: #764ba2;
+                color: #d0bcff;
             }
 
-            /* Dark mode logo styling */
+            /* Dark mode logo styling với Material You */
             body.dark .hmt-logo {
-                border-color: rgba(255, 255, 255, 0.3);
+                border-color: rgba(255, 255, 255, 0.2);
+                background: rgba(255, 255, 255, 0.05);
             }
 
             body.dark .hmt-logo:not([src]),
             body.dark .hmt-logo[src=""] {
-                background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
             }
 
             body.dark .hmt-config-preview {
-                background: #1a202c;
+                background: linear-gradient(135deg, #2b2930 0%, #1c1b1f 100%);
+                border-color: rgba(186, 180, 199, 0.12);
             }
 
             body.dark .hmt-config-footer {
-                background: #1a202c;
+                background: linear-gradient(135deg, #2b2930 0%, #1c1b1f 100%);
+                border-color: rgba(186, 180, 199, 0.08);
             }
 
             body.dark .hmt-config-reset {
-                background: #1a202c;
-                color: #a0aec0;
-                border-color: #4a5568;
+                background: #2b2930;
+                color: #cac4d0;
+                border-color: #938f99;
+                box-shadow: 0 2px 8px rgba(42, 41, 48, 0.5);
             }
 
             body.dark .hmt-config-reset:hover {
-                background: #2d3748;
-                color: #e2e8f0;
+                background: #3a3741;
+                color: #e6e1e5;
+                border-color: #d0bcff;
+                box-shadow: 0 4px 16px rgba(42, 41, 48, 0.7);
             }
         `);
 
@@ -896,6 +1165,7 @@
         const previewBox = dialog.querySelector('.hmt-preview-box');
         const saveBtn = dialog.querySelector('.hmt-config-save');
         const resetBtn = dialog.querySelector('.hmt-config-reset');
+        const hideDomainWarningCheckbox = dialog.querySelector('#hideDomainWarning');
 
         // Đóng dialog
         function closeDialog() {
@@ -1020,6 +1290,18 @@
             showNotification('Đã khôi phục màu mặc định!', 3000);
         });
 
+        // Xử lý checkbox ẩn cảnh báo tên miền
+        if (hideDomainWarningCheckbox) {
+            hideDomainWarningCheckbox.addEventListener('change', function() {
+                setHideDomainWarning(this.checked);
+                showNotification(
+                    'Cài đặt đã lưu',
+                    this.checked ? 'Đã bật ẩn cảnh báo tên miền' : 'Đã tắt ẩn cảnh báo tên miền',
+                    3000
+                );
+            });
+        }
+
         // Đóng khi nhấn ESC
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
@@ -1086,6 +1368,8 @@
         getCustomColors: getCustomColors,
         saveCustomPreset: saveCustomPreset,
         removeCustomPreset: removeCustomPreset,
+        getHideDomainWarning: getHideDomainWarning,
+        setHideDomainWarning: setHideDomainWarning,
         openConfigDialog: openConfigDialog
     };
 

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Hako: Monet Theme
 // @namespace    https://github.com/sang765
-// @version      3.1.8
+// @version      3.2.0
 // @description  Material You theme for Hako/DocLN.
 // @description:vi Material You theme dành cho Hako/DocLN.
 // @icon         https://docln.sbs/img/logo-9.png
@@ -23,7 +23,6 @@
 // @connect      *
 // @run-at       document-end
 // @require      https://greasyfork.org/scripts/447115-gm-config/code/GM_config.js?version=1060849
-// @resource     mainJS ./main.js
 // @resource     monetAPIJS ./api/monet.js
 // @resource     simpleCORSJS ./module/simple-cors.js
 // @resource     infoTruyenJS ./class/info-truyen.js
@@ -48,7 +47,9 @@
     const SCRIPT_NAME = 'Hako: Monet Theme';
     const GITHUB_REPO = 'https://github.com/sang765/HakoMonetTheme';
     const RAW_GITHUB_URL = 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/';
-    
+    const CHECK_UPDATE_INTERVAL = 30 * 60 * 1000; // 30 phút
+    const VERSION = '3.2.0';
+
     let isCheckingForUpdate = false;
     
     function debugLog(...args) {
@@ -263,9 +264,80 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
         }
     }
     
+    function checkForUpdatesAuto() {
+        debugLog('Đang kiểm tra cập nhật tự động...');
+
+        GM_xmlhttpRequest({
+            method: 'GET',
+            url: RAW_GITHUB_URL + 'HakoMonetTheme.user.js?t=' + new Date().getTime(),
+            timeout: 10000,
+            onload: function(response) {
+                if (response.status === 200) {
+                    const scriptContent = response.responseText;
+                    const versionMatch = scriptContent.match(/@version\s+([\d.]+)/);
+
+                    if (versionMatch && versionMatch[1]) {
+                        const latestVersion = versionMatch[1];
+                        debugLog(`Phiên bản hiện tại: ${VERSION}, Phiên bản mới nhất: ${latestVersion}`);
+
+                        if (isNewerVersion(latestVersion, VERSION)) {
+                            debugLog('Đã tìm thấy phiên bản mới!');
+                            showUpdateNotification(latestVersion);
+                        } else {
+                            debugLog('Đang sử dụng phiên bản mới nhất.');
+                        }
+
+                        // Lưu thời gian kiểm tra cuối cùng
+                        GM_setValue('lastUpdateCheck', Date.now());
+                    }
+                }
+            },
+            onerror: function(error) {
+                debugLog('Lỗi khi kiểm tra cập nhật:', error);
+            },
+            ontimeout: function() {
+                debugLog('Hết thời gian kiểm tra cập nhật');
+            }
+        });
+    }
+
+    function showUpdateNotification(latestVersion) {
+        if (typeof GM_notification === 'function') {
+            GM_notification({
+                title: 'HakoMonetTheme - Có bản cập nhật mới',
+                text: `Phiên bản ${latestVersion} đã có sẵn. Nhấn để cập nhật.`,
+                timeout: 10000,
+                onclick: function() {
+                    window.open(RAW_GITHUB_URL + 'HakoMonetTheme.user.js', '_blank');
+                }
+            });
+        } else {
+            // Fallback cho các userscript manager không hỗ trợ GM_notification
+            if (confirm(`HakoMonetTheme phiên bản ${latestVersion} đã có sẵn. Bạn có muốn cập nhật ngay bây giờ không?`)) {
+                window.open(RAW_GITHUB_URL + 'HakoMonetTheme.user.js', '_blank');
+            }
+        }
+    }
+
+    function setupAutoUpdate() {
+        // Kiểm tra lần cuối cập nhật
+        const lastUpdateCheck = GM_getValue('lastUpdateCheck', 0);
+        const now = Date.now();
+
+        // Nếu chưa từng kiểm tra hoặc đã qua 30 phút kể từ lần kiểm tra cuối
+        if (now - lastUpdateCheck > CHECK_UPDATE_INTERVAL) {
+            checkForUpdatesAuto();
+        }
+
+        // Thiết lập interval để kiểm tra định kỳ
+        setInterval(checkForUpdatesAuto, CHECK_UPDATE_INTERVAL);
+
+        debugLog('Đã thiết lập tự động kiểm tra cập nhật mỗi 30 phút');
+    }
+
     function loadAllResources() {
         const resources = [
-            'mainJS', 'monetJS', 'simpleCORSJS', 'infoTruyenJS',
+            'monetJS', 'simpleCORSJS', 'infoTruyenJS',
             'animationJS', 'tagColorJS', 'colorinfotruyen', 'imageAnalyzerJS', 'themeDetectorJS', 'configJS', 'adBlockerJS'
         ];
         
@@ -307,29 +379,26 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
     }
     
     function initializeScript() {
-        debugLog(`Bắt đầu khởi tạo ${SCRIPT_NAME} v${GM_info.script.version}`);
-        
+        debugLog(`Bắt đầu khởi tạo ${SCRIPT_NAME} v${VERSION}`);
+        debugLog(`Phiên bản: ${VERSION}`);
+
         // Đăng ký menu commands
         registerMenuCommands();
-        
+
+        // Thiết lập auto update
+        setupAutoUpdate();
+
         // Tải tất cả resources
         const loadedCount = loadAllResources();
-        
+
         if (loadedCount > 0) {
             showNotification(
-                `${SCRIPT_NAME}`, 
+                `${SCRIPT_NAME}`,
                 `Đã tải ${loadedCount} modules thành công!`,
                 3000
             );
         }
-        
-        // Kiểm tra cập nhật tự động (sau 5 giây)
-        setTimeout(() => {
-            if (GM_getValue('auto_update_check', true)) {
-                checkForUpdatesManual();
-            }
-        }, 5000);
-        
+
         debugLog('Khởi tạo script hoàn tất');
     }
     

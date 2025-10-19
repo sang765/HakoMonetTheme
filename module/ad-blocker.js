@@ -167,7 +167,7 @@
             </div>
         `;
 
-        // Thêm CSS
+        // Thêm CSS với Material You design
         GM_addStyle(`
             .hmt-adblocker-overlay {
                 position: fixed;
@@ -175,70 +175,97 @@
                 left: 0;
                 right: 0;
                 bottom: 0;
-                background: rgba(0, 0, 0, 0.5);
+                background: rgba(0, 0, 0, 0.32);
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 z-index: 10001;
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                backdrop-filter: blur(8px);
             }
 
             .hmt-adblocker-content {
-                background: white;
-                border-radius: 12px;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                background: #fef7ff;
+                border-radius: 28px;
+                box-shadow:
+                    0 8px 32px rgba(0, 0, 0, 0.12),
+                    0 2px 8px rgba(0, 0, 0, 0.08);
                 width: 90%;
-                max-width: 500px;
+                max-width: 520px;
                 max-height: 90vh;
                 overflow: hidden;
-                animation: hmtAdBlockerSlideIn 0.3s ease-out;
+                animation: hmtAdBlockerSlideIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                border: 1px solid rgba(255, 255, 255, 0.8);
             }
 
             .hmt-adblocker-header {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                padding: 20px 24px;
-                background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+                padding: 24px 32px;
+                background: linear-gradient(135deg, #ba1a1a 0%, #d32f2f 100%);
                 color: white;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .hmt-adblocker-header::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.02)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.02)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.03)"/><circle cx="10" cy="60" r="0.5" fill="rgba(255,255,255,0.03)"/><circle cx="90" cy="40" r="0.5" fill="rgba(255,255,255,0.03)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+                opacity: 0.3;
             }
 
             .hmt-header-content {
                 display: flex;
                 align-items: center;
+                position: relative;
+                z-index: 1;
             }
 
             .hmt-logo-section {
                 display: flex;
                 align-items: center;
-                gap: 16px;
+                gap: 20px;
             }
 
             .hmt-logo {
-                width: 48px;
-                height: 48px;
-                border-radius: 12px;
-                background: rgba(255, 255, 255, 0.1);
+                width: 56px;
+                height: 56px;
+                border-radius: 16px;
+                background: rgba(255, 255, 255, 0.08);
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 20px;
-                font-weight: bold;
+                font-size: 24px;
+                font-weight: 600;
                 color: white;
+                border: 3px solid rgba(255, 255, 255, 0.15);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            }
+
+            .hmt-logo:hover {
+                transform: scale(1.05) rotate(2deg);
+                border-color: rgba(255, 255, 255, 0.25);
             }
 
             .hmt-title-section h3 {
                 margin: 0;
-                font-size: 20px;
-                font-weight: 700;
-                letter-spacing: -0.5px;
+                font-size: 24px;
+                font-weight: 600;
+                letter-spacing: -0.25px;
             }
 
             .hmt-subtitle {
-                font-size: 14px;
-                opacity: 0.9;
+                font-size: 15px;
+                opacity: 0.85;
                 font-weight: 400;
-                margin-top: 2px;
+                margin-top: 4px;
                 display: block;
             }
 
@@ -262,40 +289,60 @@
             }
 
             .hmt-adblocker-body {
-                padding: 24px;
+                padding: 32px;
                 max-height: 60vh;
                 overflow-y: auto;
             }
 
             .hmt-adblocker-section {
-                margin-bottom: 24px;
+                margin-bottom: 32px;
+                padding: 24px;
+                background: rgba(186, 26, 26, 0.02);
+                border-radius: 20px;
+                border: 1px solid rgba(186, 26, 26, 0.08);
+                position: relative;
+            }
+
+            .hmt-adblocker-section::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 4px;
+                height: 100%;
+                background: linear-gradient(135deg, #ba1a1a 0%, #d32f2f 100%);
+                border-radius: 2px;
             }
 
             .hmt-adblocker-section h4 {
-                margin: 0 0 8px 0;
-                color: #333;
-                font-size: 16px;
+                margin: 0 0 12px 0;
+                color: #1c1b1f;
+                font-size: 18px;
                 font-weight: 600;
+                letter-spacing: -0.25px;
             }
 
             .hmt-adblocker-section p {
-                margin: 0 0 16px 0;
-                color: #666;
-                font-size: 14px;
-                line-height: 1.5;
+                margin: 0 0 20px 0;
+                color: #49454f;
+                font-size: 15px;
+                line-height: 1.6;
             }
 
             .hmt-adblocker-status {
-                background: #f8f9fa;
-                border-radius: 8px;
-                padding: 16px;
-                margin-bottom: 20px;
+                background: linear-gradient(135deg, #fef7ff 0%, #fef7ff 100%);
+                border-radius: 16px;
+                padding: 20px;
+                margin-bottom: 24px;
+                border: 1px solid rgba(186, 26, 26, 0.08);
             }
 
             .hmt-status-item {
                 display: flex;
                 justify-content: space-between;
-                margin-bottom: 8px;
+                align-items: center;
+                margin-bottom: 12px;
+                padding: 8px 0;
             }
 
             .hmt-status-item:last-child {
@@ -304,24 +351,30 @@
 
             .hmt-status-label {
                 font-weight: 500;
-                color: #495057;
+                color: #1c1b1f;
+                font-size: 15px;
             }
 
             .hmt-status-value {
                 font-weight: 600;
-                padding: 2px 8px;
-                border-radius: 4px;
-                font-size: 12px;
+                padding: 6px 12px;
+                border-radius: 12px;
+                font-size: 13px;
+                min-width: 60px;
+                text-align: center;
+                transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             }
 
             .hmt-status-value.enabled {
-                background: #d4edda;
-                color: #155724;
+                background: linear-gradient(135deg, #146c2e 0%, #1d7e3f 100%);
+                color: #ffffff;
+                box-shadow: 0 2px 8px rgba(20, 108, 46, 0.25);
             }
 
             .hmt-status-value.disabled {
-                background: #f8d7da;
-                color: #721c24;
+                background: linear-gradient(135deg, #ba1a1a 0%, #d32f2f 100%);
+                color: #ffffff;
+                box-shadow: 0 2px 8px rgba(186, 26, 26, 0.25);
             }
 
             .hmt-adblocker-toggle {
@@ -344,32 +397,34 @@
 
             .hmt-toggle-switch {
                 position: relative;
-                width: 44px;
-                height: 24px;
-                background: #ccc;
-                border-radius: 12px;
-                transition: background-color 0.3s;
+                width: 52px;
+                height: 28px;
+                background: #79747e;
+                border-radius: 16px;
+                transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                cursor: pointer;
             }
 
             .hmt-toggle-switch::before {
                 content: '';
                 position: absolute;
-                top: 2px;
-                left: 2px;
-                width: 20px;
-                height: 20px;
-                background: white;
+                top: 3px;
+                left: 3px;
+                width: 22px;
+                height: 22px;
+                background: #ffffff;
                 border-radius: 50%;
-                transition: transform 0.3s;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+                transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
             }
 
             .hmt-toggle-input:checked + .hmt-toggle-switch {
-                background: #28a745;
+                background: linear-gradient(135deg, #146c2e 0%, #1d7e3f 100%);
             }
 
             .hmt-toggle-input:checked + .hmt-toggle-switch::before {
-                transform: translateX(20px);
+                transform: translateX(24px);
+                box-shadow: 0 4px 12px rgba(20, 108, 46, 0.25);
             }
 
             .hmt-adblocker-actions {
@@ -379,33 +434,40 @@
 
             .hmt-adblocker-manual-block,
             .hmt-adblocker-manual-unblock {
-                padding: 8px 16px;
+                padding: 12px 24px;
                 border: none;
-                border-radius: 6px;
-                font-size: 14px;
-                font-weight: 500;
+                border-radius: 20px;
+                font-size: 15px;
+                font-weight: 600;
                 cursor: pointer;
-                transition: all 0.2s;
+                transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                position: relative;
+                overflow: hidden;
+                min-width: 100px;
             }
 
             .hmt-adblocker-manual-block {
-                background: #dc3545;
+                background: linear-gradient(135deg, #ba1a1a 0%, #d32f2f 100%);
                 color: white;
+                box-shadow: 0 4px 12px rgba(186, 26, 26, 0.25);
             }
 
             .hmt-adblocker-manual-block:hover {
-                background: #c82333;
-                transform: translateY(-1px);
+                background: linear-gradient(135deg, #d32f2f 0%, #ba1a1a 100%);
+                transform: translateY(-2px) scale(1.02);
+                box-shadow: 0 8px 24px rgba(186, 26, 26, 0.35);
             }
 
             .hmt-adblocker-manual-unblock {
-                background: #6c757d;
+                background: linear-gradient(135deg, #79747e 0%, #625b71 100%);
                 color: white;
+                box-shadow: 0 4px 12px rgba(121, 116, 126, 0.25);
             }
 
             .hmt-adblocker-manual-unblock:hover {
-                background: #5a6268;
-                transform: translateY(-1px);
+                background: linear-gradient(135deg, #625b71 0%, #79747e 100%);
+                transform: translateY(-2px) scale(1.02);
+                box-shadow: 0 8px 24px rgba(121, 116, 126, 0.35);
             }
 
             .hmt-adblocker-info {
@@ -433,52 +495,105 @@
             }
 
             .hmt-adblocker-footer {
-                padding: 20px 24px;
-                background: #f8f9fa;
+                padding: 28px 32px;
+                background: linear-gradient(135deg, #f7f2fa 0%, #fef7ff 100%);
                 display: flex;
                 justify-content: flex-end;
+                border-top: 1px solid rgba(186, 26, 26, 0.08);
             }
 
             .hmt-adblocker-close-btn {
-                padding: 10px 20px;
-                background: #6c757d;
+                padding: 14px 28px;
+                background: linear-gradient(135deg, #79747e 0%, #625b71 100%);
                 color: white;
                 border: none;
-                border-radius: 6px;
-                font-size: 14px;
+                border-radius: 20px;
+                font-size: 15px;
                 font-weight: 600;
                 cursor: pointer;
-                transition: all 0.2s;
+                transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                box-shadow: 0 4px 12px rgba(121, 116, 126, 0.25);
+                position: relative;
+                overflow: hidden;
             }
 
             .hmt-adblocker-close-btn:hover {
-                background: #5a6268;
-                transform: translateY(-1px);
+                background: linear-gradient(135deg, #625b71 0%, #79747e 100%);
+                transform: translateY(-2px) scale(1.02);
+                box-shadow: 0 8px 24px rgba(121, 116, 126, 0.35);
             }
 
             @keyframes hmtAdBlockerSlideIn {
                 from {
                     opacity: 0;
-                    transform: scale(0.9) translateY(-20px);
+                    transform: scale(0.85) translateY(40px) rotate(-2deg);
+                    filter: blur(8px);
                 }
                 to {
                     opacity: 1;
-                    transform: scale(1) translateY(0);
+                    transform: scale(1) translateY(0) rotate(0deg);
+                    filter: blur(0px);
                 }
             }
 
-            /* Dark mode support */
+            /* Enhanced animations for Material You */
+            @keyframes hmtFadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes hmtScaleIn {
+                from {
+                    opacity: 0;
+                    transform: scale(0.9);
+                }
+                to {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+            }
+
+            .hmt-adblocker-section {
+                animation: hmtFadeInUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s both;
+            }
+
+            .hmt-adblocker-info {
+                animation: hmtFadeInUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s both;
+            }
+
+            /* Dark mode support với Material You */
+            body.dark .hmt-adblocker-overlay {
+                background: rgba(0, 0, 0, 0.6);
+                backdrop-filter: blur(12px);
+            }
+
             body.dark .hmt-adblocker-content {
-                background: #2d3748;
-                color: #e2e8f0;
+                background: #1c1b1f;
+                color: #e6e1e5;
+                border-color: rgba(255, 255, 255, 0.1);
+            }
+
+            body.dark .hmt-adblocker-header {
+                background: linear-gradient(135deg, #ba1a1a 0%, #d32f2f 100%);
+            }
+
+            body.dark .hmt-adblocker-section {
+                background: rgba(186, 26, 26, 0.08);
+                border-color: rgba(208, 188, 255, 0.12);
             }
 
             body.dark .hmt-adblocker-section h4 {
-                color: #e2e8f0;
+                color: #e6e1e5;
             }
 
             body.dark .hmt-adblocker-section p {
-                color: #a0aec0;
+                color: #cac4d0;
             }
 
             body.dark .hmt-adblocker-status {
@@ -486,19 +601,26 @@
             }
 
             body.dark .hmt-status-label {
-                color: #a0aec0;
+                color: #e6e1e5;
             }
 
             body.dark .hmt-info-content p {
-                color: #a0aec0;
+                color: #cac4d0;
             }
 
             body.dark .hmt-adblocker-info {
-                background: #1a202c;
+                background: rgba(74, 68, 88, 0.3);
+                border: 1px solid rgba(186, 180, 199, 0.12);
             }
 
             body.dark .hmt-adblocker-footer {
-                background: #1a202c;
+                background: linear-gradient(135deg, #2b2930 0%, #1c1b1f 100%);
+                border-color: rgba(186, 180, 199, 0.08);
+            }
+
+            body.dark .hmt-adblocker-status {
+                background: linear-gradient(135deg, #2b2930 0%, #1c1b1f 100%);
+                border-color: rgba(208, 188, 255, 0.12);
             }
         `);
 

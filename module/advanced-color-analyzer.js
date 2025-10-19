@@ -3,7 +3,7 @@
  * Tối ưu hóa với CORS, CSP và performance
  *
  * @author HakoMonetTheme Team
- * @version 2.0.0
+ * @version 2.1.0
  */
 
 (function() {
