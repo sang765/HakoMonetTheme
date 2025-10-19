@@ -488,6 +488,9 @@
             return;
         }
 
+        // Lấy màu hiện tại để hiển thị trong dialog
+        const currentColor = getDefaultColor();
+
         const dialog = document.createElement('div');
         dialog.className = 'hmt-config-dialog';
         dialog.innerHTML = `
@@ -1313,7 +1316,8 @@
 
         document.body.appendChild(dialog);
 
-        // Load custom presets sẽ được gọi trong setupConfigEventListeners
+        // Load custom presets với màu hiện tại
+        loadCustomPresets(dialog);
 
          // Đóng color picker panel nếu đang mở khi khởi tạo
          const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
@@ -1349,8 +1353,7 @@
         const resetBtn = dialog.querySelector('.hmt-config-reset');
         const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
 
-        // Lưu màu hiện tại để có thể khôi phục nếu không lưu
-        const currentColor = getDefaultColor();
+        // Sử dụng màu hiện tại từ createConfigDialog
         let previewColor = currentColor; // Màu đang preview
 
         debugLog('Config dialog được mở với màu hiện tại:', currentColor);
@@ -1399,9 +1402,6 @@
                 }
             }
         });
-
-        // Load custom presets sau khi đã có currentColor
-        loadCustomPresets(dialog);
 
         // Gọi hàm gắn sự kiện global
         attachPresetEvents();
