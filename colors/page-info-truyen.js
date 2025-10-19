@@ -166,10 +166,22 @@
         // Lắng nghe sự kiện màu sắc thay đổi để cập nhật real-time
         document.addEventListener('hmtColorChanged', function(event) {
             debugLog('Nhận sự kiện màu sắc thay đổi:', event.detail);
-            // Đợi một chút để đảm bảo màu đã được lưu vào storage
-            setTimeout(() => {
-                applyCurrentColorScheme();
-            }, 100);
+
+            // Chỉ áp dụng màu thực sự nếu không phải preview mode
+            if (!event.detail.isPreview) {
+                // Đợi một chút để đảm bảo màu đã được lưu vào storage
+                setTimeout(() => {
+                    applyCurrentColorScheme();
+                }, 100);
+            } else {
+                // Nếu là preview mode, áp dụng màu ngay lập tức
+                const previewColor = event.detail.color;
+                if (previewColor && isValidColor(previewColor)) {
+                    const monetPalette = MonetAPI.generateMonetPalette(previewColor);
+                    const isLightColor = MonetAPI.isColorLight(previewColor);
+                    applyMonetColorScheme(monetPalette, isLightColor);
+                }
+            }
         });
 
         debugLog('Đã thiết lập lắng nghe sự kiện màu sắc thay đổi');
