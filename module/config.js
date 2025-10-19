@@ -90,15 +90,23 @@
              }
 
              customGrid.innerHTML = customColors.map(color => `
-                <div class="hmt-color-preset ${getDefaultColor() === color.value ? 'active' : ''}"
-                     data-color="${color.value}"
-                     data-type="${color.type}"
-                     data-preset-id="${color.id}"
-                     style="background-color: ${color.value}; position: relative;">
-                    <span class="hmt-color-name">${color.name}</span>
-                    <button class="hmt-delete-preset" data-preset-id="${color.id}" title="Xóa preset này">×</button>
-                </div>
-            `).join('');
+                 <div class="hmt-color-preset ${getDefaultColor() === color.value ? 'active' : ''}"
+                      data-color="${color.value}"
+                      data-type="${color.type}"
+                      data-preset-id="${color.id}"
+                      style="background-color: ${color.value}; position: relative;">
+                     <span class="hmt-color-name">${color.name}</span>
+                     <button class="hmt-delete-preset" data-preset-id="${color.id}" title="Xóa preset này">×</button>
+                 </div>
+             `).join('');
+
+             debugLog('Đã tạo HTML cho custom presets:', customColors.length);
+
+             // Gắn lại sự kiện cho các preset mới tạo
+             setTimeout(() => {
+                 attachPresetEvents();
+                 attachDeleteEvents();
+             }, 0);
         } else {
              customSection.style.display = 'none';
 
@@ -119,6 +127,110 @@
         if (colorPickerPanel) {
             colorPickerPanel.classList.remove('open');
         }
+
+        // Gắn lại sự kiện sau khi refresh
+        setTimeout(() => {
+            attachPresetEvents();
+            attachDeleteEvents();
+        }, 0);
+    }
+
+    // Hàm gắn sự kiện cho các preset màu (global)
+    function attachPresetEvents() {
+        const dialogs = document.querySelectorAll('.hmt-config-dialog');
+        dialogs.forEach(dialog => {
+            const allPresets = dialog.querySelectorAll('.hmt-color-preset');
+            debugLog('Gắn sự kiện preset cho dialog:', allPresets.length);
+
+            allPresets.forEach(preset => {
+                // Kiểm tra xem đã có sự kiện chưa
+                if (preset.hasAttribute('data-preset-events-attached')) {
+                    return;
+                }
+
+                preset.setAttribute('data-preset-events-attached', 'true');
+
+                preset.addEventListener('click', function() {
+                    // Bỏ active cho tất cả
+                    allPresets.forEach(p => p.classList.remove('active'));
+                    // Thêm active cho preset được chọn
+                    this.classList.add('active');
+
+                    const color = this.dataset.color;
+                    const type = this.dataset.type;
+                    debugLog('Chọn màu preset:', color, 'type:', type);
+
+                    const colorText = dialog.querySelector('.hmt-color-text');
+                    const previewBox = dialog.querySelector('.hmt-preview-box');
+                    const colorPreview = dialog.querySelector('#hmt-color-preview');
+                    const colorValue = dialog.querySelector('#hmt-color-value');
+
+                    if (colorText) colorText.value = color;
+                    if (previewBox) previewBox.style.backgroundColor = color;
+
+                    // Cập nhật color picker nếu có
+                    if (colorPreview) colorPreview.style.backgroundColor = color;
+                    if (colorValue) colorValue.textContent = color;
+
+                    // Cập nhật trạng thái nút save
+                    updateSavePresetButton(dialog);
+                });
+            });
+        });
+    }
+
+    // Hàm gắn sự kiện cho các nút xóa (global)
+    function attachDeleteEvents() {
+        const dialogs = document.querySelectorAll('.hmt-config-dialog');
+        dialogs.forEach(dialog => {
+            const deleteBtns = dialog.querySelectorAll('.hmt-delete-preset');
+            debugLog('Gắn sự kiện xóa cho dialog:', deleteBtns.length);
+
+            deleteBtns.forEach(btn => {
+                // Kiểm tra xem đã có sự kiện chưa
+                if (btn.hasAttribute('data-events-attached')) {
+                    return;
+                }
+
+                btn.setAttribute('data-events-attached', 'true');
+
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const presetId = this.dataset.presetId;
+                    debugLog('Click nút xóa preset:', presetId);
+
+                    if (!presetId) {
+                        showNotification('Lỗi: Không tìm thấy ID preset!', 5000);
+
+                        // Gắn lại sự kiện sau khi lỗi
+                        setTimeout(() => {
+                            attachPresetEvents();
+                            attachDeleteEvents();
+                        }, 100);
+                        return;
+                    }
+
+                    if (this.classList.contains('deleting')) {
+                        debugLog('Đang xóa, bỏ qua click');
+                        return; // Đang xóa, bỏ qua click
+                    }
+
+                    const presetElement = this.closest('.hmt-color-preset');
+                    const presetName = presetElement ? presetElement.querySelector('.hmt-color-name').textContent : 'Unknown';
+                    debugLog('Tên preset cần xóa:', presetName);
+
+                    if (confirm(`Bạn có chắc chắn muốn xóa preset "${presetName}"?`)) {
+                         deletePresetWithAnimation(this, presetId, dialog);
+                     } else {
+                         // Người dùng hủy xóa, gắn lại sự kiện
+                         setTimeout(() => {
+                             attachPresetEvents();
+                             attachDeleteEvents();
+                         }, 100);
+                     }
+                });
+            });
+        });
     }
 
     function saveCurrentColorToPreset(dialog) {
@@ -135,6 +247,12 @@
              if (colorPickerPanel) {
                  colorPickerPanel.classList.remove('open');
              }
+
+             // Gắn lại sự kiện sau khi lỗi
+             setTimeout(() => {
+                 attachPresetEvents();
+                 attachDeleteEvents();
+             }, 100);
              return;
          }
 
@@ -150,6 +268,12 @@
              if (colorPickerPanel) {
                  colorPickerPanel.classList.remove('open');
              }
+
+             // Gắn lại sự kiện sau khi thông báo
+             setTimeout(() => {
+                 attachPresetEvents();
+                 attachDeleteEvents();
+             }, 100);
              return;
          }
 
@@ -170,6 +294,12 @@
                  colorPickerPanel.classList.remove('open');
              }
 
+             // Gắn lại sự kiện sau khi lưu
+             setTimeout(() => {
+                 attachPresetEvents();
+                 attachDeleteEvents();
+             }, 100);
+
              showNotification(`Đã lưu màu "${customName.trim()}" vào preset!`, 3000);
          } else if (customName !== null) {
              debugLog('Người dùng hủy nhập tên preset');
@@ -178,9 +308,21 @@
              if (colorPickerPanel) {
                  colorPickerPanel.classList.remove('open');
              }
+
+             // Gắn lại sự kiện sau khi hủy
+             setTimeout(() => {
+                 attachPresetEvents();
+                 attachDeleteEvents();
+             }, 100);
          } else {
              debugLog('Prompt bị đóng hoặc không được hỗ trợ');
              showNotification('Không thể mở hộp thoại nhập tên. Vui lòng thử lại.', 3000);
+
+             // Gắn lại sự kiện sau khi lỗi
+             setTimeout(() => {
+                 attachPresetEvents();
+                 attachDeleteEvents();
+             }, 100);
          }
     }
 
@@ -241,6 +383,12 @@
                          }
                      }
 
+                     // Gắn lại sự kiện sau khi xóa
+                     setTimeout(() => {
+                         attachPresetEvents();
+                         attachDeleteEvents();
+                     }, 350);
+
                      showNotification('Đã xóa preset!', 3000);
                  }, 300);
             } else {
@@ -268,6 +416,12 @@
              if (colorPickerPanel) {
                  colorPickerPanel.classList.remove('open');
              }
+
+             // Gắn lại sự kiện sau khi lỗi
+             setTimeout(() => {
+                 attachPresetEvents();
+                 attachDeleteEvents();
+             }, 100);
          }
     }
 
@@ -275,6 +429,7 @@
      window.deleteCustomPreset = function(presetId) {
          if (confirm('Bạn có chắc chắn muốn xóa preset này?')) {
              removeCustomPreset(presetId);
+             debugLog('Đã xóa preset từ global function:', presetId);
 
              // Refresh tất cả dialogs đang mở
              document.querySelectorAll('.hmt-config-dialog').forEach(dialog => {
@@ -287,8 +442,15 @@
                  }
              });
 
+             // Gắn lại sự kiện sau khi xóa
+             setTimeout(() => {
+                 attachPresetEvents();
+                 attachDeleteEvents();
+             }, 100);
+
              showNotification('Đã xóa preset!', 3000);
          } else {
+             debugLog('Người dùng hủy xóa preset từ global function');
              // Người dùng hủy xóa, đóng color picker panel nếu đang mở
              document.querySelectorAll('.hmt-config-dialog').forEach(dialog => {
                  const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
@@ -296,6 +458,12 @@
                      colorPickerPanel.classList.remove('open');
                  }
              });
+
+             // Gắn lại sự kiện sau khi hủy
+             setTimeout(() => {
+                 attachPresetEvents();
+                 attachDeleteEvents();
+             }, 100);
          }
      };
 
@@ -1173,33 +1341,8 @@
             }
         });
 
-        // Xử lý chọn màu preset
-         colorPresets.forEach(preset => {
-             preset.addEventListener('click', function() {
-                 // Bỏ active cho tất cả
-                 colorPresets.forEach(p => p.classList.remove('active'));
-                 // Thêm active cho preset được chọn
-                 this.classList.add('active');
-
-                 const color = this.dataset.color;
-                 debugLog('Chọn màu preset:', color);
-
-                 if (colorText) colorText.value = color;
-                 if (previewBox) previewBox.style.backgroundColor = color;
-
-                 // Cập nhật color picker nếu có
-                 if (colorPreview) colorPreview.style.backgroundColor = color;
-                 if (colorValue) colorValue.textContent = color;
-
-                 // Đóng color picker panel nếu đang mở (cho các phần tử cũ)
-                 if (colorPickerPanel) {
-                     colorPickerPanel.classList.remove('open');
-                 }
-
-                 // Cập nhật trạng thái nút save
-                 updateSavePresetButton(dialog);
-             });
-         });
+        // Gọi hàm gắn sự kiện global
+        attachPresetEvents();
 
         // Xử lý color picker tùy chỉnh
         const customColorPicker = dialog.querySelector('.hmt-custom-color-picker');
@@ -1442,6 +1585,12 @@
                  if (colorPickerPanel) {
                      colorPickerPanel.classList.remove('open');
                  }
+
+                 // Gắn lại sự kiện sau khi lỗi
+                 setTimeout(() => {
+                     attachPresetEvents();
+                     attachDeleteEvents();
+                 }, 100);
              }
          });
 
@@ -1467,44 +1616,8 @@
 
          debugLog('Hoàn thành setup event listeners');
 
-         // Xử lý xóa custom presets
-        const deleteBtns = dialog.querySelectorAll('.hmt-delete-preset');
-        deleteBtns.forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const presetId = this.dataset.presetId;
-
-                if (!presetId) {
-                     showNotification('Lỗi: Không tìm thấy ID preset!', 5000);
-
-                     // Đóng color picker panel nếu đang mở
-                     if (colorPickerPanel) {
-                         colorPickerPanel.classList.remove('open');
-                     }
-                     return;
-                 }
-
-                if (this.classList.contains('deleting')) {
-                     return; // Đang xóa, bỏ qua click
-                 }
-
-                 // Đóng color picker panel nếu đang mở
-                 if (colorPickerPanel) {
-                     colorPickerPanel.classList.remove('open');
-                 }
-
-                const presetElement = this.closest('.hmt-color-preset');
-                const presetName = presetElement ? presetElement.querySelector('.hmt-color-name').textContent : 'Unknown';
-
-                if (confirm(`Bạn có chắc chắn muốn xóa preset "${presetName}"?`)) {
-                     // Đóng color picker panel nếu đang mở
-                     if (colorPickerPanel) {
-                         colorPickerPanel.classList.remove('open');
-                     }
-                     deletePresetWithAnimation(this, presetId, dialog);
-                 }
-            });
-        });
+         // Gọi hàm gắn sự kiện global
+         attachDeleteEvents();
 
         // Khôi phục mặc định
          resetBtn.addEventListener('click', function() {
@@ -1600,20 +1713,6 @@
         debugLog('Mở config dialog');
         createConfigDialog();
     }
-
-    debugLog('Config module đã được tải');
-
-    // Xuất các hàm cần thiết
-    window.HMTConfig = {
-        getDefaultColor: getDefaultColor,
-        setDefaultColor: setDefaultColor,
-        getColorName: getColorName,
-        getAllColors: getAllColors,
-        getCustomColors: getCustomColors,
-        saveCustomPreset: saveCustomPreset,
-        removeCustomPreset: removeCustomPreset,
-        openConfigDialog: openConfigDialog
-    };
 
     debugLog('Config module đã được tải');
 
