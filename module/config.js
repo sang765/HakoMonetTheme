@@ -80,8 +80,15 @@
         const customColors = getCustomColors();
 
         if (customColors.length > 0) {
-            customSection.style.display = 'block';
-            customGrid.innerHTML = customColors.map(color => `
+             customSection.style.display = 'block';
+
+             // Đóng color picker panel nếu đang mở
+             const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
+             if (colorPickerPanel) {
+                 colorPickerPanel.classList.remove('open');
+             }
+
+             customGrid.innerHTML = customColors.map(color => `
                 <div class="hmt-color-preset ${getDefaultColor() === color.value ? 'active' : ''}"
                      data-color="${color.value}"
                      data-type="${color.type}"
@@ -92,44 +99,80 @@
                 </div>
             `).join('');
         } else {
-            customSection.style.display = 'none';
-        }
-    }
+             customSection.style.display = 'none';
+
+             // Đóng color picker panel nếu đang mở
+             const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
+             if (colorPickerPanel) {
+                 colorPickerPanel.classList.remove('open');
+             }
+         }
+     }
 
     function refreshCustomPresets(dialog) {
         loadCustomPresets(dialog);
+
+        // Đóng color picker panel nếu đang mở
+        const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
+        if (colorPickerPanel) {
+            colorPickerPanel.classList.remove('open');
+        }
     }
 
     function saveCurrentColorToPreset(dialog) {
         const currentColor = dialog.querySelector('.hmt-color-text').value.trim();
-        const colorPicker = dialog.querySelector('.hmt-color-picker').value;
 
-        // Ưu tiên màu từ text input, fallback về color picker
-        const colorToSave = currentColor || colorPicker;
+        // Lấy màu từ text input
+        const colorToSave = currentColor;
 
         if (!isValidHexColor(colorToSave)) {
-            showNotification('Màu không hợp lệ! Vui lòng chọn màu trước khi lưu.', 5000);
-            return;
-        }
+             showNotification('Màu không hợp lệ! Vui lòng chọn màu trước khi lưu.', 5000);
+
+             // Đóng color picker panel nếu đang mở
+             const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
+             if (colorPickerPanel) {
+                 colorPickerPanel.classList.remove('open');
+             }
+             return;
+         }
 
         // Kiểm tra xem màu đã tồn tại trong default presets chưa
         const allColors = getAllColors();
         const existingColor = allColors.find(c => c.value.toLowerCase() === colorToSave.toLowerCase());
 
         if (existingColor && existingColor.type === 'default') {
-            showNotification('Màu này đã có trong danh sách mặc định!', 3000);
-            return;
-        }
+             showNotification('Màu này đã có trong danh sách mặc định!', 3000);
+
+             // Đóng color picker panel nếu đang mở
+             const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
+             if (colorPickerPanel) {
+                 colorPickerPanel.classList.remove('open');
+             }
+             return;
+         }
 
         // Tạo dialog nhập tên
         const name = generateColorName(colorToSave);
         const customName = prompt('Nhập tên cho màu preset này:', name);
 
         if (customName !== null && customName.trim() !== '') {
-            saveCustomPreset(colorToSave, customName.trim());
-            refreshCustomPresets(dialog);
-            showNotification(`Đã lưu màu "${customName.trim()}" vào preset!`, 3000);
-        }
+             saveCustomPreset(colorToSave, customName.trim());
+             refreshCustomPresets(dialog);
+
+             // Đóng color picker panel nếu đang mở
+             const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
+             if (colorPickerPanel) {
+                 colorPickerPanel.classList.remove('open');
+             }
+
+             showNotification(`Đã lưu màu "${customName.trim()}" vào preset!`, 3000);
+         } else if (customName !== null) {
+             // Người dùng hủy nhập tên, đóng color picker panel nếu đang mở
+             const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
+             if (colorPickerPanel) {
+                 colorPickerPanel.classList.remove('open');
+             }
+         }
     }
 
     function updateSavePresetButton(dialog) {
@@ -139,8 +182,10 @@
         if (saveBtn) {
             if (currentColor && isValidHexColor(currentColor)) {
                 saveBtn.disabled = false;
+                saveBtn.style.opacity = '1';
             } else {
                 saveBtn.disabled = true;
+                saveBtn.style.opacity = '0.5';
             }
         }
     }
@@ -163,46 +208,79 @@
                 presetElement.style.transform = 'scale(0.8)';
 
                 setTimeout(() => {
-                    refreshCustomPresets(dialog);
+                     refreshCustomPresets(dialog);
 
-                    // Kiểm tra xem còn custom presets không
-                    const customColors = getCustomColors();
-                    const customSection = dialog.querySelector('#customPresetsSection');
+                     // Kiểm tra xem còn custom presets không
+                     const customColors = getCustomColors();
+                     const customSection = dialog.querySelector('#customPresetsSection');
 
-                    if (customColors.length === 0 && customSection) {
-                        customSection.style.display = 'none';
-                    }
+                     if (customColors.length === 0 && customSection) {
+                          customSection.style.display = 'none';
+ 
+                          // Đóng color picker panel nếu đang mở
+                          const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
+                          if (colorPickerPanel) {
+                              colorPickerPanel.classList.remove('open');
+                          }
+                      }
 
-                    showNotification('Đã xóa preset!', 3000);
-                }, 300);
+                     showNotification('Đã xóa preset!', 3000);
+                 }, 300);
             } else {
                 refreshCustomPresets(dialog);
+
+                // Đóng color picker panel nếu đang mở
+                const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
+                if (colorPickerPanel) {
+                    colorPickerPanel.classList.remove('open');
+                }
+
                 showNotification('Đã xóa preset!', 3000);
             }
 
         } catch (error) {
-            debugLog('Lỗi khi xóa preset:', error);
-            showNotification('Lỗi khi xóa preset. Vui lòng thử lại.', 5000);
+             debugLog('Lỗi khi xóa preset:', error);
+             showNotification('Lỗi khi xóa preset. Vui lòng thử lại.', 5000);
 
-            // Reset button state
-            deleteBtn.classList.remove('deleting');
-            deleteBtn.textContent = '×';
-        }
+             // Reset button state
+             deleteBtn.classList.remove('deleting');
+             deleteBtn.textContent = '×';
+
+             // Đóng color picker panel nếu đang mở
+             const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
+             if (colorPickerPanel) {
+                 colorPickerPanel.classList.remove('open');
+             }
+         }
     }
 
     // Global function để xóa custom preset (được gọi từ onclick)
-    window.deleteCustomPreset = function(presetId) {
-        if (confirm('Bạn có chắc chắn muốn xóa preset này?')) {
-            removeCustomPreset(presetId);
+     window.deleteCustomPreset = function(presetId) {
+         if (confirm('Bạn có chắc chắn muốn xóa preset này?')) {
+             removeCustomPreset(presetId);
 
-            // Refresh tất cả dialogs đang mở
-            document.querySelectorAll('.hmt-config-dialog').forEach(dialog => {
-                refreshCustomPresets(dialog);
-            });
+             // Refresh tất cả dialogs đang mở
+             document.querySelectorAll('.hmt-config-dialog').forEach(dialog => {
+                 refreshCustomPresets(dialog);
 
-            showNotification('Đã xóa preset!', 3000);
-        }
-    };
+                 // Đóng color picker panel nếu đang mở
+                 const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
+                 if (colorPickerPanel) {
+                     colorPickerPanel.classList.remove('open');
+                 }
+             });
+
+             showNotification('Đã xóa preset!', 3000);
+         } else {
+             // Người dùng hủy xóa, đóng color picker panel nếu đang mở
+             document.querySelectorAll('.hmt-config-dialog').forEach(dialog => {
+                 const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
+                 if (colorPickerPanel) {
+                     colorPickerPanel.classList.remove('open');
+                 }
+             });
+         }
+     };
 
     function createConfigDialog() {
         // Kiểm tra xem dialog đã tồn tại chưa
@@ -275,11 +353,56 @@
                                 <label for="hmt-custom-color-input">Chọn màu tùy chỉnh:</label>
                                 <div class="hmt-color-input-group">
                                     <div class="hmt-color-picker-wrapper">
-                                        <input type="color"
-                                               id="hmt-custom-color-input"
-                                               value="${getDefaultColor()}"
-                                               class="hmt-color-picker">
-                                        <span class="hmt-color-picker-label">Color Picker</span>
+                                        <div class="hmt-custom-color-picker" id="hmt-custom-color-input">
+                                            <div class="hmt-color-picker-header">
+                                                <span class="hmt-color-picker-label">Color Picker</span>
+                                                <button class="hmt-picker-toggle" id="hmt-picker-toggle">▼</button>
+                                            </div>
+                                            <div class="hmt-color-picker-panel" id="hmt-color-picker-panel">
+                                                <div class="hmt-color-basic-grid">
+                                                    <div class="hmt-color-option" data-color="#FF0000" style="background-color: #FF0000;" title="Red"></div>
+                                                    <div class="hmt-color-option" data-color="#00FF00" style="background-color: #00FF00;" title="Green"></div>
+                                                    <div class="hmt-color-option" data-color="#0000FF" style="background-color: #0000FF;" title="Blue"></div>
+                                                    <div class="hmt-color-option" data-color="#FFFF00" style="background-color: #FFFF00;" title="Yellow"></div>
+                                                    <div class="hmt-color-option" data-color="#FF00FF" style="background-color: #FF00FF;" title="Magenta"></div>
+                                                    <div class="hmt-color-option" data-color="#00FFFF" style="background-color: #00FFFF;" title="Cyan"></div>
+                                                    <div class="hmt-color-option" data-color="#FFA500" style="background-color: #FFA500;" title="Orange"></div>
+                                                    <div class="hmt-color-option" data-color="#800080" style="background-color: #800080;" title="Purple"></div>
+                                                    <div class="hmt-color-option" data-color="#FFC0CB" style="background-color: #FFC0CB;" title="Pink"></div>
+                                                    <div class="hmt-color-option" data-color="#A52A2A" style="background-color: #A52A2A;" title="Brown"></div>
+                                                    <div class="hmt-color-option" data-color="#808080" style="background-color: #808080;" title="Gray"></div>
+                                                    <div class="hmt-color-option" data-color="#000000" style="background-color: #000000;" title="Black"></div>
+                                                    <div class="hmt-color-option" data-color="#FFFFFF" style="background-color: #FFFFFF; border: 1px solid #ccc;" title="White"></div>
+                                                    <div class="hmt-color-option" data-color="#C0C0C0" style="background-color: #C0C0C0;" title="Silver"></div>
+                                                    <div class="hmt-color-option" data-color="#800000" style="background-color: #800000;" title="Maroon"></div>
+                                                    <div class="hmt-color-option" data-color="#808000" style="background-color: #808000;" title="Olive"></div>
+                                                </div>
+                                                <div class="hmt-color-shades">
+                                                    <div class="hmt-shade-row">
+                                                        <div class="hmt-color-option" data-color="#FFEBEE" style="background-color: #FFEBEE;" title="Light Red"></div>
+                                                        <div class="hmt-color-option" data-color="#F3E5F5" style="background-color: #F3E5F5;" title="Light Purple"></div>
+                                                        <div class="hmt-color-option" data-color="#E8EAF6" style="background-color: #E8EAF6;" title="Light Blue"></div>
+                                                        <div class="hmt-color-option" data-color="#E0F2F1" style="background-color: #E0F2F1;" title="Light Green"></div>
+                                                        <div class="hmt-color-option" data-color="#FFF3E0" style="background-color: #FFF3E0;" title="Light Orange"></div>
+                                                    </div>
+                                                    <div class="hmt-shade-row">
+                                                        <div class="hmt-color-option" data-color="#FFCDD2" style="background-color: #FFCDD2;" title="Red Shade"></div>
+                                                        <div class="hmt-color-option" data-color="#CE93D8" style="background-color: #CE93D8;" title="Purple Shade"></div>
+                                                        <div class="hmt-color-option" data-color="#9FA8DA" style="background-color: #9FA8DA;" title="Blue Shade"></div>
+                                                        <div class="hmt-color-option" data-color="#81C784" style="background-color: #81C784;" title="Green Shade"></div>
+                                                        <div class="hmt-color-option" data-color="#FFB74D" style="background-color: #FFB74D;" title="Orange Shade"></div>
+                                                    </div>
+                                                    <div class="hmt-shade-row">
+                                                        <div class="hmt-color-option" data-color="#EF5350" style="background-color: #EF5350;" title="Dark Red"></div>
+                                                        <div class="hmt-color-option" data-color="#9C27B0" style="background-color: #9C27B0;" title="Dark Purple"></div>
+                                                        <div class="hmt-color-option" data-color="#5C6BC0" style="background-color: #5C6BC0;" title="Dark Blue"></div>
+                                                        <div class="hmt-color-option" data-color="#4CAF50" style="background-color: #4CAF50;" title="Dark Green"></div>
+                                                        <div class="hmt-color-option" data-color="#FF9800" style="background-color: #FF9800;" title="Dark Orange"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <span class="hmt-color-picker-label">Chọn màu từ bảng</span>
                                     </div>
                                     <input type="text"
                                            id="hmt-custom-color-text"
@@ -287,7 +410,7 @@
                                            class="hmt-color-text"
                                            placeholder="#6c5ce7">
                                 </div>
-                                <small class="hmt-color-help">Sử dụng color picker để chọn màu, hoặc nhập mã HEX trực tiếp</small>
+                                <small class="hmt-color-help">Nhấn vào bảng màu để chọn, hoặc nhập mã HEX trực tiếp</small>
                             </div>
                         </div>
 
@@ -571,19 +694,30 @@
                 gap: 8px;
             }
 
-            .hmt-color-picker {
+            .hmt-custom-color-picker {
                 width: 80px;
-                height: 60px;
                 border: 3px solid #667eea;
                 border-radius: 12px;
                 cursor: pointer;
                 transition: all 0.3s ease;
                 box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+                background: white;
+                position: relative;
             }
 
-            .hmt-color-picker:hover {
+            .hmt-custom-color-picker:hover {
                 transform: scale(1.05);
                 box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+            }
+
+            .hmt-color-picker-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px;
+                background: #f8f9fa;
+                border-radius: 8px 8px 0 0;
+                border-bottom: 1px solid #e9ecef;
             }
 
             .hmt-color-picker-label {
@@ -592,6 +726,76 @@
                 font-weight: 600;
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
+            }
+
+            .hmt-picker-toggle {
+                background: none;
+                border: none;
+                color: #667eea;
+                font-size: 10px;
+                cursor: pointer;
+                padding: 2px 4px;
+                border-radius: 3px;
+                transition: background-color 0.2s;
+            }
+
+            .hmt-picker-toggle:hover {
+                background: rgba(102, 126, 234, 0.1);
+            }
+
+            .hmt-color-picker-panel {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                border: 1px solid #e9ecef;
+                border-radius: 0 0 8px 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                z-index: 1000;
+                max-height: 200px;
+                overflow-y: auto;
+                display: none;
+            }
+
+            .hmt-color-picker-panel.open {
+                display: block;
+            }
+
+            .hmt-color-basic-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 2px;
+                padding: 8px;
+            }
+
+            .hmt-color-shades {
+                padding: 8px;
+                border-top: 1px solid #e9ecef;
+            }
+
+            .hmt-shade-row {
+                display: flex;
+                gap: 2px;
+                margin-bottom: 2px;
+            }
+
+            .hmt-shade-row:last-child {
+                margin-bottom: 0;
+            }
+
+            .hmt-color-option {
+                width: 20px;
+                height: 20px;
+                border-radius: 3px;
+                cursor: pointer;
+                transition: transform 0.2s;
+                border: 1px solid rgba(0, 0, 0, 0.1);
+            }
+
+            .hmt-color-option:hover {
+                transform: scale(1.1);
+                border: 2px solid #667eea;
             }
 
             .hmt-color-text {
@@ -870,10 +1074,16 @@
         document.body.appendChild(dialog);
 
         // Load custom presets
-        loadCustomPresets(dialog);
+         loadCustomPresets(dialog);
 
-        // Event listeners
-        setupConfigEventListeners(dialog);
+         // Đóng color picker panel nếu đang mở khi khởi tạo
+         const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
+         if (colorPickerPanel) {
+             colorPickerPanel.classList.remove('open');
+         }
+
+         // Event listeners
+         setupConfigEventListeners(dialog);
 
         // Xử lý lỗi load logo
         const logo = dialog.querySelector('.hmt-logo');
@@ -898,84 +1108,151 @@
         const resetBtn = dialog.querySelector('.hmt-config-reset');
 
         // Đóng dialog
-        function closeDialog() {
-            dialog.remove();
-        }
+         function closeDialog() {
+             // Đóng color picker panel nếu đang mở
+             if (colorPickerPanel) {
+                 colorPickerPanel.classList.remove('open');
+             }
+             dialog.remove();
+         }
 
         closeBtn.addEventListener('click', closeDialog);
         overlay.addEventListener('click', function(e) {
             if (e.target === overlay) {
-                closeDialog();
+                // Đóng color picker panel nếu đang mở
+                if (colorPickerPanel && colorPickerPanel.classList.contains('open')) {
+                    colorPickerPanel.classList.remove('open');
+                } else {
+                    closeDialog();
+                }
             }
         });
 
         // Xử lý chọn màu preset
-        colorPresets.forEach(preset => {
-            preset.addEventListener('click', function() {
-                // Bỏ active cho tất cả
-                colorPresets.forEach(p => p.classList.remove('active'));
-                // Thêm active cho preset được chọn
-                this.classList.add('active');
+         colorPresets.forEach(preset => {
+             preset.addEventListener('click', function() {
+                 // Bỏ active cho tất cả
+                 colorPresets.forEach(p => p.classList.remove('active'));
+                 // Thêm active cho preset được chọn
+                 this.classList.add('active');
 
-                const color = this.dataset.color;
-                colorPicker.value = color;
-                colorText.value = color;
-                previewBox.style.backgroundColor = color;
+                 const color = this.dataset.color;
+                 colorText.value = color;
+                 previewBox.style.backgroundColor = color;
 
-                debugLog('Đã chọn màu preset:', color);
+                 // Đóng color picker panel nếu đang mở
+                 if (colorPickerPanel) {
+                     colorPickerPanel.classList.remove('open');
+                 }
+
+                 debugLog('Đã chọn màu preset:', color);
+             });
+         });
+
+        // Xử lý color picker tùy chỉnh
+        const customColorPicker = dialog.querySelector('.hmt-custom-color-picker');
+        const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
+        const pickerToggle = dialog.querySelector('.hmt-picker-toggle');
+        const colorOptions = dialog.querySelectorAll('.hmt-color-option');
+
+        // Toggle color picker panel
+        if (pickerToggle && colorPickerPanel) {
+            pickerToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                colorPickerPanel.classList.toggle('open');
             });
-        });
 
-        // Xử lý color picker
-        colorPicker.addEventListener('input', function() {
-            const color = this.value;
-            colorText.value = color;
-            previewBox.style.backgroundColor = color;
-
-            // Bỏ active cho tất cả presets nếu đang chọn màu tùy chỉnh
-            colorPresets.forEach(p => p.classList.remove('active'));
-
-            // Cập nhật trạng thái nút save
-            updateSavePresetButton(dialog);
-        });
-
-        // Xử lý text input
-        colorText.addEventListener('input', function() {
-            const color = this.value.trim();
-            if (isValidHexColor(color)) {
-                colorPicker.value = color;
-                previewBox.style.backgroundColor = color;
-                colorPresets.forEach(p => p.classList.remove('active'));
-            }
-
-            // Cập nhật trạng thái nút save
-            updateSavePresetButton(dialog);
-        });
-
-        // Lưu cài đặt
-        saveBtn.addEventListener('click', function() {
-            const selectedColor = colorText.value.trim();
-            if (isValidHexColor(selectedColor)) {
-                setDefaultColor(selectedColor);
-                showNotification('Đã lưu cài đặt màu sắc!', 3000);
-                closeDialog();
-            } else {
-                showNotification('Màu không hợp lệ! Vui lòng nhập mã màu HEX đúng định dạng.', 5000);
-            }
-        });
-
-        // Save to preset
-        const saveToPresetBtn = dialog.querySelector('#saveToPresetBtn');
-        if (saveToPresetBtn) {
-            saveToPresetBtn.addEventListener('click', function() {
-                saveCurrentColorToPreset(dialog);
+            // Đóng panel khi click bên ngoài
+            document.addEventListener('click', function(e) {
+                if (!customColorPicker.contains(e.target)) {
+                    colorPickerPanel.classList.remove('open');
+                }
             });
         }
 
-        // Update save button state
-        updateSavePresetButton(dialog);
+        // Xử lý chọn màu từ bảng màu
+        colorOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const color = this.dataset.color;
+                colorText.value = color;
+                previewBox.style.backgroundColor = color;
 
-        // Xử lý xóa custom presets
+                // Bỏ active cho tất cả presets nếu đang chọn màu tùy chỉnh
+                colorPresets.forEach(p => p.classList.remove('active'));
+
+                // Đóng color picker panel
+                if (colorPickerPanel) {
+                    colorPickerPanel.classList.remove('open');
+                }
+
+                // Cập nhật trạng thái nút save
+                updateSavePresetButton(dialog);
+
+                debugLog('Đã chọn màu từ color picker:', color);
+            });
+        });
+
+        // Xử lý text input
+         colorText.addEventListener('input', function() {
+             const color = this.value.trim();
+             if (isValidHexColor(color)) {
+                 previewBox.style.backgroundColor = color;
+                 colorPresets.forEach(p => p.classList.remove('active'));
+
+                 // Đóng color picker panel nếu đang mở
+                 if (colorPickerPanel) {
+                     colorPickerPanel.classList.remove('open');
+                 }
+             }
+
+             // Cập nhật trạng thái nút save
+             updateSavePresetButton(dialog);
+         });
+
+        // Lưu cài đặt
+         saveBtn.addEventListener('click', function() {
+             const selectedColor = colorText.value.trim();
+             if (isValidHexColor(selectedColor)) {
+                 setDefaultColor(selectedColor);
+
+                 // Đóng color picker panel nếu đang mở
+                 if (colorPickerPanel) {
+                     colorPickerPanel.classList.remove('open');
+                 }
+
+                 showNotification('Đã lưu cài đặt màu sắc!', 3000);
+                 closeDialog();
+             } else {
+                 showNotification('Màu không hợp lệ! Vui lòng nhập mã màu HEX đúng định dạng.', 5000);
+
+                 // Đóng color picker panel nếu đang mở
+                 if (colorPickerPanel) {
+                     colorPickerPanel.classList.remove('open');
+                 }
+             }
+         });
+
+        // Save to preset
+         const saveToPresetBtn = dialog.querySelector('#saveToPresetBtn');
+         if (saveToPresetBtn) {
+             saveToPresetBtn.addEventListener('click', function() {
+                 // Đóng color picker panel nếu đang mở
+                 if (colorPickerPanel) {
+                     colorPickerPanel.classList.remove('open');
+                 }
+                 saveCurrentColorToPreset(dialog);
+             });
+         }
+
+        // Update save button state
+         updateSavePresetButton(dialog);
+
+         // Đóng color picker panel nếu đang mở khi khởi tạo
+         if (colorPickerPanel) {
+             colorPickerPanel.classList.remove('open');
+         }
+
+         // Xử lý xóa custom presets
         const deleteBtns = dialog.querySelectorAll('.hmt-delete-preset');
         deleteBtns.forEach(btn => {
             btn.addEventListener('click', function(e) {
@@ -983,49 +1260,72 @@
                 const presetId = this.dataset.presetId;
 
                 if (!presetId) {
-                    showNotification('Lỗi: Không tìm thấy ID preset!', 5000);
-                    return;
-                }
+                     showNotification('Lỗi: Không tìm thấy ID preset!', 5000);
+
+                     // Đóng color picker panel nếu đang mở
+                     if (colorPickerPanel) {
+                         colorPickerPanel.classList.remove('open');
+                     }
+                     return;
+                 }
 
                 if (this.classList.contains('deleting')) {
-                    return; // Đang xóa, bỏ qua click
-                }
+                     return; // Đang xóa, bỏ qua click
+                 }
+
+                 // Đóng color picker panel nếu đang mở
+                 if (colorPickerPanel) {
+                     colorPickerPanel.classList.remove('open');
+                 }
 
                 const presetElement = this.closest('.hmt-color-preset');
                 const presetName = presetElement ? presetElement.querySelector('.hmt-color-name').textContent : 'Unknown';
 
                 if (confirm(`Bạn có chắc chắn muốn xóa preset "${presetName}"?`)) {
-                    deletePresetWithAnimation(this, presetId, dialog);
-                }
+                     // Đóng color picker panel nếu đang mở
+                     if (colorPickerPanel) {
+                         colorPickerPanel.classList.remove('open');
+                     }
+                     deletePresetWithAnimation(this, presetId, dialog);
+                 }
             });
         });
 
         // Khôi phục mặc định
-        resetBtn.addEventListener('click', function() {
-            const defaultColor = '#6c5ce7';
-            setDefaultColor(defaultColor);
+         resetBtn.addEventListener('click', function() {
+             const defaultColor = '#6c5ce7';
+             setDefaultColor(defaultColor);
 
-            // Cập nhật UI
-            colorPicker.value = defaultColor;
-            colorText.value = defaultColor;
-            previewBox.style.backgroundColor = defaultColor;
+             // Cập nhật UI
+             colorText.value = defaultColor;
+             previewBox.style.backgroundColor = defaultColor;
 
-            // Đặt active cho preset mặc định
-            colorPresets.forEach(p => p.classList.remove('active'));
-            const defaultPreset = dialog.querySelector(`[data-color="${defaultColor}"]`);
-            if (defaultPreset) {
-                defaultPreset.classList.add('active');
-            }
+             // Đóng color picker panel nếu đang mở
+             if (colorPickerPanel) {
+                 colorPickerPanel.classList.remove('open');
+             }
 
-            showNotification('Đã khôi phục màu mặc định!', 3000);
-        });
+             // Đặt active cho preset mặc định
+             colorPresets.forEach(p => p.classList.remove('active'));
+             const defaultPreset = dialog.querySelector(`[data-color="${defaultColor}"]`);
+             if (defaultPreset) {
+                 defaultPreset.classList.add('active');
+             }
+
+             showNotification('Đã khôi phục màu mặc định!', 3000);
+         });
 
         // Đóng khi nhấn ESC
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeDialog();
-            }
-        });
+         document.addEventListener('keydown', function(e) {
+             if (e.key === 'Escape') {
+                 // Đóng color picker panel nếu đang mở
+                 if (colorPickerPanel && colorPickerPanel.classList.contains('open')) {
+                     colorPickerPanel.classList.remove('open');
+                 } else {
+                     closeDialog();
+                 }
+             }
+         });
     }
 
     function isValidHexColor(color) {
