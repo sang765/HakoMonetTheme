@@ -1,8 +1,43 @@
 (function() {
     'use strict';
-    
+
     const DEBUG = true;
     const TARGET_DOMAINS = ['docln', 'hako', 'i2.hako.vip', 'docln.sbs', 'docln.net', 'ln.hako.vn'];
+
+    // Load Advanced Color Analyzer module nếu chưa có
+    function loadAdvancedColorAnalyzer() {
+        return new Promise((resolve, reject) => {
+            if (window.AdvancedColorAnalyzer) {
+                resolve();
+                return;
+            }
+
+            // Kiểm tra xem script đã được load chưa
+            const existingScript = document.querySelector('script[src*="advanced-color-analyzer"]');
+            if (existingScript) {
+                // Đợi script load xong
+                if (existingScript.onload) {
+                    existingScript.onload = resolve;
+                } else {
+                    resolve();
+                }
+                return;
+            }
+
+            // Load script mới
+            const script = document.createElement('script');
+            script.src = 'module/advanced-color-analyzer.js';
+            script.onload = () => {
+                debugLog('Advanced Color Analyzer module loaded successfully');
+                resolve();
+            };
+            script.onerror = () => {
+                reject(new Error('Failed to load Advanced Color Analyzer module'));
+            };
+
+            document.head.appendChild(script);
+        });
+    }
 
     function debugLog(...args) {
         if (DEBUG) {
@@ -71,7 +106,16 @@
         debugLog('Integrated CORS handling for images is ready');
     }
     
-    function initPageInfoTruyen() {
+    async function initPageInfoTruyen() {
+        try {
+            // Load Advanced Color Analyzer module trước
+            await loadAdvancedColorAnalyzer();
+            debugLog('Advanced Color Analyzer module đã sẵn sàng');
+        } catch (error) {
+            debugLog('Không thể load Advanced Color Analyzer module:', error);
+            // Tiếp tục với code cũ nếu không load được module mới
+        }
+
         // Kiểm tra xem có phải trang chi tiết truyện không
         const pathParts = window.location.pathname.split('/').filter(part => part !== '');
         if (pathParts.length < 2 || !['truyen', 'sang-tac', 'ai-dich'].includes(pathParts[0])) {
@@ -101,34 +145,93 @@
         // Thêm CSS cho phần trên của feature-section trong suốt
         addTransparentTopCSS();
         
-        // Phân tích màu từ ảnh bìa
-        analyzeImageColorTraditionalAccent(coverUrl)
-            .then(dominantColor => {
-                debugLog('Màu chủ đạo (accent truyền thống):', dominantColor);
-                
-                if (!isValidColor(dominantColor)) {
-                    debugLog('Màu không hợp lệ, sử dụng màu mặc định');
-                    applyDefaultColorScheme();
-                    return;
-                }
-                
-                // Gọi API Monet để tạo palette
-                const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
-                debugLog('Monet Palette:', monetPalette);
-                
-                const isLightColor = MonetAPI.isColorLight(dominantColor);
-                debugLog('Màu sáng?', isLightColor);
-                
-                applyMonetColorScheme(monetPalette, isLightColor);
-            })
-            .catch(error => {
-                debugLog('Lỗi khi phân tích ảnh:', error);
+        // Sử dụng Advanced Color Analyzer mới
+        try {
+            const result = await analyzeImageWithAdvancedAnalyzer(coverUrl);
+            debugLog('Kết quả phân tích màu nâng cao:', result);
+
+            if (!result || !isValidColor(result.dominantColor)) {
+                debugLog('Màu không hợp lệ, sử dụng màu mặc định');
                 applyDefaultColorScheme();
-            });
+                return;
+            }
+
+            debugLog('Màu chủ đạo được chọn:', result.dominantColor);
+            debugLog('Algorithm sử dụng:', result.algorithmUsed);
+            debugLog('Độ tin cậy:', result.confidence);
+            debugLog('Thời gian xử lý:', result.processingTime + 'ms');
+
+            const monetPalette = result.palette;
+            debugLog('Monet Palette:', monetPalette);
+
+            const isLightColor = result.isLight;
+            debugLog('Màu sáng?', isLightColor);
+
+            applyMonetColorScheme(monetPalette, isLightColor);
+        } catch (error) {
+            debugLog('Lỗi khi phân tích ảnh với Advanced Analyzer:', error);
+            applyDefaultColorScheme();
+        }
     }
     
     function isValidColor(color) {
         return MonetAPI.isValidColor(color);
+    }
+
+    // Hàm phân tích ảnh với Advanced Color Analyzer
+    async function analyzeImageWithAdvancedAnalyzer(imageUrl) {
+        try {
+            // Đảm bảo module đã được load
+            await loadAdvancedColorAnalyzer();
+
+            // Khởi tạo analyzer nếu chưa có
+            if (!window.advancedColorAnalyzer) {
+                window.advancedColorAnalyzer = new AdvancedColorAnalyzer();
+                await window.advancedColorAnalyzer.initialize();
+                debugLog('Advanced Color Analyzer đã được khởi tạo');
+            }
+
+            // Phân tích với các options tối ưu cho ảnh bìa truyện
+            const options = {
+                maxDimension: 400,
+                sampleSize: 8000,
+                focusArea: { x: 0.2, y: 0.2, width: 0.6, height: 0.6 }, // Tập trung vào trung tâm ảnh bìa
+                algorithmPreference: ['traditionalAccent', 'vibrantDominant', 'materialYou']
+            };
+
+            const result = await window.advancedColorAnalyzer.analyzeImage(imageUrl, options);
+
+            // Validate kết quả
+            if (!result || !result.dominantColor) {
+                throw new Error('Không nhận được kết quả phân tích hợp lệ');
+            }
+
+            return result;
+
+        } catch (error) {
+            debugLog('Lỗi khi sử dụng Advanced Color Analyzer:', error);
+
+            // Fallback: thử với các strategies khác
+            try {
+                const fallbackStrategies = [
+                    { algorithmPreference: ['vibrantDominant', 'colorThief'] },
+                    { algorithmPreference: ['materialYou'] },
+                    { maxDimension: 200, sampleSize: 4000 }, // Giảm chất lượng để tăng tốc độ
+                    {} // Sử dụng default options
+                ];
+
+                const result = await window.advancedColorAnalyzer.analyzeImageWithFallback(imageUrl, fallbackStrategies);
+
+                if (result) {
+                    debugLog('Fallback strategy thành công');
+                    return result;
+                }
+            } catch (fallbackError) {
+                debugLog('Tất cả fallback strategies đều thất bại:', fallbackError);
+            }
+
+            throw error;
+        }
     }
     
     // Hàm thêm CSS cho phần trên của feature-section trong suốt
@@ -891,9 +994,20 @@
     }
     
     // Khởi chạy module
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initPageInfoTruyen);
-    } else {
-        initPageInfoTruyen();
+    async function startModule() {
+        try {
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', async () => {
+                    await initPageInfoTruyen();
+                });
+            } else {
+                await initPageInfoTruyen();
+            }
+        } catch (error) {
+            debugLog('Lỗi khi khởi chạy module:', error);
+        }
     }
+
+    // Bắt đầu module
+    startModule();
 })();
