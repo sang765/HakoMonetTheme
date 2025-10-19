@@ -26,6 +26,16 @@
     function setDefaultColor(color) {
         GM_setValue('default_color', color);
         debugLog('Đã lưu màu mặc định:', color);
+
+        // Phát sự kiện màu sắc thay đổi để các module khác cập nhật real-time
+        const colorChangeEvent = new CustomEvent('hmtColorChanged', {
+            detail: {
+                color: color,
+                timestamp: Date.now()
+            }
+        });
+        document.dispatchEvent(colorChangeEvent);
+        debugLog('Đã phát sự kiện màu sắc thay đổi:', color);
     }
 
     function getColorName(colorValue) {
@@ -587,7 +597,10 @@
                     </div>
                     <div class="hmt-config-footer">
                         <button class="hmt-config-reset">Khôi phục mặc định</button>
-                        <button class="hmt-config-save">Lưu cài đặt</button>
+                        <div class="hmt-config-buttons">
+                            <button class="hmt-config-apply">Áp dụng ngay</button>
+                            <button class="hmt-config-save">Lưu cài đặt</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -823,6 +836,19 @@
             .hmt-color-preset.active {
                 border-color: #333;
                 box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
+                animation: hmtPresetSelected 0.3s ease-out;
+            }
+
+            @keyframes hmtPresetSelected {
+                0% {
+                    transform: scale(0.95);
+                }
+                50% {
+                    transform: scale(1.05);
+                }
+                100% {
+                    transform: scale(1);
+                }
             }
 
             .hmt-color-name {
@@ -1163,7 +1189,13 @@
                 background: #f8f9fa;
                 display: flex;
                 justify-content: space-between;
+                align-items: center;
                 gap: 12px;
+            }
+
+            .hmt-config-buttons {
+                display: flex;
+                gap: 8px;
             }
 
             .hmt-config-reset,
@@ -1186,6 +1218,40 @@
             .hmt-config-reset:hover {
                 background: #e9ecef;
                 color: #333;
+            }
+
+            .hmt-config-apply {
+                background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                color: white;
+                border: none;
+                padding: 10px 16px;
+                border-radius: 6px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .hmt-config-apply:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+            }
+
+            .hmt-config-apply:active {
+                transform: translateY(0);
+                animation: hmtApplyBtnClick 0.2s ease-out;
+            }
+
+            @keyframes hmtApplyBtnClick {
+                0% {
+                    transform: translateY(0) scale(0.98);
+                }
+                50% {
+                    transform: translateY(-2px) scale(1.02);
+                }
+                100% {
+                    transform: translateY(0) scale(1);
+                }
             }
 
             .hmt-config-save {
@@ -1317,6 +1383,7 @@
         const colorText = dialog.querySelector('.hmt-color-text');
         const previewBox = dialog.querySelector('.hmt-preview-box');
         const saveBtn = dialog.querySelector('.hmt-config-save');
+        const applyBtn = dialog.querySelector('.hmt-config-apply');
         const resetBtn = dialog.querySelector('.hmt-config-reset');
         const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
 
@@ -1594,17 +1661,51 @@
              }
          });
 
+        // Áp dụng màu ngay lập tức (real-time update)
+        if (applyBtn) {
+            applyBtn.addEventListener('click', function() {
+                const selectedColor = colorText.value.trim();
+                debugLog('Áp dụng màu ngay lập tức:', selectedColor);
+
+                if (isValidHexColor(selectedColor)) {
+                    // Lưu màu vào storage và phát sự kiện để các module khác cập nhật
+                    setDefaultColor(selectedColor);
+
+                    // Đóng color picker panel nếu đang mở
+                    if (colorPickerPanel) {
+                        colorPickerPanel.classList.remove('open');
+                    }
+
+                    showNotification('Đã áp dụng màu sắc mới! Bạn có thể thấy thay đổi ngay lập tức.', 3000);
+                } else {
+                    debugLog('Màu không hợp lệ khi áp dụng ngay:', selectedColor);
+                    showNotification('Màu không hợp lệ! Vui lòng nhập mã màu HEX đúng định dạng.', 5000);
+
+                    // Đóng color picker panel nếu đang mở
+                    if (colorPickerPanel) {
+                        colorPickerPanel.classList.remove('open');
+                    }
+
+                    // Gắn lại sự kiện sau khi lỗi
+                    setTimeout(() => {
+                        attachPresetEvents();
+                        attachDeleteEvents();
+                    }, 100);
+                }
+            });
+        }
+
         // Save to preset
-         const saveToPresetBtn = dialog.querySelector('#saveToPresetBtn');
-         if (saveToPresetBtn) {
-             saveToPresetBtn.addEventListener('click', function() {
-                 debugLog('Nút Lưu vào Preset được click');
-                 const currentColor = colorText.value.trim();
-                 debugLog('Màu hiện tại:', currentColor);
-                 debugLog('Màu hợp lệ:', isValidHexColor(currentColor));
-                 saveCurrentColorToPreset(dialog);
-             });
-         }
+        const saveToPresetBtn = dialog.querySelector('#saveToPresetBtn');
+        if (saveToPresetBtn) {
+            saveToPresetBtn.addEventListener('click', function() {
+                debugLog('Nút Lưu vào Preset được click');
+                const currentColor = colorText.value.trim();
+                debugLog('Màu hiện tại:', currentColor);
+                debugLog('Màu hợp lệ:', isValidHexColor(currentColor));
+                saveCurrentColorToPreset(dialog);
+            });
+        }
 
         // Update save button state
          updateSavePresetButton(dialog);
@@ -1699,7 +1800,31 @@
                 <p style="margin: 0; font-size: 14px; opacity: 0.9;">${message}</p>
             `;
 
+            // Thêm animation vào notification
+            setTimeout(() => {
+                notification.style.animation = 'hmtNotificationSlideIn 0.5s ease-out';
+            }, 10);
+
             document.body.appendChild(notification);
+
+            // Thêm keyframes cho notification animation nếu chưa có
+            if (!document.querySelector('#hmt-notification-styles')) {
+                const style = document.createElement('style');
+                style.id = 'hmt-notification-styles';
+                style.textContent = `
+                    @keyframes hmtNotificationSlideIn {
+                        from {
+                            transform: translateX(100%);
+                            opacity: 0;
+                        }
+                        to {
+                            transform: translateX(0);
+                            opacity: 1;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
 
             setTimeout(() => {
                 if (notification.parentElement) {
