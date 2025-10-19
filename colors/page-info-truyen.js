@@ -679,10 +679,60 @@
                 filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#002a2a2a",endColorstr="${palette[800]}",GradientType=0) !important;
             }
             
-            .visible-toolkit .visible-toolkit-item.do-like.liked { 
-                border-bottom-color: ${palette[500]} !important; 
-                color: ${palette[500]} !important; 
-                font-weight: 700 !important; 
+            .visible-toolkit .visible-toolkit-item.do-like.liked {
+                border-bottom-color: ${palette[500]} !important;
+                color: ${palette[500]} !important;
+                font-weight: 700 !important;
+            }
+
+            /* Additional styles for TinyMCE editor and search */
+            .navbar-search .search-input {
+                background-color: ${palette[900]} !important;
+            }
+
+            .button-green {
+                background-color: ${palette[400]} !important;
+                border-color: ${palette[600]} !important;
+                color: ${textColor} !important;
+            }
+
+            .tox .tox-statusbar {
+                background-color: ${palette[800]} !important;
+                border-top: 1px solid ${palette[600]} !important;
+                color: ${palette[200]} !important;
+            }
+
+            #tinymce {
+                background-color: ${palette[800]} !important;
+            }
+
+            .tox:not(.tox-tinymce-inline) .tox-editor-header {
+                background-color: ${palette[800]} !important;
+                border-bottom: 1px solid ${palette[600]} !important;
+            }
+
+            .tox .tox-tbtn {
+                background: ${palette[800]} !important;
+                color: ${textColor} !important;
+            }
+
+            .tox .tox-tbtn:hover {
+                background: ${palette[700]} !important;
+                color: ${textColor} !important;
+            }
+
+            .tox .tox-tbtn--active, .tox .tox-tbtn--enabled, .tox .tox-tbtn--enabled:focus, .tox .tox-tbtn--enabled:hover {
+                background: ${palette[500]} !important;
+                color: ${textColor} !important;
+            }
+
+            .tox .tox-tbtn--disabled, .tox .tox-tbtn--disabled:hover, .tox .tox-tbtn:disabled, .tox .tox-tbtn:disabled:hover {
+                background: ${palette[800]} !important;
+                color: ${palette[300]} !important;
+            }
+
+            :is(.dark .dark\:ring-cyan-900) {
+                --tw-ring-color: ${palette[800]} !important;
             }
         `;
         
@@ -879,10 +929,60 @@
                 filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#002a2a2a",endColorstr="${defaultPalette[800]}",GradientType=0) !important;
             }
             
-            .visible-toolkit .visible-toolkit-item.do-like.liked { 
-                border-bottom-color: ${defaultColor} !important; 
-                color: ${defaultColor} !important; 
-                font-weight: 700 !important; 
+            .visible-toolkit .visible-toolkit-item.do-like.liked {
+                border-bottom-color: ${defaultColor} !important;
+                color: ${defaultColor} !important;
+                font-weight: 700 !important;
+            }
+
+            /* Additional styles for TinyMCE editor and search */
+            .navbar-search .search-input {
+                background-color: ${defaultPalette[900]} !important;
+            }
+
+            .button-green {
+                background-color: ${defaultPalette[400]} !important;
+                border-color: ${defaultPalette[600]} !important;
+                color: #fff !important;
+            }
+
+            .tox .tox-statusbar {
+                background-color: ${defaultPalette[800]} !important;
+                border-top: 1px solid ${defaultPalette[600]} !important;
+                color: ${defaultPalette[200]} !important;
+            }
+
+            #tinymce {
+                background-color: ${defaultPalette[800]} !important;
+            }
+
+            .tox:not(.tox-tinymce-inline) .tox-editor-header {
+                background-color: ${defaultPalette[800]} !important;
+                border-bottom: 1px solid ${defaultPalette[600]} !important;
+            }
+
+            .tox .tox-tbtn {
+                background: ${defaultPalette[800]} !important;
+                color: #fff !important;
+            }
+
+            .tox .tox-tbtn:hover {
+                background: ${defaultPalette[700]} !important;
+                color: #fff !important;
+            }
+
+            .tox .tox-tbtn--active, .tox .tox-tbtn--enabled, .tox .tox-tbtn--enabled:focus, .tox .tox-tbtn--enabled:hover {
+                background: ${defaultColor} !important;
+                color: #fff !important;
+            }
+
+            .tox .tox-tbtn--disabled, .tox .tox-tbtn--disabled:hover, .tox .tox-tbtn:disabled, .tox .tox-tbtn:disabled:hover {
+                background: ${defaultPalette[800]} !important;
+                color: ${defaultPalette[300]} !important;
+            }
+
+            :is(.dark .dark\:ring-cyan-900) {
+                --tw-ring-color: ${defaultPalette[800]} !important;
             }
         `;
         
