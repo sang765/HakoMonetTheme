@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Hako: Monet Theme (DEV)
+// @name         Hako: Monet Theme
 // @namespace    https://github.com/sang765
 // @version      3.2.1
 // @description  Material You theme for Hako/DocLN.
