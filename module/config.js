@@ -354,55 +354,34 @@
                                 <div class="hmt-color-input-group">
                                     <div class="hmt-color-picker-wrapper">
                                         <div class="hmt-custom-color-picker" id="hmt-custom-color-input">
-                                            <div class="hmt-color-picker-header">
-                                                <span class="hmt-color-picker-label">Color Picker</span>
-                                                <button class="hmt-picker-toggle" id="hmt-picker-toggle">▼</button>
+                                            <div class="hmt-color-picker-display">
+                                                <div class="hmt-color-preview" id="hmt-color-preview"></div>
+                                                <span class="hmt-color-value" id="hmt-color-value">#6c5ce7</span>
                                             </div>
-                                            <div class="hmt-color-picker-panel" id="hmt-color-picker-panel">
-                                                <div class="hmt-color-basic-grid">
-                                                    <div class="hmt-color-option" data-color="#FF0000" style="background-color: #FF0000;" title="Red"></div>
-                                                    <div class="hmt-color-option" data-color="#00FF00" style="background-color: #00FF00;" title="Green"></div>
-                                                    <div class="hmt-color-option" data-color="#0000FF" style="background-color: #0000FF;" title="Blue"></div>
-                                                    <div class="hmt-color-option" data-color="#FFFF00" style="background-color: #FFFF00;" title="Yellow"></div>
-                                                    <div class="hmt-color-option" data-color="#FF00FF" style="background-color: #FF00FF;" title="Magenta"></div>
-                                                    <div class="hmt-color-option" data-color="#00FFFF" style="background-color: #00FFFF;" title="Cyan"></div>
-                                                    <div class="hmt-color-option" data-color="#FFA500" style="background-color: #FFA500;" title="Orange"></div>
-                                                    <div class="hmt-color-option" data-color="#800080" style="background-color: #800080;" title="Purple"></div>
-                                                    <div class="hmt-color-option" data-color="#FFC0CB" style="background-color: #FFC0CB;" title="Pink"></div>
-                                                    <div class="hmt-color-option" data-color="#A52A2A" style="background-color: #A52A2A;" title="Brown"></div>
-                                                    <div class="hmt-color-option" data-color="#808080" style="background-color: #808080;" title="Gray"></div>
-                                                    <div class="hmt-color-option" data-color="#000000" style="background-color: #000000;" title="Black"></div>
-                                                    <div class="hmt-color-option" data-color="#FFFFFF" style="background-color: #FFFFFF; border: 1px solid #ccc;" title="White"></div>
-                                                    <div class="hmt-color-option" data-color="#C0C0C0" style="background-color: #C0C0C0;" title="Silver"></div>
-                                                    <div class="hmt-color-option" data-color="#800000" style="background-color: #800000;" title="Maroon"></div>
-                                                    <div class="hmt-color-option" data-color="#808000" style="background-color: #808000;" title="Olive"></div>
+                                            <div class="hmt-color-controls">
+                                                <div class="hmt-color-slider-group">
+                                                    <label class="hmt-slider-label">Hue</label>
+                                                    <input type="range" class="hmt-color-slider hmt-hue-slider" id="hmt-hue-slider" min="0" max="360" value="262">
                                                 </div>
-                                                <div class="hmt-color-shades">
-                                                    <div class="hmt-shade-row">
-                                                        <div class="hmt-color-option" data-color="#FFEBEE" style="background-color: #FFEBEE;" title="Light Red"></div>
-                                                        <div class="hmt-color-option" data-color="#F3E5F5" style="background-color: #F3E5F5;" title="Light Purple"></div>
-                                                        <div class="hmt-color-option" data-color="#E8EAF6" style="background-color: #E8EAF6;" title="Light Blue"></div>
-                                                        <div class="hmt-color-option" data-color="#E0F2F1" style="background-color: #E0F2F1;" title="Light Green"></div>
-                                                        <div class="hmt-color-option" data-color="#FFF3E0" style="background-color: #FFF3E0;" title="Light Orange"></div>
-                                                    </div>
-                                                    <div class="hmt-shade-row">
-                                                        <div class="hmt-color-option" data-color="#FFCDD2" style="background-color: #FFCDD2;" title="Red Shade"></div>
-                                                        <div class="hmt-color-option" data-color="#CE93D8" style="background-color: #CE93D8;" title="Purple Shade"></div>
-                                                        <div class="hmt-color-option" data-color="#9FA8DA" style="background-color: #9FA8DA;" title="Blue Shade"></div>
-                                                        <div class="hmt-color-option" data-color="#81C784" style="background-color: #81C784;" title="Green Shade"></div>
-                                                        <div class="hmt-color-option" data-color="#FFB74D" style="background-color: #FFB74D;" title="Orange Shade"></div>
-                                                    </div>
-                                                    <div class="hmt-shade-row">
-                                                        <div class="hmt-color-option" data-color="#EF5350" style="background-color: #EF5350;" title="Dark Red"></div>
-                                                        <div class="hmt-color-option" data-color="#9C27B0" style="background-color: #9C27B0;" title="Dark Purple"></div>
-                                                        <div class="hmt-color-option" data-color="#5C6BC0" style="background-color: #5C6BC0;" title="Dark Blue"></div>
-                                                        <div class="hmt-color-option" data-color="#4CAF50" style="background-color: #4CAF50;" title="Dark Green"></div>
-                                                        <div class="hmt-color-option" data-color="#FF9800" style="background-color: #FF9800;" title="Dark Orange"></div>
-                                                    </div>
+                                                <div class="hmt-color-slider-group">
+                                                    <label class="hmt-slider-label">Saturation</label>
+                                                    <input type="range" class="hmt-color-slider hmt-sat-slider" id="hmt-sat-slider" min="0" max="100" value="73">
+                                                </div>
+                                                <div class="hmt-color-slider-group">
+                                                    <label class="hmt-slider-label">Lightness</label>
+                                                    <input type="range" class="hmt-color-slider hmt-light-slider" id="hmt-light-slider" min="0" max="100" value="59">
+                                                </div>
+                                            </div>
+                                            <div class="hmt-color-palette">
+                                                <div class="hmt-color-palette-area" id="hmt-color-palette-area">
+                                                    <div class="hmt-palette-cursor" id="hmt-palette-cursor"></div>
+                                                </div>
+                                                <div class="hmt-hue-bar">
+                                                    <div class="hmt-hue-cursor" id="hmt-hue-cursor"></div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <span class="hmt-color-picker-label">Chọn màu từ bảng</span>
+                                        <span class="hmt-color-picker-label">Color Picker tùy chỉnh</span>
                                     </div>
                                     <input type="text"
                                            id="hmt-custom-color-text"
@@ -410,7 +389,7 @@
                                            class="hmt-color-text"
                                            placeholder="#6c5ce7">
                                 </div>
-                                <small class="hmt-color-help">Nhấn vào bảng màu để chọn, hoặc nhập mã HEX trực tiếp</small>
+                                <small class="hmt-color-help">Kéo thanh trượt hoặc click vào bảng màu để chọn, hoặc nhập mã HEX trực tiếp</small>
                             </div>
                         </div>
 
@@ -695,29 +674,145 @@
             }
 
             .hmt-custom-color-picker {
-                width: 80px;
-                border: 3px solid #667eea;
-                border-radius: 12px;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+                width: 280px;
                 background: white;
-                position: relative;
+                border: 2px solid #e9ecef;
+                border-radius: 8px;
+                padding: 16px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             }
 
-            .hmt-custom-color-picker:hover {
-                transform: scale(1.05);
-                box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
-            }
-
-            .hmt-color-picker-header {
+            .hmt-color-picker-display {
                 display: flex;
-                justify-content: space-between;
                 align-items: center;
-                padding: 8px;
+                gap: 12px;
+                margin-bottom: 16px;
+            }
+
+            .hmt-color-preview {
+                width: 40px;
+                height: 40px;
+                border-radius: 6px;
+                border: 2px solid #e9ecef;
+                background: #6c5ce7;
+            }
+
+            .hmt-color-value {
+                font-family: monospace;
+                font-size: 14px;
+                font-weight: 600;
+                color: #495057;
                 background: #f8f9fa;
-                border-radius: 8px 8px 0 0;
-                border-bottom: 1px solid #e9ecef;
+                padding: 8px 12px;
+                border-radius: 4px;
+                border: 1px solid #e9ecef;
+                min-width: 80px;
+                text-align: center;
+            }
+
+            .hmt-color-controls {
+                margin-bottom: 16px;
+            }
+
+            .hmt-color-slider-group {
+                margin-bottom: 12px;
+            }
+
+            .hmt-color-slider-group:last-child {
+                margin-bottom: 0;
+            }
+
+            .hmt-slider-label {
+                display: block;
+                font-size: 12px;
+                font-weight: 600;
+                color: #495057;
+                margin-bottom: 6px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .hmt-color-slider {
+                width: 100%;
+                height: 8px;
+                border-radius: 4px;
+                outline: none;
+                cursor: pointer;
+                background: #e9ecef;
+                border: none;
+                -webkit-appearance: none;
+            }
+
+            .hmt-color-slider::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                background: #667eea;
+                cursor: pointer;
+                border: 2px solid white;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            }
+
+            .hmt-color-slider::-moz-range-thumb {
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                background: #667eea;
+                cursor: pointer;
+                border: 2px solid white;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            }
+
+            .hmt-color-palette {
+                display: flex;
+                gap: 8px;
+                margin-bottom: 12px;
+            }
+
+            .hmt-color-palette-area {
+                width: 180px;
+                height: 120px;
+                background: linear-gradient(to top, #000, transparent),
+                           linear-gradient(to right, #fff, transparent);
+                border-radius: 4px;
+                position: relative;
+                cursor: crosshair;
+                border: 1px solid #dee2e6;
+            }
+
+            .hmt-palette-cursor {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: white;
+                border: 2px solid #333;
+                position: absolute;
+                pointer-events: none;
+                transform: translate(-50%, -50%);
+            }
+
+            .hmt-hue-bar {
+                width: 20px;
+                height: 120px;
+                background: linear-gradient(to bottom,
+                  #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%,
+                  #0000ff 67%, #ff00ff 83%, #ff0000 100%);
+                border-radius: 4px;
+                position: relative;
+                cursor: pointer;
+                border: 1px solid #dee2e6;
+            }
+
+            .hmt-hue-cursor {
+                width: 20px;
+                height: 4px;
+                background: white;
+                border: 1px solid #333;
+                position: absolute;
+                left: -1px;
+                pointer-events: none;
             }
 
             .hmt-color-picker-label {
@@ -726,76 +821,6 @@
                 font-weight: 600;
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
-            }
-
-            .hmt-picker-toggle {
-                background: none;
-                border: none;
-                color: #667eea;
-                font-size: 10px;
-                cursor: pointer;
-                padding: 2px 4px;
-                border-radius: 3px;
-                transition: background-color 0.2s;
-            }
-
-            .hmt-picker-toggle:hover {
-                background: rgba(102, 126, 234, 0.1);
-            }
-
-            .hmt-color-picker-panel {
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: white;
-                border: 1px solid #e9ecef;
-                border-radius: 0 0 8px 8px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                z-index: 1000;
-                max-height: 200px;
-                overflow-y: auto;
-                display: none;
-            }
-
-            .hmt-color-picker-panel.open {
-                display: block;
-            }
-
-            .hmt-color-basic-grid {
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 2px;
-                padding: 8px;
-            }
-
-            .hmt-color-shades {
-                padding: 8px;
-                border-top: 1px solid #e9ecef;
-            }
-
-            .hmt-shade-row {
-                display: flex;
-                gap: 2px;
-                margin-bottom: 2px;
-            }
-
-            .hmt-shade-row:last-child {
-                margin-bottom: 0;
-            }
-
-            .hmt-color-option {
-                width: 20px;
-                height: 20px;
-                border-radius: 3px;
-                cursor: pointer;
-                transition: transform 0.2s;
-                border: 1px solid rgba(0, 0, 0, 0.1);
-            }
-
-            .hmt-color-option:hover {
-                transform: scale(1.1);
-                border: 2px solid #667eea;
             }
 
             .hmt-color-text {
@@ -1119,7 +1144,7 @@
         closeBtn.addEventListener('click', closeDialog);
         overlay.addEventListener('click', function(e) {
             if (e.target === overlay) {
-                // Đóng color picker panel nếu đang mở
+                // Đóng color picker panel nếu đang mở (cho các phần tử cũ)
                 if (colorPickerPanel && colorPickerPanel.classList.contains('open')) {
                     colorPickerPanel.classList.remove('open');
                 } else {
@@ -1140,7 +1165,13 @@
                  colorText.value = color;
                  previewBox.style.backgroundColor = color;
 
-                 // Đóng color picker panel nếu đang mở
+                 // Cập nhật color picker nếu có
+                 if (colorPreview && colorValue) {
+                     colorPreview.style.backgroundColor = color;
+                     colorValue.textContent = color;
+                 }
+
+                 // Đóng color picker panel nếu đang mở (cho các phần tử cũ)
                  if (colorPickerPanel) {
                      colorPickerPanel.classList.remove('open');
                  }
@@ -1151,46 +1182,174 @@
 
         // Xử lý color picker tùy chỉnh
         const customColorPicker = dialog.querySelector('.hmt-custom-color-picker');
-        const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
-        const pickerToggle = dialog.querySelector('.hmt-picker-toggle');
-        const colorOptions = dialog.querySelectorAll('.hmt-color-option');
+        const colorPreview = dialog.querySelector('#hmt-color-preview');
+        const colorValue = dialog.querySelector('#hmt-color-value');
+        const hueSlider = dialog.querySelector('#hmt-hue-slider');
+        const satSlider = dialog.querySelector('#hmt-sat-slider');
+        const lightSlider = dialog.querySelector('#hmt-light-slider');
+        const paletteArea = dialog.querySelector('#hmt-color-palette-area');
+        const paletteCursor = dialog.querySelector('#hmt-palette-cursor');
+        const hueBar = dialog.querySelector('.hmt-hue-bar');
+        const hueCursor = dialog.querySelector('#hmt-hue-cursor');
 
-        // Toggle color picker panel
-        if (pickerToggle && colorPickerPanel) {
-            pickerToggle.addEventListener('click', function(e) {
-                e.stopPropagation();
-                colorPickerPanel.classList.toggle('open');
-            });
+        let currentHue = 262;
+        let currentSat = 73;
+        let currentLight = 59;
+        let currentX = 0.73;
+        let currentY = 0.41;
 
-            // Đóng panel khi click bên ngoài
-            document.addEventListener('click', function(e) {
-                if (!customColorPicker.contains(e.target)) {
-                    colorPickerPanel.classList.remove('open');
-                }
+        // Hàm chuyển đổi HSL sang HEX
+        function hslToHex(h, s, l) {
+            h /= 360;
+            s /= 100;
+            l /= 100;
+
+            const c = (1 - Math.abs(2 * l - 1)) * s;
+            const x = c * (1 - Math.abs((h * 6) % 2 - 1));
+            const m = l - c/2;
+            let r = 0, g = 0, b = 0;
+
+            if (0 <= h && h < 1/6) {
+                r = c; g = x; b = 0;
+            } else if (1/6 <= h && h < 2/6) {
+                r = x; g = c; b = 0;
+            } else if (2/6 <= h && h < 3/6) {
+                r = 0; g = c; b = x;
+            } else if (3/6 <= h && h < 4/6) {
+                r = 0; g = x; b = c;
+            } else if (4/6 <= h && h < 5/6) {
+                r = x; g = 0; b = c;
+            } else if (5/6 <= h && h < 1) {
+                r = c; g = 0; b = x;
+            }
+
+            r = Math.round((r + m) * 255);
+            g = Math.round((g + m) * 255);
+            b = Math.round((b + m) * 255);
+
+            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        }
+
+        // Hàm cập nhật màu từ HSL
+        function updateColorFromHSL() {
+            const hex = hslToHex(currentHue, currentSat, currentLight);
+            colorPreview.style.backgroundColor = hex;
+            colorValue.textContent = hex;
+            colorText.value = hex;
+            previewBox.style.backgroundColor = hex;
+
+            // Bỏ active cho tất cả presets nếu đang chọn màu tùy chỉnh
+            colorPresets.forEach(p => p.classList.remove('active'));
+
+            // Cập nhật trạng thái nút save
+            updateSavePresetButton(dialog);
+        }
+
+        // Hàm cập nhật vị trí cursor
+        function updateCursors() {
+            if (paletteCursor) {
+                paletteCursor.style.left = (currentX * 180) + 'px';
+                paletteCursor.style.top = (120 - currentY * 120) + 'px';
+            }
+            if (hueCursor) {
+                hueCursor.style.top = (currentHue / 360 * 120) + 'px';
+            }
+        }
+
+        // Xử lý thanh hue
+        if (hueSlider) {
+            hueSlider.addEventListener('input', function() {
+                currentHue = parseInt(this.value);
+                updateColorFromHSL();
+                updateCursors();
             });
         }
 
-        // Xử lý chọn màu từ bảng màu
-        colorOptions.forEach(option => {
-            option.addEventListener('click', function() {
-                const color = this.dataset.color;
-                colorText.value = color;
-                previewBox.style.backgroundColor = color;
+        // Xử lý thanh saturation
+        if (satSlider) {
+            satSlider.addEventListener('input', function() {
+                currentSat = parseInt(this.value);
+                updateColorFromHSL();
+            });
+        }
 
-                // Bỏ active cho tất cả presets nếu đang chọn màu tùy chỉnh
-                colorPresets.forEach(p => p.classList.remove('active'));
+        // Xử lý thanh lightness
+        if (lightSlider) {
+            lightSlider.addEventListener('input', function() {
+                currentLight = parseInt(this.value);
+                updateColorFromHSL();
+            });
+        }
 
-                // Đóng color picker panel
-                if (colorPickerPanel) {
-                    colorPickerPanel.classList.remove('open');
+        // Xử lý bảng màu 2D
+        if (paletteArea) {
+            paletteArea.addEventListener('mousedown', function(e) {
+                function updatePaletteColor(e) {
+                    const rect = paletteArea.getBoundingClientRect();
+                    const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+                    const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+
+                    currentX = x;
+                    currentY = y;
+
+                    // Tính saturation và lightness từ vị trí
+                    currentSat = x * 100;
+                    currentLight = (1 - y) * 100;
+
+                    satSlider.value = currentSat;
+                    lightSlider.value = currentLight;
+
+                    updateColorFromHSL();
+                    updateCursors();
                 }
 
-                // Cập nhật trạng thái nút save
-                updateSavePresetButton(dialog);
+                updatePaletteColor(e);
 
-                debugLog('Đã chọn màu từ color picker:', color);
+                function onMouseMove(e) {
+                    updatePaletteColor(e);
+                }
+
+                function onMouseUp() {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                }
+
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
             });
-        });
+        }
+
+        // Xử lý thanh hue màu sắc
+        if (hueBar) {
+            hueBar.addEventListener('mousedown', function(e) {
+                function updateHue(e) {
+                    const rect = hueBar.getBoundingClientRect();
+                    const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+                    currentHue = y * 360;
+                    hueSlider.value = currentHue;
+                    updateColorFromHSL();
+                    updateCursors();
+                }
+
+                updateHue(e);
+
+                function onMouseMove(e) {
+                    updateHue(e);
+                }
+
+                function onMouseUp() {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                }
+
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            });
+        }
+
+        // Khởi tạo màu ban đầu
+        updateColorFromHSL();
+        updateCursors();
 
         // Xử lý text input
          colorText.addEventListener('input', function() {
@@ -1199,7 +1358,13 @@
                  previewBox.style.backgroundColor = color;
                  colorPresets.forEach(p => p.classList.remove('active'));
 
-                 // Đóng color picker panel nếu đang mở
+                 // Cập nhật color picker nếu có
+                 if (colorPreview && colorValue) {
+                     colorPreview.style.backgroundColor = color;
+                     colorValue.textContent = color;
+                 }
+
+                 // Đóng color picker panel nếu đang mở (cho các phần tử cũ)
                  if (colorPickerPanel) {
                      colorPickerPanel.classList.remove('open');
                  }
@@ -1300,7 +1465,13 @@
              colorText.value = defaultColor;
              previewBox.style.backgroundColor = defaultColor;
 
-             // Đóng color picker panel nếu đang mở
+             // Cập nhật color picker nếu có
+             if (colorPreview && colorValue) {
+                 colorPreview.style.backgroundColor = defaultColor;
+                 colorValue.textContent = defaultColor;
+             }
+
+             // Đóng color picker panel nếu đang mở (cho các phần tử cũ)
              if (colorPickerPanel) {
                  colorPickerPanel.classList.remove('open');
              }
@@ -1318,7 +1489,7 @@
         // Đóng khi nhấn ESC
          document.addEventListener('keydown', function(e) {
              if (e.key === 'Escape') {
-                 // Đóng color picker panel nếu đang mở
+                 // Đóng color picker panel nếu đang mở (cho các phần tử cũ)
                  if (colorPickerPanel && colorPickerPanel.classList.contains('open')) {
                      colorPickerPanel.classList.remove('open');
                  } else {
