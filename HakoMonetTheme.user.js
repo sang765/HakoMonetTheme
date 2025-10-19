@@ -31,7 +31,6 @@
 // @resource     tagColorJS ./class/tag-color.js
 // @resource     colorinfotruyen ./colors/page-info-truyen.js
 // @resource     pagegeneralJS ./colors/page-general.js
-// @resource     imageAnalyzerJS ./module/image-analyzer.js
 // @resource     themeDetectorJS ./module/theme-detector.js
 // @resource     configJS ./module/config.js
 // @resource     adBlockerJS ./module/ad-blocker.js
