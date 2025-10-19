@@ -40,6 +40,39 @@
         // Lấy màu hiện tại từ storage
         const currentColor = getDefaultColor();
 
+        // Hàm chuyển đổi HEX sang HSL để lấy giá trị mặc định cho sliders
+        function hexToHsl(hex) {
+            hex = hex.replace('#', '');
+            const r = parseInt(hex.substr(0, 2), 16) / 255;
+            const g = parseInt(hex.substr(2, 2), 16) / 255;
+            const b = parseInt(hex.substr(4, 2), 16) / 255;
+
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+
+            if (max === min) {
+                h = s = 0;
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+
+            return {
+                h: Math.round(h * 360),
+                s: Math.round(s * 100),
+                l: Math.round(l * 100)
+            };
+        }
+
+        const currentHsl = hexToHsl(currentColor);
+
         dialog.innerHTML = `
             <div class="hmt-config-overlay">
                 <div class="hmt-config-content">
@@ -69,20 +102,20 @@
                                         <div class="hmt-custom-color-picker" id="hmt-custom-color-input">
                                             <div class="hmt-color-picker-display">
                                                 <div class="hmt-color-preview" id="hmt-color-preview"></div>
-                                                <span class="hmt-color-value" id="hmt-color-value">#17deb3</span>
+                                                <span class="hmt-color-value" id="hmt-color-value">${currentColor}</span>
                                             </div>
                                             <div class="hmt-color-controls">
                                                 <div class="hmt-color-slider-group">
                                                     <label class="hmt-slider-label">Hue</label>
-                                                    <input type="range" class="hmt-color-slider hmt-hue-slider" id="hmt-hue-slider" min="0" max="360" value="165">
+                                                    <input type="range" class="hmt-color-slider hmt-hue-slider" id="hmt-hue-slider" min="0" max="360" value="${currentHsl.h}">
                                                 </div>
                                                 <div class="hmt-color-slider-group">
                                                     <label class="hmt-slider-label">Saturation</label>
-                                                    <input type="range" class="hmt-color-slider hmt-sat-slider" id="hmt-sat-slider" min="0" max="100" value="75">
+                                                    <input type="range" class="hmt-color-slider hmt-sat-slider" id="hmt-sat-slider" min="0" max="100" value="${currentHsl.s}">
                                                 </div>
                                                 <div class="hmt-color-slider-group">
                                                     <label class="hmt-slider-label">Lightness</label>
-                                                    <input type="range" class="hmt-color-slider hmt-light-slider" id="hmt-light-slider" min="0" max="100" value="50">
+                                                    <input type="range" class="hmt-color-slider hmt-light-slider" id="hmt-light-slider" min="0" max="100" value="${currentHsl.l}">
                                                 </div>
                                             </div>
                                             <div class="hmt-color-palette">
@@ -721,11 +754,47 @@
         const hueBar = dialog.querySelector('.hmt-hue-bar');
         const hueCursor = dialog.querySelector('#hmt-hue-cursor');
 
-        let currentHue = 165;
-        let currentSat = 75;
-        let currentLight = 50;
-        let currentX = 0.75;
-        let currentY = 0.50;
+        // Hàm chuyển đổi HEX sang HSL
+        function hexToHsl(hex) {
+            // Loại bỏ dấu # nếu có
+            hex = hex.replace('#', '');
+
+            // Chuyển đổi hex sang RGB
+            const r = parseInt(hex.substr(0, 2), 16) / 255;
+            const g = parseInt(hex.substr(2, 2), 16) / 255;
+            const b = parseInt(hex.substr(4, 2), 16) / 255;
+
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+
+            if (max === min) {
+                h = s = 0; // achromatic
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+
+            return {
+                h: Math.round(h * 360),
+                s: Math.round(s * 100),
+                l: Math.round(l * 100)
+            };
+        }
+
+        // Khởi tạo giá trị HSL từ màu hiện tại
+        const currentHsl = hexToHsl(currentColor);
+        let currentHue = currentHsl.h;
+        let currentSat = currentHsl.s;
+        let currentLight = currentHsl.l;
+        let currentX = currentSat / 100;
+        let currentY = 1 - (currentLight / 100);
 
         // Hàm chuyển đổi HSL sang HEX
         function hslToHex(h, s, l) {
@@ -759,16 +828,26 @@
             return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
         }
 
+        // Hàm đồng bộ UI với màu hiện tại (không gửi sự kiện preview)
+        function syncUIWithColor(hex) {
+            debugLog('Đồng bộ UI với màu:', hex);
+
+            // Cập nhật tất cả các elements UI
+            if (colorPreview) colorPreview.style.backgroundColor = hex;
+            if (colorValue) colorValue.textContent = hex;
+            if (colorText) colorText.value = hex;
+            if (previewBox) previewBox.style.backgroundColor = hex;
+
+            debugLog('Đã đồng bộ UI với màu:', hex);
+        }
+
         // Hàm cập nhật màu từ HSL
          function updateColorFromHSL() {
              const hex = hslToHex(currentHue, currentSat, currentLight);
              debugLog('Cập nhật màu từ HSL:', hex);
 
              // Cập nhật tất cả các elements UI
-             if (colorPreview) colorPreview.style.backgroundColor = hex;
-             if (colorValue) colorValue.textContent = hex;
-             if (colorText) colorText.value = hex;
-             if (previewBox) previewBox.style.backgroundColor = hex;
+             syncUIWithColor(hex);
 
              // Áp dụng màu preview ngay lập tức
              previewColor = hex;
@@ -886,7 +965,7 @@
              });
          }
 
-        // Khởi tạo màu ban đầu
+        // Khởi tạo màu ban đầu - đồng bộ với màu hiện tại
          debugLog('Khởi tạo color picker tùy chỉnh');
          debugLog('Color preview element:', !!colorPreview);
          debugLog('Color value element:', !!colorValue);
@@ -896,7 +975,10 @@
          debugLog('Palette area element:', !!paletteArea);
          debugLog('Hue bar element:', !!hueBar);
 
-         updateColorFromHSL();
+         // Đồng bộ các elements với màu hiện tại (không gửi sự kiện preview)
+         syncUIWithColor(currentColor);
+
+         // Đặt vị trí cursor dựa trên giá trị HSL hiện tại
          updateCursors();
 
         // Xử lý text input
@@ -907,9 +989,7 @@
              if (isValidHexColor(color)) {
                  debugLog('Màu hợp lệ từ text input');
                  // Cập nhật tất cả các elements UI
-                 if (previewBox) previewBox.style.backgroundColor = color;
-                 if (colorPreview) colorPreview.style.backgroundColor = color;
-                 if (colorValue) colorValue.textContent = color;
+                 syncUIWithColor(color);
 
                  // Áp dụng màu preview ngay lập tức
                  previewColor = color;
@@ -933,10 +1013,7 @@
                  setDefaultColor(selectedColor);
 
                  // Cập nhật tất cả các elements UI với màu đã lưu
-                 if (colorText) colorText.value = selectedColor;
-                 if (previewBox) previewBox.style.backgroundColor = selectedColor;
-                 if (colorPreview) colorPreview.style.backgroundColor = selectedColor;
-                 if (colorValue) colorValue.textContent = selectedColor;
+                 syncUIWithColor(selectedColor);
 
                  // Đóng color picker panel nếu đang mở
                  if (colorPickerPanel) {
@@ -974,10 +1051,7 @@
              previewColor = defaultColor;
 
              // Cập nhật tất cả các elements UI
-             if (colorText) colorText.value = defaultColor;
-             if (previewBox) previewBox.style.backgroundColor = defaultColor;
-             if (colorPreview) colorPreview.style.backgroundColor = defaultColor;
-             if (colorValue) colorValue.textContent = defaultColor;
+             syncUIWithColor(defaultColor);
 
              // Áp dụng màu preview ngay lập tức
              applyPreviewColor(defaultColor);
