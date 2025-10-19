@@ -25,26 +25,50 @@
 
         debugLog('Khởi tạo PageGeneral cho trang không phải truyện');
 
-        // Lấy màu mặc định từ config
-        const defaultColor = window.HMTConfig && window.HMTConfig.getDefaultColor ?
-            window.HMTConfig.getDefaultColor() : '#6c5ce7';
+        // Hàm áp dụng màu sắc hiện tại
+        function applyCurrentColorScheme() {
+            const defaultColor = window.HMTConfig && window.HMTConfig.getDefaultColor ?
+                window.HMTConfig.getDefaultColor() : '#6c5ce7';
 
-        debugLog('Màu từ config:', defaultColor);
+            debugLog('Áp dụng màu từ config:', defaultColor);
 
-        if (!isValidColor(defaultColor)) {
-            debugLog('Màu không hợp lệ, sử dụng màu mặc định');
-            applyDefaultColorScheme();
-            return;
+            if (!isValidColor(defaultColor)) {
+                debugLog('Màu không hợp lệ, sử dụng màu mặc định');
+                applyDefaultColorScheme();
+                return;
+            }
+
+            // Thêm class để kích hoạt animation
+            document.body.classList.add('hmt-color-changing');
+
+            // Tạo Monet palette từ màu config
+            const monetPalette = MonetAPI.generateMonetPalette(defaultColor);
+            debugLog('Monet Palette từ config:', monetPalette);
+
+            const isLightColor = MonetAPI.isColorLight(defaultColor);
+            debugLog('Màu sáng?', isLightColor);
+
+            applyMonetColorScheme(monetPalette, isLightColor);
+
+            // Loại bỏ class sau khi animation hoàn thành
+            setTimeout(() => {
+                document.body.classList.remove('hmt-color-changing');
+            }, 600);
         }
 
-        // Tạo Monet palette từ màu config
-        const monetPalette = MonetAPI.generateMonetPalette(defaultColor);
-        debugLog('Monet Palette từ config:', monetPalette);
+        // Áp dụng màu sắc lần đầu
+        applyCurrentColorScheme();
 
-        const isLightColor = MonetAPI.isColorLight(defaultColor);
-        debugLog('Màu sáng?', isLightColor);
+        // Lắng nghe sự kiện màu sắc thay đổi để cập nhật real-time
+        document.addEventListener('hmtColorChanged', function(event) {
+            debugLog('Nhận sự kiện màu sắc thay đổi:', event.detail);
+            // Đợi một chút để đảm bảo màu đã được lưu vào storage
+            setTimeout(() => {
+                applyCurrentColorScheme();
+            }, 100);
+        });
 
-        applyMonetColorScheme(monetPalette, isLightColor);
+        debugLog('Đã thiết lập lắng nghe sự kiện màu sắc thay đổi');
     }
 
     function isValidColor(color) {
@@ -71,6 +95,16 @@
                 --monet-background-dark: ${palette[100]};
                 --monet-elevated: ${palette[0]};
                 --monet-elevated-dark: ${palette[100]};
+            }
+
+            /* Smooth color transitions for real-time updates */
+            * {
+                transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease !important;
+            }
+
+            /* Faster transitions for interactive elements */
+            a, button, .navbar-menu, .nav-submenu, .noti-sidebar, .account-sidebar {
+                transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
             }
 
             a:hover,
@@ -413,6 +447,34 @@
         }
 
         const css = `
+            /* Smooth color transitions for real-time updates */
+            * {
+                transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease !important;
+            }
+
+            /* Faster transitions for interactive elements */
+            a, button, .navbar-menu, .nav-submenu, .noti-sidebar, .account-sidebar {
+                transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
+            }
+
+            /* Special animation for color changes */
+            @keyframes hmtColorChangePulse {
+                0% {
+                    filter: brightness(1) saturate(1);
+                }
+                50% {
+                    filter: brightness(1.05) saturate(1.1);
+                }
+                100% {
+                    filter: brightness(1) saturate(1);
+                }
+            }
+
+            /* Apply subtle pulse animation when colors change */
+            body.hmt-color-changing * {
+                animation: hmtColorChangePulse 0.6s ease-in-out;
+            }
+
             a:hover,
             .text-slate-500,
             .long-text a:hover,
