@@ -374,7 +374,7 @@
                 background-color: ${palette[1000]} !important;
             }
 
-            body {
+            body:not(.mce-content-body) {
                 background-color: ${palette[900]} !important;
                 color: ${palette[100]} !important;
             }
@@ -707,7 +707,7 @@
                 background-color: ${defaultPalette[1000]} !important;
             }
 
-            body {
+            body:not(.mce-content-body) {
                 background-color: ${defaultPalette[900]} !important;
                 color: ${defaultPalette[100]} !important;
             }
