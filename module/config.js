@@ -80,6 +80,7 @@
         const customColors = getCustomColors();
 
         if (customColors.length > 0) {
+             debugLog('Load custom presets:', customColors.length);
              customSection.style.display = 'block';
 
              // Đóng color picker panel nếu đang mở
@@ -110,6 +111,7 @@
      }
 
     function refreshCustomPresets(dialog) {
+        debugLog('Refresh custom presets');
         loadCustomPresets(dialog);
 
         // Đóng color picker panel nếu đang mở
@@ -152,10 +154,13 @@
          }
 
         // Tạo dialog nhập tên
-        const name = generateColorName(colorToSave);
-        const customName = prompt('Nhập tên cho màu preset này:', name);
+         const name = generateColorName(colorToSave);
+         debugLog('Tên mặc định được tạo:', name);
+         const customName = prompt('Nhập tên cho màu preset này:', name);
+         debugLog('Tên người dùng nhập:', customName);
 
         if (customName !== null && customName.trim() !== '') {
+             debugLog('Lưu preset với tên:', customName.trim());
              saveCustomPreset(colorToSave, customName.trim());
              refreshCustomPresets(dialog);
 
@@ -167,11 +172,15 @@
 
              showNotification(`Đã lưu màu "${customName.trim()}" vào preset!`, 3000);
          } else if (customName !== null) {
+             debugLog('Người dùng hủy nhập tên preset');
              // Người dùng hủy nhập tên, đóng color picker panel nếu đang mở
              const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
              if (colorPickerPanel) {
                  colorPickerPanel.classList.remove('open');
              }
+         } else {
+             debugLog('Prompt bị đóng hoặc không được hỗ trợ');
+             showNotification('Không thể mở hộp thoại nhập tên. Vui lòng thử lại.', 3000);
          }
     }
 
@@ -179,13 +188,20 @@
         const saveBtn = dialog.querySelector('#saveToPresetBtn');
         const currentColor = dialog.querySelector('.hmt-color-text').value.trim();
 
+        debugLog('Cập nhật trạng thái nút Save to Preset');
+        debugLog('Màu hiện tại:', currentColor);
+        debugLog('Màu hợp lệ:', isValidHexColor(currentColor));
+        debugLog('Nút save tồn tại:', !!saveBtn);
+
         if (saveBtn) {
             if (currentColor && isValidHexColor(currentColor)) {
                 saveBtn.disabled = false;
                 saveBtn.style.opacity = '1';
+                debugLog('Nút Save được kích hoạt');
             } else {
                 saveBtn.disabled = true;
                 saveBtn.style.opacity = '0.5';
+                debugLog('Nút Save bị vô hiệu hóa');
             }
         }
     }
@@ -208,6 +224,7 @@
                 presetElement.style.transform = 'scale(0.8)';
 
                 setTimeout(() => {
+                     debugLog('Hoàn thành xóa preset với animation');
                      refreshCustomPresets(dialog);
 
                      // Kiểm tra xem còn custom presets không
@@ -215,14 +232,14 @@
                      const customSection = dialog.querySelector('#customPresetsSection');
 
                      if (customColors.length === 0 && customSection) {
-                          customSection.style.display = 'none';
- 
-                          // Đóng color picker panel nếu đang mở
-                          const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
-                          if (colorPickerPanel) {
-                              colorPickerPanel.classList.remove('open');
-                          }
-                      }
+                         customSection.style.display = 'none';
+
+                         // Đóng color picker panel nếu đang mở
+                         const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
+                         if (colorPickerPanel) {
+                             colorPickerPanel.classList.remove('open');
+                         }
+                     }
 
                      showNotification('Đã xóa preset!', 3000);
                  }, 300);
@@ -1107,6 +1124,8 @@
              colorPickerPanel.classList.remove('open');
          }
 
+         debugLog('Tạo config dialog hoàn thành');
+
          // Event listeners
          setupConfigEventListeners(dialog);
 
@@ -1131,6 +1150,7 @@
         const previewBox = dialog.querySelector('.hmt-preview-box');
         const saveBtn = dialog.querySelector('.hmt-config-save');
         const resetBtn = dialog.querySelector('.hmt-config-reset');
+        const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
 
         // Đóng dialog
          function closeDialog() {
@@ -1162,21 +1182,22 @@
                  this.classList.add('active');
 
                  const color = this.dataset.color;
-                 colorText.value = color;
-                 previewBox.style.backgroundColor = color;
+                 debugLog('Chọn màu preset:', color);
+
+                 if (colorText) colorText.value = color;
+                 if (previewBox) previewBox.style.backgroundColor = color;
 
                  // Cập nhật color picker nếu có
-                 if (colorPreview && colorValue) {
-                     colorPreview.style.backgroundColor = color;
-                     colorValue.textContent = color;
-                 }
+                 if (colorPreview) colorPreview.style.backgroundColor = color;
+                 if (colorValue) colorValue.textContent = color;
 
                  // Đóng color picker panel nếu đang mở (cho các phần tử cũ)
                  if (colorPickerPanel) {
                      colorPickerPanel.classList.remove('open');
                  }
 
-                 debugLog('Đã chọn màu preset:', color);
+                 // Cập nhật trạng thái nút save
+                 updateSavePresetButton(dialog);
              });
          });
 
@@ -1231,19 +1252,21 @@
         }
 
         // Hàm cập nhật màu từ HSL
-        function updateColorFromHSL() {
-            const hex = hslToHex(currentHue, currentSat, currentLight);
-            colorPreview.style.backgroundColor = hex;
-            colorValue.textContent = hex;
-            colorText.value = hex;
-            previewBox.style.backgroundColor = hex;
+         function updateColorFromHSL() {
+             const hex = hslToHex(currentHue, currentSat, currentLight);
+             debugLog('Cập nhật màu từ HSL:', hex);
 
-            // Bỏ active cho tất cả presets nếu đang chọn màu tùy chỉnh
-            colorPresets.forEach(p => p.classList.remove('active'));
+             if (colorPreview) colorPreview.style.backgroundColor = hex;
+             if (colorValue) colorValue.textContent = hex;
+             if (colorText) colorText.value = hex;
+             if (previewBox) previewBox.style.backgroundColor = hex;
 
-            // Cập nhật trạng thái nút save
-            updateSavePresetButton(dialog);
-        }
+             // Bỏ active cho tất cả presets nếu đang chọn màu tùy chỉnh
+             colorPresets.forEach(p => p.classList.remove('active'));
+
+             // Cập nhật trạng thái nút save
+             updateSavePresetButton(dialog);
+         }
 
         // Hàm cập nhật vị trí cursor
         function updateCursors() {
@@ -1257,117 +1280,136 @@
         }
 
         // Xử lý thanh hue
-        if (hueSlider) {
-            hueSlider.addEventListener('input', function() {
-                currentHue = parseInt(this.value);
-                updateColorFromHSL();
-                updateCursors();
-            });
-        }
+         if (hueSlider) {
+             hueSlider.addEventListener('input', function() {
+                 currentHue = parseInt(this.value);
+                 debugLog('Hue thay đổi:', currentHue);
+                 updateColorFromHSL();
+                 updateCursors();
+             });
+         }
 
-        // Xử lý thanh saturation
-        if (satSlider) {
-            satSlider.addEventListener('input', function() {
-                currentSat = parseInt(this.value);
-                updateColorFromHSL();
-            });
-        }
+         // Xử lý thanh saturation
+         if (satSlider) {
+             satSlider.addEventListener('input', function() {
+                 currentSat = parseInt(this.value);
+                 debugLog('Saturation thay đổi:', currentSat);
+                 updateColorFromHSL();
+             });
+         }
 
-        // Xử lý thanh lightness
-        if (lightSlider) {
-            lightSlider.addEventListener('input', function() {
-                currentLight = parseInt(this.value);
-                updateColorFromHSL();
-            });
-        }
+         // Xử lý thanh lightness
+         if (lightSlider) {
+             lightSlider.addEventListener('input', function() {
+                 currentLight = parseInt(this.value);
+                 debugLog('Lightness thay đổi:', currentLight);
+                 updateColorFromHSL();
+             });
+         }
 
         // Xử lý bảng màu 2D
-        if (paletteArea) {
-            paletteArea.addEventListener('mousedown', function(e) {
-                function updatePaletteColor(e) {
-                    const rect = paletteArea.getBoundingClientRect();
-                    const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-                    const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+         if (paletteArea) {
+             paletteArea.addEventListener('mousedown', function(e) {
+                 debugLog('Palette area mousedown');
+                 function updatePaletteColor(e) {
+                     const rect = paletteArea.getBoundingClientRect();
+                     const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+                     const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
 
-                    currentX = x;
-                    currentY = y;
+                     currentX = x;
+                     currentY = y;
 
-                    // Tính saturation và lightness từ vị trí
-                    currentSat = x * 100;
-                    currentLight = (1 - y) * 100;
+                     // Tính saturation và lightness từ vị trí
+                     currentSat = x * 100;
+                     currentLight = (1 - y) * 100;
 
-                    satSlider.value = currentSat;
-                    lightSlider.value = currentLight;
+                     if (satSlider) satSlider.value = currentSat;
+                     if (lightSlider) lightSlider.value = currentLight;
 
-                    updateColorFromHSL();
-                    updateCursors();
-                }
+                     debugLog('Palette color cập nhật:', {x, y, currentSat, currentLight});
+                     updateColorFromHSL();
+                     updateCursors();
+                 }
 
-                updatePaletteColor(e);
+                 updatePaletteColor(e);
 
-                function onMouseMove(e) {
-                    updatePaletteColor(e);
-                }
+                 function onMouseMove(e) {
+                     updatePaletteColor(e);
+                 }
 
-                function onMouseUp() {
-                    document.removeEventListener('mousemove', onMouseMove);
-                    document.removeEventListener('mouseup', onMouseUp);
-                }
+                 function onMouseUp() {
+                     document.removeEventListener('mousemove', onMouseMove);
+                     document.removeEventListener('mouseup', onMouseUp);
+                 }
 
-                document.addEventListener('mousemove', onMouseMove);
-                document.addEventListener('mouseup', onMouseUp);
-            });
-        }
+                 document.addEventListener('mousemove', onMouseMove);
+                 document.addEventListener('mouseup', onMouseUp);
+             });
+         }
 
         // Xử lý thanh hue màu sắc
-        if (hueBar) {
-            hueBar.addEventListener('mousedown', function(e) {
-                function updateHue(e) {
-                    const rect = hueBar.getBoundingClientRect();
-                    const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
-                    currentHue = y * 360;
-                    hueSlider.value = currentHue;
-                    updateColorFromHSL();
-                    updateCursors();
-                }
+         if (hueBar) {
+             hueBar.addEventListener('mousedown', function(e) {
+                 debugLog('Hue bar mousedown');
+                 function updateHue(e) {
+                     const rect = hueBar.getBoundingClientRect();
+                     const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+                     currentHue = y * 360;
+                     if (hueSlider) hueSlider.value = currentHue;
+                     debugLog('Hue cập nhật:', currentHue);
+                     updateColorFromHSL();
+                     updateCursors();
+                 }
 
-                updateHue(e);
+                 updateHue(e);
 
-                function onMouseMove(e) {
-                    updateHue(e);
-                }
+                 function onMouseMove(e) {
+                     updateHue(e);
+                 }
 
-                function onMouseUp() {
-                    document.removeEventListener('mousemove', onMouseMove);
-                    document.removeEventListener('mouseup', onMouseUp);
-                }
+                 function onMouseUp() {
+                     document.removeEventListener('mousemove', onMouseMove);
+                     document.removeEventListener('mouseup', onMouseUp);
+                 }
 
-                document.addEventListener('mousemove', onMouseMove);
-                document.addEventListener('mouseup', onMouseUp);
-            });
-        }
+                 document.addEventListener('mousemove', onMouseMove);
+                 document.addEventListener('mouseup', onMouseUp);
+             });
+         }
 
         // Khởi tạo màu ban đầu
-        updateColorFromHSL();
-        updateCursors();
+         debugLog('Khởi tạo color picker tùy chỉnh');
+         debugLog('Color preview element:', !!colorPreview);
+         debugLog('Color value element:', !!colorValue);
+         debugLog('Hue slider element:', !!hueSlider);
+         debugLog('Sat slider element:', !!satSlider);
+         debugLog('Light slider element:', !!lightSlider);
+         debugLog('Palette area element:', !!paletteArea);
+         debugLog('Hue bar element:', !!hueBar);
+
+         updateColorFromHSL();
+         updateCursors();
 
         // Xử lý text input
          colorText.addEventListener('input', function() {
              const color = this.value.trim();
+             debugLog('Text input thay đổi:', color);
+
              if (isValidHexColor(color)) {
-                 previewBox.style.backgroundColor = color;
+                 debugLog('Màu hợp lệ từ text input');
+                 if (previewBox) previewBox.style.backgroundColor = color;
                  colorPresets.forEach(p => p.classList.remove('active'));
 
                  // Cập nhật color picker nếu có
-                 if (colorPreview && colorValue) {
-                     colorPreview.style.backgroundColor = color;
-                     colorValue.textContent = color;
-                 }
+                 if (colorPreview) colorPreview.style.backgroundColor = color;
+                 if (colorValue) colorValue.textContent = color;
 
                  // Đóng color picker panel nếu đang mở (cho các phần tử cũ)
                  if (colorPickerPanel) {
                      colorPickerPanel.classList.remove('open');
                  }
+             } else {
+                 debugLog('Màu không hợp lệ từ text input');
              }
 
              // Cập nhật trạng thái nút save
@@ -1377,8 +1419,13 @@
         // Lưu cài đặt
          saveBtn.addEventListener('click', function() {
              const selectedColor = colorText.value.trim();
+             debugLog('Lưu cài đặt màu:', selectedColor);
              if (isValidHexColor(selectedColor)) {
                  setDefaultColor(selectedColor);
+
+                 // Cập nhật color picker nếu có
+                 if (colorPreview) colorPreview.style.backgroundColor = selectedColor;
+                 if (colorValue) colorValue.textContent = selectedColor;
 
                  // Đóng color picker panel nếu đang mở
                  if (colorPickerPanel) {
@@ -1388,6 +1435,7 @@
                  showNotification('Đã lưu cài đặt màu sắc!', 3000);
                  closeDialog();
              } else {
+                 debugLog('Màu không hợp lệ khi lưu:', selectedColor);
                  showNotification('Màu không hợp lệ! Vui lòng nhập mã màu HEX đúng định dạng.', 5000);
 
                  // Đóng color picker panel nếu đang mở
@@ -1401,10 +1449,10 @@
          const saveToPresetBtn = dialog.querySelector('#saveToPresetBtn');
          if (saveToPresetBtn) {
              saveToPresetBtn.addEventListener('click', function() {
-                 // Đóng color picker panel nếu đang mở
-                 if (colorPickerPanel) {
-                     colorPickerPanel.classList.remove('open');
-                 }
+                 debugLog('Nút Lưu vào Preset được click');
+                 const currentColor = colorText.value.trim();
+                 debugLog('Màu hiện tại:', currentColor);
+                 debugLog('Màu hợp lệ:', isValidHexColor(currentColor));
                  saveCurrentColorToPreset(dialog);
              });
          }
@@ -1416,6 +1464,8 @@
          if (colorPickerPanel) {
              colorPickerPanel.classList.remove('open');
          }
+
+         debugLog('Hoàn thành setup event listeners');
 
          // Xử lý xóa custom presets
         const deleteBtns = dialog.querySelectorAll('.hmt-delete-preset');
@@ -1459,17 +1509,16 @@
         // Khôi phục mặc định
          resetBtn.addEventListener('click', function() {
              const defaultColor = '#6c5ce7';
+             debugLog('Reset màu về mặc định:', defaultColor);
              setDefaultColor(defaultColor);
 
              // Cập nhật UI
-             colorText.value = defaultColor;
-             previewBox.style.backgroundColor = defaultColor;
+             if (colorText) colorText.value = defaultColor;
+             if (previewBox) previewBox.style.backgroundColor = defaultColor;
 
              // Cập nhật color picker nếu có
-             if (colorPreview && colorValue) {
-                 colorPreview.style.backgroundColor = defaultColor;
-                 colorValue.textContent = defaultColor;
-             }
+             if (colorPreview) colorPreview.style.backgroundColor = defaultColor;
+             if (colorValue) colorValue.textContent = defaultColor;
 
              // Đóng color picker panel nếu đang mở (cho các phần tử cũ)
              if (colorPickerPanel) {
@@ -1482,6 +1531,9 @@
              if (defaultPreset) {
                  defaultPreset.classList.add('active');
              }
+
+             // Cập nhật trạng thái nút save
+             updateSavePresetButton(dialog);
 
              showNotification('Đã khôi phục màu mặc định!', 3000);
          });
@@ -1545,8 +1597,11 @@
     }
 
     function openConfigDialog() {
+        debugLog('Mở config dialog');
         createConfigDialog();
     }
+
+    debugLog('Config module đã được tải');
 
     // Xuất các hàm cần thiết
     window.HMTConfig = {
@@ -1561,5 +1616,17 @@
     };
 
     debugLog('Config module đã được tải');
+
+    // Xuất các hàm cần thiết
+    window.HMTConfig = {
+        getDefaultColor: getDefaultColor,
+        setDefaultColor: setDefaultColor,
+        getColorName: getColorName,
+        getAllColors: getAllColors,
+        getCustomColors: getCustomColors,
+        saveCustomPreset: saveCustomPreset,
+        removeCustomPreset: removeCustomPreset,
+        openConfigDialog: openConfigDialog
+    };
 
 })();
