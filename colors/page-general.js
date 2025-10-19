@@ -258,6 +258,149 @@
                 color: ${palette[500]} !important;
                 font-weight: 700 !important;
             }
+
+            /* Additional styles for general pages */
+            .bottom-part.at-index {
+                background-color: ${palette[1000]} !important;
+                border-bottom: 1px solid ${palette[800]} !important;
+                border-top: 1px solid ${palette[800]} !important;
+            }
+
+            .navbar-search .search-input {
+                background-color: ${palette[900]} !important;
+            }
+
+            table.listext-table tr:nth-child(2n+1) {
+                background-color: ${palette[700]} !important;
+            }
+
+            table.listext-table {
+                background-color: ${palette[800]} !important;
+            }
+
+            .action-link:hover {
+                color: ${palette[500]} !important;
+                text-decoration: underline !important;
+            }
+
+            .user-private-tabs li.current {
+                border-left-color: ${palette[500]} !important;
+                color: ${palette[500]} !important;
+            }
+
+            table.listext-table .update-status.no-chapters {
+                background-color: ${palette[500]} !important;
+                border-color: ${palette[700]} !important;
+                font-weight: 400 !important;
+            }
+
+            .daily-recent_views .top-tab_title.title-active {
+                background-color: ${palette[600]} !important;
+            }
+
+            .sts-bold {
+                background-color: ${palette[600]} !important;
+            }
+
+            .filters-wrapper {
+                background-color: ${palette[900]} !important;
+            }
+
+            [type="date"], [type="email"], [type="number"], [type="password"], [type="tel"], [type="text"], select, select.form-control {
+                background-color: ${palette[700]} !important;
+                border-color: ${palette[600]} !important;
+                color: ${textColor} !important;
+            }
+
+            .sub-index-style .section-title {
+                background-color: ${palette[700]} !important;
+                border: none !important;
+                color: ${textColor} !important;
+            }
+
+            .browse-alphabet .current {
+                background-color: ${palette[400]} !important;
+                color: ${textColor} !important;
+            }
+
+            .hover\:bg-green-700:hover {
+                background-color: ${palette[600]} !important;
+            }
+
+            .pagination_wrap .current {
+                background-color: ${palette[600]} !important;
+                color: ${textColor} !important;
+            }
+
+            .paging_item {
+                color: ${palette[400]} !important;
+            }
+
+            :is(.dark .dark\:ring-cyan-900) {
+                --tw-ring-color: ${palette[800]} !important;
+            }
+
+            .tox .tox-statusbar {
+                background-color: ${palette[800]} !important;
+                border-top: 1px solid ${palette[600]} !important;
+                color: ${palette[200]} !important;
+            }
+
+            #tinymce {
+                background-color: ${palette[800]} !important;
+            }
+
+            #mainpart.custome-page, #mainpart.page-board {
+                background-color: ${palette[900]} !important;
+            }
+
+            .tox .tox-toolbar, .tox .tox-toolbar__overflow, .tox .tox-toolbar__primary {
+                background-color: ${palette[800]} !important;
+            }
+
+            .tox:not(.tox-tinymce-inline) .tox-editor-header {
+                background-color: ${palette[800]} !important;
+                border-bottom: 1px solid ${palette[600]} !important;
+            }
+
+            .tox .tox-tbtn:hover {
+                background: ${palette[700]} !important;
+            }
+
+            .tox .tox-tbtn {
+                background: ${palette[800]} !important;
+            }
+
+            .tox .tox-tbtn--active, .tox .tox-tbtn--enabled, .tox .tox-tbtn--enabled:focus, .tox .tox-tbtn--enabled:hover {
+                background: ${palette[500]} !important;
+                color: ${textColor} !important;
+            }
+
+            .button-green {
+                background-color: ${palette[400]} !important;
+                border-color: ${palette[600]} !important;
+                color: ${textColor} !important;
+            }
+
+            .profile-nav {
+                background-color: ${palette[800]} !important;
+            }
+
+            .bg-blue-600 {
+                background-color: ${palette[500]} !important;
+            }
+
+            :is(.dark .dark\:bg-gray-700) {
+                background-color: ${palette[700]} !important;
+            }
+
+            ul.bookmarks_list li:nth-of-type(2n+1) {
+                background-color: ${palette[700]} !important;
+            }
+
+            .page-title .page-name_wrapper .page-name i {
+                color: ${palette[400]} !important;
+            }
         `;
 
         GM_addStyle(css);
@@ -457,6 +600,149 @@
                 border-bottom-color: ${defaultColor} !important;
                 color: ${defaultColor} !important;
                 font-weight: 700 !important;
+            }
+
+            /* Additional styles for general pages */
+            .bottom-part.at-index {
+                background-color: ${defaultPalette[1000]} !important;
+                border-bottom: 1px solid ${defaultPalette[800]} !important;
+                border-top: 1px solid ${defaultPalette[800]} !important;
+            }
+
+            .navbar-search .search-input {
+                background-color: ${defaultPalette[900]} !important;
+            }
+
+            table.listext-table tr:nth-child(2n+1) {
+                background-color: ${defaultPalette[700]} !important;
+            }
+
+            table.listext-table {
+                background-color: ${defaultPalette[800]} !important;
+            }
+
+            .action-link:hover {
+                color: ${defaultColor} !important;
+                text-decoration: underline !important;
+            }
+
+            .user-private-tabs li.current {
+                border-left-color: ${defaultColor} !important;
+                color: ${defaultColor} !important;
+            }
+
+            table.listext-table .update-status.no-chapters {
+                background-color: ${defaultColor} !important;
+                border-color: ${defaultPalette[700]} !important;
+                font-weight: 400 !important;
+            }
+
+            .daily-recent_views .top-tab_title.title-active {
+                background-color: ${defaultPalette[600]} !important;
+            }
+
+            .sts-bold {
+                background-color: ${defaultPalette[600]} !important;
+            }
+
+            .filters-wrapper {
+                background-color: ${defaultPalette[900]} !important;
+            }
+
+            [type="date"], [type="email"], [type="number"], [type="password"], [type="tel"], [type="text"], select, select.form-control {
+                background-color: ${defaultPalette[700]} !important;
+                border-color: ${defaultPalette[600]} !important;
+                color: #fff !important;
+            }
+
+            .sub-index-style .section-title {
+                background-color: ${defaultPalette[700]} !important;
+                border: none !important;
+                color: #fff !important;
+            }
+
+            .browse-alphabet .current {
+                background-color: ${defaultPalette[400]} !important;
+                color: #fff !important;
+            }
+
+            .hover\:bg-green-700:hover {
+                background-color: ${defaultPalette[600]} !important;
+            }
+
+            .pagination_wrap .current {
+                background-color: ${defaultPalette[600]} !important;
+                color: #fff !important;
+            }
+
+            .paging_item {
+                color: ${defaultPalette[400]} !important;
+            }
+
+            :is(.dark .dark\:ring-cyan-900) {
+                --tw-ring-color: ${defaultPalette[800]} !important;
+            }
+
+            .tox .tox-statusbar {
+                background-color: ${defaultPalette[800]} !important;
+                border-top: 1px solid ${defaultPalette[600]} !important;
+                color: ${defaultPalette[200]} !important;
+            }
+
+            #tinymce {
+                background-color: ${defaultPalette[800]} !important;
+            }
+
+            #mainpart.custome-page, #mainpart.page-board {
+                background-color: ${defaultPalette[900]} !important;
+            }
+
+            .tox .tox-toolbar, .tox .tox-toolbar__overflow, .tox .tox-toolbar__primary {
+                background-color: ${defaultPalette[800]} !important;
+            }
+
+            .tox:not(.tox-tinymce-inline) .tox-editor-header {
+                background-color: ${defaultPalette[800]} !important;
+                border-bottom: 1px solid ${defaultPalette[600]} !important;
+            }
+
+            .tox .tox-tbtn:hover {
+                background: ${defaultPalette[700]} !important;
+            }
+
+            .tox .tox-tbtn {
+                background: ${defaultPalette[800]} !important;
+            }
+
+            .tox .tox-tbtn--active, .tox .tox-tbtn--enabled, .tox .tox-tbtn--enabled:focus, .tox .tox-tbtn--enabled:hover {
+                background: ${defaultColor} !important;
+                color: #fff !important;
+            }
+
+            .button-green {
+                background-color: ${defaultPalette[400]} !important;
+                border-color: ${defaultPalette[600]} !important;
+                color: #fff !important;
+            }
+
+            .profile-nav {
+                background-color: ${defaultPalette[800]} !important;
+            }
+
+            .bg-blue-600 {
+                background-color: ${defaultColor} !important;
+            }
+
+            :is(.dark .dark\:bg-gray-700) {
+                background-color: ${defaultPalette[700]} !important;
+            }
+
+            ul.bookmarks_list li:nth-of-type(2n+1) {
+                background-color: ${defaultPalette[700]} !important;
+            }
+
+            .page-title .page-name_wrapper .page-name i {
+                color: ${defaultPalette[400]} !important;
             }
         `;
 

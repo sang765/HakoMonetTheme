@@ -29,6 +29,8 @@
             [href*="/the-loai/adapted-to-anime"],
             [href*="/the-loai/adapted-to-drama-cd"],
             [href*="/the-loai/adapted-to-manga"],
+            [href*="/the-loai/adapted-to-manhua"],
+            [href*="/the-loai/adapted-to-manhwa"],
             [href*="/the-loai/adventure"],
             [href*="/the-loai/character-growth"],
             [href*="/the-loai/chinese-novel"],
@@ -82,7 +84,8 @@
             [href*="/the-loai/netorare"],
             [href*="/the-loai/shoujo-ai"],
             [href*="/the-loai/shonen-ai"],
-            [href*="/the-loai/yuri"] {
+            [href*="/the-loai/yuri"],
+            [href*="/the-loai/yandere"] {
                 background-color: #fff3cd !important;
                 border: 1px solid #ffeaa7 !important;
                 color: #856404 !important;
