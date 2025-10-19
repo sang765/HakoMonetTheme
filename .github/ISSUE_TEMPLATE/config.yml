@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📧 Discord Support
+    url: https://discord.gg/EXx8pYg7fm
+    about: Nhận hỗ trợ trực tiếp từ cộng đồng Discord
+  - name: 💬 Discussion Board
+    url: https://github.com/sang765/HakoMonetTheme/discussions
+    about: Thảo luận ý tưởng và câu hỏi chung
+  - name: 📚 Documentation
+    url: https://github.com/sang765/HakoMonetTheme/wiki
+    about: Kiểm tra wiki để biết hướng dẫn chi tiết
