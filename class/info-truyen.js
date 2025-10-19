@@ -13,9 +13,9 @@
         debugLog('InfoTruyen class đã được tải');
         
         // Kiểm tra xem có phải là trang truyện không
-        const pathParts = window.location.pathname.split('/').filter(part => part !== '');
-        if (pathParts.length < 2 || !['truyen', 'sang-tac', 'ai-dich'].includes(pathParts[0])) {
-            debugLog('Đây không phải trang chi tiết truyện, bỏ qua tính năng InfoTruyen.');
+        const sideFeaturesElement = document.querySelector('div.col-4.col-md.feature-item.width-auto-xl');
+        if (!sideFeaturesElement) {
+            debugLog('Không tìm thấy element, bỏ qua tính năng đổi màu.');
             return;
         }
         

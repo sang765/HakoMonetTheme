@@ -72,10 +72,10 @@
     }
     
     function initPageInfoTruyen() {
-        // Kiểm tra xem có phải trang chi tiết truyện không
-        const pathParts = window.location.pathname.split('/').filter(part => part !== '');
-        if (pathParts.length < 2 || !['truyen', 'sang-tac', 'ai-dich'].includes(pathParts[0])) {
-            debugLog('Đây không phải trang chi tiết truyện, bỏ qua tính năng đổi màu.');
+        // Kiểm tra xem có phải trang chi tiết truyện không bằng cách tìm element đặc trưng
+        const sideFeaturesElement = document.querySelector('div.col-4.col-md.feature-item.width-auto-xl');
+        if (!sideFeaturesElement) {
+            debugLog('Không tìm thấy element, bỏ qua tính năng đổi màu.');
             return;
         }
         
