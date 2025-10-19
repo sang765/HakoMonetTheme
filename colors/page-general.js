@@ -401,6 +401,15 @@
             .page-title .page-name_wrapper .page-name i {
                 color: ${palette[400]} !important;
             }
+
+            .browse-section .pagination-footer, .has-pagination .pagination-footer {
+                background-color: ${palette[1000]} !important;
+            }
+
+            body {
+                background-color: ${palette[900]} !important;
+                color: ${palette[100]} !important;
+            }
         `;
 
         GM_addStyle(css);
@@ -743,6 +752,15 @@
 
             .page-title .page-name_wrapper .page-name i {
                 color: ${defaultPalette[400]} !important;
+            }
+
+            .browse-section .pagination-footer, .has-pagination .pagination-footer {
+                background-color: ${defaultPalette[1000]} !important;
+            }
+
+            body {
+                background-color: ${defaultPalette[900]} !important;
+                color: ${defaultPalette[100]} !important;
             }
         `;
 
