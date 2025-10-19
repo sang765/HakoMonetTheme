@@ -4,7 +4,7 @@
     const DEBUG = true;
     const CHECK_UPDATE_INTERVAL = 30 * 60 * 1000; // 30 phút
     const VERSION = '3.2.0';
-    const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/HakoMonetTheme.user.js';
+    const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/dev/HakoMonetTheme.user.js';
     
     function debugLog(...args) {
         if (DEBUG) {
