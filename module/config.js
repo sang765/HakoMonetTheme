@@ -84,7 +84,7 @@
         return `Custom ${existingCount + 1}`;
     }
 
-    function loadCustomPresets(dialog) {
+    function loadCustomPresets(dialog, currentColor = getDefaultColor()) {
         const customSection = dialog.querySelector('#customPresetsSection');
         const customGrid = dialog.querySelector('#customPresetsGrid');
         const customColors = getCustomColors();
@@ -128,9 +128,9 @@
          }
      }
 
-    function refreshCustomPresets(dialog) {
+    function refreshCustomPresets(dialog, currentColor) {
         debugLog('Refresh custom presets');
-        loadCustomPresets(dialog);
+        loadCustomPresets(dialog, currentColor);
 
         // Đóng color picker panel nếu đang mở
         const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
@@ -173,6 +173,7 @@
                     // Cập nhật preview color
                     previewColor = color;
 
+                    // Cập nhật tất cả các elements UI
                     const colorText = dialog.querySelector('.hmt-color-text');
                     const previewBox = dialog.querySelector('.hmt-preview-box');
                     const colorPreview = dialog.querySelector('#hmt-color-preview');
@@ -180,15 +181,16 @@
 
                     if (colorText) colorText.value = color;
                     if (previewBox) previewBox.style.backgroundColor = color;
-
-                    // Cập nhật color picker nếu có
                     if (colorPreview) colorPreview.style.backgroundColor = color;
                     if (colorValue) colorValue.textContent = color;
 
                     // Áp dụng màu ngay lập tức để preview (chưa lưu vào storage)
                     applyPreviewColor(color);
 
-                    debugLog('Đã áp dụng màu preview từ preset:', color);
+                    // Cập nhật trạng thái nút save
+                    updateSavePresetButton(dialog);
+
+                    debugLog('Đã cập nhật UI cho preset:', color);
                 });
             });
         });
@@ -301,7 +303,7 @@
         if (customName !== null && customName.trim() !== '') {
              debugLog('Lưu preset với tên:', customName.trim());
              saveCustomPreset(colorToSave, customName.trim());
-             refreshCustomPresets(dialog);
+             refreshCustomPresets(dialog, previewColor);
 
              // Đóng color picker panel nếu đang mở
              const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
@@ -382,7 +384,7 @@
 
                 setTimeout(() => {
                      debugLog('Hoàn thành xóa preset với animation');
-                     refreshCustomPresets(dialog);
+                     refreshCustomPresets(dialog, previewColor);
 
                      // Kiểm tra xem còn custom presets không
                      const customColors = getCustomColors();
@@ -407,7 +409,7 @@
                      showNotification('Đã xóa preset!', 3000);
                  }, 300);
             } else {
-                refreshCustomPresets(dialog);
+                refreshCustomPresets(dialog, previewColor);
 
                 // Đóng color picker panel nếu đang mở
                 const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
@@ -448,7 +450,9 @@
 
              // Refresh tất cả dialogs đang mở
              document.querySelectorAll('.hmt-config-dialog').forEach(dialog => {
-                 refreshCustomPresets(dialog);
+                 // Lấy currentColor từ dialog nếu có
+                 const dialogColor = dialog._currentColor || getDefaultColor();
+                 refreshCustomPresets(dialog, dialogColor);
 
                  // Đóng color picker panel nếu đang mở
                  const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
@@ -488,9 +492,6 @@
             return;
         }
 
-        // Lấy màu hiện tại để hiển thị trong dialog
-        const currentColor = getDefaultColor();
-
         const dialog = document.createElement('div');
         dialog.className = 'hmt-config-dialog';
         dialog.innerHTML = `
@@ -520,7 +521,7 @@
                                     <h5>Màu mặc định</h5>
                                     <div class="hmt-presets-grid">
                                         ${DEFAULT_COLORS.map(color => `
-                                            <div class="hmt-color-preset ${currentColor === color.value ? 'active' : ''}"
+                                            <div class="hmt-color-preset ${getDefaultColor() === color.value ? 'active' : ''}"
                                                  data-color="${color.value}"
                                                  data-type="${color.type}"
                                                  style="background-color: ${color.value}">
@@ -588,7 +589,7 @@
                                     </div>
                                     <input type="text"
                                            id="hmt-custom-color-text"
-                                           value="${currentColor}"
+                                           value="${getDefaultColor()}"
                                            class="hmt-color-text"
                                            placeholder="#6c5ce7">
                                 </div>
@@ -598,7 +599,7 @@
 
                         <div class="hmt-config-preview">
                             <h4>Xem trước</h4>
-                            <div class="hmt-preview-box" style="background-color: ${currentColor}">
+                            <div class="hmt-preview-box" style="background-color: ${getDefaultColor()}">
                                 <span>Màu chủ đạo</span>
                             </div>
                         </div>
@@ -1317,7 +1318,36 @@
         document.body.appendChild(dialog);
 
         // Load custom presets với màu hiện tại
-        loadCustomPresets(dialog);
+         loadCustomPresets(dialog, currentColor);
+
+         // Đồng bộ màu hiện tại với tất cả các elements
+         const currentColor = getDefaultColor();
+         debugLog('Đồng bộ màu hiện tại với dialog:', currentColor);
+
+         // Đồng bộ color text input
+         const colorText = dialog.querySelector('.hmt-color-text');
+         if (colorText) {
+             colorText.value = currentColor;
+         }
+
+         // Đồng bộ preview box
+         const previewBox = dialog.querySelector('.hmt-preview-box');
+         if (previewBox) {
+             previewBox.style.backgroundColor = currentColor;
+         }
+
+         // Đồng bộ color picker display
+         const colorPreview = dialog.querySelector('#hmt-color-preview');
+         const colorValue = dialog.querySelector('#hmt-color-value');
+         if (colorPreview) colorPreview.style.backgroundColor = currentColor;
+         if (colorValue) colorValue.textContent = currentColor;
+
+         // Đặt active cho preset hiện tại
+         const currentPreset = dialog.querySelector(`[data-color="${currentColor}"]`);
+         if (currentPreset) {
+             dialog.querySelectorAll('.hmt-color-preset').forEach(p => p.classList.remove('active'));
+             currentPreset.classList.add('active');
+         }
 
          // Đóng color picker panel nếu đang mở khi khởi tạo
          const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
@@ -1353,10 +1383,12 @@
         const resetBtn = dialog.querySelector('.hmt-config-reset');
         const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
 
-        // Sử dụng màu hiện tại từ createConfigDialog
+        // Lưu màu hiện tại để có thể khôi phục nếu không lưu
+        const currentColor = getDefaultColor();
         let previewColor = currentColor; // Màu đang preview
 
-        debugLog('Config dialog được mở với màu hiện tại:', currentColor);
+        // Lưu currentColor vào dialog để có thể truy cập từ bên ngoài
+        dialog._currentColor = currentColor;
 
         // Hàm áp dụng màu preview (chưa lưu vào storage)
         function applyPreviewColor(color) {
@@ -1388,6 +1420,8 @@
                  applyPreviewColor(currentColor);
              }
 
+             // Xóa currentColor khỏi dialog trước khi remove
+             delete dialog._currentColor;
              dialog.remove();
          }
 
@@ -1461,6 +1495,7 @@
              const hex = hslToHex(currentHue, currentSat, currentLight);
              debugLog('Cập nhật màu từ HSL:', hex);
 
+             // Cập nhật tất cả các elements UI
              if (colorPreview) colorPreview.style.backgroundColor = hex;
              if (colorValue) colorValue.textContent = hex;
              if (colorText) colorText.value = hex;
@@ -1473,7 +1508,10 @@
              previewColor = hex;
              applyPreviewColor(hex);
 
-             debugLog('Đã áp dụng màu preview từ HSL:', hex);
+             // Cập nhật trạng thái nút save
+             updateSavePresetButton(dialog);
+
+             debugLog('Đã cập nhật UI từ HSL picker:', hex);
          }
 
         // Hàm cập nhật vị trí cursor
@@ -1585,60 +1623,18 @@
              });
          }
 
-        // Khởi tạo màu ban đầu với màu hiện tại
-          debugLog('Khởi tạo color picker tùy chỉnh với màu hiện tại:', currentColor);
+        // Khởi tạo màu ban đầu
+         debugLog('Khởi tạo color picker tùy chỉnh');
+         debugLog('Color preview element:', !!colorPreview);
+         debugLog('Color value element:', !!colorValue);
+         debugLog('Hue slider element:', !!hueSlider);
+         debugLog('Sat slider element:', !!satSlider);
+         debugLog('Light slider element:', !!lightSlider);
+         debugLog('Palette area element:', !!paletteArea);
+         debugLog('Hue bar element:', !!hueBar);
 
-          // Khởi tạo các biến HSL từ màu hiện tại
-          const currentColorHex = currentColor.replace('#', '');
-          const r = parseInt(currentColorHex.substr(0, 2), 16);
-          const g = parseInt(currentColorHex.substr(2, 2), 16);
-          const b = parseInt(currentColorHex.substr(4, 2), 16);
-
-          // Chuyển RGB sang HSL
-          const rNorm = r / 255;
-          const gNorm = g / 255;
-          const bNorm = b / 255;
-
-          const max = Math.max(rNorm, gNorm, bNorm);
-          const min = Math.min(rNorm, gNorm, bNorm);
-          const delta = max - min;
-
-          let hue = 0;
-          let sat = 0;
-          const light = (max + min) / 2;
-
-          if (delta !== 0) {
-              sat = light > 0.5 ? delta / (2 - max - min) : delta / (max + min);
-
-              switch (max) {
-                  case rNorm: hue = (gNorm - bNorm) / delta + (gNorm < bNorm ? 6 : 0); break;
-                  case gNorm: hue = (bNorm - rNorm) / delta + 2; break;
-                  case bNorm: hue = (rNorm - gNorm) / delta + 4; break;
-              }
-              hue /= 6;
-          }
-
-          currentHue = Math.round(hue * 360);
-          currentSat = Math.round(sat * 100);
-          currentLight = Math.round(light * 100);
-
-          debugLog('HSL khởi tạo:', {currentHue, currentSat, currentLight});
-
-          // Cập nhật UI với màu hiện tại
-          if (colorPreview) colorPreview.style.backgroundColor = currentColor;
-          if (colorValue) colorValue.textContent = currentColor;
-          if (colorText) colorText.value = currentColor;
-          if (previewBox) previewBox.style.backgroundColor = currentColor;
-
-          // Cập nhật sliders
-          if (hueSlider) hueSlider.value = currentHue;
-          if (satSlider) satSlider.value = currentSat;
-          if (lightSlider) lightSlider.value = currentLight;
-
-          // Cập nhật vị trí cursor
-          updateCursors();
-
-          debugLog('Đã khởi tạo color picker với màu hiện tại');
+         updateColorFromHSL();
+         updateCursors();
 
         // Xử lý text input
          colorText.addEventListener('input', function() {
@@ -1647,18 +1643,19 @@
 
              if (isValidHexColor(color)) {
                  debugLog('Màu hợp lệ từ text input');
+                 // Cập nhật tất cả các elements UI
                  if (previewBox) previewBox.style.backgroundColor = color;
-                 colorPresets.forEach(p => p.classList.remove('active'));
-
-                 // Cập nhật color picker nếu có
                  if (colorPreview) colorPreview.style.backgroundColor = color;
                  if (colorValue) colorValue.textContent = color;
+
+                 // Bỏ active cho tất cả presets vì đang nhập màu tùy chỉnh
+                 colorPresets.forEach(p => p.classList.remove('active'));
 
                  // Áp dụng màu preview ngay lập tức
                  previewColor = color;
                  applyPreviewColor(color);
 
-                 // Đóng color picker panel nếu đang mở (cho các phần tử cũ)
+                 // Đóng color picker panel nếu đang mở
                  if (colorPickerPanel) {
                      colorPickerPanel.classList.remove('open');
                  }
@@ -1666,7 +1663,8 @@
                  debugLog('Màu không hợp lệ từ text input');
              }
 
-             debugLog('Đã áp dụng màu preview từ text input:', color);
+             // Cập nhật trạng thái nút save
+             updateSavePresetButton(dialog);
          });
 
         // Lưu cài đặt
@@ -1677,7 +1675,9 @@
                  // Thực sự lưu màu vào storage và phát sự kiện chính thức
                  setDefaultColor(selectedColor);
 
-                 // Cập nhật color picker nếu có
+                 // Cập nhật tất cả các elements UI với màu đã lưu
+                 if (colorText) colorText.value = selectedColor;
+                 if (previewBox) previewBox.style.backgroundColor = selectedColor;
                  if (colorPreview) colorPreview.style.backgroundColor = selectedColor;
                  if (colorValue) colorValue.textContent = selectedColor;
 
@@ -1705,39 +1705,6 @@
              }
          });
 
-        // Áp dụng màu ngay lập tức (real-time update)
-        if (applyBtn) {
-            applyBtn.addEventListener('click', function() {
-                const selectedColor = colorText.value.trim();
-                debugLog('Áp dụng màu ngay lập tức:', selectedColor);
-
-                if (isValidHexColor(selectedColor)) {
-                    // Lưu màu vào storage và phát sự kiện để các module khác cập nhật
-                    setDefaultColor(selectedColor);
-
-                    // Đóng color picker panel nếu đang mở
-                    if (colorPickerPanel) {
-                        colorPickerPanel.classList.remove('open');
-                    }
-
-                    showNotification('Đã áp dụng màu sắc mới! Bạn có thể thấy thay đổi ngay lập tức.', 3000);
-                } else {
-                    debugLog('Màu không hợp lệ khi áp dụng ngay:', selectedColor);
-                    showNotification('Màu không hợp lệ! Vui lòng nhập mã màu HEX đúng định dạng.', 5000);
-
-                    // Đóng color picker panel nếu đang mở
-                    if (colorPickerPanel) {
-                        colorPickerPanel.classList.remove('open');
-                    }
-
-                    // Gắn lại sự kiện sau khi lỗi
-                    setTimeout(() => {
-                        attachPresetEvents();
-                        attachDeleteEvents();
-                    }, 100);
-                }
-            });
-        }
 
         // Save to preset
         const saveToPresetBtn = dialog.querySelector('#saveToPresetBtn');
@@ -1751,8 +1718,8 @@
             });
         }
 
-        // Khởi tạo hoàn thành
-        debugLog('Hoàn thành setup event listeners');
+        // Update save button state (loại bỏ việc kiểm tra nút apply vì đã bị xóa)
+         updateSavePresetButton(dialog);
 
          // Đóng color picker panel nếu đang mở khi khởi tạo
          if (colorPickerPanel) {
@@ -1772,18 +1739,16 @@
              // Cập nhật preview color
              previewColor = defaultColor;
 
-             // Cập nhật UI
+             // Cập nhật tất cả các elements UI
              if (colorText) colorText.value = defaultColor;
              if (previewBox) previewBox.style.backgroundColor = defaultColor;
-
-             // Cập nhật color picker nếu có
              if (colorPreview) colorPreview.style.backgroundColor = defaultColor;
              if (colorValue) colorValue.textContent = defaultColor;
 
              // Áp dụng màu preview ngay lập tức
              applyPreviewColor(defaultColor);
 
-             // Đóng color picker panel nếu đang mở (cho các phần tử cũ)
+             // Đóng color picker panel nếu đang mở
              if (colorPickerPanel) {
                  colorPickerPanel.classList.remove('open');
              }
@@ -1795,8 +1760,12 @@
                  defaultPreset.classList.add('active');
              }
 
-             debugLog('Đã reset về màu mặc định (preview):', defaultColor);
+             // Cập nhật trạng thái nút save
+             updateSavePresetButton(dialog);
+
              showNotification('Đã khôi phục màu mặc định!', 3000);
+
+             debugLog('Đã cập nhật UI cho reset button:', defaultColor);
          });
 
         // Đóng khi nhấn ESC
