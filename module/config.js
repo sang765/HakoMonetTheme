@@ -28,6 +28,33 @@
         debugLog('Đã phát sự kiện màu sắc thay đổi:', color);
     }
 
+    function getHideDomainWarning() {
+        return GM_getValue('hide_domain_warning', false);
+    }
+
+    function setHideDomainWarning(hide) {
+        GM_setValue('hide_domain_warning', hide);
+        debugLog('Đã lưu cài đặt ẩn cảnh báo tên miền:', hide);
+
+        // Áp dụng thay đổi ngay lập tức
+        applyDomainWarningVisibility();
+    }
+
+    function applyDomainWarningVisibility() {
+        const shouldHide = getHideDomainWarning();
+        const warningElements = document.querySelectorAll('.border-l-4.border-yellow-400.bg-yellow-50.p-4');
+
+        warningElements.forEach(element => {
+            if (shouldHide) {
+                element.style.display = 'none';
+                debugLog('Đã ẩn cảnh báo tên miền');
+            } else {
+                element.style.display = '';
+                debugLog('Đã hiện cảnh báo tên miền');
+            }
+        });
+    }
+
     function createConfigDialog() {
         // Kiểm tra xem dialog đã tồn tại chưa
         if (document.querySelector('.hmt-config-dialog')) {
@@ -84,7 +111,7 @@
                                      class="hmt-logo">
                                 <div class="hmt-title-section">
                                     <h3>HakoMonetTheme</h3>
-                                    <span class="hmt-subtitle">Cài đặt màu sắc</span>
+                                    <span class="hmt-subtitle">Cài đặt</span>
                                 </div>
                             </div>
                         </div>
@@ -93,7 +120,7 @@
                     <div class="hmt-config-body">
                         <div class="hmt-config-section">
                             <h4>Màu mặc định</h4>
-                            <p>Chọn màu sẽ được sử dụng khi không thể lấy màu từ ảnh bìa truyện. Sử dụng bộ chọn màu HSL để điều chỉnh màu sắc theo ý muốn.</p>
+                            <p>Chọn màu sẽ được sử dụng khi không thể lấy màu từ ảnh bìa truyện. Sử dụng thanh trượt HSL để điều chỉnh màu sắc theo ý muốn.</p>
 
                             <div class="hmt-custom-color">
                                 <label for="hmt-custom-color-input">Chọn màu tùy chỉnh:</label>
@@ -118,16 +145,34 @@
                                                     <input type="range" class="hmt-color-slider hmt-light-slider" id="hmt-light-slider" min="0" max="100" value="${currentHsl.l}">
                                                 </div>
                                             </div>
-                                            <div class="hmt-color-palette">
-                                                <div class="hmt-color-palette-area" id="hmt-color-palette-area">
-                                                    <div class="hmt-palette-cursor" id="hmt-palette-cursor"></div>
+                                            <div class="hmt-hsl-controls">
+                                                <div class="hmt-hsl-slider-group">
+                                                    <label class="hmt-slider-label">Hue</label>
+                                                    <div class="hmt-slider-with-buttons">
+                                                        <button class="hmt-slider-btn hmt-minus-btn" data-target="hmt-hue-slider" data-action="decrease">-</button>
+                                                        <input type="range" class="hmt-color-slider hmt-hue-slider" id="hmt-hue-slider" min="0" max="360" value="${currentHsl.h}">
+                                                        <button class="hmt-slider-btn hmt-plus-btn" data-target="hmt-hue-slider" data-action="increase">+</button>
+                                                    </div>
                                                 </div>
-                                                <div class="hmt-hue-bar">
-                                                    <div class="hmt-hue-cursor" id="hmt-hue-cursor"></div>
+                                                <div class="hmt-hsl-slider-group">
+                                                    <label class="hmt-slider-label">Saturation</label>
+                                                    <div class="hmt-slider-with-buttons">
+                                                        <button class="hmt-slider-btn hmt-minus-btn" data-target="hmt-sat-slider" data-action="decrease">-</button>
+                                                        <input type="range" class="hmt-color-slider hmt-sat-slider" id="hmt-sat-slider" min="0" max="100" value="${currentHsl.s}">
+                                                        <button class="hmt-slider-btn hmt-plus-btn" data-target="hmt-sat-slider" data-action="increase">+</button>
+                                                    </div>
+                                                </div>
+                                                <div class="hmt-hsl-slider-group">
+                                                    <label class="hmt-slider-label">Lightness</label>
+                                                    <div class="hmt-slider-with-buttons">
+                                                        <button class="hmt-slider-btn hmt-minus-btn" data-target="hmt-light-slider" data-action="decrease">-</button>
+                                                        <input type="range" class="hmt-color-slider hmt-light-slider" id="hmt-light-slider" min="0" max="100" value="${currentHsl.l}">
+                                                        <button class="hmt-slider-btn hmt-plus-btn" data-target="hmt-light-slider" data-action="increase">+</button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <span class="hmt-color-picker-label">Color Picker với thanh HSL</span>
+                                        <span class="hmt-color-picker-label">Thanh trượt HSL</span>
                                     </div>
                                     <input type="text"
                                            id="hmt-custom-color-text"
@@ -135,7 +180,20 @@
                                            class="hmt-color-text"
                                            placeholder="#17deb3">
                                 </div>
-                                <small class="hmt-color-help">Kéo thanh trượt HSL để chọn màu, hoặc nhập mã HEX trực tiếp</small>
+                                <small class="hmt-color-help">Kéo thanh trượt HSL để chọn màu, sử dụng nút +/- để điều chỉnh chi tiết, hoặc nhập mã HEX trực tiếp</small>
+                            </div>
+                        </div>
+
+                        <div class="hmt-config-section">
+                            <h4>Ẩn cảnh báo tên miền</h4>
+                            <p>Ẩn các cảnh báo về tên miền không chính thức trên trang web. Tính năng này sẽ ẩn các thông báo cảnh báo màu vàng.</p>
+
+                            <div class="hmt-domain-warning-toggle">
+                                <label class="hmt-toggle-label">
+                                    <input type="checkbox" ${getHideDomainWarning() ? 'checked' : ''} class="hmt-domain-warning-toggle-input">
+                                    <span class="hmt-toggle-switch"></span>
+                                    Ẩn cảnh báo tên miền
+                                </label>
                             </div>
                         </div>
 
@@ -408,54 +466,49 @@
                 box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             }
 
-            .hmt-color-palette {
-                display: flex;
-                gap: 8px;
+            .hmt-hsl-controls {
+                margin-bottom: 16px;
+            }
+
+            .hmt-hsl-slider-group {
                 margin-bottom: 12px;
             }
 
-            .hmt-color-palette-area {
-                width: 180px;
-                height: 120px;
-                background: linear-gradient(to top, #000, transparent),
-                           linear-gradient(to right, #fff, transparent);
-                border-radius: 4px;
-                position: relative;
-                cursor: crosshair;
-                border: 1px solid #dee2e6;
+            .hmt-hsl-slider-group:last-child {
+                margin-bottom: 0;
             }
 
-            .hmt-palette-cursor {
-                width: 8px;
-                height: 8px;
-                border-radius: 50%;
-                background: white;
-                border: 2px solid #333;
-                position: absolute;
-                pointer-events: none;
-                transform: translate(-50%, -50%);
+            .hmt-slider-with-buttons {
+                display: flex;
+                align-items: center;
+                gap: 8px;
             }
 
-            .hmt-hue-bar {
-                width: 20px;
-                height: 120px;
-                background: linear-gradient(to bottom,
-                  #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%,
-                  #0000ff 67%, #ff00ff 83%, #ff0000 100%);
-                border-radius: 4px;
-                position: relative;
+            .hmt-slider-btn {
+                width: 32px;
+                height: 32px;
+                border: 2px solid #e9ecef;
+                border-radius: 6px;
+                background: #f8f9fa;
+                color: #495057;
+                font-size: 16px;
+                font-weight: 600;
                 cursor: pointer;
-                border: 1px solid #dee2e6;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s;
+                user-select: none;
             }
 
-            .hmt-hue-cursor {
-                width: 20px;
-                height: 4px;
-                background: white;
-                border: 1px solid #333;
-                position: absolute;
-                left: -1px;
-                pointer-events: none;
+            .hmt-slider-btn:hover {
+                background: #e9ecef;
+                border-color: #667eea;
+                color: #667eea;
+            }
+
+            .hmt-slider-btn:active {
+                transform: scale(0.95);
             }
 
             .hmt-color-picker-label {
@@ -640,6 +693,10 @@
                 background: #2d3748;
                 color: #e2e8f0;
             }
+
+            .hmt-domain-warning-toggle {
+                margin-top: 16px;
+            }
         `);
 
         document.body.appendChild(dialog);
@@ -690,6 +747,7 @@
         const saveBtn = dialog.querySelector('.hmt-config-save');
         const resetBtn = dialog.querySelector('.hmt-config-reset');
         const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
+        const domainWarningToggle = dialog.querySelector('.hmt-domain-warning-toggle-input');
 
         // Lưu màu hiện tại để có thể khôi phục nếu không lưu
          const currentColor = dialog._currentColor || getDefaultColor();
@@ -760,10 +818,7 @@
         const hueSlider = dialog.querySelector('#hmt-hue-slider');
         const satSlider = dialog.querySelector('#hmt-sat-slider');
         const lightSlider = dialog.querySelector('#hmt-light-slider');
-        const paletteArea = dialog.querySelector('#hmt-color-palette-area');
-        const paletteCursor = dialog.querySelector('#hmt-palette-cursor');
-        const hueBar = dialog.querySelector('.hmt-hue-bar');
-        const hueCursor = dialog.querySelector('#hmt-hue-cursor');
+        const sliderButtons = dialog.querySelectorAll('.hmt-slider-btn');
 
         // Hàm chuyển đổi HEX sang HSL
         function hexToHsl(hex) {
@@ -804,8 +859,6 @@
         let currentHue = currentHsl.h;
         let currentSat = currentHsl.s;
         let currentLight = currentHsl.l;
-        let currentX = currentSat / 100;
-        let currentY = 1 - (currentLight / 100);
 
         // Hàm chuyển đổi HSL sang HEX
         function hslToHex(h, s, l) {
@@ -873,16 +926,6 @@
              });
          }
 
-        // Hàm cập nhật vị trí cursor
-        function updateCursors() {
-            if (paletteCursor) {
-                paletteCursor.style.left = (currentX * 180) + 'px';
-                paletteCursor.style.top = (120 - currentY * 120) + 'px';
-            }
-            if (hueCursor) {
-                hueCursor.style.top = (currentHue / 360 * 120) + 'px';
-            }
-        }
 
         // Xử lý thanh hue
          if (hueSlider) {
@@ -912,75 +955,32 @@
              });
          }
 
-        // Xử lý bảng màu 2D
-         if (paletteArea) {
-             paletteArea.addEventListener('mousedown', function(e) {
-                 debugLog('Palette area mousedown');
-                 function updatePaletteColor(e) {
-                     const rect = paletteArea.getBoundingClientRect();
-                     const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-                     const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+        // Xử lý nút +/- cho sliders
+        sliderButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const action = this.getAttribute('data-action');
+                const targetSlider = dialog.querySelector(`#${targetId}`);
 
-                     currentX = x;
-                     currentY = y;
+                if (targetSlider) {
+                    const step = targetId.includes('hue') ? 5 : 2; // Hue có step lớn hơn
+                    const currentValue = parseInt(targetSlider.value);
+                    let newValue;
 
-                     // Tính saturation và lightness từ vị trí
-                     currentSat = x * 100;
-                     currentLight = (1 - y) * 100;
+                    if (action === 'increase') {
+                        newValue = Math.min(currentValue + step, parseInt(targetSlider.max));
+                    } else {
+                        newValue = Math.max(currentValue - step, parseInt(targetSlider.min));
+                    }
 
-                     if (satSlider) satSlider.value = currentSat;
-                     if (lightSlider) lightSlider.value = currentLight;
+                    targetSlider.value = newValue;
+                    debugLog(`${targetId} ${action}: ${currentValue} -> ${newValue}`);
 
-                     debugLog('Palette color cập nhật:', {x, y, currentSat, currentLight});
-                     updateColorFromHSL();
-                     updateCursors();
-                 }
-
-                 updatePaletteColor(e);
-
-                 function onMouseMove(e) {
-                     updatePaletteColor(e);
-                 }
-
-                 function onMouseUp() {
-                     document.removeEventListener('mousemove', onMouseMove);
-                     document.removeEventListener('mouseup', onMouseUp);
-                 }
-
-                 document.addEventListener('mousemove', onMouseMove);
-                 document.addEventListener('mouseup', onMouseUp);
-             });
-         }
-
-        // Xử lý thanh hue màu sắc
-         if (hueBar) {
-             hueBar.addEventListener('mousedown', function(e) {
-                 debugLog('Hue bar mousedown');
-                 function updateHue(e) {
-                     const rect = hueBar.getBoundingClientRect();
-                     const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
-                     currentHue = y * 360;
-                     if (hueSlider) hueSlider.value = currentHue;
-                     debugLog('Hue cập nhật:', currentHue);
-                     updateColorFromHSL();
-                     updateCursors();
-                 }
-
-                 updateHue(e);
-
-                 function onMouseMove(e) {
-                     updateHue(e);
-                 }
-
-                 function onMouseUp() {
-                     document.removeEventListener('mousemove', onMouseMove);
-                     document.removeEventListener('mouseup', onMouseUp);
-                 }
-
-                 document.addEventListener('mousemove', onMouseMove);
-                 document.addEventListener('mouseup', onMouseUp);
-             });
-         }
+                    // Trigger input event để cập nhật màu
+                    targetSlider.dispatchEvent(new Event('input'));
+                }
+            });
+        });
 
         // Khởi tạo màu ban đầu - đồng bộ với màu hiện tại
          debugLog('Khởi tạo color picker tùy chỉnh');
@@ -989,14 +989,10 @@
          debugLog('Hue slider element:', !!hueSlider);
          debugLog('Sat slider element:', !!satSlider);
          debugLog('Light slider element:', !!lightSlider);
-         debugLog('Palette area element:', !!paletteArea);
-         debugLog('Hue bar element:', !!hueBar);
+         debugLog('Slider buttons count:', sliderButtons.length);
 
          // Đồng bộ các elements với màu hiện tại (không gửi sự kiện preview)
          syncUIWithColor(currentColor);
-
-         // Đặt vị trí cursor dựa trên giá trị HSL hiện tại
-         updateCursors();
 
         // Xử lý text input
          colorText.addEventListener('input', function() {
@@ -1083,17 +1079,25 @@
              debugLog('Đã cập nhật UI cho reset button:', defaultColor);
          });
 
+        // Domain warning toggle
+        if (domainWarningToggle) {
+            domainWarningToggle.addEventListener('change', function() {
+                setHideDomainWarning(this.checked);
+                showNotification('Đã cập nhật cài đặt ẩn cảnh báo tên miền!', 3000);
+            });
+        }
+
         // Đóng khi nhấn ESC
-         document.addEventListener('keydown', function(e) {
-             if (e.key === 'Escape') {
-                 // Đóng color picker panel nếu đang mở (cho các phần tử cũ)
-                 if (colorPickerPanel && colorPickerPanel.classList.contains('open')) {
-                     colorPickerPanel.classList.remove('open');
-                 } else {
-                     closeDialog();
-                 }
-             }
-         });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                // Đóng color picker panel nếu đang mở (cho các phần tử cũ)
+                if (colorPickerPanel && colorPickerPanel.classList.contains('open')) {
+                    colorPickerPanel.classList.remove('open');
+                } else {
+                    closeDialog();
+                }
+            }
+        });
     }
 
     function isValidHexColor(color) {
@@ -1170,13 +1174,25 @@
         createConfigDialog();
     }
 
+    function initializeConfig() {
+        // Áp dụng cài đặt domain warning khi khởi tạo
+        applyDomainWarningVisibility();
+        debugLog('Config module đã được khởi tạo');
+    }
+
     debugLog('Config module đã được tải');
 
     // Xuất các hàm cần thiết
     window.HMTConfig = {
         getDefaultColor: getDefaultColor,
         setDefaultColor: setDefaultColor,
-        openConfigDialog: openConfigDialog
+        getHideDomainWarning: getHideDomainWarning,
+        setHideDomainWarning: setHideDomainWarning,
+        openConfigDialog: openConfigDialog,
+        initialize: initializeConfig
     };
+
+    // Khởi tạo config khi module load
+    initializeConfig();
 
 })();

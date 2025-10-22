@@ -120,7 +120,7 @@
                     <div class="hmt-adblocker-body">
                         <div class="hmt-adblocker-section">
                             <h4>Cài đặt Ad Blocker</h4>
-                            <p>Chặn các banner quảng cáo không mong muốn trên trang web. Tính năng này sẽ ẩn các phần tử phù hợp với selector được chỉ định.</p>
+                            <p>Chặn các banner quảng cáo không mong muốn trên trang web. Tính năng này sẽ tự động ẩn các phần tử phù hợp với selector được chỉ định.</p>
 
                             <div class="hmt-adblocker-status">
                                 <div class="hmt-status-item">
@@ -145,16 +145,12 @@
                                 </label>
                             </div>
 
-                            <div class="hmt-adblocker-actions">
-                                <button class="hmt-adblocker-manual-block">Chặn ngay</button>
-                                <button class="hmt-adblocker-manual-unblock">Bỏ chặn</button>
-                            </div>
                         </div>
 
                         <div class="hmt-adblocker-info">
                             <h4>Thông tin</h4>
                             <div class="hmt-info-content">
-                                <p><strong>Hoạt động:</strong> Tính năng này sẽ ẩn các phần tử DOM phù hợp với các selector CSS được chỉ định.</p>
+                                <p><strong>Hoạt động:</strong> Tính năng này sẽ tự động ẩn các phần tử DOM phù hợp với các selector CSS được chỉ định.</p>
                                 <p><strong>Đối tượng:</strong> Chặn banner quảng cáo và các liên kết không mong muốn trong nội dung chương truyện.</p>
                                 <p><strong>Lưu ý:</strong> Thay đổi cài đặt sẽ được áp dụng ngay lập tức và được lưu lại cho các lần truy cập sau.</p>
                             </div>
@@ -372,42 +368,6 @@
                 transform: translateX(20px);
             }
 
-            .hmt-adblocker-actions {
-                display: flex;
-                gap: 12px;
-            }
-
-            .hmt-adblocker-manual-block,
-            .hmt-adblocker-manual-unblock {
-                padding: 8px 16px;
-                border: none;
-                border-radius: 6px;
-                font-size: 14px;
-                font-weight: 500;
-                cursor: pointer;
-                transition: all 0.2s;
-            }
-
-            .hmt-adblocker-manual-block {
-                background: #dc3545;
-                color: white;
-            }
-
-            .hmt-adblocker-manual-block:hover {
-                background: #c82333;
-                transform: translateY(-1px);
-            }
-
-            .hmt-adblocker-manual-unblock {
-                background: #6c757d;
-                color: white;
-            }
-
-            .hmt-adblocker-manual-unblock:hover {
-                background: #5a6268;
-                transform: translateY(-1px);
-            }
-
             .hmt-adblocker-info {
                 padding: 16px;
                 background: #e9ecef;
@@ -515,8 +475,6 @@
         const closeBtnFooter = dialog.querySelector('.hmt-adblocker-close-btn');
         const overlay = dialog.querySelector('.hmt-adblocker-overlay');
         const toggleInput = dialog.querySelector('.hmt-toggle-input');
-        const manualBlockBtn = dialog.querySelector('.hmt-adblocker-manual-block');
-        const manualUnblockBtn = dialog.querySelector('.hmt-adblocker-manual-unblock');
 
         // Đóng dialog
         function closeDialog() {
@@ -541,25 +499,6 @@
             statusValue.className = `hmt-status-value ${this.checked ? 'enabled' : 'disabled'}`;
         });
 
-        // Manual block
-        manualBlockBtn.addEventListener('click', function() {
-            const blockedCount = blockAds();
-            if (blockedCount > 0) {
-                showNotification(`Đã chặn ${blockedCount} banner quảng cáo`, 3000);
-            } else {
-                showNotification('Không tìm thấy banner quảng cáo nào để chặn', 3000);
-            }
-        });
-
-        // Manual unblock
-        manualUnblockBtn.addEventListener('click', function() {
-            const unblockedCount = unblockAds();
-            if (unblockedCount > 0) {
-                showNotification(`Đã bỏ chặn ${unblockedCount} banner quảng cáo`, 3000);
-            } else {
-                showNotification('Không tìm thấy banner quảng cáo nào để bỏ chặn', 3000);
-            }
-        });
 
         // Đóng khi nhấn ESC
         document.addEventListener('keydown', function(e) {
@@ -676,8 +615,6 @@
         isEnabled: isAdBlockerEnabled,
         setEnabled: setAdBlockerEnabled,
         toggle: toggleAdBlocker,
-        blockAds: blockAds,
-        unblockAds: unblockAds,
         openDialog: openAdBlockerDialog,
         initialize: initializeAdBlocker
     };
