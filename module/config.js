@@ -157,14 +157,14 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <input type="text"
+                                                   id="hmt-custom-color-text"
+                                                   value="${currentColor}"
+                                                   class="hmt-color-text"
+                                                   placeholder="#17deb3">
                                         </div>
                                         <span class="hmt-color-picker-label">Thanh trượt HSL</span>
                                     </div>
-                                    <input type="text"
-                                           id="hmt-custom-color-text"
-                                           value="${currentColor}"
-                                           class="hmt-color-text"
-                                           placeholder="#17deb3">
                                 </div>
                                 <small class="hmt-color-help">Kéo thanh trượt HSL để chọn màu, sử dụng nút +/- để điều chỉnh chi tiết, hoặc nhập mã HEX trực tiếp</small>
                             </div>
@@ -361,12 +361,15 @@
             }
 
             .hmt-custom-color-picker {
-                width: 280px;
+                width: 320px;
                 background: white;
                 border: 2px solid #e9ecef;
                 border-radius: 8px;
                 padding: 16px;
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
             }
 
             .hmt-color-picker-display {
@@ -442,7 +445,7 @@
             }
 
             .hmt-hsl-controls {
-                margin-bottom: 16px;
+                margin-bottom: 8px;
             }
 
             .hmt-hsl-slider-group {
@@ -495,15 +498,16 @@
             }
 
             .hmt-color-text {
-                flex: 1;
-                padding: 12px 16px;
+                width: 100%;
+                padding: 10px 12px;
                 border: 2px solid #e1e5e9;
-                border-radius: 8px;
+                border-radius: 6px;
                 font-size: 14px;
                 font-family: monospace;
                 background: #f8f9fa;
                 color: #495057;
                 font-weight: 500;
+                box-sizing: border-box;
             }
 
             .hmt-color-text:focus {
