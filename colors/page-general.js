@@ -323,6 +323,18 @@
                 background-color: ${palette[700]} !important;
             }
 
+            table.broad-table tr:hover {
+                background-color: ${palette[600]} !important;
+            }
+
+            .ln-list-option li {
+                background-color: ${palette[700]} !important;
+            }
+
+            .ln-list-option li:hover {
+                background-color: ${palette[600]} !important;
+            }
+
             .action-link:hover {
                 color: ${palette[500]} !important;
                 text-decoration: underline !important;
