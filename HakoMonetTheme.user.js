@@ -4,7 +4,7 @@
 // @version      3.2.5
 // @description  Material You theme for Hako/DocLN.
 // @description:vi Material You theme dành cho Hako/DocLN.
-// @icon         https://docln.sbs/img/logo-9.png
+// @icon         https://github.com/sang765/HakoMonetTheme/raw/main/.github/assets/logo.png
 // @author       SangsDayy
 // @match        https://docln.sbs/*
 // @match        https://docln.net/*
