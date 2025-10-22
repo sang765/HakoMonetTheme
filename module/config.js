@@ -961,6 +961,17 @@
 
              if (isValidHexColor(color)) {
                  debugLog('Màu hợp lệ từ text input');
+                 // Chuyển đổi hex sang HSL và cập nhật sliders
+                 const hsl = hexToHsl(color);
+                 currentHue = hsl.h;
+                 currentSat = hsl.s;
+                 currentLight = hsl.l;
+
+                 // Cập nhật giá trị sliders
+                 if (hueSlider) hueSlider.value = currentHue;
+                 if (satSlider) satSlider.value = currentSat;
+                 if (lightSlider) lightSlider.value = currentLight;
+
                  // Cập nhật tất cả các elements UI
                  syncUIWithColor(color);
 
