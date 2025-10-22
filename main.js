@@ -24,8 +24,17 @@
     }
     
     function checkForUpdates() {
+        // Kiểm tra xem người dùng có bật thông báo cập nhật không
+        const updateNotificationsEnabled = GM_getValue('update_notifications_enabled', true);
+        if (!updateNotificationsEnabled) {
+            debugLog('Thông báo cập nhật đã bị tắt bởi người dùng');
+            // Vẫn lưu thời gian kiểm tra để tránh spam requests
+            GM_setValue('lastUpdateCheck', Date.now());
+            return;
+        }
+
         debugLog('Đang kiểm tra cập nhật...');
-        
+
         GM_xmlhttpRequest({
             method: 'GET',
             url: GITHUB_RAW_URL + '?t=' + new Date().getTime(),
@@ -34,18 +43,18 @@
                 if (response.status === 200) {
                     const scriptContent = response.responseText;
                     const versionMatch = scriptContent.match(/@version\s+([\d.]+)/);
-                    
+
                     if (versionMatch && versionMatch[1]) {
                         const latestVersion = versionMatch[1];
                         debugLog(`Phiên bản hiện tại: ${VERSION}, Phiên bản mới nhất: ${latestVersion}`);
-                        
+
                         if (isNewerVersion(latestVersion, VERSION)) {
                             debugLog('Đã tìm thấy phiên bản mới!');
                             showUpdateNotification(latestVersion);
                         } else {
                             debugLog('Đang sử dụng phiên bản mới nhất.');
                         }
-                        
+
                         // Lưu thời gian kiểm tra cuối cùng
                         GM_setValue('lastUpdateCheck', Date.now());
                     }
@@ -53,9 +62,13 @@
             },
             onerror: function(error) {
                 debugLog('Lỗi khi kiểm tra cập nhật:', error);
+                // Vẫn lưu thời gian kiểm tra để tránh spam requests
+                GM_setValue('lastUpdateCheck', Date.now());
             },
             ontimeout: function() {
                 debugLog('Hết thời gian kiểm tra cập nhật');
+                // Vẫn lưu thời gian kiểm tra để tránh spam requests
+                GM_setValue('lastUpdateCheck', Date.now());
             }
         });
     }
@@ -94,18 +107,25 @@
     }
     
     function setupAutoUpdate() {
+        // Kiểm tra xem người dùng có bật tự động kiểm tra cập nhật không
+        const autoUpdateEnabled = GM_getValue('auto_update_enabled', true);
+        if (!autoUpdateEnabled) {
+            debugLog('Tự động kiểm tra cập nhật đã bị tắt bởi người dùng');
+            return;
+        }
+
         // Kiểm tra lần cuối cập nhật
         const lastUpdateCheck = GM_getValue('lastUpdateCheck', 0);
         const now = Date.now();
-        
-        // Nếu chưa từng kiểm tra hoặc đã qua 30 phút kể từ lần kiểm tra cuối
+
+        // Nếu chưa từng kiểm tra hoặc đã qua khoảng thời gian kiểm tra kể từ lần kiểm tra cuối
         if (now - lastUpdateCheck > CHECK_UPDATE_INTERVAL) {
             checkForUpdates();
         }
-        
+
         // Thiết lập interval để kiểm tra định kỳ
         setInterval(checkForUpdates, CHECK_UPDATE_INTERVAL);
-        
+
         debugLog('Đã thiết lập tự động kiểm tra cập nhật mỗi 30 phút');
     }
     

@@ -98,11 +98,57 @@
         }
     }
     
+    function openUpdateSettings() {
+        const autoUpdateEnabled = GM_getValue('auto_update_enabled', true);
+        const updateNotificationsEnabled = GM_getValue('update_notifications_enabled', true);
+        const showInitNotification = GM_getValue('show_init_notification', false);
+
+        const settings = `
+Tự động kiểm tra cập nhật: ${autoUpdateEnabled ? 'Bật' : 'Tắt'}
+Thông báo cập nhật: ${updateNotificationsEnabled ? 'Bật' : 'Tắt'}
+Thông báo khởi tạo: ${showInitNotification ? 'Bật' : 'Tắt'}
+
+Chọn thiết lập cần thay đổi:
+1. ${autoUpdateEnabled ? 'Tắt' : 'Bật'} tự động kiểm tra cập nhật
+2. ${updateNotificationsEnabled ? 'Tắt' : 'Bật'} thông báo cập nhật
+3. ${showInitNotification ? 'Tắt' : 'Bật'} thông báo khởi tạo
+4. Đặt lại tất cả về mặc định
+        `.trim();
+
+        const choice = prompt(settings + '\n\nNhập số (1-4) hoặc để trống để hủy:');
+
+        switch(choice) {
+            case '1':
+                GM_setValue('auto_update_enabled', !autoUpdateEnabled);
+                showNotification('Thiết lập cập nhật', `Đã ${!autoUpdateEnabled ? 'bật' : 'tắt'} tự động kiểm tra cập nhật`, 3000);
+                break;
+            case '2':
+                GM_setValue('update_notifications_enabled', !updateNotificationsEnabled);
+                showNotification('Thiết lập cập nhật', `Đã ${!updateNotificationsEnabled ? 'bật' : 'tắt'} thông báo cập nhật`, 3000);
+                break;
+            case '3':
+                GM_setValue('show_init_notification', !showInitNotification);
+                showNotification('Thiết lập cập nhật', `Đã ${!showInitNotification ? 'bật' : 'tắt'} thông báo khởi tạo`, 3000);
+                break;
+            case '4':
+                GM_deleteValue('auto_update_enabled');
+                GM_deleteValue('update_notifications_enabled');
+                GM_deleteValue('show_init_notification');
+                showNotification('Thiết lập cập nhật', 'Đã đặt lại tất cả thiết lập về mặc định', 3000);
+                break;
+            default:
+                return;
+        }
+
+        debugLog('Đã cập nhật thiết lập cập nhật');
+    }
+
     function registerMenuCommands() {
         // Command để kiểm tra cập nhật
         if (typeof GM_registerMenuCommand === 'function') {
             GM_registerMenuCommand('🔄 Kiểm tra cập nhật', checkForUpdatesManual, 'u');
-            GM_registerMenuCommand('⚙️ Cài đặt', openColorConfig, 'c');
+            GM_registerMenuCommand('⚙️ Thiết lập cập nhật', openUpdateSettings, 's');
+            GM_registerMenuCommand('🎨 Cài đặt màu sắc', openColorConfig, 'c');
             GM_registerMenuCommand('🚫 Ad Blocker', openAdBlockerConfig, 'a');
             GM_registerMenuCommand('📊 Thông tin script', showScriptInfo, 'i');
             GM_registerMenuCommand('🐛 Báo cáo lỗi', reportBug, 'b');
@@ -352,20 +398,18 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
         // Tải tất cả resources
         const { loadedCount } = loadAllResources();
         
-        if (loadedCount > 0) {
+        // Only show initialization notification if user has enabled it or if there are errors
+        const showInitNotification = GM_getValue('show_init_notification', false);
+        if (showInitNotification && loadedCount > 0) {
             showNotification(
-                `${SCRIPT_NAME}`, 
+                `${SCRIPT_NAME}`,
                 `Đã tải ${loadedCount} modules thành công!`,
                 3000
             );
         }
         
-        // Kiểm tra cập nhật tự động (sau 5 giây)
-        setTimeout(() => {
-            if (GM_getValue('auto_update_check', true)) {
-                checkForUpdatesManual();
-            }
-        }, 5000);
+        // Kiểm tra cập nhật tự động được xử lý bởi main.js
+        // để tránh duplicate notifications
         
         debugLog('Khởi tạo script hoàn tất');
     }
