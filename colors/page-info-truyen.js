@@ -170,7 +170,7 @@
         analyzeAndApplyImageColor();
 
         // Lắng nghe sự kiện màu sắc thay đổi để cập nhật real-time
-        document.addEventListener('hmtColorChanged', function(event) {
+        (window.top || window).document.addEventListener('hmtColorChanged', function(event) {
             debugLog('Nhận sự kiện màu sắc thay đổi:', event.detail);
 
             // Kiểm tra chế độ màu

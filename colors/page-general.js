@@ -112,7 +112,7 @@
         applyCurrentColorScheme();
 
         // Lắng nghe sự kiện màu sắc thay đổi để cập nhật real-time
-        document.addEventListener('hmtColorChanged', function(event) {
+        (window.top || window).document.addEventListener('hmtColorChanged', function(event) {
             debugLog('Nhận sự kiện màu sắc thay đổi:', event.detail);
 
             // Kiểm tra chế độ màu
@@ -138,7 +138,7 @@
         debugLog('Đã thiết lập lắng nghe sự kiện màu sắc thay đổi');
 
         // Lắng nghe sự kiện tắt màu thay đổi
-        document.addEventListener('hmtDisableColorsChanged', function(event) {
+        (window.top || window).document.addEventListener('hmtDisableColorsChanged', function(event) {
             const isDisabled = event.detail.disabled;
             debugLog('Nhận sự kiện tắt màu thay đổi:', isDisabled);
 
@@ -187,7 +187,7 @@
         });
 
         // Lắng nghe sự kiện chế độ màu thay đổi
-        document.addEventListener('hmtModeChanged', function(event) {
+        (window.top || window).document.addEventListener('hmtModeChanged', function(event) {
             const newMode = event.detail.mode;
             debugLog('Nhận sự kiện chế độ màu thay đổi:', newMode);
 

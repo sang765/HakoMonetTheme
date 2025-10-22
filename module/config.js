@@ -24,7 +24,7 @@
                 timestamp: Date.now()
             }
         });
-        document.dispatchEvent(colorChangeEvent);
+        (window.top || window).document.dispatchEvent(colorChangeEvent);
         debugLog('Đã phát sự kiện màu sắc thay đổi:', color);
     }
 
@@ -52,7 +52,7 @@
         const disableChangeEvent = new CustomEvent('hmtDisableColorsChanged', {
             detail: { disabled: disable }
         });
-        document.dispatchEvent(disableChangeEvent);
+        (window.top || window).document.dispatchEvent(disableChangeEvent);
         debugLog('Đã phát sự kiện tắt màu thay đổi:', disable);
     }
 
@@ -68,7 +68,7 @@
         const modeChangeEvent = new CustomEvent('hmtModeChanged', {
             detail: { mode: mode }
         });
-        document.dispatchEvent(modeChangeEvent);
+        (window.top || window).document.dispatchEvent(modeChangeEvent);
         debugLog('Đã phát sự kiện chế độ màu thay đổi:', mode);
     }
 
@@ -808,7 +808,7 @@
             }
         `);
 
-        document.body.appendChild(dialog);
+        (window.top || window).document.body.appendChild(dialog);
 
         // Đồng bộ màu hiện tại với tất cả các elements
          debugLog('Đồng bộ màu hiện tại với dialog:', currentColor);
@@ -1243,7 +1243,7 @@
         }
 
         // Đóng khi nhấn ESC
-        document.addEventListener('keydown', function(e) {
+        (window.top || window).document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeDialog();
             }
@@ -1290,7 +1290,7 @@
                 notification.style.animation = 'hmtNotificationSlideIn 0.5s ease-out';
             }, 10);
 
-            document.body.appendChild(notification);
+            (window.top || window).document.body.appendChild(notification);
 
             // Thêm keyframes cho notification animation nếu chưa có
             if (!document.querySelector('#hmt-notification-styles')) {
