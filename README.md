@@ -40,35 +40,13 @@ Material You theme dành cho Hako/DocLN.
 > ![Mobile](https://www.tampermonkey.net/images/edge_dev_mode.jpg)  
 > Chi tiết bạn có thể đọc [Tampermonkey FAQ #209](https://www.tampermonkey.net/faq.php?locale=en#Q209) nếu bạn biết Tiếng Anh.
 
-### Bước 2: Cài đặt extension CORS (Quan trọng)
-- **Allow CORS: Access-Control-Allow-Origin**: [Chromium](https://chromewebstore.google.com/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf) hoặc [Firefox](https://addons.mozilla.org/firefox/addon/access-control-allow-origin/)
-
-### Bước 3: Cài đặt script
+### Bước 2: Cài đặt script
 Nhấp vào [raw userscript](https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js) và nhấn "Install"  
 ![Install Userscript](/.github/assets/Install_us.jpg)
 
-### Bước 4: Thiết lập CORS extension
-Sau khi cài đặt extension Allow CORS: Access-Control-Allow-Origin, hãy bật nó lên để kích hoạt  
-![CORS Disable](/.github/assets/cors_disable.jpg)![CORS Enable](/.github/assets/cors_enable.jpg)
-
-### Bước 5: Cấp quyền cross-origin cho userscript
+### Bước 3: Cấp quyền cross-origin cho userscript
 Khi vào bất kỳ trang web nào của Hako thì sẽ thông báo như ở dưới hình hiện lên. Hãy ấn "Always allow domain" và tận hưởng thành quả.  
 ![Userscript Ask](/.github/assets/userscript_asking.jpg)
-
-</div>
-
-## ❓ Tại sao cần có Allow CORS? ❓
-
-<div align="left">
-
-Script này cần phân tích màu sắc từ ảnh bìa truyện để tạo palette màu phù hợp. Tuy nhiên, các trình duyệt hiện đại chặn truy cập tài nguyên cross-origin do chính sách CORS (Cross-Origin Resource Sharing). 
-
-Extension Allow CORS giúp:
-- 🛡️ Bỏ qua chính sách CORS cho các domain được chỉ định
-- 🖼️ Cho phép script truy cập và phân tích ảnh bìa
-- 🎨 Kích hoạt tính năng tự động tạo màu chủ đề
-
-**Lưu ý quan trọng**: Extension CORS chỉ nên được bật khi truy cập các trang web đáng tin cậy. Tắt extension khi không sử dụng các trang web cần thiết để đảm bảo bảo mật.
 
 </div>
 
