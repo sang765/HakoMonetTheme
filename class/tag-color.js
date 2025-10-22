@@ -11,11 +11,24 @@
     
     function initTagColor() {
         debugLog('TagColor class đã được tải');
-        
+
         // Thêm CSS editor liên quan đến tag
         addTagCSS();
+
+        // Ẩn element toggle genre
+        hideGenreToggle();
     }
     
+    function hideGenreToggle() {
+        // Ẩn element toggle genre
+        const toggleElements = document.querySelectorAll('a.series-gerne-item[x-show*="!more"][@click*="more = true"]');
+
+        toggleElements.forEach(element => {
+            element.style.display = 'none';
+            debugLog('Đã ẩn element toggle genre');
+        });
+    }
+
     function addTagCSS() {
         // CSS cho các tag với màu sắc khác nhau
         GM_addStyle(`
