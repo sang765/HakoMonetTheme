@@ -319,6 +319,10 @@
                 background-color: ${palette[800]} !important;
             }
 
+            table.broad-table tr th, table.broad-table tr:nth-child(2n+1) {
+                background-color: ${palette[700]} !important;
+            }
+
             .action-link:hover {
                 color: ${palette[500]} !important;
                 text-decoration: underline !important;
@@ -677,6 +681,10 @@
 
             table.listext-table {
                 background-color: ${defaultPalette[800]} !important;
+            }
+
+            table.broad-table tr th, table.broad-table tr:nth-child(2n+1) {
+                background-color: ${defaultPalette[700]} !important;
             }
 
             .action-link:hover {
