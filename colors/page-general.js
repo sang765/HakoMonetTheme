@@ -109,14 +109,9 @@
                 --monet-elevated-dark: ${palette[100]};
             }
 
-            /* Smooth color transitions for real-time updates */
-            * {
-                transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease !important;
-            }
-
             /* Faster transitions for interactive elements */
             a, button, .navbar-menu, .nav-submenu, .noti-sidebar, .account-sidebar {
-                transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
+                transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease !important;
             }
 
             a:hover,
@@ -459,14 +454,9 @@
         }
 
         const css = `
-            /* Smooth color transitions for real-time updates */
-            * {
-                transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease !important;
-            }
-
             /* Faster transitions for interactive elements */
             a, button, .navbar-menu, .nav-submenu, .noti-sidebar, .account-sidebar {
-                transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
+                transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease !important;
             }
 
             /* Special animation for color changes */
