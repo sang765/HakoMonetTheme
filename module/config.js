@@ -844,10 +844,15 @@
 
             // Sử dụng requestAnimationFrame để tránh blocking
             requestAnimationFrame(() => {
-                // Tạm thời disable transition cho preview box để tránh animation
-                let originalTransition = '';
+                // Tạm thời disable transition cho các elements để tránh animation
+                let originalTransitionPreview = '';
+                let originalTransitionBox = '';
+                if (colorPreview) {
+                    originalTransitionPreview = colorPreview.style.transition || '';
+                    colorPreview.style.transition = 'none';
+                }
                 if (previewBox) {
-                    originalTransition = previewBox.style.transition || '';
+                    originalTransitionBox = previewBox.style.transition || '';
                     previewBox.style.transition = 'none';
                 }
 
@@ -858,8 +863,11 @@
                 if (previewBox) previewBox.style.backgroundColor = hex;
 
                 // Restore transition sau khi update
+                if (colorPreview) {
+                    colorPreview.style.transition = originalTransitionPreview;
+                }
                 if (previewBox) {
-                    previewBox.style.transition = originalTransition;
+                    previewBox.style.transition = originalTransitionBox;
                 }
 
                 debugLog('Đã đồng bộ UI với màu:', hex);
