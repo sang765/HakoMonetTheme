@@ -347,6 +347,251 @@
         }
     }
 
+    // Hàm phân tích ảnh với focus vào accent color truyền thống
+    function analyzeImageColorTraditionalAccent(imageUrl) {
+        return new Promise((resolve, reject) => {
+            // Setup CORS handling for images if needed
+            if (isTargetDomain(imageUrl)) {
+                debugLog('Ảnh từ domain target, thiết lập CORS handling');
+                setupImageCorsHandling();
+            }
+
+            const img = new Image();
+
+            // Always set crossOrigin for safety
+            if (isTargetDomain(imageUrl)) {
+                img.crossOrigin = 'anonymous';
+                debugLog('Đã set crossOrigin cho ảnh từ domain target');
+            }
+
+            img.onload = function() {
+                debugLog('Ảnh đã tải xong, kích thước:', img.width, 'x', img.height);
+                try {
+                    const dominantColor = getTraditionalAccentColorFromImage(img);
+                    resolve(dominantColor);
+                } catch (error) {
+                    reject('Lỗi khi phân tích ảnh: ' + error);
+                }
+            };
+
+            img.onerror = function(error) {
+                debugLog('Lỗi tải ảnh với Image API:', imageUrl, error);
+
+                // Fallback: try using XMLHttpRequest with CORS headers
+                if (isTargetDomain(imageUrl)) {
+                    debugLog('Thử tải ảnh bằng XMLHttpRequest với CORS headers');
+                    loadImageWithXHR(imageUrl)
+                        .then(img => {
+                            try {
+                                const dominantColor = getTraditionalAccentColorFromImage(img);
+                                resolve(dominantColor);
+                            } catch (error) {
+                                reject('Lỗi khi phân tích ảnh từ XHR: ' + error);
+                            }
+                        })
+                        .catch(xhrError => {
+                            debugLog('XMLHttpRequest cũng thất bại:', xhrError);
+                            reject('Không thể tải ảnh bằng cả Image API và XMLHttpRequest');
+                        });
+                } else {
+                    reject('Không thể tải ảnh');
+                }
+            };
+
+            img.src = imageUrl;
+        });
+    }
+
+    // Fallback function to load image using XMLHttpRequest with CORS headers
+    function loadImageWithXHR(imageUrl) {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', imageUrl, true);
+            xhr.responseType = 'blob';
+
+            // Add CORS headers for target domains
+            if (isTargetDomain(imageUrl)) {
+                xhr.setRequestHeader('Origin', window.location.origin);
+                xhr.setRequestHeader('Referer', window.location.href);
+                xhr.setRequestHeader('Access-Control-Request-Method', 'GET');
+            }
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    const blob = xhr.response;
+                    const img = new Image();
+                    img.onload = () => resolve(img);
+                    img.onerror = () => reject('Không thể tạo ảnh từ blob');
+                    img.src = URL.createObjectURL(blob);
+                } else {
+                    reject('XHR failed with status: ' + xhr.status);
+                }
+            };
+
+            xhr.onerror = function() {
+                reject('XHR network error');
+            };
+
+            xhr.send();
+        });
+    }
+
+    // Hàm lấy màu accent truyền thống từ ảnh
+    function getTraditionalAccentColorFromImage(img) {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Thiết lập kích thước canvas
+        const width = 200;
+        const height = 200;
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Vẽ ảnh với kích thước nhỏ
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Lấy dữ liệu pixel từ toàn bộ ảnh
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const data = imageData.data;
+        
+        debugLog('Phân tích toàn bộ ảnh để tìm accent color truyền thống');
+        debugLog('Tổng pixel trong ảnh:', data.length / 4);
+        
+        // Đếm màu với trọng số ưu tiên màu accent truyền thống
+        const colorCount = {};
+        let maxCount = 0;
+        let dominantColor = '#6c5ce7'; // Màu mặc định
+        
+        // Phạm vi màu accent truyền thống (loại bỏ màu quá sáng và quá tối)
+        const traditionalAccentRanges = [
+            // Màu đỏ
+            {min: [120, 0, 0], max: [255, 100, 100], weight: 1.8},
+            // Màu cam
+            {min: [200, 80, 0], max: [255, 165, 50], weight: 1.7},
+            // Màu vàng (không quá sáng)
+            {min: [180, 150, 0], max: [240, 220, 100], weight: 1.5},
+            // Màu xanh lá
+            {min: [0, 100, 0], max: [100, 255, 100], weight: 1.6},
+            // Màu xanh dương
+            {min: [0, 0, 120], max: [100, 100, 255], weight: 1.8},
+            // Màu tím
+            {min: [100, 0, 100], max: [200, 100, 200], weight: 1.7},
+            // Màu hồng
+            {min: [200, 100, 150], max: [255, 180, 200], weight: 1.6}
+        ];
+        
+        for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+            const a = data[i + 3];
+            
+            // Bỏ qua pixel trong suốt
+            if (a < 128) continue;
+            
+            // LOẠI BỎ màu quá sáng (gần trắng) và quá tối (gần đen)
+            const brightness = (r + g + b) / 3;
+            if (brightness > 240 || brightness < 15) {
+                continue;
+            }
+            
+            // LOẠI BỎ màu xám (khi các kênh màu gần bằng nhau)
+            const maxChannel = Math.max(r, g, b);
+            const minChannel = Math.min(r, g, b);
+            const saturation = maxChannel - minChannel;
+            
+            // Bỏ qua màu có độ bão hòa thấp (màu xám)
+            if (saturation < 30) {
+                continue;
+            }
+            
+            // Nhóm màu
+            const roundedR = Math.round(r / 8) * 8;
+            const roundedG = Math.round(g / 8) * 8;
+            const roundedB = Math.round(b / 8) * 8;
+            
+            const colorGroup = `${roundedR},${roundedG},${roundedB}`;
+            
+            // Tính trọng số dựa trên màu accent truyền thống
+            let weight = 1.0;
+            for (const accentRange of traditionalAccentRanges) {
+                if (roundedR >= accentRange.min[0] && roundedR <= accentRange.max[0] &&
+                    roundedG >= accentRange.min[1] && roundedG <= accentRange.max[1] &&
+                    roundedB >= accentRange.min[2] && roundedB <= accentRange.max[2]) {
+                    weight = accentRange.weight;
+                    break;
+                }
+            }
+            
+            // Giảm trọng số cho màu có độ bão hòa thấp
+            const normalizedSaturation = saturation / 255;
+            weight *= (0.5 + normalizedSaturation * 0.5);
+            
+            const weightedCount = Math.round(weight);
+            
+            if (colorCount[colorGroup]) {
+                colorCount[colorGroup] += weightedCount;
+            } else {
+                colorCount[colorGroup] = weightedCount;
+            }
+            
+            if (colorCount[colorGroup] > maxCount) {
+                maxCount = colorCount[colorGroup];
+                dominantColor = MonetAPI.rgbToHex(roundedR, roundedG, roundedB);
+            }
+        }
+        
+        // Nếu không tìm thấy màu accent phù hợp, sử dụng màu có độ bão hòa cao nhất
+        if (maxCount === 0) {
+            debugLog('Không tìm thấy màu accent truyền thống, sử dụng màu bão hòa cao nhất');
+            dominantColor = getMostSaturatedColor(img);
+        }
+        
+        debugLog('Màu accent được chọn:', dominantColor);
+        return dominantColor;
+    }
+
+    // Hàm lấy màu có độ bão hòa cao nhất (fallback)
+    function getMostSaturatedColor(img) {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const width = 100;
+        const height = 100;
+        canvas.width = width;
+        canvas.height = height;
+        
+        ctx.drawImage(img, 0, 0, width, height);
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const data = imageData.data;
+        
+        let maxSaturation = 0;
+        let mostSaturatedColor = '#6c5ce7';
+        
+        for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+            const a = data[i + 3];
+            
+            if (a < 128) continue;
+            
+            const maxChannel = Math.max(r, g, b);
+            const minChannel = Math.min(r, g, b);
+            const saturation = maxChannel - minChannel;
+            
+            // Bỏ qua màu quá sáng/quá tối
+            const brightness = (r + g + b) / 3;
+            if (brightness > 240 || brightness < 15) continue;
+            
+            if (saturation > maxSaturation) {
+                maxSaturation = saturation;
+                mostSaturatedColor = MonetAPI.rgbToHex(r, g, b);
+            }
+        }
+        
+        return mostSaturatedColor;
+    }
+
     // Hàm lấy URL ảnh bìa từ trang thông tin truyện
     function getCoverUrlFromInfoPage(storyId) {
         const infoUrl = window.location.origin + '/truyen/' + storyId;
