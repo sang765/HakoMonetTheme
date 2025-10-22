@@ -24,6 +24,8 @@
                 const overlay = targetElement.querySelector('.hmt-block-overlay');
                 if (overlay) {
                     overlay.remove();
+                    // Khôi phục pointer events
+                    targetElement.style.pointerEvents = 'auto';
                     debugLog('Đã xóa overlay trên trang đọc truyện vì tính năng tắt màu được bật');
                 }
             }
@@ -145,6 +147,8 @@
                         const overlay = targetElement.querySelector('.hmt-block-overlay');
                         if (overlay) {
                             overlay.remove();
+                            // Khôi phục pointer events
+                            targetElement.style.pointerEvents = 'auto';
                             debugLog('Đã xóa overlay do tắt màu');
                         }
                     }
@@ -194,6 +198,8 @@
                         const overlay = targetElement.querySelector('.hmt-block-overlay');
                         if (overlay) {
                             overlay.remove();
+                            // Khôi phục pointer events
+                            targetElement.style.pointerEvents = 'auto';
                             debugLog('Đã xóa overlay do chế độ màu thay đổi và tắt màu');
                         }
                     }
@@ -256,9 +262,19 @@
                 width: 100%;
                 height: 100%;
                 background: rgba(0, 0, 0, 0.5);
-                pointer-events: none;
+                pointer-events: auto;
                 z-index: 1000;
             `;
+
+            // Thêm event listener để chặn click
+            overlay.addEventListener('click', function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                return false;
+            }, true);
+
+            // Chặn pointer events trên element gốc
+            targetElement.style.pointerEvents = 'none';
 
             // Đảm bảo element có position relative
             if (getComputedStyle(targetElement).position === 'static') {
