@@ -640,7 +640,7 @@
             .noti-sidebar,
             #sidenav-icon.active,
             .navbar-menu {
-                background-color: ${palette[700]} !important;
+                background-color: ${palette[800]} !important;
             }
             
             #navbar-user#guest-menu ul.nav-submenu,
@@ -860,7 +860,7 @@
             .noti-sidebar,
             #sidenav-icon.active,
             .navbar-menu {
-                background-color: ${defaultPalette[700]} !important;
+                background-color: ${defaultPalette[800]} !important;
             }
             
             #navbar-user#guest-menu ul.nav-submenu,
