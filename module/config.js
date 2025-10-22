@@ -40,6 +40,24 @@
         applyDomainWarningVisibility();
     }
 
+    function getDisableColorsOnReadingPage() {
+        return GM_getValue('disable_colors_on_reading_page', false);
+    }
+
+    function setDisableColorsOnReadingPage(disable) {
+        GM_setValue('disable_colors_on_reading_page', disable);
+        debugLog('Đã lưu cài đặt tắt màu trên trang đọc truyện:', disable);
+    }
+
+    function getColorMode() {
+        return GM_getValue('color_mode', 'default');
+    }
+
+    function setColorMode(mode) {
+        GM_setValue('color_mode', mode);
+        debugLog('Đã lưu chế độ màu:', mode);
+    }
+
     function applyDomainWarningVisibility() {
         const shouldHide = getHideDomainWarning();
         const warningElements = document.querySelectorAll('.border-l-4.border-yellow-400.bg-yellow-50.p-4');
@@ -180,6 +198,32 @@
                                     <span class="hmt-toggle-switch"></span>
                                     Ẩn cảnh báo tên miền
                                 </label>
+                            </div>
+                        </div>
+
+                        <div class="hmt-config-section">
+                            <h4>Tắt màu trên trang đọc truyện</h4>
+                            <p>Tắt việc áp dụng màu sắc từ theme vào trang đọc truyện (nhận biết bởi class ".rd-basic_icon.row"). Khi bật, các trang đọc truyện sẽ không bị ảnh hưởng bởi màu theme.</p>
+
+                            <div class="hmt-reading-page-toggle">
+                                <label class="hmt-toggle-label">
+                                    <input type="checkbox" ${getDisableColorsOnReadingPage() ? 'checked' : ''} class="hmt-reading-page-toggle-input">
+                                    <span class="hmt-toggle-switch"></span>
+                                    Tắt màu trên trang đọc truyện
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="hmt-config-section">
+                            <h4>Chế độ màu</h4>
+                            <p>Chọn loại màu để áp dụng cho theme: Mặc định sử dụng màu từ config, Thumbnail sử dụng màu lấy từ ảnh bìa truyện.</p>
+
+                            <div class="hmt-color-mode-dropdown">
+                                <label for="hmt-color-mode-select">Chế độ màu:</label>
+                                <select id="hmt-color-mode-select" class="hmt-color-mode-select">
+                                    <option value="default" ${getColorMode() === 'default' ? 'selected' : ''}>Mặc định</option>
+                                    <option value="thumbnail" ${getColorMode() === 'thumbnail' ? 'selected' : ''}>Thumbnail</option>
+                                </select>
                             </div>
                         </div>
 
@@ -677,6 +721,77 @@
             .hmt-domain-warning-toggle {
                 margin-top: 16px;
             }
+
+            .hmt-reading-page-toggle {
+                margin-top: 16px;
+            }
+
+            .hmt-color-mode-dropdown {
+                margin-top: 16px;
+            }
+
+            .hmt-color-mode-select {
+                width: 100%;
+                padding: 8px 12px;
+                border: 2px solid #e9ecef;
+                border-radius: 6px;
+                background: #f8f9fa;
+                color: #495057;
+                font-size: 14px;
+                font-family: inherit;
+                box-sizing: border-box;
+            }
+
+            .hmt-color-mode-select:focus {
+                outline: none;
+                border-color: #667eea;
+                background: white;
+            }
+
+            .hmt-toggle-label {
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 500;
+                color: #333;
+                user-select: none;
+            }
+
+            .hmt-toggle-label input[type="checkbox"] {
+                display: none;
+            }
+
+            .hmt-toggle-switch {
+                position: relative;
+                display: inline-block;
+                width: 50px;
+                height: 24px;
+                background-color: #ccc;
+                border-radius: 24px;
+                margin-right: 12px;
+                transition: background-color 0.3s;
+            }
+
+            .hmt-toggle-switch::after {
+                content: '';
+                position: absolute;
+                top: 2px;
+                left: 2px;
+                width: 20px;
+                height: 20px;
+                background-color: white;
+                border-radius: 50%;
+                transition: transform 0.3s;
+            }
+
+            .hmt-toggle-label input[type="checkbox"]:checked + .hmt-toggle-switch {
+                background-color: #667eea;
+            }
+
+            .hmt-toggle-label input[type="checkbox"]:checked + .hmt-toggle-switch::after {
+                transform: translateX(26px);
+            }
         `);
 
         document.body.appendChild(dialog);
@@ -727,6 +842,7 @@
         const saveBtn = dialog.querySelector('.hmt-config-save');
         const resetBtn = dialog.querySelector('.hmt-config-reset');
         const domainWarningToggle = dialog.querySelector('.hmt-domain-warning-toggle-input');
+        const readingPageToggle = dialog.querySelector('.hmt-reading-page-toggle-input');
 
         // Lưu màu hiện tại để có thể khôi phục nếu không lưu
          const currentColor = dialog._currentColor || getDefaultColor();
@@ -1095,6 +1211,23 @@
             });
         }
 
+        // Reading page colors toggle
+        if (readingPageToggle) {
+            readingPageToggle.addEventListener('change', function() {
+                setDisableColorsOnReadingPage(this.checked);
+                showNotification('Đã cập nhật cài đặt tắt màu trên trang đọc truyện!', 3000);
+            });
+        }
+
+        // Color mode dropdown
+        const colorModeSelect = dialog.querySelector('#hmt-color-mode-select');
+        if (colorModeSelect) {
+            colorModeSelect.addEventListener('change', function() {
+                setColorMode(this.value);
+                showNotification('Đã cập nhật chế độ màu!', 3000);
+            });
+        }
+
         // Đóng khi nhấn ESC
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
@@ -1191,6 +1324,10 @@
         setDefaultColor: setDefaultColor,
         getHideDomainWarning: getHideDomainWarning,
         setHideDomainWarning: setHideDomainWarning,
+        getDisableColorsOnReadingPage: getDisableColorsOnReadingPage,
+        setDisableColorsOnReadingPage: setDisableColorsOnReadingPage,
+        getColorMode: getColorMode,
+        setColorMode: setColorMode,
         openConfigDialog: openConfigDialog,
         initialize: initializeConfig
     };

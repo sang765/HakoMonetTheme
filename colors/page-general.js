@@ -16,6 +16,42 @@
     }
 
     function initPageGeneral() {
+        // Kiểm tra xem có phải trang đọc truyện không và có tắt màu không
+        if (document.querySelector('.rd-basic_icon.row') && window.HMTConfig && window.HMTConfig.getDisableColorsOnReadingPage && window.HMTConfig.getDisableColorsOnReadingPage()) {
+            debugLog('Phát hiện trang đọc truyện và tính năng tắt màu được bật, bỏ qua áp dụng màu.');
+            return;
+        }
+
+        // Kiểm tra chế độ màu
+        const colorMode = window.HMTConfig && window.HMTConfig.getColorMode ? window.HMTConfig.getColorMode() : 'default';
+
+        // Nếu là trang đọc truyện và chế độ thumbnail, áp dụng màu từ thumbnail
+        if (document.querySelector('.rd-basic_icon.row') && colorMode === 'thumbnail') {
+            debugLog('Trang đọc truyện với chế độ thumbnail, áp dụng màu từ thumbnail.');
+
+            // Lấy story ID từ URL
+            const pathParts = window.location.pathname.split('/');
+            const storyId = pathParts[2];
+            if (storyId) {
+                getCoverUrlFromInfoPage(storyId)
+                    .then(coverUrl => {
+                        debugLog('Đã lấy URL ảnh bìa:', coverUrl);
+                        return analyzeImageColorTraditionalAccent(coverUrl);
+                    })
+                    .then(dominantColor => {
+                        debugLog('Màu chủ đạo từ thumbnail:', dominantColor);
+                        const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
+                        const isLightColor = MonetAPI.isColorLight(dominantColor);
+                        applyMonetColorScheme(monetPalette, isLightColor);
+                    })
+                    .catch(error => {
+                        debugLog('Lỗi khi lấy màu từ thumbnail:', error);
+                        applyCurrentColorScheme(); // Fallback to config color
+                    });
+                return;
+            }
+        }
+
         // Kiểm tra xem có phải trang truyện không bằng cách tìm element đặc trưng
         const sideFeaturesElement = document.querySelector('div.col-4.col-md.feature-item.width-auto-xl');
         if (sideFeaturesElement) {
@@ -63,13 +99,16 @@
         document.addEventListener('hmtColorChanged', function(event) {
             debugLog('Nhận sự kiện màu sắc thay đổi:', event.detail);
 
-            // Chỉ áp dụng màu thực sự nếu không phải preview mode
-            if (!event.detail.isPreview) {
+            // Kiểm tra chế độ màu
+            const colorMode = window.HMTConfig && window.HMTConfig.getColorMode ? window.HMTConfig.getColorMode() : 'default';
+
+            // Chỉ áp dụng màu thực sự nếu không phải preview mode và chế độ là default
+            if (!event.detail.isPreview && colorMode === 'default') {
                 // Đợi một chút để đảm bảo màu đã được lưu vào storage
                 setTimeout(() => {
                     applyCurrentColorScheme();
                 }, 100);
-            } else {
+            } else if (event.detail.isPreview) {
                 // Nếu là preview mode, áp dụng màu ngay lập tức
                 const previewColor = event.detail.color;
                 if (previewColor && isValidColor(previewColor)) {
@@ -85,6 +124,42 @@
 
     function isValidColor(color) {
         return MonetAPI.isValidColor(color);
+    }
+
+    // Hàm lấy URL ảnh bìa từ trang thông tin truyện
+    function getCoverUrlFromInfoPage(storyId) {
+        const infoUrl = window.location.origin + '/truyen/' + storyId;
+        debugLog('Đang lấy ảnh bìa từ:', infoUrl);
+
+        return new Promise((resolve, reject) => {
+            GM_xmlhttpRequest({
+                method: 'GET',
+                url: infoUrl,
+                onload: function(response) {
+                    if (response.status === 200) {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(response.responseText, 'text/html');
+                        const coverElement = doc.querySelector('.series-cover .img-in-ratio');
+                        if (coverElement) {
+                            const coverStyle = coverElement.style.backgroundImage;
+                            const coverUrl = coverStyle.replace(/url\(['"]?(.*?)['"]?\)/i, '$1');
+                            if (coverUrl) {
+                                resolve(coverUrl);
+                            } else {
+                                reject('No cover URL found');
+                            }
+                        } else {
+                            reject('No cover element found');
+                        }
+                    } else {
+                        reject('Failed to fetch info page');
+                    }
+                },
+                onerror: function(error) {
+                    reject('Network error: ' + error);
+                }
+            });
+        });
     }
 
     // Hàm áp dụng Monet color scheme
