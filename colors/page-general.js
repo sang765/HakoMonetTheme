@@ -16,6 +16,9 @@
     }
 
     function initPageGeneral() {
+        // Setup CORS handling for images
+        setupImageCorsHandling();
+
         // Kiểm tra xem có phải trang đọc truyện không và có tắt màu không
         if (document.querySelector('.rd-basic_icon.row') && window.HMTConfig && window.HMTConfig.getDisableColorsOnReadingPage && window.HMTConfig.getDisableColorsOnReadingPage()) {
             // Xóa overlay nếu có
@@ -242,6 +245,62 @@
         return MonetAPI.isValidColor(color);
     }
 
+    // Integrated CORS handling for images
+    function setupImageCorsHandling() {
+        if (window.__imageCorsSetup) return;
+
+        debugLog('Setting up integrated CORS handling for images');
+
+        // Patch Image constructor
+        const originalImage = window.Image;
+        window.Image = function(width, height) {
+            const img = new originalImage(width, height);
+            // Patch the src setter
+            const originalSrcDescriptor = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
+            if (originalSrcDescriptor && originalSrcDescriptor.set) {
+                Object.defineProperty(img, 'src', {
+                    set: function(value) {
+                        if (isTargetDomain(value)) {
+                            this.crossOrigin = 'anonymous';
+                            debugLog('Set crossOrigin for image:', value);
+                        }
+                        return originalSrcDescriptor.set.call(this, value);
+                    },
+                    get: originalSrcDescriptor.get,
+                    configurable: true,
+                    enumerable: true
+                });
+            }
+            return img;
+        };
+
+        // Copy static properties
+        Object.keys(originalImage).forEach(key => {
+            window.Image[key] = originalImage[key];
+        });
+
+        // Also patch existing Image prototype for direct property access
+        const protoDescriptor = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
+        if (protoDescriptor && protoDescriptor.set) {
+            const originalSet = protoDescriptor.set;
+            Object.defineProperty(HTMLImageElement.prototype, 'src', {
+                set: function(value) {
+                    if (isTargetDomain(value)) {
+                        this.crossOrigin = 'anonymous';
+                        debugLog('Set crossOrigin for existing image:', value);
+                    }
+                    return originalSet.call(this, value);
+                },
+                get: protoDescriptor.get,
+                configurable: true,
+                enumerable: true
+            });
+        }
+
+        window.__imageCorsSetup = true;
+        debugLog('Integrated CORS handling for images is ready');
+    }
+
     // Hàm thêm overlay block trên element
     function addOverlay() {
         const targetElement = document.querySelector('.set-input.clear.justify-center');
@@ -303,13 +362,27 @@
                         const doc = parser.parseFromString(response.responseText, 'text/html');
                         const coverElement = doc.querySelector('.series-cover .img-in-ratio');
                         if (coverElement) {
-                            const coverStyle = coverElement.style.backgroundImage;
-                            const coverUrl = coverStyle.replace(/url\(['"]?(.*?)['"]?\)/i, '$1');
+                            // Thử lấy từ style.backgroundImage trước
+                            let coverUrl = coverElement.style.backgroundImage;
                             if (coverUrl) {
-                                resolve(coverUrl);
-                            } else {
-                                reject('No cover URL found');
+                                coverUrl = coverUrl.replace(/url\(['"]?(.*?)['"]?\)/i, '$1');
+                                if (coverUrl) {
+                                    resolve(coverUrl);
+                                    return;
+                                }
                             }
+
+                            // Nếu không có, thử tìm img tag bên trong
+                            const imgElement = coverElement.querySelector('img');
+                            if (imgElement) {
+                                coverUrl = imgElement.src || imgElement.getAttribute('data-src');
+                                if (coverUrl) {
+                                    resolve(coverUrl);
+                                    return;
+                                }
+                            }
+
+                            reject('No cover URL found in style or img tag');
                         } else {
                             reject('No cover element found');
                         }
