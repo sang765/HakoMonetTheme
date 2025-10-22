@@ -131,20 +131,6 @@
                                                 <div class="hmt-color-preview" id="hmt-color-preview"></div>
                                                 <span class="hmt-color-value" id="hmt-color-value">${currentColor}</span>
                                             </div>
-                                            <div class="hmt-color-controls">
-                                                <div class="hmt-color-slider-group">
-                                                    <label class="hmt-slider-label">Hue</label>
-                                                    <input type="range" class="hmt-color-slider hmt-hue-slider" id="hmt-hue-slider" min="0" max="360" value="${currentHsl.h}">
-                                                </div>
-                                                <div class="hmt-color-slider-group">
-                                                    <label class="hmt-slider-label">Saturation</label>
-                                                    <input type="range" class="hmt-color-slider hmt-sat-slider" id="hmt-sat-slider" min="0" max="100" value="${currentHsl.s}">
-                                                </div>
-                                                <div class="hmt-color-slider-group">
-                                                    <label class="hmt-slider-label">Lightness</label>
-                                                    <input type="range" class="hmt-color-slider hmt-light-slider" id="hmt-light-slider" min="0" max="100" value="${currentHsl.l}">
-                                                </div>
-                                            </div>
                                             <div class="hmt-hsl-controls">
                                                 <div class="hmt-hsl-slider-group">
                                                     <label class="hmt-slider-label">Hue</label>
@@ -411,17 +397,6 @@
                 text-align: center;
             }
 
-            .hmt-color-controls {
-                margin-bottom: 16px;
-            }
-
-            .hmt-color-slider-group {
-                margin-bottom: 12px;
-            }
-
-            .hmt-color-slider-group:last-child {
-                margin-bottom: 0;
-            }
 
             .hmt-slider-label {
                 display: block;
@@ -746,7 +721,6 @@
         const previewBox = dialog.querySelector('.hmt-preview-box');
         const saveBtn = dialog.querySelector('.hmt-config-save');
         const resetBtn = dialog.querySelector('.hmt-config-reset');
-        const colorPickerPanel = dialog.querySelector('.hmt-color-picker-panel');
         const domainWarningToggle = dialog.querySelector('.hmt-domain-warning-toggle-input');
 
         // Lưu màu hiện tại để có thể khôi phục nếu không lưu
@@ -782,11 +756,6 @@
 
         // Đóng dialog
          function closeDialog() {
-             // Đóng color picker panel nếu đang mở
-             if (colorPickerPanel) {
-                 colorPickerPanel.classList.remove('open');
-             }
-
              // Nếu màu preview khác với màu hiện tại và không phải là màu đã lưu
              if (previewColor !== currentColor) {
                  debugLog('Khôi phục màu cũ khi đóng dialog:', currentColor);
@@ -802,12 +771,7 @@
         closeBtn.addEventListener('click', closeDialog);
         overlay.addEventListener('click', function(e) {
             if (e.target === overlay) {
-                // Đóng color picker panel nếu đang mở (cho các phần tử cũ)
-                if (colorPickerPanel && colorPickerPanel.classList.contains('open')) {
-                    colorPickerPanel.classList.remove('open');
-                } else {
-                    closeDialog();
-                }
+                closeDialog();
             }
         });
 
@@ -815,9 +779,6 @@
         const customColorPicker = dialog.querySelector('.hmt-custom-color-picker');
         const colorPreview = dialog.querySelector('#hmt-color-preview');
         const colorValue = dialog.querySelector('#hmt-color-value');
-        const hueSlider = dialog.querySelector('#hmt-hue-slider');
-        const satSlider = dialog.querySelector('#hmt-sat-slider');
-        const lightSlider = dialog.querySelector('#hmt-light-slider');
         const sliderButtons = dialog.querySelectorAll('.hmt-slider-btn');
 
         // Hàm chuyển đổi HEX sang HSL
@@ -927,33 +888,6 @@
          }
 
 
-        // Xử lý thanh hue
-         if (hueSlider) {
-             hueSlider.addEventListener('input', function() {
-                 currentHue = parseInt(this.value);
-                 debugLog('Hue thay đổi:', currentHue);
-                 updateColorFromHSL();
-                 updateCursors();
-             });
-         }
-
-         // Xử lý thanh saturation
-         if (satSlider) {
-             satSlider.addEventListener('input', function() {
-                 currentSat = parseInt(this.value);
-                 debugLog('Saturation thay đổi:', currentSat);
-                 updateColorFromHSL();
-             });
-         }
-
-         // Xử lý thanh lightness
-         if (lightSlider) {
-             lightSlider.addEventListener('input', function() {
-                 currentLight = parseInt(this.value);
-                 debugLog('Lightness thay đổi:', currentLight);
-                 updateColorFromHSL();
-             });
-         }
 
         // Xử lý nút +/- cho sliders
         sliderButtons.forEach(button => {
@@ -986,9 +920,6 @@
          debugLog('Khởi tạo color picker tùy chỉnh');
          debugLog('Color preview element:', !!colorPreview);
          debugLog('Color value element:', !!colorValue);
-         debugLog('Hue slider element:', !!hueSlider);
-         debugLog('Sat slider element:', !!satSlider);
-         debugLog('Light slider element:', !!lightSlider);
          debugLog('Slider buttons count:', sliderButtons.length);
 
          // Đồng bộ các elements với màu hiện tại (không gửi sự kiện preview)
@@ -1007,11 +938,6 @@
                  // Áp dụng màu preview ngay lập tức
                  previewColor = color;
                  applyPreviewColor(color);
-
-                 // Đóng color picker panel nếu đang mở
-                 if (colorPickerPanel) {
-                     colorPickerPanel.classList.remove('open');
-                 }
              } else {
                  debugLog('Màu không hợp lệ từ text input');
              }
@@ -1028,30 +954,15 @@
                  // Cập nhật tất cả các elements UI với màu đã lưu
                  syncUIWithColor(selectedColor);
 
-                 // Đóng color picker panel nếu đang mở
-                 if (colorPickerPanel) {
-                     colorPickerPanel.classList.remove('open');
-                 }
-
                  showNotification('Đã lưu cài đặt màu sắc!', 3000);
                  closeDialog();
              } else {
                  debugLog('Màu không hợp lệ khi lưu:', selectedColor);
                  showNotification('Màu không hợp lệ! Vui lòng nhập mã màu HEX đúng định dạng.', 5000);
 
-                 // Đóng color picker panel nếu đang mở
-                 if (colorPickerPanel) {
-                     colorPickerPanel.classList.remove('open');
-                 }
-
                  // Không cần gắn lại sự kiện vì đã loại bỏ preset
              }
          });
-
-         // Đóng color picker panel nếu đang mở khi khởi tạo
-         if (colorPickerPanel) {
-             colorPickerPanel.classList.remove('open');
-         }
 
          debugLog('Hoàn thành setup event listeners');
 
@@ -1069,11 +980,6 @@
              // Áp dụng màu preview ngay lập tức
              applyPreviewColor(defaultColor);
 
-             // Đóng color picker panel nếu đang mở
-             if (colorPickerPanel) {
-                 colorPickerPanel.classList.remove('open');
-             }
-
              showNotification('Đã khôi phục màu mặc định!', 3000);
 
              debugLog('Đã cập nhật UI cho reset button:', defaultColor);
@@ -1090,12 +996,7 @@
         // Đóng khi nhấn ESC
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                // Đóng color picker panel nếu đang mở (cho các phần tử cũ)
-                if (colorPickerPanel && colorPickerPanel.classList.contains('open')) {
-                    colorPickerPanel.classList.remove('open');
-                } else {
-                    closeDialog();
-                }
+                closeDialog();
             }
         });
     }
