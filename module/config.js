@@ -515,6 +515,7 @@
                 color: white;
                 font-weight: 600;
                 text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+                transition: background-color 0.3s ease;
             }
 
             .hmt-config-footer {
@@ -694,31 +695,20 @@
          const currentColor = dialog._currentColor || getDefaultColor();
          let previewColor = currentColor; // Màu đang preview
 
-         // Throttle cho event dispatching để tránh quá tải
-         let lastEventTime = 0;
-         const EVENT_THROTTLE = 100; // ms
-
         // Hàm áp dụng màu preview (chưa lưu vào storage)
         function applyPreviewColor(color) {
             debugLog('Áp dụng màu preview:', color);
 
-            // Sử dụng requestAnimationFrame để tránh blocking
-            requestAnimationFrame(() => {
-                const now = Date.now();
-                if (now - lastEventTime >= EVENT_THROTTLE) {
-                    // Phát sự kiện màu sắc thay đổi để các module khác cập nhật real-time
-                    const colorChangeEvent = new CustomEvent('hmtColorChanged', {
-                        detail: {
-                            color: color,
-                            timestamp: now,
-                            isPreview: true // Đánh dấu là preview mode
-                        }
-                    });
-                    document.dispatchEvent(colorChangeEvent);
-                    lastEventTime = now;
-                    debugLog('Đã phát sự kiện màu sắc thay đổi (preview):', color);
+            // Phát sự kiện màu sắc thay đổi để các module khác cập nhật real-time
+            const colorChangeEvent = new CustomEvent('hmtColorChanged', {
+                detail: {
+                    color: color,
+                    timestamp: Date.now(),
+                    isPreview: true // Đánh dấu là preview mode
                 }
             });
+            document.dispatchEvent(colorChangeEvent);
+            debugLog('Đã phát sự kiện màu sắc thay đổi (preview):', color);
         }
 
         // Đóng dialog
@@ -842,36 +832,13 @@
         function syncUIWithColor(hex) {
             debugLog('Đồng bộ UI với màu:', hex);
 
-            // Sử dụng requestAnimationFrame để tránh blocking
-            requestAnimationFrame(() => {
-                // Tạm thời disable transition cho các elements để tránh animation
-                let originalTransitionPreview = '';
-                let originalTransitionBox = '';
-                if (colorPreview) {
-                    originalTransitionPreview = colorPreview.style.transition || '';
-                    colorPreview.style.transition = 'none';
-                }
-                if (previewBox) {
-                    originalTransitionBox = previewBox.style.transition || '';
-                    previewBox.style.transition = 'none';
-                }
+            // Cập nhật tất cả các elements UI
+            if (colorPreview) colorPreview.style.backgroundColor = hex;
+            if (colorValue) colorValue.textContent = hex;
+            if (colorText) colorText.value = hex;
+            if (previewBox) previewBox.style.backgroundColor = hex;
 
-                // Cập nhật tất cả các elements UI
-                if (colorPreview) colorPreview.style.backgroundColor = hex;
-                if (colorValue) colorValue.textContent = hex;
-                if (colorText) colorText.value = hex;
-                if (previewBox) previewBox.style.backgroundColor = hex;
-
-                // Restore transition sau khi update
-                if (colorPreview) {
-                    colorPreview.style.transition = originalTransitionPreview;
-                }
-                if (previewBox) {
-                    previewBox.style.transition = originalTransitionBox;
-                }
-
-                debugLog('Đã đồng bộ UI với màu:', hex);
-            });
+            debugLog('Đã đồng bộ UI với màu:', hex);
         }
 
         // Hàm cập nhật màu từ HSL
@@ -879,17 +846,14 @@
              const hex = hslToHex(currentHue, currentSat, currentLight);
              debugLog('Cập nhật màu từ HSL:', hex);
 
-             // Sử dụng requestAnimationFrame để tránh blocking main thread
-             requestAnimationFrame(() => {
-                 // Cập nhật tất cả các elements UI
-                 syncUIWithColor(hex);
+             // Cập nhật tất cả các elements UI
+             syncUIWithColor(hex);
 
-                 // Áp dụng màu preview ngay lập tức
-                 previewColor = hex;
-                 applyPreviewColor(hex);
+             // Áp dụng màu preview ngay lập tức
+             previewColor = hex;
+             applyPreviewColor(hex);
 
-                 debugLog('Đã cập nhật UI từ HSL picker:', hex);
-             });
+             debugLog('Đã cập nhật UI từ HSL picker:', hex);
          }
 
         // Hàm cập nhật vị trí cursor
