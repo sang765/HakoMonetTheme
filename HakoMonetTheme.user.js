@@ -108,6 +108,7 @@
             GM_registerMenuCommand('🐛 Báo cáo lỗi', reportBug, 'b');
             GM_registerMenuCommand('💡 Đề xuất tính năng', suggestFeature, 'f');
             GM_registerMenuCommand('🔧 Debug Mode', toggleDebugMode, 'd');
+            GM_registerMenuCommand('🔄 Update Resources', updateAllResources, 'r');
 
             debugLog('Đã đăng ký menu commands');
         }
@@ -265,8 +266,8 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
     
     function loadAllResources() {
         const resources = [
-            'mainJS', 'monetJS', 'simpleCORSJS', 'infoTruyenJS',
-            'animationJS', 'tagColorJS', 'colorinfotruyen', 'pagegeneralJS', 'imageAnalyzerJS', 'themeDetectorJS', 'configJS', 'adBlockerJS'
+            'mainJS', 'monetAPIJS', 'simpleCORSJS', 'infoTruyenJS',
+            'animationJS', 'tagColorJS', 'colorinfotruyen', 'pagegeneralJS', 'themeDetectorJS', 'configJS', 'adBlockerJS'
         ];
         
         let loadedCount = 0;
@@ -305,7 +306,26 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
         
         return loadedCount;
     }
-    
+
+    function updateAllResources() {
+        debugLog('Bắt đầu cập nhật tất cả resources...');
+        const loadedCount = loadAllResources();
+        if (loadedCount > 0) {
+            showNotification(
+                'Cập nhật Resources',
+                `Đã cập nhật ${loadedCount} resources thành công!`,
+                3000
+            );
+        } else {
+            showNotification(
+                'Lỗi',
+                'Không thể cập nhật resources. Vui lòng thử lại.',
+                5000
+            );
+        }
+        debugLog('Cập nhật resources hoàn tất');
+    }
+
     function initializeScript() {
         debugLog(`Bắt đầu khởi tạo ${SCRIPT_NAME} v${GM_info.script.version}`);
         
