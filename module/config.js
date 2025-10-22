@@ -26,50 +26,8 @@
         });
         document.dispatchEvent(colorChangeEvent);
         debugLog('Đã phát sự kiện màu sắc thay đổi:', color);
-
     }
 
-    function getHideDomainWarnings() {
-
-        return GM_getValue('hide_domain_warnings', false);
-
-    }
-
-    function setHideDomainWarnings(value) {
-
-        GM_setValue('hide_domain_warnings', value);
-
-        debugLog('Đã lưu cài đặt ẩn cảnh báo tên miền:', value);
-
-        // Hide or show the elements
-
-        const selector = '.border-l-4.border-yellow-400.bg-yellow-50.p-4';
-
-        const elements = document.querySelectorAll(selector);
-
-        elements.forEach(el => {
-
-            el.style.display = value ? 'none' : '';
-
-        });
-
-        // Also, dispatch event if needed
-
-        const event = new CustomEvent('hmtHideWarningsChanged', {
-
-            detail: {
-
-                hide: value,
-
-                timestamp: Date.now()
-
-            }
-
-        });
-
-        document.dispatchEvent(event);
-
-    }
     function createConfigDialog() {
         // Kiểm tra xem dialog đã tồn tại chưa
         if (document.querySelector('.hmt-config-dialog')) {
@@ -179,22 +137,6 @@
                                 </div>
                                 <small class="hmt-color-help">Kéo thanh trượt HSL để chọn màu, hoặc nhập mã HEX trực tiếp</small>
                             </div>
-                        </div>
-
-                        <div class="hmt-config-section">
-
-                            <h4>Ẩn cảnh báo tên miền</h4>
-
-                            <p>Khi bật lên, userscript sẽ ẩn các element cảnh báo tên miền.</p>
-
-                            <label class="hmt-toggle">
-
-                                <input type="checkbox" id="hmt-hide-domain-warnings" ${getHideDomainWarnings() ? 'checked' : ''}>
-
-                                <span class="hmt-toggle-slider"></span>
-
-                            </label>
-
                         </div>
 
                         <div class="hmt-config-preview">
@@ -952,7 +894,7 @@
              });
          }
 
-        // Xử lý thanh saturation
+         // Xử lý thanh saturation
          if (satSlider) {
              satSlider.addEventListener('input', function() {
                  currentSat = parseInt(this.value);
@@ -961,7 +903,7 @@
              });
          }
 
-        // Xử lý thanh lightness
+         // Xử lý thanh lightness
          if (lightSlider) {
              lightSlider.addEventListener('input', function() {
                  currentLight = parseInt(this.value);
