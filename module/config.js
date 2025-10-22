@@ -915,11 +915,15 @@
             });
         }
 
-        // Xử lý nút +/- cho sliders
+        // Xử lý nút +/- cho sliders với khả năng ấn giữ
         sliderButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const targetId = this.getAttribute('data-target');
-                const action = this.getAttribute('data-action');
+            let intervalId = null;
+            let isHolding = false;
+
+            // Hàm thực hiện tăng/giảm giá trị
+            function performAction() {
+                const targetId = button.getAttribute('data-target');
+                const action = button.getAttribute('data-action');
                 const targetSlider = dialog.querySelector(`#${targetId}`);
 
                 if (targetSlider) {
@@ -934,10 +938,63 @@
                     }
 
                     targetSlider.value = newValue;
-                    debugLog(`${targetId} ${action}: ${currentValue} -> ${newValue}`);
+                    debugLog(`${targetId} ${action} (hold): ${currentValue} -> ${newValue}`);
 
                     // Trigger input event để cập nhật màu
                     targetSlider.dispatchEvent(new Event('input'));
+                }
+            }
+
+            // Xử lý click thông thường
+            button.addEventListener('click', function(e) {
+                if (!isHolding) {
+                    performAction();
+                }
+            });
+
+            // Xử lý bắt đầu ấn giữ
+            button.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                isHolding = true;
+
+                // Thực hiện action ngay lập tức
+                performAction();
+
+                // Đợi 500ms rồi bắt đầu lặp liên tục
+                setTimeout(() => {
+                    if (isHolding) {
+                        intervalId = setInterval(performAction, 100); // Lặp mỗi 100ms
+                    }
+                }, 500);
+            });
+
+            // Xử lý kết thúc ấn giữ
+            function stopHolding() {
+                isHolding = false;
+                if (intervalId) {
+                    clearInterval(intervalId);
+                    intervalId = null;
+                }
+            }
+
+            // Lắng nghe mouseup trên toàn bộ document để dừng khi thả chuột ở bất cứ đâu
+            document.addEventListener('mouseup', function() {
+                if (isHolding) {
+                    stopHolding();
+                }
+            });
+
+            // Lắng nghe mouseleave để dừng khi chuột rời khỏi nút
+            button.addEventListener('mouseleave', function() {
+                if (isHolding) {
+                    stopHolding();
+                }
+            });
+
+            // Lắng nghe contextmenu để ngăn menu chuột phải khi ấn giữ
+            button.addEventListener('contextmenu', function(e) {
+                if (isHolding) {
+                    e.preventDefault();
                 }
             });
         });
