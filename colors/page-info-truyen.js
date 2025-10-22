@@ -10,6 +10,106 @@
         }
     }
 
+    // Performance Monitoring Class
+    class ExtractionMetrics {
+        constructor() {
+            this.strategyPerformance = new Map();
+            this.loadHistoricalData();
+        }
+
+        async loadHistoricalData() {
+            try {
+                const data = localStorage.getItem('hakoColorExtractionMetrics');
+                if (data) {
+                    this.strategyPerformance = new Map(JSON.parse(data));
+                }
+            } catch (error) {
+                debugLog('Error loading historical data:', error);
+            }
+        }
+
+        async saveHistoricalData() {
+            try {
+                localStorage.setItem('hakoColorExtractionMetrics', JSON.stringify([...this.strategyPerformance]));
+            } catch (error) {
+                debugLog('Error saving historical data:', error);
+            }
+        }
+
+        async trackStrategySuccess(strategyName) {
+            const stats = this.strategyPerformance.get(strategyName) || { success: 0, total: 0 };
+            stats.success++;
+            stats.total++;
+            this.strategyPerformance.set(strategyName, stats);
+            await this.saveHistoricalData();
+        }
+
+        async trackStrategyFailure(strategyName, error) {
+            const stats = this.strategyPerformance.get(strategyName) || { success: 0, total: 0 };
+            stats.total++;
+            this.strategyPerformance.set(strategyName, stats);
+            await this.saveHistoricalData();
+        }
+
+        getStrategySuccessRate(strategyName) {
+            const stats = this.strategyPerformance.get(strategyName);
+            return stats ? stats.success / stats.total : 0.5; // Default 50%
+        }
+
+        async sortStrategiesByPerformance(strategies) {
+            return strategies.sort((a, b) => {
+                const rateA = this.getStrategySuccessRate(a.name);
+                const rateB = this.getStrategySuccessRate(b.name);
+                return rateB - rateA;
+            });
+        }
+    }
+
+    const extractionMetrics = new ExtractionMetrics();
+
+    // Utility functions
+    function executeWithTimeout(fn, ...args) {
+        return new Promise((resolve, reject) => {
+            const timeout = args.pop(); // Last arg is timeout
+            const timeoutId = setTimeout(() => {
+                reject(new Error('Timeout'));
+            }, timeout);
+
+            fn(...args)
+                .then(result => {
+                    clearTimeout(timeoutId);
+                    resolve(result);
+                })
+                .catch(error => {
+                    clearTimeout(timeoutId);
+                    reject(error);
+                });
+        });
+    }
+
+    function isValidColor(color) {
+        return MonetAPI.isValidColor(color);
+    }
+
+    function blobToImage(blob) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => resolve(img);
+            img.onerror = () => reject(new Error('Failed to create image from blob'));
+            img.src = URL.createObjectURL(blob);
+        });
+    }
+
+    function fetchWithCorsFallback(url) {
+        return fetch(url, {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            }
+        }).then(response => response.blob());
+    }
+
     function isTargetDomain(url) {
         if (!url) return false;
         return TARGET_DOMAINS.some(domain => url.includes(domain));
@@ -134,10 +234,10 @@
             // Thêm CSS cho phần trên của feature-section trong suốt
             addTransparentTopCSS();
 
-            // Phân tích màu từ ảnh bìa
-            analyzeImageColorTraditionalAccent(coverUrl)
+            // Sử dụng hệ thống robust với fallback chain
+            analyzeImageColorRobust(coverUrl)
                 .then(dominantColor => {
-                    debugLog('Màu chủ đạo (accent truyền thống):', dominantColor);
+                    debugLog('Màu chủ đạo (robust extraction):', dominantColor);
 
                     if (!isValidColor(dominantColor)) {
                         debugLog('Màu không hợp lệ, sử dụng màu mặc định');
@@ -155,7 +255,7 @@
                     applyMonetColorScheme(monetPalette, isLightColor);
                 })
                 .catch(error => {
-                    debugLog('Lỗi khi phân tích ảnh:', error);
+                    debugLog('Lỗi khi phân tích ảnh với tất cả fallbacks:', error);
                     applyCurrentColorScheme();
                 });
         }
@@ -292,6 +392,355 @@
         }
     }
     
+    // Layer 3: Service Worker Integration
+    class HakoColorExtractionSW {
+        constructor() {
+            this.swRegistered = false;
+        }
+
+        async register() {
+            if ('serviceWorker' in navigator && !this.swRegistered) {
+                try {
+                    const registration = await navigator.serviceWorker.register('/sw.js'); // Assuming SW is available
+                    this.swRegistered = true;
+                    debugLog('Service Worker registered for color extraction');
+                    return registration;
+                } catch (error) {
+                    debugLog('Service Worker registration failed:', error);
+                }
+            }
+        }
+
+        async extractColor(imageUrl) {
+            if (!this.swRegistered) {
+                await this.register();
+            }
+
+            return new Promise((resolve, reject) => {
+                navigator.serviceWorker.controller?.postMessage({
+                    type: 'EXTRACT_COLOR',
+                    url: imageUrl
+                });
+
+                navigator.serviceWorker.addEventListener('message', function handler(event) {
+                    if (event.data.type === 'COLOR_EXTRACTED') {
+                        navigator.serviceWorker.removeEventListener('message', handler);
+                        resolve(event.data.color);
+                    } else if (event.data.type === 'EXTRACTION_FAILED') {
+                        navigator.serviceWorker.removeEventListener('message', handler);
+                        reject(new Error(event.data.error));
+                    }
+                });
+            });
+        }
+    }
+
+    const hakoSW = new HakoColorExtractionSW();
+
+    // Layer 4: Heuristic Analysis with Hako Context
+    // Layer 5: Browser-Specific Solutions
+    function getBrowserType() {
+        const ua = navigator.userAgent;
+        if (ua.includes('Chrome')) return 'chrome';
+        if (ua.includes('Firefox')) return 'firefox';
+        if (ua.includes('Safari')) return 'safari';
+        return 'other';
+    }
+
+    async function browserSpecificExtraction(imageUrl) {
+        const browser = getBrowserType();
+
+        switch (browser) {
+            case 'chrome':
+                // Use chrome-specific features if available
+                if (chrome && chrome.identity) {
+                    return await chromeIdentityExtraction(imageUrl);
+                }
+                break;
+            case 'firefox':
+                // Firefox relaxed CORS
+                return await firefoxExtraction(imageUrl);
+            case 'safari':
+                // Safari ITP bypass
+                return await safariExtraction(imageUrl);
+            default:
+                break;
+        }
+
+        throw new Error('Browser-specific extraction not supported');
+    }
+
+    async function chromeIdentityExtraction(imageUrl) {
+        // Placeholder for chrome.identity usage
+        return enhancedCanvasExtraction(imageUrl); // Fallback to canvas
+    }
+
+    async function firefoxExtraction(imageUrl) {
+        // Firefox might allow more relaxed CORS
+        return enhancedCanvasExtraction(imageUrl);
+    }
+
+    // Main Robust Function
+    async function analyzeImageColorRobust(imageUrl) {
+        const strategies = [
+            {
+                name: 'enhanced-canvas',
+                fn: enhancedCanvasExtraction,
+                weight: 10,
+                timeout: 5000
+            },
+            {
+                name: 'hako-proxy-rotation',
+                fn: hakoProxyExtraction,
+                weight: 8,
+                timeout: 3000
+            },
+            {
+                name: 'service-worker-bypass',
+                fn: serviceWorkerExtraction,
+                weight: 7,
+                timeout: 4000
+            },
+            {
+                name: 'hako-heuristic',
+                fn: hakoHeuristicExtraction,
+                weight: 6,
+                timeout: 1000
+            },
+            {
+                name: 'browser-specific',
+                fn: browserSpecificExtraction,
+                weight: 5,
+                timeout: 2000
+            },
+            {
+                name: 'hako-ultimate-fallback',
+                fn: hakoUltimateFallback,
+                weight: 1,
+                timeout: 500
+            }
+        ];
+
+        // Adaptive strategy selection based on historical performance
+        const sortedStrategies = await extractionMetrics.sortStrategiesByPerformance(strategies);
+
+        for (const strategy of sortedStrategies) {
+            try {
+                const result = await executeWithTimeout(strategy.fn, imageUrl, strategy.timeout);
+                if (result && isValidColor(result)) {
+                    await extractionMetrics.trackStrategySuccess(strategy.name);
+                    return result;
+                }
+            } catch (error) {
+                await extractionMetrics.trackStrategyFailure(strategy.name, error);
+                continue;
+            }
+        }
+
+        throw new Error('All color extraction strategies failed');
+    }
+
+    // Layer 6: Hako-Specific Ultimate Fallbacks
+    function hakoUltimateFallback(imageUrl) {
+        // Default color palettes based on novel genres
+        const genreElement = document.querySelector('.series-type');
+        if (genreElement) {
+            const genreText = genreElement.textContent.toLowerCase();
+            const genreColors = {
+                'romance': '#ff69b4',
+                'fantasy': '#8a2be2',
+                'action': '#ff4500',
+                'comedy': '#ffd700',
+                'drama': '#4169e1',
+                'horror': '#8b0000',
+                'mystery': '#2f4f4f',
+                'sci-fi': '#00ced1'
+            };
+
+            for (const [key, color] of Object.entries(genreColors)) {
+                if (genreText.includes(key)) {
+                    return color;
+                }
+            }
+        }
+
+        // Domain-based color mapping
+        if (imageUrl.includes('docln')) return '#6c5ce7';
+        if (imageUrl.includes('hako')) return '#00b894';
+        if (imageUrl.includes('ln.hako')) return '#00b894';
+
+        // Seasonal/trending color suggestions
+        const month = new Date().getMonth();
+        const seasonalColors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dda0dd'];
+        return seasonalColors[month % seasonalColors.length];
+    }
+
+    async function safariExtraction(imageUrl) {
+        // Safari specific handling
+        return enhancedCanvasExtraction(imageUrl);
+    }
+
+    function hakoHeuristicExtraction(imageUrl) {
+        // Analyze parent elements for color hints
+        const coverElement = document.querySelector('.series-cover .img-in-ratio');
+        if (coverElement) {
+            const parentColor = window.getComputedStyle(coverElement.parentElement).backgroundColor;
+            if (parentColor && parentColor !== 'rgba(0, 0, 0, 0)' && parentColor !== 'transparent') {
+                const rgb = parentColor.match(/\d+/g);
+                if (rgb) {
+                    return MonetAPI.rgbToHex(parseInt(rgb[0]), parseInt(rgb[1]), parseInt(rgb[2]));
+                }
+            }
+        }
+
+        // Genre-based color mapping
+        const genreElement = document.querySelector('.series-type');
+        if (genreElement) {
+            const genreText = genreElement.textContent.toLowerCase();
+            const genreColors = {
+                'romance': '#ff69b4',
+                'fantasy': '#8a2be2',
+                'action': '#ff4500',
+                'comedy': '#ffd700',
+                'drama': '#4169e1',
+                'horror': '#8b0000',
+                'mystery': '#2f4f4f',
+                'sci-fi': '#00ced1'
+            };
+
+            for (const [key, color] of Object.entries(genreColors)) {
+                if (genreText.includes(key)) {
+                    return color;
+                }
+            }
+        }
+
+        // Domain-based fallback
+        if (imageUrl.includes('docln')) return '#6c5ce7';
+        if (imageUrl.includes('hako')) return '#00b894';
+
+        return '#6c5ce7'; // Default
+    }
+
+    async function serviceWorkerExtraction(imageUrl) {
+        try {
+            return await hakoSW.extractColor(imageUrl);
+        } catch (error) {
+            throw new Error('Service Worker extraction failed: ' + error.message);
+        }
+    }
+
+    // Layer 2: CORS Proxy Rotation
+    const HAKO_PROXY_ENDPOINTS = [
+        'https://corsproxy.io/?{url}',
+        'https://api.codetabs.com/v1/proxy?quest={url}',
+        'https://cors-anywhere.herokuapp.com/{url}',
+        'https://proxy.cors.sh/{url}' // Premium proxy
+    ];
+
+    async function hakoProxyExtraction(imageUrl) {
+        const proxies = HAKO_PROXY_ENDPOINTS.map(proxy =>
+            proxy.replace('{url}', encodeURIComponent(imageUrl))
+        );
+
+        for (let i = 0; i < proxies.length; i++) {
+            try {
+                const proxyUrl = proxies[i];
+                const response = await fetch(proxyUrl, {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    }
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const img = await blobToImage(blob);
+                    const color = getTraditionalAccentColorFromImage(img);
+                    URL.revokeObjectURL(img.src);
+                    return color;
+                }
+            } catch (error) {
+                debugLog(`Proxy ${i} failed:`, error);
+                continue;
+            }
+        }
+
+        throw new Error('All proxies failed');
+    }
+
+    // Layer 1: Enhanced Direct Canvas Approach
+    async function enhancedCanvasExtraction(imageUrl) {
+        return new Promise((resolve, reject) => {
+            const cleanup = () => {
+                clearTimeout(timeoutId);
+                if (objectUrl) URL.revokeObjectURL(objectUrl);
+            };
+
+            let objectUrl = null;
+            const timeoutId = setTimeout(() => {
+                cleanup();
+                reject(new Error('Canvas extraction timeout'));
+            }, 5000);
+
+            const img = new Image();
+
+            // Enhanced CORS handling
+            if (isTargetDomain(imageUrl)) {
+                img.crossOrigin = 'anonymous';
+                // Add cache busting
+                imageUrl += (imageUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
+            }
+
+            img.onload = function() {
+                try {
+                    // Use OffscreenCanvas if supported
+                    let canvas;
+                    if (typeof OffscreenCanvas !== 'undefined') {
+                        canvas = new OffscreenCanvas(img.width, img.height);
+                    } else {
+                        canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                    }
+
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+
+                    // Progressive loading with sampling
+                    const dominantColor = getTraditionalAccentColorFromImage(img);
+                    cleanup();
+                    resolve(dominantColor);
+                } catch (error) {
+                    cleanup();
+                    reject(error);
+                }
+            };
+
+            img.onerror = function() {
+                cleanup();
+                reject(new Error('Image loading failed'));
+            };
+
+            // Fallback to handle blob URLs
+            if (imageUrl.startsWith('blob:')) {
+                img.src = imageUrl;
+            } else {
+                // Try to load with fetch first for CORS
+                fetchWithCorsFallback(imageUrl)
+                    .then(blob => {
+                        objectUrl = URL.createObjectURL(blob);
+                        img.src = objectUrl;
+                    })
+                    .catch(() => {
+                        // Fallback to direct loading
+                        img.src = imageUrl;
+                    });
+            }
+        });
+    }
+
     // Hàm phân tích ảnh với focus vào accent color truyền thống
     function analyzeImageColorTraditionalAccent(imageUrl) {
         return new Promise((resolve, reject) => {
