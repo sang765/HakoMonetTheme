@@ -779,6 +779,9 @@
         const customColorPicker = dialog.querySelector('.hmt-custom-color-picker');
         const colorPreview = dialog.querySelector('#hmt-color-preview');
         const colorValue = dialog.querySelector('#hmt-color-value');
+        const hueSlider = dialog.querySelector('#hmt-hue-slider');
+        const satSlider = dialog.querySelector('#hmt-sat-slider');
+        const lightSlider = dialog.querySelector('#hmt-light-slider');
         const sliderButtons = dialog.querySelectorAll('.hmt-slider-btn');
 
         // Hàm chuyển đổi HEX sang HSL
@@ -887,7 +890,30 @@
              });
          }
 
+        // Xử lý thanh HSL sliders
+        if (hueSlider) {
+            hueSlider.addEventListener('input', function() {
+                currentHue = parseInt(this.value);
+                debugLog('Hue thay đổi:', currentHue);
+                updateColorFromHSL();
+            });
+        }
 
+        if (satSlider) {
+            satSlider.addEventListener('input', function() {
+                currentSat = parseInt(this.value);
+                debugLog('Saturation thay đổi:', currentSat);
+                updateColorFromHSL();
+            });
+        }
+
+        if (lightSlider) {
+            lightSlider.addEventListener('input', function() {
+                currentLight = parseInt(this.value);
+                debugLog('Lightness thay đổi:', currentLight);
+                updateColorFromHSL();
+            });
+        }
 
         // Xử lý nút +/- cho sliders
         sliderButtons.forEach(button => {
@@ -920,6 +946,9 @@
          debugLog('Khởi tạo color picker tùy chỉnh');
          debugLog('Color preview element:', !!colorPreview);
          debugLog('Color value element:', !!colorValue);
+         debugLog('Hue slider element:', !!hueSlider);
+         debugLog('Sat slider element:', !!satSlider);
+         debugLog('Light slider element:', !!lightSlider);
          debugLog('Slider buttons count:', sliderButtons.length);
 
          // Đồng bộ các elements với màu hiện tại (không gửi sự kiện preview)
