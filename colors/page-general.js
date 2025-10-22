@@ -377,21 +377,21 @@
             img.onerror = function(error) {
                 debugLog('Lỗi tải ảnh với Image API:', imageUrl, error);
 
-                // Fallback: try using XMLHttpRequest with CORS headers
+                // Fallback: try using GM_xmlhttpRequest (CORS bypass)
                 if (isTargetDomain(imageUrl)) {
-                    debugLog('Thử tải ảnh bằng XMLHttpRequest với CORS headers');
+                    debugLog('Thử tải ảnh bằng GM_xmlhttpRequest (CORS bypass)');
                     loadImageWithXHR(imageUrl)
                         .then(img => {
                             try {
                                 const dominantColor = getTraditionalAccentColorFromImage(img);
                                 resolve(dominantColor);
                             } catch (error) {
-                                reject('Lỗi khi phân tích ảnh từ XHR: ' + error);
+                                reject('Lỗi khi phân tích ảnh từ GM_xmlhttpRequest: ' + error);
                             }
                         })
                         .catch(xhrError => {
-                            debugLog('XMLHttpRequest cũng thất bại:', xhrError);
-                            reject('Không thể tải ảnh bằng cả Image API và XMLHttpRequest');
+                            debugLog('GM_xmlhttpRequest cũng thất bại:', xhrError);
+                            reject('Không thể tải ảnh bằng cả Image API và GM_xmlhttpRequest');
                         });
                 } else {
                     reject('Không thể tải ảnh');
@@ -402,37 +402,29 @@
         });
     }
 
-    // Fallback function to load image using XMLHttpRequest with CORS headers
+    // Fallback function to load image using GM_xmlhttpRequest (bypasses CORS)
     function loadImageWithXHR(imageUrl) {
         return new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', imageUrl, true);
-            xhr.responseType = 'blob';
-
-            // Add CORS headers for target domains
-            if (isTargetDomain(imageUrl)) {
-                xhr.setRequestHeader('Origin', window.location.origin);
-                xhr.setRequestHeader('Referer', window.location.href);
-                xhr.setRequestHeader('Access-Control-Request-Method', 'GET');
-            }
-
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    const blob = xhr.response;
-                    const img = new Image();
-                    img.onload = () => resolve(img);
-                    img.onerror = () => reject('Không thể tạo ảnh từ blob');
-                    img.src = URL.createObjectURL(blob);
-                } else {
-                    reject('XHR failed with status: ' + xhr.status);
+            debugLog('Sending GM_xmlhttpRequest to:', imageUrl);
+            GM_xmlhttpRequest({
+                method: 'GET',
+                url: imageUrl,
+                responseType: 'blob',
+                onload: function(response) {
+                    if (response.status === 200) {
+                        const blob = response.response;
+                        const img = new Image();
+                        img.onload = () => resolve(img);
+                        img.onerror = () => reject('Không thể tạo ảnh từ blob');
+                        img.src = URL.createObjectURL(blob);
+                    } else {
+                        reject('GM_xmlhttpRequest failed with status: ' + response.status);
+                    }
+                },
+                onerror: function(error) {
+                    reject('GM_xmlhttpRequest network error: ' + error);
                 }
-            };
-
-            xhr.onerror = function() {
-                reject('XHR network error');
-            };
-
-            xhr.send();
+            });
         });
     }
 
