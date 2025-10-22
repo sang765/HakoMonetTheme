@@ -288,6 +288,16 @@
                         return;
                     }
 
+                    // Kiểm tra thêm để tránh màu quá tối (như #121212)
+                    if (dominantColor.startsWith('#1') || dominantColor.startsWith('#0')) {
+                        const testRgb = MonetAPI.hexToRgb(dominantColor);
+                        if (testRgb && (testRgb.r + testRgb.g + testRgb.b) / 3 < 40) {
+                            debugLog('Màu quá tối, sử dụng màu mặc định');
+                            applyCurrentColorScheme();
+                            return;
+                        }
+                    }
+
                     // Gọi API Monet để tạo palette
                     const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
                     debugLog('Monet Palette:', monetPalette);
@@ -555,8 +565,14 @@
             {
                 name: 'hako-proxy-rotation',
                 fn: hakoProxyExtraction,
-                weight: 8,
+                weight: 9,
                 timeout: 3000
+            },
+            {
+                name: 'browser-specific',
+                fn: browserSpecificExtraction,
+                weight: 8,
+                timeout: 2000
             },
             {
                 name: 'service-worker-bypass',
@@ -565,22 +581,16 @@
                 timeout: 4000
             },
             {
-                name: 'hako-heuristic',
-                fn: hakoHeuristicExtraction,
-                weight: 6,
-                timeout: 1000
-            },
-            {
-                name: 'browser-specific',
-                fn: browserSpecificExtraction,
-                weight: 5,
-                timeout: 2000
-            },
-            {
                 name: 'hako-ultimate-fallback',
                 fn: hakoUltimateFallback,
-                weight: 1,
+                weight: 6,
                 timeout: 500
+            },
+            {
+                name: 'hako-heuristic',
+                fn: hakoHeuristicExtraction,
+                weight: 2,
+                timeout: 1000
             }
         ];
 
@@ -594,6 +604,14 @@
                 const result = await executeWithTimeout(strategy.fn, imageUrl, strategy.timeout);
                 debugLog(`Strategy ${strategy.name} result:`, result);
                 if (result && isValidColor(result)) {
+                    // Kiểm tra thêm để tránh màu quá tối
+                    const rgb = MonetAPI.hexToRgb(result);
+                    if (rgb && (rgb.r + rgb.g + rgb.b) / 3 < 40) {
+                        debugLog(`Strategy ${strategy.name} returned too dark color:`, result, 'skipping');
+                        await extractionMetrics.trackStrategyFailure(strategy.name, new Error('Color too dark'));
+                        continue;
+                    }
+
                     debugLog(`Strategy ${strategy.name} succeeded with color:`, result);
                     await extractionMetrics.trackStrategySuccess(strategy.name);
                     return result;
@@ -669,28 +687,7 @@
     async function hakoHeuristicExtraction(imageUrl) {
         debugLog('Starting heuristic extraction for:', imageUrl);
 
-        // Analyze parent elements for color hints
-        const coverElement = document.querySelector('.series-cover .img-in-ratio');
-        debugLog('Cover element found:', !!coverElement);
-        if (coverElement) {
-            const parentColor = window.getComputedStyle(coverElement.parentElement).backgroundColor;
-            debugLog('Parent color:', parentColor);
-            if (parentColor && parentColor !== 'rgba(0, 0, 0, 0)' && parentColor !== 'transparent') {
-                const rgb = parentColor.match(/\d+/g);
-                debugLog('RGB values:', rgb);
-                if (rgb && rgb.length >= 3) {
-                    try {
-                        const color = MonetAPI.rgbToHex(parseInt(rgb[0]), parseInt(rgb[1]), parseInt(rgb[2]));
-                        debugLog('Converted parent color to:', color);
-                        return Promise.resolve(color);
-                    } catch (error) {
-                        debugLog('Error converting parent color to hex:', error);
-                    }
-                }
-            }
-        }
-
-        // Genre-based color mapping
+        // Ưu tiên 1: Genre-based color mapping (tốt nhất)
         const genreElement = document.querySelector('.series-type');
         debugLog('Genre element found:', !!genreElement);
         if (genreElement) {
@@ -704,13 +701,45 @@
                 'drama': '#4169e1',
                 'horror': '#8b0000',
                 'mystery': '#2f4f4f',
-                'sci-fi': '#00ced1'
+                'sci-fi': '#00ced1',
+                'adventure': '#ff8c00',
+                'school': '#32cd32',
+                'slice of life': '#dda0dd'
             };
 
             for (const [key, color] of Object.entries(genreColors)) {
                 if (genreText.includes(key)) {
                     debugLog('Found matching genre:', key, '->', color);
                     return Promise.resolve(color);
+                }
+            }
+        }
+
+        // Ưu tiên 2: Analyze parent elements for color hints (chỉ khi không quá tối)
+        const coverElement = document.querySelector('.series-cover .img-in-ratio');
+        debugLog('Cover element found:', !!coverElement);
+        if (coverElement) {
+            const parentColor = window.getComputedStyle(coverElement.parentElement).backgroundColor;
+            debugLog('Parent color:', parentColor);
+            if (parentColor && parentColor !== 'rgba(0, 0, 0, 0)' && parentColor !== 'transparent') {
+                const rgb = parentColor.match(/\d+/g);
+                debugLog('RGB values:', rgb);
+                if (rgb && rgb.length >= 3) {
+                    const brightness = (parseInt(rgb[0]) + parseInt(rgb[1]) + parseInt(rgb[2])) / 3;
+                    debugLog('Parent color brightness:', brightness);
+
+                    // Tránh màu quá tối (như #121212)
+                    if (brightness > 50) {
+                        try {
+                            const color = MonetAPI.rgbToHex(parseInt(rgb[0]), parseInt(rgb[1]), parseInt(rgb[2]));
+                            debugLog('Converted parent color to:', color);
+                            return Promise.resolve(color);
+                        } catch (error) {
+                            debugLog('Error converting parent color to hex:', error);
+                        }
+                    } else {
+                        debugLog('Parent color too dark, skipping');
+                    }
                 }
             }
         }
@@ -1009,23 +1038,25 @@
         const colorCount = {};
         let maxCount = 0;
         let dominantColor = '#6c5ce7'; // Màu mặc định
-        
-        // Phạm vi màu accent truyền thống (loại bỏ màu quá sáng và quá tối)
+
+        // Cải thiện phạm vi màu accent truyền thống với trọng số cao hơn cho màu rực rỡ
         const traditionalAccentRanges = [
-            // Màu đỏ
-            {min: [120, 0, 0], max: [255, 100, 100], weight: 1.8},
-            // Màu cam
-            {min: [200, 80, 0], max: [255, 165, 50], weight: 1.7},
-            // Màu vàng (không quá sáng)
-            {min: [180, 150, 0], max: [240, 220, 100], weight: 1.5},
-            // Màu xanh lá
-            {min: [0, 100, 0], max: [100, 255, 100], weight: 1.6},
+            // Màu đỏ rực rỡ
+            {min: [140, 20, 20], max: [255, 120, 120], weight: 2.2},
+            // Màu cam sáng
+            {min: [220, 100, 20], max: [255, 180, 80], weight: 2.1},
+            // Màu vàng rực rỡ
+            {min: [200, 180, 40], max: [255, 240, 120], weight: 2.0},
+            // Màu xanh lá cây
+            {min: [40, 120, 40], max: [120, 255, 120], weight: 2.0},
             // Màu xanh dương
-            {min: [0, 0, 120], max: [100, 100, 255], weight: 1.8},
+            {min: [40, 80, 140], max: [120, 140, 255], weight: 2.1},
             // Màu tím
-            {min: [100, 0, 100], max: [200, 100, 200], weight: 1.7},
+            {min: [120, 40, 140], max: [220, 120, 220], weight: 2.0},
             // Màu hồng
-            {min: [200, 100, 150], max: [255, 180, 200], weight: 1.6}
+            {min: [220, 120, 160], max: [255, 200, 220], weight: 2.0},
+            // Màu xanh ngọc
+            {min: [40, 180, 140], max: [120, 220, 180], weight: 1.9}
         ];
         
         for (let i = 0; i < data.length; i += 4) {
@@ -1036,20 +1067,25 @@
             
             // Bỏ qua pixel trong suốt
             if (a < 128) continue;
-            
+
             // LOẠI BỎ màu quá sáng (gần trắng) và quá tối (gần đen)
             const brightness = (r + g + b) / 3;
-            if (brightness > 240 || brightness < 15) {
+            if (brightness > 245 || brightness < 25) {
                 continue;
             }
-            
+
             // LOẠI BỎ màu xám (khi các kênh màu gần bằng nhau)
             const maxChannel = Math.max(r, g, b);
             const minChannel = Math.min(r, g, b);
             const saturation = maxChannel - minChannel;
-            
-            // Bỏ qua màu có độ bão hòa thấp (màu xám)
-            if (saturation < 30) {
+
+            // Tăng ngưỡng độ bão hòa để loại bỏ màu xám và ưu tiên màu rực rỡ
+            if (saturation < 40) {
+                continue;
+            }
+
+            // LOẠI BỎ màu quá tối hoặc quá xám (như #121212)
+            if (brightness < 40 || (maxChannel - minChannel) < 35) {
                 continue;
             }
             
@@ -1070,10 +1106,16 @@
                     break;
                 }
             }
-            
-            // Giảm trọng số cho màu có độ bão hòa thấp
+
+            // Tăng trọng số cho màu có độ bão hòa và độ sáng cao
             const normalizedSaturation = saturation / 255;
-            weight *= (0.5 + normalizedSaturation * 0.5);
+            const normalizedBrightness = brightness / 255;
+            weight *= (0.3 + normalizedSaturation * 0.7) * (0.4 + normalizedBrightness * 0.6);
+
+            // Thưởng thêm cho màu có độ sáng trung bình (không quá tối, không quá sáng)
+            if (brightness > 60 && brightness < 200) {
+                weight *= 1.3;
+            }
             
             const weightedCount = Math.round(weight);
             
@@ -1093,6 +1135,12 @@
         if (maxCount === 0) {
             debugLog('Không tìm thấy màu accent truyền thống, sử dụng màu bão hòa cao nhất');
             dominantColor = getMostSaturatedColor(img);
+
+            // Nếu vẫn là màu tối, thử tìm màu sáng hơn
+            if (dominantColor === '#6c5ce7' || dominantColor.startsWith('#1') || dominantColor.startsWith('#0')) {
+                debugLog('Màu tìm được quá tối, thử tìm màu sáng hơn');
+                dominantColor = getBrightAccentColor(img);
+            }
         }
         
         debugLog('Màu accent được chọn:', dominantColor);
@@ -1127,17 +1175,61 @@
             const minChannel = Math.min(r, g, b);
             const saturation = maxChannel - minChannel;
             
-            // Bỏ qua màu quá sáng/quá tối
+            // Bỏ qua màu quá sáng/quá tối và ưu tiên màu có độ sáng trung bình
             const brightness = (r + g + b) / 3;
-            if (brightness > 240 || brightness < 15) continue;
-            
-            if (saturation > maxSaturation) {
+            if (brightness > 240 || brightness < 40) continue;
+    
+            // Ưu tiên màu có độ sáng trung bình và độ bão hòa cao
+            if (saturation > maxSaturation && brightness > 60 && brightness < 200) {
                 maxSaturation = saturation;
                 mostSaturatedColor = MonetAPI.rgbToHex(r, g, b);
             }
         }
         
         return mostSaturatedColor;
+    }
+
+    // Hàm lấy màu accent sáng và rực rỡ (fallback khi màu chính quá tối)
+    function getBrightAccentColor(img) {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const width = 150;
+        const height = 150;
+        canvas.width = width;
+        canvas.height = height;
+
+        ctx.drawImage(img, 0, 0, width, height);
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const data = imageData.data;
+
+        let bestColor = '#6c5ce7';
+        let bestScore = 0;
+
+        for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+            const a = data[i + 3];
+
+            if (a < 128) continue;
+
+            const brightness = (r + g + b) / 3;
+            const maxChannel = Math.max(r, g, b);
+            const minChannel = Math.min(r, g, b);
+            const saturation = maxChannel - minChannel;
+
+            // Ưu tiên màu sáng, rực rỡ và có độ bão hòa cao
+            if (brightness > 100 && brightness < 200 && saturation > 60) {
+                const score = saturation * (brightness / 255) * 2.0;
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestColor = MonetAPI.rgbToHex(r, g, b);
+                }
+            }
+        }
+
+        debugLog('Bright accent color found:', bestColor, 'with score:', bestScore);
+        return bestColor;
     }
     
     // Hàm áp dụng Monet color scheme
