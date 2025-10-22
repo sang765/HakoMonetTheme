@@ -269,33 +269,40 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
             'mainJS', 'monetAPIJS', 'simpleCORSJS', 'infoTruyenJS',
             'animationJS', 'tagColorJS', 'colorinfotruyen', 'pagegeneralJS', 'themeDetectorJS', 'configJS', 'adBlockerJS'
         ];
-        
+
         let loadedCount = 0;
         let failedCount = 0;
-        
+        const loadedResources = [];
+        const failedResources = [];
+
         resources.forEach(resourceName => {
             try {
                 const resourceContent = GM_getResourceText(resourceName);
                 if (resourceContent) {
                     eval(resourceContent);
                     loadedCount++;
+                    loadedResources.push(resourceName);
                     debugLog(`Đã tải ${resourceName}`);
                 } else {
                     debugLog(`Không tìm thấy resource: ${resourceName}`);
                     failedCount++;
+                    failedResources.push(resourceName);
                 }
             } catch (error) {
                 debugLog(`Lỗi khi tải ${resourceName}:`, error);
                 failedCount++;
+                failedResources.push(resourceName);
             }
         });
-        
+
         if (failedCount > 0) {
             debugLog(`Tải resources: ${loadedCount} thành công, ${failedCount} thất bại`);
-            
+            debugLog(`Loaded: ${loadedResources.join(', ')}`);
+            debugLog(`Failed: ${failedResources.join(', ')}`);
+
             if (failedCount === resources.length) {
                 showNotification(
-                    'Lỗi nghiêm trọng', 
+                    'Lỗi nghiêm trọng',
                     'Không thể tải bất kỳ resource nào. Vui lòng cài đặt lại script.',
                     10000
                 );
@@ -303,20 +310,30 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
         } else {
             debugLog('Đã tải tất cả resources thành công');
         }
-        
-        return loadedCount;
+
+        return { loadedCount, loadedResources, failedCount, failedResources };
     }
 
     function updateAllResources() {
         debugLog('Bắt đầu cập nhật tất cả resources...');
-        const loadedCount = loadAllResources();
+        const { loadedCount, loadedResources, failedCount, failedResources } = loadAllResources();
         if (loadedCount > 0) {
+            const resourceList = loadedResources.join(', ');
             showNotification(
                 'Cập nhật Resources',
-                `Đã cập nhật ${loadedCount} resources thành công!`,
-                3000
+                `Đã cập nhật ${loadedCount} resources: ${resourceList}`,
+                5000
             );
-        } else {
+        }
+        if (failedCount > 0) {
+            const failedList = failedResources.join(', ');
+            showNotification(
+                'Cảnh báo',
+                `Không thể cập nhật ${failedCount} resources: ${failedList}`,
+                5000
+            );
+        }
+        if (loadedCount === 0) {
             showNotification(
                 'Lỗi',
                 'Không thể cập nhật resources. Vui lòng thử lại.',
@@ -333,7 +350,7 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
         registerMenuCommands();
         
         // Tải tất cả resources
-        const loadedCount = loadAllResources();
+        const { loadedCount } = loadAllResources();
         
         if (loadedCount > 0) {
             showNotification(
