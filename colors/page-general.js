@@ -54,25 +54,10 @@
                     })
                     .then(dominantColor => {
                         debugLog('Màu chủ đạo từ thumbnail:', dominantColor);
-
-                        // Sử dụng ThemeDetector để tạo color scheme phù hợp với theme hiện tại
-                        if (window.ThemeDetector && window.ThemeDetector.generateColorScheme) {
-                            const currentTheme = window.ThemeDetector.getCurrentTheme();
-                            const colorScheme = window.ThemeDetector.generateColorScheme(dominantColor, currentTheme);
-
-                            if (colorScheme) {
-                                debugLog('Áp dụng color scheme từ thumbnail cho theme:', currentTheme, colorScheme.palette[500]);
-                                applyMonetColorScheme(colorScheme.palette, colorScheme.isLight);
-                                addOverlay();
-                                return;
-                            }
-                        }
-
-                        // Fallback to old method if ThemeDetector is not available
-                        debugLog('ThemeDetector không khả dụng, sử dụng phương thức cũ');
                         const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
                         const isLightColor = MonetAPI.isColorLight(dominantColor);
                         applyMonetColorScheme(monetPalette, isLightColor);
+                        // Thêm overlay sau khi áp dụng màu
                         addOverlay();
                     })
                     .catch(error => {
@@ -105,33 +90,22 @@
                 return;
             }
 
-            // Sử dụng ThemeDetector để tạo color scheme phù hợp với theme hiện tại
-            if (window.ThemeDetector && window.ThemeDetector.generateColorScheme) {
-                const currentTheme = window.ThemeDetector.getCurrentTheme();
-                const colorScheme = window.ThemeDetector.generateColorScheme(defaultColor, currentTheme);
+            // Thêm class để kích hoạt animation
+            document.body.classList.add('hmt-color-changing');
 
-                if (colorScheme) {
-                    debugLog('Áp dụng color scheme cho theme:', currentTheme, colorScheme.palette[500]);
-
-                    // Thêm class để kích hoạt animation
-                    document.body.classList.add('hmt-color-changing');
-
-                    applyMonetColorScheme(colorScheme.palette, colorScheme.isLight);
-
-                    // Loại bỏ class sau khi animation hoàn thành
-                    setTimeout(() => {
-                        document.body.classList.remove('hmt-color-changing');
-                    }, 600);
-
-                    return;
-                }
-            }
-
-            // Fallback to old method if ThemeDetector is not available
-            debugLog('ThemeDetector không khả dụng, sử dụng phương thức cũ');
+            // Tạo Monet palette từ màu config
             const monetPalette = MonetAPI.generateMonetPalette(defaultColor);
+            debugLog('Monet Palette từ config:', monetPalette);
+
             const isLightColor = MonetAPI.isColorLight(defaultColor);
+            debugLog('Màu sáng?', isLightColor);
+
             applyMonetColorScheme(monetPalette, isLightColor);
+
+            // Loại bỏ class sau khi animation hoàn thành
+            setTimeout(() => {
+                document.body.classList.remove('hmt-color-changing');
+            }, 600);
         }
 
         // Áp dụng màu sắc lần đầu
@@ -154,39 +128,10 @@
                 // Nếu là preview mode, áp dụng màu ngay lập tức
                 const previewColor = event.detail.color;
                 if (previewColor && isValidColor(previewColor)) {
-                    // Sử dụng ThemeDetector để tạo color scheme phù hợp với theme hiện tại
-                    if (window.ThemeDetector && window.ThemeDetector.generateColorScheme) {
-                        const currentTheme = window.ThemeDetector.getCurrentTheme();
-                        const colorScheme = window.ThemeDetector.generateColorScheme(previewColor, currentTheme);
-                        if (colorScheme) {
-                            applyMonetColorScheme(colorScheme.palette, colorScheme.isLight);
-                            return;
-                        }
-                    }
-
-                    // Fallback to old method
                     const monetPalette = MonetAPI.generateMonetPalette(previewColor);
                     const isLightColor = MonetAPI.isColorLight(previewColor);
                     applyMonetColorScheme(monetPalette, isLightColor);
                 }
-            }
-        });
-
-        // Lắng nghe sự kiện theme color thay đổi từ ThemeDetector
-        (window.top || window).document.addEventListener('hmtThemeColorChanged', function(event) {
-            const colorScheme = event.detail;
-            debugLog('Nhận sự kiện theme color thay đổi:', colorScheme);
-
-            if (colorScheme && colorScheme.palette) {
-                // Thêm class để kích hoạt animation
-                document.body.classList.add('hmt-color-changing');
-
-                applyMonetColorScheme(colorScheme.palette, colorScheme.isLight);
-
-                // Loại bỏ class sau khi animation hoàn thành
-                setTimeout(() => {
-                    document.body.classList.remove('hmt-color-changing');
-                }, 600);
             }
         });
 
@@ -221,21 +166,6 @@
                             getCoverUrlFromInfoPage(storyId)
                                 .then(coverUrl => analyzeImageColorTraditionalAccent(coverUrl))
                                 .then(dominantColor => {
-                                    // Sử dụng ThemeDetector để tạo color scheme phù hợp với theme hiện tại
-                                    if (window.ThemeDetector && window.ThemeDetector.generateColorScheme) {
-                                        const currentTheme = window.ThemeDetector.getCurrentTheme();
-                                        const colorScheme = window.ThemeDetector.generateColorScheme(dominantColor, currentTheme);
-
-                                        if (colorScheme) {
-                                            debugLog('Áp dụng color scheme từ thumbnail cho theme:', currentTheme, colorScheme.palette[500]);
-                                            applyMonetColorScheme(colorScheme.palette, colorScheme.isLight);
-                                            addOverlay();
-                                            return;
-                                        }
-                                    }
-
-                                    // Fallback to old method if ThemeDetector is not available
-                                    debugLog('ThemeDetector không khả dụng, sử dụng phương thức cũ');
                                     const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
                                     const isLightColor = MonetAPI.isColorLight(dominantColor);
                                     applyMonetColorScheme(monetPalette, isLightColor);
@@ -290,22 +220,6 @@
                                 })
                                 .then(dominantColor => {
                                     debugLog('Màu chủ đạo từ thumbnail:', dominantColor);
-
-                                    // Sử dụng ThemeDetector để tạo color scheme phù hợp với theme hiện tại
-                                    if (window.ThemeDetector && window.ThemeDetector.generateColorScheme) {
-                                        const currentTheme = window.ThemeDetector.getCurrentTheme();
-                                        const colorScheme = window.ThemeDetector.generateColorScheme(dominantColor, currentTheme);
-
-                                        if (colorScheme) {
-                                            debugLog('Áp dụng color scheme từ thumbnail cho theme:', currentTheme, colorScheme.palette[500]);
-                                            applyMonetColorScheme(colorScheme.palette, colorScheme.isLight);
-                                            addOverlay();
-                                            return;
-                                        }
-                                    }
-
-                                    // Fallback to old method if ThemeDetector is not available
-                                    debugLog('ThemeDetector không khả dụng, sử dụng phương thức cũ');
                                     const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
                                     const isLightColor = MonetAPI.isColorLight(dominantColor);
                                     applyMonetColorScheme(monetPalette, isLightColor);
@@ -740,71 +654,6 @@
                 --monet-background-dark: ${palette[100]};
                 --monet-elevated: ${palette[0]};
                 --monet-elevated-dark: ${palette[100]};
-            }
-
-            /* Material You Light Theme Enhancements */
-            ${isLight ? `
-                /* Light theme specific styles */
-                body {
-                    background: linear-gradient(135deg, ${palette[50]} 0%, ${palette[100]} 100%) !important;
-                }
-
-                /* Subtle shadows for depth */
-                .basic-section, .detail-list, .feature-section, .modal-content {
-                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
-                }
-
-                /* Elevated surfaces */
-                .navbar-menu, .nav-submenu, .account-sidebar, .noti-sidebar {
-                    background: ${palette[0]} !important;
-                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06) !important;
-                }
-
-                /* Better text contrast */
-                .text-slate-500, .long-text a {
-                    color: ${palette[700]} !important;
-                }
-
-                /* Input fields with better styling */
-                [type="date"], [type="email"], [type="number"], [type="password"], [type="tel"], [type="text"], select, select.form-control {
-                    background-color: ${palette[0]} !important;
-                    border-color: ${palette[300]} !important;
-                    color: ${palette[900]} !important;
-                }
-
-                /* Hover effects for light theme */
-                .action-link:hover, .summary-more.more-state:hover, .mobile-more:hover {
-                    background-color: ${palette[100]} !important;
-                }
-            ` : `
-                /* Dark theme specific styles */
-                body {
-                    background: linear-gradient(135deg, ${palette[900]} 0%, ${palette[1000]} 100%) !important;
-                }
-
-                /* Enhanced shadows for dark theme */
-                .basic-section, .detail-list, .feature-section, .modal-content {
-                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2) !important;
-                }
-
-                /* Elevated surfaces for dark theme */
-                .navbar-menu, .nav-submenu, .account-sidebar, .noti-sidebar {
-                    background: ${palette[800]} !important;
-                    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 4px 10px rgba(0, 0, 0, 0.3) !important;
-                }
-            `}
-
-            /* Smooth theme transition animations */
-            body.hmt-theme-transitioning * {
-                transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-                           color 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-                           border-color 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-                           box-shadow 0.6s cubic-bezier(0.4, 0, 0.2, 1) !important;
-            }
-
-            /* Fade effect during theme transition */
-            body.hmt-theme-transitioning {
-                transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1) !important;
             }
 
             /* Faster transitions for interactive elements */
