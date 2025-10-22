@@ -18,6 +18,15 @@
     function initPageGeneral() {
         // Kiểm tra xem có phải trang đọc truyện không và có tắt màu không
         if (document.querySelector('.rd-basic_icon.row') && window.HMTConfig && window.HMTConfig.getDisableColorsOnReadingPage && window.HMTConfig.getDisableColorsOnReadingPage()) {
+            // Xóa overlay nếu có
+            const targetElement = document.querySelector('.set-input.clear.justify-center');
+            if (targetElement) {
+                const overlay = targetElement.querySelector('.hmt-block-overlay');
+                if (overlay) {
+                    overlay.remove();
+                    debugLog('Đã xóa overlay trên trang đọc truyện vì tính năng tắt màu được bật');
+                }
+            }
             debugLog('Phát hiện trang đọc truyện và tính năng tắt màu được bật, bỏ qua áp dụng màu.');
             return;
         }
@@ -43,6 +52,8 @@
                         const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
                         const isLightColor = MonetAPI.isColorLight(dominantColor);
                         applyMonetColorScheme(monetPalette, isLightColor);
+                        // Thêm overlay sau khi áp dụng màu
+                        addOverlay();
                     })
                     .catch(error => {
                         debugLog('Lỗi khi lấy màu từ thumbnail:', error);
@@ -120,10 +131,145 @@
         });
 
         debugLog('Đã thiết lập lắng nghe sự kiện màu sắc thay đổi');
+
+        // Lắng nghe sự kiện tắt màu thay đổi
+        document.addEventListener('hmtDisableColorsChanged', function(event) {
+            const isDisabled = event.detail.disabled;
+            debugLog('Nhận sự kiện tắt màu thay đổi:', isDisabled);
+
+            if (document.querySelector('.rd-basic_icon.row')) {
+                if (isDisabled) {
+                    // Xóa overlay
+                    const targetElement = document.querySelector('.set-input.clear.justify-center');
+                    if (targetElement) {
+                        const overlay = targetElement.querySelector('.hmt-block-overlay');
+                        if (overlay) {
+                            overlay.remove();
+                            debugLog('Đã xóa overlay do tắt màu');
+                        }
+                    }
+                } else {
+                    // Áp dụng lại màu và thêm overlay
+                    const colorMode = window.HMTConfig.getColorMode();
+                    if (colorMode === 'thumbnail') {
+                        debugLog('Áp dụng lại màu thumbnail');
+                        const pathParts = window.location.pathname.split('/');
+                        const storyId = pathParts[2];
+                        if (storyId) {
+                            getCoverUrlFromInfoPage(storyId)
+                                .then(coverUrl => analyzeImageColorTraditionalAccent(coverUrl))
+                                .then(dominantColor => {
+                                    const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
+                                    const isLightColor = MonetAPI.isColorLight(dominantColor);
+                                    applyMonetColorScheme(monetPalette, isLightColor);
+                                    addOverlay();
+                                })
+                                .catch(error => {
+                                    debugLog('Lỗi khi áp dụng màu thumbnail:', error);
+                                    applyCurrentColorScheme();
+                                    addOverlay();
+                                });
+                        }
+                    } else {
+                        debugLog('Áp dụng lại màu config');
+                        applyCurrentColorScheme();
+                        addOverlay();
+                    }
+                }
+            }
+        });
+
+        // Lắng nghe sự kiện chế độ màu thay đổi
+        document.addEventListener('hmtModeChanged', function(event) {
+            const newMode = event.detail.mode;
+            debugLog('Nhận sự kiện chế độ màu thay đổi:', newMode);
+
+            if (document.querySelector('.rd-basic_icon.row')) {
+                const isDisabled = window.HMTConfig.getDisableColorsOnReadingPage();
+
+                if (isDisabled) {
+                    // Xóa overlay
+                    const targetElement = document.querySelector('.set-input.clear.justify-center');
+                    if (targetElement) {
+                        const overlay = targetElement.querySelector('.hmt-block-overlay');
+                        if (overlay) {
+                            overlay.remove();
+                            debugLog('Đã xóa overlay do chế độ màu thay đổi và tắt màu');
+                        }
+                    }
+                } else {
+                    // Áp dụng lại màu dựa trên chế độ mới
+                    if (newMode === 'thumbnail') {
+                        debugLog('Chế độ thumbnail, áp dụng lại màu từ thumbnail');
+                        const pathParts = window.location.pathname.split('/');
+                        const storyId = pathParts[2];
+                        if (storyId) {
+                            getCoverUrlFromInfoPage(storyId)
+                                .then(coverUrl => {
+                                    debugLog('Đã lấy URL ảnh bìa:', coverUrl);
+                                    return analyzeImageColorTraditionalAccent(coverUrl);
+                                })
+                                .then(dominantColor => {
+                                    debugLog('Màu chủ đạo từ thumbnail:', dominantColor);
+                                    const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
+                                    const isLightColor = MonetAPI.isColorLight(dominantColor);
+                                    applyMonetColorScheme(monetPalette, isLightColor);
+                                    addOverlay();
+                                })
+                                .catch(error => {
+                                    debugLog('Lỗi khi áp dụng lại màu thumbnail:', error);
+                                    applyCurrentColorScheme();
+                                    addOverlay();
+                                });
+                        }
+                    } else {
+                        debugLog('Chế độ default, áp dụng lại màu từ config');
+                        applyCurrentColorScheme();
+                        addOverlay();
+                    }
+                }
+            }
+        });
     }
 
     function isValidColor(color) {
         return MonetAPI.isValidColor(color);
+    }
+
+    // Hàm thêm overlay block trên element
+    function addOverlay() {
+        const targetElement = document.querySelector('.set-input.clear.justify-center');
+        if (targetElement) {
+            // Xóa overlay cũ nếu có
+            const existingOverlay = targetElement.querySelector('.hmt-block-overlay');
+            if (existingOverlay) {
+                existingOverlay.remove();
+            }
+
+            // Tạo overlay mới
+            const overlay = document.createElement('div');
+            overlay.className = 'hmt-block-overlay';
+            overlay.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                pointer-events: none;
+                z-index: 1000;
+            `;
+
+            // Đảm bảo element có position relative
+            if (getComputedStyle(targetElement).position === 'static') {
+                targetElement.style.position = 'relative';
+            }
+
+            targetElement.appendChild(overlay);
+            debugLog('Đã thêm overlay block trên trang đọc truyện');
+        } else {
+            debugLog('Không tìm thấy element .set-input.clear.justify-center để thêm overlay');
+        }
     }
 
     // Hàm lấy URL ảnh bìa từ trang thông tin truyện
@@ -531,6 +677,11 @@
 
         GM_addStyle(css);
         debugLog('Đã áp dụng Monet theme với màu từ config:', palette[500]);
+
+        // Thêm overlay nếu đang ở trang đọc truyện
+        if (document.querySelector('.rd-basic_icon.row')) {
+            addOverlay();
+        }
     }
 
     function applyDefaultColorScheme() {
@@ -891,6 +1042,11 @@
 
         GM_addStyle(css);
         debugLog('Đã áp dụng màu mặc định từ config:', defaultColor);
+
+        // Thêm overlay nếu đang ở trang đọc truyện
+        if (document.querySelector('.rd-basic_icon.row')) {
+            addOverlay();
+        }
     }
 
     // Khởi chạy module

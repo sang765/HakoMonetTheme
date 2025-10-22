@@ -47,6 +47,13 @@
     function setDisableColorsOnReadingPage(disable) {
         GM_setValue('disable_colors_on_reading_page', disable);
         debugLog('Đã lưu cài đặt tắt màu trên trang đọc truyện:', disable);
+
+        // Phát sự kiện để các module khác cập nhật
+        const disableChangeEvent = new CustomEvent('hmtDisableColorsChanged', {
+            detail: { disabled: disable }
+        });
+        document.dispatchEvent(disableChangeEvent);
+        debugLog('Đã phát sự kiện tắt màu thay đổi:', disable);
     }
 
     function getColorMode() {
@@ -56,6 +63,13 @@
     function setColorMode(mode) {
         GM_setValue('color_mode', mode);
         debugLog('Đã lưu chế độ màu:', mode);
+
+        // Phát sự kiện chế độ màu thay đổi để các module khác cập nhật
+        const modeChangeEvent = new CustomEvent('hmtModeChanged', {
+            detail: { mode: mode }
+        });
+        document.dispatchEvent(modeChangeEvent);
+        debugLog('Đã phát sự kiện chế độ màu thay đổi:', mode);
     }
 
     function applyDomainWarningVisibility() {
