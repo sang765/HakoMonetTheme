@@ -172,10 +172,12 @@
     }
     
     function initPageInfoTruyen() {
+        debugLog('Initializing PageInfoTruyen color extraction...');
+
         // Kiểm tra xem có phải trang chi tiết truyện không bằng cách tìm element đặc trưng
         const sideFeaturesElement = document.querySelector('div.col-4.col-md.feature-item.width-auto-xl');
         if (!sideFeaturesElement) {
-            debugLog('Không tìm thấy element, bỏ qua tính năng đổi màu.');
+            debugLog('Không tìm thấy element đặc trưng, bỏ qua tính năng đổi màu.');
             return;
         }
 
@@ -185,15 +187,23 @@
             return;
         }
 
-        const coverStyle = coverElement.style.backgroundImage;
+        const coverStyle = window.getComputedStyle(coverElement).backgroundImage || coverElement.style.backgroundImage;
         const coverUrl = coverStyle.replace(/url\(['"]?(.*?)['"]?\)/i, '$1');
 
-        if (!coverUrl) {
-            debugLog('Không thể lấy URL ảnh bìa.');
+        if (!coverUrl || coverUrl === 'none') {
+            debugLog('Không thể lấy URL ảnh bìa từ backgroundImage.');
             return;
         }
 
         debugLog('Đang phân tích màu từ ảnh bìa:', coverUrl);
+        debugLog('Cover URL type:', typeof coverUrl);
+        debugLog('Cover URL length:', coverUrl ? coverUrl.length : 'null');
+
+        // Validate cover URL
+        if (!coverUrl || coverUrl === 'none' || coverUrl.trim() === '') {
+            debugLog('Cover URL is invalid or empty');
+            return;
+        }
 
         // Hàm áp dụng màu sắc hiện tại
         function applyCurrentColorScheme() {
@@ -233,6 +243,13 @@
 
             // Thêm CSS cho phần trên của feature-section trong suốt
             addTransparentTopCSS();
+
+            // Check if MonetAPI is available
+            if (!window.MonetAPI || !window.MonetAPI.generateMonetPalette) {
+                debugLog('MonetAPI not available, using default color scheme');
+                applyCurrentColorScheme();
+                return;
+            }
 
             // Sử dụng hệ thống robust với fallback chain
             analyzeImageColorRobust(coverUrl)
@@ -288,6 +305,11 @@
     }
     
     function isValidColor(color) {
+        // Check if MonetAPI is available
+        if (!window.MonetAPI || !window.MonetAPI.isValidColor) {
+            // Basic validation if MonetAPI is not available
+            return color && typeof color === 'string' && color.match(/^#[0-9A-Fa-f]{6}$/);
+        }
         return MonetAPI.isValidColor(color);
     }
     
@@ -401,12 +423,15 @@
         async register() {
             if ('serviceWorker' in navigator && !this.swRegistered) {
                 try {
-                    const registration = await navigator.serviceWorker.register('/sw.js'); // Assuming SW is available
+                    // Try to register service worker, but don't fail if it doesn't exist
+                    const registration = await navigator.serviceWorker.register('/sw.js');
                     this.swRegistered = true;
                     debugLog('Service Worker registered for color extraction');
                     return registration;
                 } catch (error) {
-                    debugLog('Service Worker registration failed:', error);
+                    debugLog('Service Worker registration failed (this is normal if no SW file exists):', error);
+                    // Don't throw error, just mark as not available
+                    this.swRegistered = false;
                 }
             }
         }
@@ -472,11 +497,20 @@
 
     async function chromeIdentityExtraction(imageUrl) {
         // Placeholder for chrome.identity usage
+        try {
+            if (chrome && chrome.identity) {
+                // Could use chrome.identity here for better CORS handling
+                debugLog('Chrome identity available, but using canvas fallback for now');
+            }
+        } catch (error) {
+            debugLog('Chrome identity not available:', error);
+        }
         return enhancedCanvasExtraction(imageUrl); // Fallback to canvas
     }
 
     async function firefoxExtraction(imageUrl) {
         // Firefox might allow more relaxed CORS
+        debugLog('Using Firefox-specific extraction');
         return enhancedCanvasExtraction(imageUrl);
     }
 
@@ -523,15 +557,22 @@
 
         // Adaptive strategy selection based on historical performance
         const sortedStrategies = await extractionMetrics.sortStrategiesByPerformance(strategies);
+        debugLog('Strategy order:', sortedStrategies.map(s => `${s.name} (${s.weight})`));
 
         for (const strategy of sortedStrategies) {
+            debugLog(`Trying strategy: ${strategy.name}`);
             try {
                 const result = await executeWithTimeout(strategy.fn, imageUrl, strategy.timeout);
+                debugLog(`Strategy ${strategy.name} result:`, result);
                 if (result && isValidColor(result)) {
+                    debugLog(`Strategy ${strategy.name} succeeded with color:`, result);
                     await extractionMetrics.trackStrategySuccess(strategy.name);
                     return result;
+                } else {
+                    debugLog(`Strategy ${strategy.name} returned invalid color:`, result);
                 }
             } catch (error) {
+                debugLog(`Strategy ${strategy.name} failed:`, error.message);
                 await extractionMetrics.trackStrategyFailure(strategy.name, error);
                 continue;
             }
@@ -587,8 +628,12 @@
             const parentColor = window.getComputedStyle(coverElement.parentElement).backgroundColor;
             if (parentColor && parentColor !== 'rgba(0, 0, 0, 0)' && parentColor !== 'transparent') {
                 const rgb = parentColor.match(/\d+/g);
-                if (rgb) {
-                    return MonetAPI.rgbToHex(parseInt(rgb[0]), parseInt(rgb[1]), parseInt(rgb[2]));
+                if (rgb && rgb.length >= 3) {
+                    try {
+                        return MonetAPI.rgbToHex(parseInt(rgb[0]), parseInt(rgb[1]), parseInt(rgb[2]));
+                    } catch (error) {
+                        debugLog('Error converting parent color to hex:', error);
+                    }
                 }
             }
         }
@@ -624,8 +669,14 @@
 
     async function serviceWorkerExtraction(imageUrl) {
         try {
-            return await hakoSW.extractColor(imageUrl);
+            // Only attempt if service worker is actually available and registered
+            if (hakoSW.swRegistered) {
+                return await hakoSW.extractColor(imageUrl);
+            } else {
+                throw new Error('Service Worker not available');
+            }
         } catch (error) {
+            debugLog('Service Worker extraction failed:', error);
             throw new Error('Service Worker extraction failed: ' + error.message);
         }
     }
@@ -694,31 +745,51 @@
             }
 
             img.onload = function() {
+                debugLog('Image loaded successfully:', img.width, 'x', img.height);
                 try {
                     // Use OffscreenCanvas if supported
                     let canvas;
                     if (typeof OffscreenCanvas !== 'undefined') {
                         canvas = new OffscreenCanvas(img.width, img.height);
+                        debugLog('Using OffscreenCanvas');
                     } else {
                         canvas = document.createElement('canvas');
                         canvas.width = img.width;
                         canvas.height = img.height;
+                        debugLog('Using regular Canvas');
                     }
 
                     const ctx = canvas.getContext('2d');
+                    if (!ctx) {
+                        throw new Error('Could not get canvas context');
+                    }
+
                     ctx.drawImage(img, 0, 0);
+                    debugLog('Image drawn to canvas successfully');
 
                     // Progressive loading with sampling
                     const dominantColor = getTraditionalAccentColorFromImage(img);
+                    debugLog('Color extraction completed:', dominantColor);
                     cleanup();
                     resolve(dominantColor);
                 } catch (error) {
+                    debugLog('Error in canvas processing:', error);
                     cleanup();
                     reject(error);
                 }
             };
 
             img.onerror = function() {
+                debugLog('Image failed to load:', imageUrl);
+                debugLog('Image error details:', {
+                    src: this.src,
+                    width: this.width,
+                    height: this.height,
+                    naturalWidth: this.naturalWidth,
+                    naturalHeight: this.naturalHeight,
+                    complete: this.complete,
+                    crossOrigin: this.crossOrigin
+                });
                 cleanup();
                 reject(new Error('Image loading failed'));
             };
@@ -832,6 +903,18 @@
     
     // Hàm lấy màu accent truyền thống từ ảnh
     function getTraditionalAccentColorFromImage(img) {
+        // Check if required APIs are available
+        if (!window.MonetAPI || !window.MonetAPI.rgbToHex) {
+            debugLog('MonetAPI not available, using fallback color');
+            return '#6c5ce7';
+        }
+
+        // Check if canvas is supported
+        const testCanvas = document.createElement('canvas');
+        if (!testCanvas || !testCanvas.getContext) {
+            debugLog('Canvas not supported, using fallback color');
+            return '#6c5ce7';
+        }
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         
