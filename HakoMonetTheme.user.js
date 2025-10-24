@@ -31,6 +31,8 @@
 // @resource     tagColorJS ./class/tag-color.js
 // @resource     colorinfotruyen ./colors/page-info-truyen.js
 // @resource     pagegeneralJS ./colors/page-general.js
+// @resource     pagegenerallightJS ./colors/page-general-light.js
+// @resource     colorinfotruyenlight ./colors/page-info-truyen-light.js
 // @resource     themeDetectorJS ./module/theme-detector.js
 // @resource     configJS ./module/config.js
 // @resource     adBlockerJS ./module/ad-blocker.js
@@ -148,7 +150,7 @@ Chọn thiết lập cần thay đổi:
         if (typeof GM_registerMenuCommand === 'function') {
             GM_registerMenuCommand('🔄 Kiểm tra cập nhật', checkForUpdatesManual, 'u');
             GM_registerMenuCommand('⚙️ Thiết lập cập nhật', openUpdateSettings, 's');
-            GM_registerMenuCommand('🎨 Cài đặt màu sắc', openColorConfig, 'c');
+            GM_registerMenuCommand('🎨 Cài đặt', openColorConfig, 'c');
             GM_registerMenuCommand('🚫 Ad Blocker', openAdBlockerConfig, 'a');
             GM_registerMenuCommand('📊 Thông tin script', showScriptInfo, 'i');
             GM_registerMenuCommand('🐛 Báo cáo lỗi', reportBug, 'b');
@@ -313,7 +315,7 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
     function loadAllResources() {
         const resources = [
             'mainJS', 'monetAPIJS', 'simpleCORSJS', 'infoTruyenJS',
-            'animationJS', 'tagColorJS', 'colorinfotruyen', 'pagegeneralJS', 'themeDetectorJS', 'configJS', 'adBlockerJS'
+            'animationJS', 'tagColorJS', 'colorinfotruyen', 'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyenlight', 'themeDetectorJS', 'configJS', 'adBlockerJS'
         ];
 
         let loadedCount = 0;
