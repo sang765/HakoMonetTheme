@@ -78,22 +78,9 @@
             return;
         }
 
-        // Kiểm tra chế độ màu
-        const colorMode = window.HMTConfig && window.HMTConfig.getColorMode ? window.HMTConfig.getColorMode() : 'default';
-        if (colorMode === 'thumbnail') {
-            debugLog('Chế độ thumbnail trên trang info, bỏ qua áp dụng màu.');
-            return;
-        }
-
         // Kiểm tra xem có phải trang đọc truyện không và có tắt màu không
         if (document.querySelector('.rd-basic_icon.row') && window.HMTConfig && window.HMTConfig.getDisableColorsOnReadingPage && window.HMTConfig.getDisableColorsOnReadingPage()) {
             debugLog('Phát hiện trang đọc truyện và tính năng tắt màu được bật, bỏ qua áp dụng màu.');
-            return;
-        }
-
-        // Kiểm tra xem có tắt màu trên trang info truyện không
-        if (window.HMTConfig && window.HMTConfig.getDisableColorsOnInfoPage && window.HMTConfig.getDisableColorsOnInfoPage()) {
-            debugLog('Tính năng tắt màu trên trang info truyện được bật, bỏ qua áp dụng màu.');
             return;
         }
 
@@ -216,13 +203,6 @@
                     applyMonetColorScheme(monetPalette, isLightColor);
                 }
             }
-        });
-
-        // Lắng nghe sự kiện tắt màu trên trang info truyện thay đổi
-        (window.top || window).document.addEventListener('hmtDisableColorsOnInfoPageChanged', function(event) {
-            debugLog('Nhận sự kiện tắt màu trên trang info truyện thay đổi:', event.detail);
-            // Re-initialize để kiểm tra lại disable flag
-            initPageInfoTruyen();
         });
 
         debugLog('Đã thiết lập lắng nghe sự kiện màu sắc thay đổi');
