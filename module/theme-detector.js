@@ -6,7 +6,7 @@
 
     function debugLog(...args) {
         if (DEBUG) {
-            console.log('[Phát Hiện Chủ Đề]', ...args);
+            console.log('[ThemeDetector]', ...args);
         }
     }
 
