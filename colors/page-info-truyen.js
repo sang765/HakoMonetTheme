@@ -114,9 +114,6 @@
                 return;
             }
 
-            // Thêm class để kích hoạt animation
-            document.body.classList.add('hmt-color-changing');
-
             // Tạo Monet palette từ màu config
             const monetPalette = MonetAPI.generateMonetPalette(defaultColor);
             debugLog('Monet Palette từ config:', monetPalette);
@@ -125,11 +122,6 @@
             debugLog('Màu sáng?', isLightColor);
 
             applyMonetColorScheme(monetPalette, isLightColor);
-
-            // Loại bỏ class sau khi animation hoàn thành
-            setTimeout(() => {
-                document.body.classList.remove('hmt-color-changing');
-            }, 600);
         }
 
         // Hàm phân tích màu từ ảnh bìa và áp dụng
@@ -565,23 +557,6 @@
                 transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease !important;
             }
 
-            /* Special animation for color changes */
-            @keyframes hmtColorChangePulse {
-                0% {
-                    filter: brightness(1) saturate(1);
-                }
-                50% {
-                    filter: brightness(1.05) saturate(1.1);
-                }
-                100% {
-                    filter: brightness(1) saturate(1);
-                }
-            }
-
-            /* Apply subtle pulse animation when colors change */
-            body.hmt-color-changing * {
-                animation: hmtColorChangePulse 0.6s ease-in-out;
-            }
             
             a:hover,
             .long-text a:hover {
