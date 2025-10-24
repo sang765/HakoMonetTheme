@@ -17,108 +17,22 @@
 
     // Theme detection methods
     const themeDetectors = {
-        // Check prefers-color-scheme media query
-        checkPrefersColorScheme: function() {
-            if (window.matchMedia) {
-                const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
-                const lightModeQuery = window.matchMedia('(prefers-color-scheme: light)');
-
-                if (darkModeQuery.matches) return 'dark';
-                if (lightModeQuery.matches) return 'light';
-            }
-            return null;
-        },
-
-        // Check for common dark mode classes on body and html
-        checkBodyClasses: function() {
-            const body = document.body;
-            const html = document.documentElement;
-
-            const darkClasses = ['dark', 'dark-mode', 'theme-dark', 'dark-theme', 'night-mode'];
-            const lightClasses = ['light', 'light-mode', 'theme-light', 'light-theme', 'day-mode'];
-
-            // Check body classes
-            for (const cls of darkClasses) {
-                if (body.classList.contains(cls) || html.classList.contains(cls)) {
-                    return 'dark';
-                }
+        // Check storage and cookies for night_mode
+        checkStorageAndCookies: function() {
+            // Check localStorage
+            if (typeof localStorage !== 'undefined') {
+                const nightMode = localStorage.getItem('night_mode');
+                if (nightMode === 'true') return 'dark';
             }
 
-            for (const cls of lightClasses) {
-                if (body.classList.contains(cls) || html.classList.contains(cls)) {
-                    return 'light';
-                }
+            // Check cookies
+            const cookies = document.cookie.split(';');
+            for (const cookie of cookies) {
+                const [name, value] = cookie.trim().split('=');
+                if (name === 'night_mode' && value === 'true') return 'dark';
             }
 
-            return null;
-        },
-
-        // Check CSS custom properties that might indicate theme
-        checkCSSVariables: function() {
-            const computedStyle = getComputedStyle(document.documentElement);
-            const bodyStyle = getComputedStyle(document.body);
-
-            // Common theme-related CSS variables
-            const themeVars = [
-                '--theme-mode',
-                '--color-scheme',
-                '--theme',
-                '--mode'
-            ];
-
-            for (const varName of themeVars) {
-                const value = computedStyle.getPropertyValue(varName).trim() ||
-                             bodyStyle.getPropertyValue(varName).trim();
-
-                if (value) {
-                    if (value.includes('dark')) return 'dark';
-                    if (value.includes('light')) return 'light';
-                }
-            }
-
-            return null;
-        },
-
-        // Check for theme-related data attributes
-        checkDataAttributes: function() {
-            const body = document.body;
-            const html = document.documentElement;
-
-            const themeAttrs = ['data-theme', 'data-mode', 'data-color-scheme'];
-
-            for (const attr of themeAttrs) {
-                const value = body.getAttribute(attr) || html.getAttribute(attr);
-                if (value) {
-                    if (value.toLowerCase().includes('dark')) return 'dark';
-                    if (value.toLowerCase().includes('light')) return 'light';
-                }
-            }
-
-            return null;
-        },
-
-        // Check for specific meta tags
-        checkMetaTags: function() {
-            const metaTags = document.querySelectorAll('meta[name="theme-color"], meta[name="color-scheme"]');
-
-            for (const meta of metaTags) {
-                const content = meta.getAttribute('content');
-                if (content) {
-                    // Dark theme colors are usually darker
-                    const color = content.toLowerCase();
-                    if (color.includes('#000') || color.includes('#111') ||
-                        color.includes('#222') || color.includes('black') ||
-                        color.includes('dark')) {
-                        return 'dark';
-                    }
-                    if (color.includes('#fff') || color.includes('#eee') ||
-                        color.includes('white') || color.includes('light')) {
-                        return 'light';
-                    }
-                }
-            }
-
-            return null;
+            return 'light';
         }
     };
 
@@ -146,11 +60,7 @@
         detectTheme() {
             // Try different detection methods in order of reliability
             const detectionMethods = [
-                themeDetectors.checkBodyClasses,
-                themeDetectors.checkDataAttributes,
-                themeDetectors.checkCSSVariables,
-                themeDetectors.checkMetaTags,
-                themeDetectors.checkPrefersColorScheme
+                themeDetectors.checkStorageAndCookies
             ];
 
             for (const method of detectionMethods) {
@@ -172,44 +82,14 @@
         }
 
         setupChangeListeners() {
-            // Listen for class changes on body and html
-            const observer = new MutationObserver((mutations) => {
-                let shouldCheck = false;
-
-                mutations.forEach((mutation) => {
-                    if (mutation.type === 'attributes' &&
-                        (mutation.attributeName === 'class' || mutation.attributeName.startsWith('data-'))) {
-                        shouldCheck = true;
-                    }
-                });
-
-                if (shouldCheck) {
+            // Listen for localStorage changes
+            const handleStorageChange = (e) => {
+                if (e.key === 'night_mode') {
                     this.checkForThemeChange();
                 }
-            });
+            };
 
-            observer.observe(document.body, {
-                attributes: true,
-                attributeFilter: ['class', 'data-theme', 'data-mode', 'data-color-scheme']
-            });
-
-            observer.observe(document.documentElement, {
-                attributes: true,
-                attributeFilter: ['class', 'data-theme', 'data-mode', 'data-color-scheme']
-            });
-
-            // Listen for prefers-color-scheme changes
-            if (window.matchMedia) {
-                const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
-                const lightModeQuery = window.matchMedia('(prefers-color-scheme: light)');
-
-                const handleChange = () => {
-                    this.checkForThemeChange();
-                };
-
-                darkModeQuery.addEventListener('change', handleChange);
-                lightModeQuery.addEventListener('change', handleChange);
-            }
+            window.addEventListener('storage', handleStorageChange);
 
             debugLog('Theme change listeners set up');
         }

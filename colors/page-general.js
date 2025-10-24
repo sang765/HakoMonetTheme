@@ -16,6 +16,12 @@
     }
 
     function initPageGeneral() {
+        // Check if in dark mode
+        if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
+            debugLog('Not in dark mode, skipping color application');
+            return;
+        }
+
         // Setup CORS handling for images
         setupImageCorsHandling();
 
@@ -107,6 +113,12 @@
         (window.top || window).document.addEventListener('hmtColorChanged', function(event) {
             debugLog('Nhận sự kiện màu sắc thay đổi:', event.detail);
 
+            // Check if in dark mode
+            if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
+                debugLog('Not in dark mode, skipping color application');
+                return;
+            }
+
             // Kiểm tra chế độ màu
             const colorMode = window.HMTConfig && window.HMTConfig.getColorMode ? window.HMTConfig.getColorMode() : 'default';
 
@@ -133,6 +145,12 @@
         (window.top || window).document.addEventListener('hmtDisableColorsChanged', function(event) {
             const isDisabled = event.detail.disabled;
             debugLog('Nhận sự kiện tắt màu thay đổi:', isDisabled);
+
+            // Check if in dark mode
+            if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
+                debugLog('Not in dark mode, skipping color application');
+                return;
+            }
 
             if (document.querySelector('.rd-basic_icon.row')) {
                 if (isDisabled) {
@@ -182,6 +200,12 @@
         (window.top || window).document.addEventListener('hmtModeChanged', function(event) {
             const newMode = event.detail.mode;
             debugLog('Nhận sự kiện chế độ màu thay đổi:', newMode);
+
+            // Check if in dark mode
+            if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
+                debugLog('Not in dark mode, skipping color application');
+                return;
+            }
 
             if (document.querySelector('.rd-basic_icon.row')) {
                 const isDisabled = window.HMTConfig.getDisableColorsOnReadingPage();
