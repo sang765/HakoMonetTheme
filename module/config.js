@@ -56,6 +56,22 @@
         debugLog('Đã phát sự kiện tắt màu thay đổi:', disable);
     }
 
+    function getDisableColorsOnInfoPage() {
+        return GM_getValue('disable_colors_on_info_page', false);
+    }
+
+    function setDisableColorsOnInfoPage(disable) {
+        GM_setValue('disable_colors_on_info_page', disable);
+        debugLog('Đã lưu cài đặt tắt màu trên trang info truyện:', disable);
+
+        // Phát sự kiện để các module khác cập nhật
+        const disableChangeEvent = new CustomEvent('hmtDisableColorsOnInfoPageChanged', {
+            detail: { disabled: disable }
+        });
+        (window.top || window).document.dispatchEvent(disableChangeEvent);
+        debugLog('Đã phát sự kiện tắt màu trên trang info thay đổi:', disable);
+    }
+
     function getColorMode() {
         return GM_getValue('color_mode', 'default');
     }
@@ -63,6 +79,13 @@
     function setColorMode(mode) {
         GM_setValue('color_mode', mode);
         debugLog('Đã lưu chế độ màu:', mode);
+
+        // Nếu chế độ là thumbnail, tự động tắt màu trên trang info và đọc truyện
+        if (mode === 'thumbnail') {
+            setDisableColorsOnInfoPage(true);
+            setDisableColorsOnReadingPage(true);
+            debugLog('Đã tự động tắt màu trên trang info và đọc truyện cho chế độ thumbnail');
+        }
 
         // Phát sự kiện chế độ màu thay đổi để các module khác cập nhật
         const modeChangeEvent = new CustomEvent('hmtModeChanged', {
@@ -224,6 +247,19 @@
                                     <input type="checkbox" ${getDisableColorsOnReadingPage() ? 'checked' : ''} class="hmt-reading-page-toggle-input">
                                     <span class="hmt-toggle-switch"></span>
                                     Tắt màu trên trang đọc truyện
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="hmt-config-section">
+                            <h4>Tắt màu trên trang info truyện</h4>
+                            <p>Tắt việc áp dụng màu sắc từ theme vào trang info truyện. Khi bật, các trang info truyện sẽ không bị ảnh hưởng bởi màu theme.</p>
+
+                            <div class="hmt-info-page-toggle">
+                                <label class="hmt-toggle-label">
+                                    <input type="checkbox" ${getDisableColorsOnInfoPage() ? 'checked' : ''} class="hmt-info-page-toggle-input">
+                                    <span class="hmt-toggle-switch"></span>
+                                    Tắt màu trên trang info truyện
                                 </label>
                             </div>
                         </div>
@@ -740,6 +776,10 @@
                 margin-top: 16px;
             }
 
+            .hmt-info-page-toggle {
+                margin-top: 16px;
+            }
+
             .hmt-color-mode-dropdown {
                 margin-top: 16px;
             }
@@ -1233,6 +1273,15 @@
             });
         }
 
+        // Info page colors toggle
+        const infoPageToggle = dialog.querySelector('.hmt-info-page-toggle-input');
+        if (infoPageToggle) {
+            infoPageToggle.addEventListener('change', function() {
+                setDisableColorsOnInfoPage(this.checked);
+                showNotification('Đã cập nhật cài đặt tắt màu trên trang info truyện!', 3000);
+            });
+        }
+
         // Color mode dropdown
         const colorModeSelect = dialog.querySelector('#hmt-color-mode-select');
         if (colorModeSelect) {
@@ -1340,6 +1389,8 @@
         setHideDomainWarning: setHideDomainWarning,
         getDisableColorsOnReadingPage: getDisableColorsOnReadingPage,
         setDisableColorsOnReadingPage: setDisableColorsOnReadingPage,
+        getDisableColorsOnInfoPage: getDisableColorsOnInfoPage,
+        setDisableColorsOnInfoPage: setDisableColorsOnInfoPage,
         getColorMode: getColorMode,
         setColorMode: setColorMode,
         openConfigDialog: openConfigDialog,
