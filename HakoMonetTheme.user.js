@@ -22,7 +22,6 @@
 // @grant        GM_openInTab
 // @connect      *
 // @run-at       document-end
-// @require      https://greasyfork.org/scripts/447115-gm-config/code/GM_config.js?version=1060849
 // @resource     mainJS ./main.js
 // @resource     monetAPIJS ./api/monet.js
 // @resource     simpleCORSJS ./module/simple-cors.js
