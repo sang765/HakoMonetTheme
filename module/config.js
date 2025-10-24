@@ -112,9 +112,10 @@
 
     function createConfigDialog() {
         // Kiểm tra xem dialog đã tồn tại chưa
-        if (document.querySelector('.hmt-config-dialog')) {
+        if (document.querySelector('.hmt-config-dialog') || window.hmtConfigDialogOpen) {
             return;
         }
+        window.hmtConfigDialogOpen = true;
 
         const dialog = document.createElement('div');
         dialog.className = 'hmt-config-dialog';
@@ -941,6 +942,7 @@
              // Xóa currentColor khỏi dialog trước khi remove
              delete dialog._currentColor;
              dialog.remove();
+             window.hmtConfigDialogOpen = false;
          }
 
         closeBtn.addEventListener('click', closeDialog);
