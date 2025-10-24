@@ -16,12 +16,6 @@
     }
 
     function initPageGeneral() {
-        // Kiểm tra xem trang web có đang ở chế độ tối không
-        if (!window.ThemeDetector || !window.ThemeDetector.isDark()) {
-            debugLog('Trang web không ở chế độ tối, bỏ qua áp dụng màu sắc.');
-            return;
-        }
-
         // Setup CORS handling for images
         setupImageCorsHandling();
 
@@ -121,12 +115,6 @@
         (window.top || window).document.addEventListener('hmtColorChanged', function(event) {
             debugLog('Nhận sự kiện màu sắc thay đổi:', event.detail);
 
-            // Kiểm tra xem trang web có đang ở chế độ tối không
-            if (!window.ThemeDetector || !window.ThemeDetector.isDark()) {
-                debugLog('Trang web không ở chế độ tối, bỏ qua sự kiện màu sắc.');
-                return;
-            }
-
             // Kiểm tra chế độ màu
             const colorMode = window.HMTConfig && window.HMTConfig.getColorMode ? window.HMTConfig.getColorMode() : 'default';
 
@@ -153,12 +141,6 @@
         (window.top || window).document.addEventListener('hmtDisableColorsChanged', function(event) {
             const isDisabled = event.detail.disabled;
             debugLog('Nhận sự kiện tắt màu thay đổi:', isDisabled);
-
-            // Kiểm tra xem trang web có đang ở chế độ tối không
-            if (!window.ThemeDetector || !window.ThemeDetector.isDark()) {
-                debugLog('Trang web không ở chế độ tối, bỏ qua sự kiện tắt màu.');
-                return;
-            }
 
             if (document.querySelector('.rd-basic_icon.row')) {
                 if (isDisabled) {
@@ -208,12 +190,6 @@
         (window.top || window).document.addEventListener('hmtModeChanged', function(event) {
             const newMode = event.detail.mode;
             debugLog('Nhận sự kiện chế độ màu thay đổi:', newMode);
-
-            // Kiểm tra xem trang web có đang ở chế độ tối không
-            if (!window.ThemeDetector || !window.ThemeDetector.isDark()) {
-                debugLog('Trang web không ở chế độ tối, bỏ qua sự kiện chế độ màu.');
-                return;
-            }
 
             if (document.querySelector('.rd-basic_icon.row')) {
                 const isDisabled = window.HMTConfig.getDisableColorsOnReadingPage();

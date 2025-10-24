@@ -72,12 +72,6 @@
     }
     
     function initPageInfoTruyen() {
-        // Kiểm tra xem trang web có đang ở chế độ tối không
-        if (!window.ThemeDetector || !window.ThemeDetector.isDark()) {
-            debugLog('Trang web không ở chế độ tối, bỏ qua áp dụng màu sắc.');
-            return;
-        }
-
         // Kiểm tra xem có phải trang đọc truyện không và có tắt màu không
         if (document.querySelector('.rd-basic_icon.row') && window.HMTConfig && window.HMTConfig.getDisableColorsOnReadingPage && window.HMTConfig.getDisableColorsOnReadingPage()) {
             debugLog('Phát hiện trang đọc truyện và tính năng tắt màu được bật, bỏ qua áp dụng màu.');
@@ -178,12 +172,6 @@
         // Lắng nghe sự kiện màu sắc thay đổi để cập nhật real-time
         (window.top || window).document.addEventListener('hmtColorChanged', function(event) {
             debugLog('Nhận sự kiện màu sắc thay đổi:', event.detail);
-
-            // Kiểm tra xem trang web có đang ở chế độ tối không
-            if (!window.ThemeDetector || !window.ThemeDetector.isDark()) {
-                debugLog('Trang web không ở chế độ tối, bỏ qua sự kiện màu sắc.');
-                return;
-            }
 
             // Kiểm tra chế độ màu
             const colorMode = window.HMTConfig && window.HMTConfig.getColorMode ? window.HMTConfig.getColorMode() : 'default';
