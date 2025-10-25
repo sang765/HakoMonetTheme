@@ -1187,6 +1187,12 @@
                  syncUIWithColor(selectedColor);
 
                  showNotification('Đã lưu cài đặt màu sắc!', 3000);
+
+                 // Tự động reload trang sau khi lưu cài đặt
+                 setTimeout(() => {
+                     location.reload();
+                 }, 1000); // Đợi 1 giây để notification hiển thị trước khi reload
+
                  closeDialog();
              } else {
                  debugLog('Màu không hợp lệ khi lưu:', selectedColor);
