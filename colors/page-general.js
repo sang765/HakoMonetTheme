@@ -341,6 +341,9 @@
                 z-index: 1000;
             `;
 
+            // Thêm text note vào overlay
+            overlay.innerHTML = '<div style="color: white; font-size: 14px; text-align: center; padding: 20px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">Tắt màu trên trang đọc truyện</div>';
+
             // Thêm event listener để chặn click
             overlay.addEventListener('click', function(e) {
                 e.stopPropagation();
