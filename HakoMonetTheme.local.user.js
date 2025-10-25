@@ -99,8 +99,6 @@
         }
     }
     
-    
-    
     function registerMenuCommands() {
         // Command để kiểm tra cập nhật
         if (typeof GM_registerMenuCommand === 'function') {
