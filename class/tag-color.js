@@ -21,7 +21,7 @@
     
     function hideGenreToggle() {
         // Ẩn element toggle genre
-        const toggleElements = document.querySelectorAll('a.series-gerne-item[x-show*="!more"][@click*="more = true"]');
+        const toggleElements = document.querySelectorAll('[class="series-gerne-item"]:has([class="fas fa-ellipsis-h"])');
 
         toggleElements.forEach(element => {
             element.style.display = 'none';
