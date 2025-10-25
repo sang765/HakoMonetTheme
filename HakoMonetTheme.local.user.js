@@ -22,20 +22,20 @@
 // @grant        GM_openInTab
 // @run-at       document-end
 // @require      https://greasyfork.org/scripts/447115-gm-config/code/GM_config.js?version=1060849
-// @require      file://./main.js
-// @require      file://./api/monet.js
-// @require      file://./module/simple-cors.js
-// @require      file://./class/info-truyen.js
-// @require      file://./class/animation.js
-// @require      file://./class/tag-color.js
-// @require      file://./colors/page-info-truyen.js
-// @require      file://./colors/page-general.js
-// @require      file://./colors/page-general-light.js
-// @require      file://./colors/page-info-truyen-light.js
-// @require      file://./module/theme-detector.js
-// @require      file://./module/config.js
-// @require      file://./module/ad-blocker.js
-// @require      file://./module/auto-reload.js
+// @require      http://localhost:8000/main.js
+// @require      http://localhost:8000/api/monet.js
+// @require      http://localhost:8000/module/simple-cors.js
+// @require      http://localhost:8000/class/info-truyen.js
+// @require      http://localhost:8000/class/animation.js
+// @require      http://localhost:8000/class/tag-color.js
+// @require      http://localhost:8000/colors/page-info-truyen.js
+// @require      http://localhost:8000/colors/page-general.js
+// @require      http://localhost:8000/colors/page-general-light.js
+// @require      http://localhost:8000/colors/page-info-truyen-light.js
+// @require      http://localhost:8000/module/theme-detector.js
+// @require      http://localhost:8000/module/config.js
+// @require      http://localhost:8000/module/ad-blocker.js
+// @require      http://localhost:8000/module/auto-reload.js
 // @supportURL   https://github.com/sang765/HakoMonetTheme/issues
 // @homepageURL  https://github.com/sang765/HakoMonetTheme
 // @license      MIT
@@ -99,6 +99,8 @@
         }
     }
     
+    
+    
     function registerMenuCommands() {
         // Command để kiểm tra cập nhật
         if (typeof GM_registerMenuCommand === 'function') {
@@ -108,7 +110,7 @@
             GM_registerMenuCommand('🐛 Báo cáo lỗi', reportBug, 'b');
             GM_registerMenuCommand('💡 Đề xuất tính năng', suggestFeature, 'f');
             GM_registerMenuCommand('🔧 Debug Mode', toggleDebugMode, 'd');
-
+    
             debugLog('Đã đăng ký menu commands');
         }
     }
@@ -200,13 +202,43 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
     
     function initializeScript() {
         debugLog(`Bắt đầu khởi tạo ${SCRIPT_NAME} v${GM_info.script.version}`);
-        
+    
         // Đăng ký menu commands
         registerMenuCommands();
-        
-        // Modules are loaded via @require, no need to load manually
-        
-        // Only show initialization notification if user has enabled it or if there are errors
+    
+        // Check if local server is running
+        GM_xmlhttpRequest({
+            method: 'HEAD',
+            url: 'http://localhost:8000/main.js',
+            timeout: 5000,
+            onload: function(response) {
+                if (response.status !== 200) {
+                    showNotification(
+                        'Local Server Required',
+                        'Please run the local server using this command in PowerShell:\n\npowershell -c "Add-Type -AssemblyName System.Net; $listener = New-Object System.Net.HttpListener; $listener.Prefixes.Add(\'http://localhost:8000/\'); $listener.Start(); Write-Host \'Server running at http://localhost:8000/\'; while ($listener.IsListening) { $context = $listener.GetContext(); $request = $context.Request; $response = $context.Response; $localPath = $request.Url.LocalPath; if ($localPath -eq \'/\') { $localPath = \'/index.html\' }; $filePath = Join-Path (Get-Location) $localPath.TrimStart(\'/\'); if (Test-Path $filePath -PathType Leaf) { $content = Get-Content $filePath -Raw -Encoding UTF8; $response.ContentType = \'text/plain\'; $buffer = [System.Text.Encoding]::UTF8.GetBytes($content); $response.ContentLength64 = $buffer.Length; $response.OutputStream.Write($buffer, 0, $buffer.Length) } else { $response.StatusCode = 404 }; $response.OutputStream.Close() }"',
+                        15000
+                    );
+                }
+            },
+            onerror: function() {
+                showNotification(
+                    'Local Server Required',
+                    'Local server is not running. Please start it using the PowerShell command above.',
+                    10000
+                );
+            },
+            ontimeout: function() {
+                showNotification(
+                    'Local Server Required',
+                    'Local server is not running. Please start it using the PowerShell command above.',
+                    10000
+                );
+            }
+        });
+    
+        // Modules are loaded via @require
+    
+        // Only show initialization notification if user has enabled it
         const showInitNotification = GM_getValue('show_init_notification', false);
         if (showInitNotification) {
             showNotification(
@@ -215,7 +247,7 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
                 3000
             );
         }
-        
+    
         debugLog('Khởi tạo script hoàn tất');
     }
     
