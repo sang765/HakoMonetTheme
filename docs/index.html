@@ -9,7 +9,7 @@
     </style>
 </head>
 <body>
-    <header>
+    <header class="elevation-3 animate-fade-in-up">
         <div class="container">
             <h1>Hako: Monet Theme</h1>
             <p>Material You theme dành cho Hako/DocLN</p>
@@ -18,38 +18,40 @@
                 <span class="badge">Dynamic Colors</span>
                 <span class="badge">Responsive</span>
             </div>
+            <label for="color-picker" class="color-picker-button" aria-label="Pick main color">🎨</label>
+            <input type="color" id="color-picker" value="#6c5ce7" style="display: none;">
             <a href="https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js" class="button">Cài đặt ngay</a>
             <a href="https://github.com/sang765/HakoMonetTheme" class="button secondary">GitHub Repository</a>
         </div>
     </header>
 
     <div class="container">
-        <section>
+        <section class="animate-fade-in-up">
             <h2>Giới thiệu</h2>
-            <div class="card">
+            <div class="card elevation-2">
                 <p>Hako: Monet Theme là userscript tự động áp dụng Material You color scheme cho trang web Hako và DocLN dựa trên màu sắc từ ảnh bìa truyện. Script phân tích màu sắc ưu tiên màu tóc nhân vật để tạo ra trải nghiệm cá nhân hóa và đẹp mắt.</p>
             </div>
         </section>
 
-        <section>
+        <section class="animate-fade-in-up">
             <h2>Tính năng nổi bật</h2>
             <div class="feature-grid">
-                <div class="feature-item">
+                <div class="feature-item elevation-2">
                     <div class="feature-icon">🎨</div>
                     <h3>Phân tích màu tự động</h3>
                     <p>Tự động phân tích màu sắc từ ảnh bìa truyện để tạo palette màu phù hợp</p>
                 </div>
-                <div class="feature-item">
+                <div class="feature-item elevation-2">
                     <div class="feature-icon">📱</div>
                     <h3>Giao diện responsive</h3>
                     <p>Thiết kế hiện đại, tương thích với mọi thiết bị và độ phân giải</p>
                 </div>
-                <div class="feature-item">
+                <div class="feature-item elevation-2">
                     <div class="feature-icon">🌙</div>
                     <h3>Dark Mode</h3>
                     <p>Hỗ trợ chế độ tối, giảm mỏi mắt khi đọc truyện ban đêm</p>
                 </div>
-                <div class="feature-item">
+                <div class="feature-item elevation-2">
                     <div class="feature-icon">⚡</div>
                     <h3>Tối ưu hiệu suất</h3>
                     <p>Được tối ưu hóa để hoạt động mượt mà, không ảnh hưởng trải nghiệm</p>
@@ -57,9 +59,9 @@
             </div>
         </section>
 
-        <section>
+        <section class="animate-fade-in-up">
             <h2>Cài đặt</h2>
-            <div class="card">
+            <div class="card elevation-2">
                 <ol class="step-list">
                     <li>Cài đặt extension userscript manager: <a href="https://www.tampermonkey.net/" target="_blank">Tampermonkey</a> hoặc <a href="https://violentmonkey.github.io/get-it/" target="_blank">Violentmonkey</a></li>
                     <li>Cài đặt extension CORS: <a href="https://chromewebstore.google.com/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf" target="_blank">Chromium</a> hoặc <a href="https://addons.mozilla.org/en-US/firefox/addon/cors-everywhere/" target="_blank">Firefox</a></li>
@@ -70,14 +72,12 @@
             </div>
         </section>
 
-        <section>
+        <section class="animate-fade-in-up">
             <h2>Hình ảnh</h2>
-            <div class="card">
+            <div class="card elevation-2">
                 <div class="screenshot-grid">
                     <img src="../.github/assets/Novel-1.png" alt="Ví dụ giao diện theme trên trang truyện 1" class="screenshot">
                     <img src="../.github/assets/Novel-2.png" alt="Ví dụ giao diện theme trên trang truyện 2" class="screenshot">
-                    <img src="../.github/assets/Install_us.jpg" alt="Hướng dẫn cài đặt userscript" class="screenshot">
-                    <img src="../.github/assets/cors_enable.jpg" alt="Cài đặt CORS extension" class="screenshot">
                     <img src="../.github/assets/menu.png" alt="Menu với theme Material You" class="screenshot">
                 </div>
             </div>
@@ -100,7 +100,7 @@
         </section>
     </div>
 
-    <footer>
+    <footer class="elevation-1 animate-fade-in-up">
         <div class="container">
             <p>© 2025 Hako: Monet Theme. MIT License.</p>
             <p>
