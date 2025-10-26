@@ -25,6 +25,18 @@ Material You theme dành cho Hako/DocLN.
 
 </div>
 
+## 🔒 Quyền riêng tư & Thu thập dữ liệu 🔒
+
+<div align="left">
+
+- Script này hoạt động hoàn toàn trong trình duyệt của bạn và không gửi bất kỳ dữ liệu nào ra ngoài.
+- Phân tích màu sắc từ ảnh bìa truyện được thực hiện cục bộ bằng Canvas API.
+- Cài đặt người dùng được lưu trữ cục bộ thông qua GM_getValue (bộ nhớ của Tampermonkey/Violentmonkey).
+- Cookie chỉ được sử dụng cho các tính năng cụ thể như ẩn cảnh báo tên miền và không chứa thông tin cá nhân.
+- Không thu thập hoặc truyền tải bất kỳ thông tin cá nhân nào.
+
+</div>
+
 ## 📦 Cài đặt 📦
 
 <div align="left">
