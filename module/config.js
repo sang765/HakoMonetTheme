@@ -35,7 +35,16 @@
     function setHideDomainWarning(hide) {
         GM_setValue('hide_domain_warning', hide);
         debugLog('Đã lưu cài đặt ẩn cảnh báo tên miền:', hide);
-
+    
+        // Cập nhật cookie storage
+        if (hide) {
+            (window.top || window).document.cookie = "globalwarning=false; path=/; SameSite=Lax;";
+            debugLog('Đã thêm cookie globalwarning=false');
+        } else {
+            (window.top || window).document.cookie = "globalwarning=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax;";
+            debugLog('Đã xóa cookie globalwarning');
+        }
+    
         // Áp dụng thay đổi ngay lập tức
         applyDomainWarningVisibility();
     }
