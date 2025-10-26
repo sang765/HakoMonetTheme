@@ -98,11 +98,23 @@ Màu sắc chủ đề sẽ được tự động điều chỉnh dựa trên �
 
 </div>
 
-## 🖼️ Hình ảnh 🖼️
+## 🖼️ Screenshot 🖼️
 
-![Novel 1](/.github/assets/Novel-1.png)![Novel 2](/.github/assets/Novel-2.png)![Novel 3](/.github/assets/Novel-3.png)  
-![Novel 3-1](/.github/assets/3-1.png)![Novel 3-2](/.github/assets/3-2.png)![Novel 3-3](/.github/assets/3-3.png)  
-![Menu](/.github/assets/menu.png)![Notification](/.github/assets/notification.png)![Account](/.github/assets/account.png)
+### 📱 **Trên Mobile** 📱
+
+| | | |
+|---|---|---|
+| ![Novel 1](/.github/assets/Novel-1.png)<br>*Trang truyện với theme động* | ![Novel 2](/.github/assets/Novel-2.png)<br>*Giao diện đọc truyện* | ![Novel 3](/.github/assets/Novel-3.png)<br>*Menu và điều hướng* |
+| ![Novel 3-1](/.github/assets/3-1.png)<br>*Dark mode trên mobile* | ![Novel 3-2](/.github/assets/3-2.png)<br>*Responsive layout* | ![Novel 3-3](/.github/assets/3-3.png)<br>*Tối ưu cho màn hình nhỏ* |
+| ![Menu](/.github/assets/menu.png)<br>*Menu chính* | ![Notification](/.github/assets/notification.png)<br>*Thông báo* | ![Account](/.github/assets/account.png)<br>*Trang tài khoản* |
+
+### 💻 **Trên Desktop** 💻
+
+| | | |
+|---|---|---|
+| ![Desktop Home](/.github/assets/desktop-home.png)<br>*Trang chủ với theme Material You* | ![Desktop Info Truyen](/.github/assets/desktop-info-truyen.png)<br>*Trang thông tin truyện* | ![Desktop Info Truyen GIF](/.github/assets/desktop-info-truyen.gif)<br>*Demo trang info truyện* |
+| ![Desktop Settings GIF](/.github/assets/desktop-settings.gif)<br>*Cài đặt và tùy chỉnh* | ![Desktop Block Banner GIF](/.github/assets/desktop-block-banner.gif)<br>*Chặn banner quảng cáo* | |
+
 
 ## 🔧 Technical Details 🔧
 
