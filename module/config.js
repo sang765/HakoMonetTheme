@@ -96,6 +96,11 @@
         });
     }
 
+    function isInfoPage() {
+        // Kiểm tra nếu đang ở trang thông tin truyện dựa trên element đặc trưng từ colors/page-info-truyen.js
+        return document.querySelector('div.col-4.col-md.feature-item.width-auto-xl') !== null;
+    }
+
     function createConfigDialog() {
         // Kiểm tra xem dialog đã tồn tại chưa
         if (document.querySelector('.hmt-config-dialog')) {
@@ -159,6 +164,7 @@
                         <button class="hmt-config-close">&times;</button>
                     </div>
                     <div class="hmt-config-body">
+${!isInfoPage() ? `
                         <div class="hmt-config-section">
                             <h4>Màu mặc định</h4>
                             <p>Chọn màu sẽ được sử dụng khi không thể lấy màu từ ảnh bìa truyện. Sử dụng thanh trượt HSL để điều chỉnh màu sắc theo ý muốn.</p>
@@ -210,6 +216,7 @@
                                 <small class="hmt-color-help">Kéo thanh trượt HSL để chọn màu, sử dụng nút +/- để điều chỉnh chi tiết, hoặc nhập mã HEX trực tiếp</small>
                             </div>
                         </div>
+` : ''}
 
                         <div class="hmt-config-section">
                             <h4>Ẩn cảnh báo tên miền</h4>
@@ -250,12 +257,14 @@
                             </div>
                         </div>
 
+${!isInfoPage() ? `
                         <div class="hmt-config-preview">
                             <h4>Xem trước</h4>
                             <div class="hmt-preview-box" style="background-color: ${currentColor}">
                                 <span>Màu chủ đạo</span>
                             </div>
                         </div>
+` : ''}
                     </div>
                     <div class="hmt-config-footer">
                         <button class="hmt-config-reset">Khôi phục mặc định</button>
@@ -1156,33 +1165,35 @@
          syncUIWithColor(currentColor);
 
         // Xử lý text input
-         colorText.addEventListener('input', function() {
-             const color = this.value.trim();
-             debugLog('Text input thay đổi:', color);
+        if (colorText) {
+            colorText.addEventListener('input', function() {
+                const color = this.value.trim();
+                debugLog('Text input thay đổi:', color);
 
-             if (isValidHexColor(color)) {
-                 debugLog('Màu hợp lệ từ text input');
-                 // Chuyển đổi hex sang HSL và cập nhật sliders
-                 const hsl = hexToHsl(color);
-                 currentHue = hsl.h;
-                 currentSat = hsl.s;
-                 currentLight = hsl.l;
+                if (isValidHexColor(color)) {
+                    debugLog('Màu hợp lệ từ text input');
+                    // Chuyển đổi hex sang HSL và cập nhật sliders
+                    const hsl = hexToHsl(color);
+                    currentHue = hsl.h;
+                    currentSat = hsl.s;
+                    currentLight = hsl.l;
 
-                 // Cập nhật giá trị sliders
-                 if (hueSlider) hueSlider.value = currentHue;
-                 if (satSlider) satSlider.value = currentSat;
-                 if (lightSlider) lightSlider.value = currentLight;
+                    // Cập nhật giá trị sliders
+                    if (hueSlider) hueSlider.value = currentHue;
+                    if (satSlider) satSlider.value = currentSat;
+                    if (lightSlider) lightSlider.value = currentLight;
 
-                 // Cập nhật tất cả các elements UI
-                 syncUIWithColor(color);
+                    // Cập nhật tất cả các elements UI
+                    syncUIWithColor(color);
 
-                 // Áp dụng màu preview ngay lập tức
-                 previewColor = color;
-                 applyPreviewColor(color);
-             } else {
-                 debugLog('Màu không hợp lệ từ text input');
-             }
-         });
+                    // Áp dụng màu preview ngay lập tức
+                    previewColor = color;
+                    applyPreviewColor(color);
+                } else {
+                    debugLog('Màu không hợp lệ từ text input');
+                }
+            });
+        }
 
         // Lưu cài đặt
          saveBtn.addEventListener('click', function() {
