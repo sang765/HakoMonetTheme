@@ -102,8 +102,8 @@
     }
 
     function createConfigDialog() {
-        // Kiểm tra xem dialog đã tồn tại chưa
-        if (document.querySelector('.hmt-config-dialog')) {
+        // Kiểm tra xem dialog đã tồn tại chưa (kiểm tra ở top window để tránh duplicate trong iframe)
+        if ((window.top || window).document.querySelector('.hmt-config-dialog')) {
             return;
         }
 
@@ -244,6 +244,7 @@ ${!isInfoPage() ? `
                             </div>
                         </div>
 
+${!isInfoPage() ? `
                         <div class="hmt-config-section">
                             <h4>Chế độ màu</h4>
                             <p>Chọn loại màu để áp dụng cho theme: Mặc định sử dụng màu từ config, Thumbnail sử dụng màu lấy từ ảnh bìa truyện.</p>
@@ -256,6 +257,7 @@ ${!isInfoPage() ? `
                                 </select>
                             </div>
                         </div>
+` : ''}
 
 ${!isInfoPage() ? `
                         <div class="hmt-config-preview">
@@ -1260,12 +1262,14 @@ ${!isInfoPage() ? `
         }
 
         // Color mode dropdown
-        const colorModeSelect = dialog.querySelector('#hmt-color-mode-select');
-        if (colorModeSelect) {
-            colorModeSelect.addEventListener('change', function() {
-                setColorMode(this.value);
-                showNotification('Đã cập nhật chế độ màu!', 3000);
-            });
+        if (!isInfoPage()) {
+            const colorModeSelect = dialog.querySelector('#hmt-color-mode-select');
+            if (colorModeSelect) {
+                colorModeSelect.addEventListener('change', function() {
+                    setColorMode(this.value);
+                    showNotification('Đã cập nhật chế độ màu!', 3000);
+                });
+            }
         }
 
         // Đóng khi nhấn ESC
