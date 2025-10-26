@@ -115,7 +115,7 @@ Màu sắc chủ đề sẽ được tự động điều chỉnh dựa trên �
 
 | | | |
 |---|---|---|
-| ![Desktop Home](/.github/assets/desktop-home.png) | ![Desktop Info Truyen](/.github/assets/desktop-info-truyen.png) | ![Desktop Info Truyen GIF](/.github/assets/desktop-info-truyen.gif)* |
+| ![Desktop Home](/.github/assets/desktop-home.png) | ![Desktop Info Truyen](/.github/assets/desktop-info-truyen.png) | ![Desktop Info Truyen GIF](/.github/assets/desktop-info-truyen.gif) |
 | **Preview Trang Chủ** | **Peview Trang Thông Tin Truyện** | **Trang Thông Tin Truyện - GIF** | 
 | ![Desktop Settings GIF](/.github/assets/desktop-settings.gif) | ![Desktop Block Banner GIF](/.github/assets/desktop-block-banner.gif) | |
 | **Preview Cài Đặt Userscript** | **Peview Chặn Banner** | | 
