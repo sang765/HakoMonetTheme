@@ -151,10 +151,10 @@ Chọn thiết lập cần thay đổi:
         // Command để kiểm tra cập nhật
         if (typeof GM_registerMenuCommand === 'function') {
             GM_registerMenuCommand('🔄 Kiểm tra cập nhật', checkForUpdatesManual, 'u');
-            GM_registerMenuCommand('⚙️ Thiết lập cập nhật', openUpdateSettings, 's');
             GM_registerMenuCommand('🎨 Cài đặt', openColorConfig, 'c');
             GM_registerMenuCommand('🚫 Ad Blocker', openAdBlockerConfig, 'a');
             GM_registerMenuCommand('📊 Thông tin script', showScriptInfo, 'i');
+            GM_registerMenuCommand('⚙️ Thiết lập cập nhật', openUpdateSettings, 's');
             GM_registerMenuCommand('🐛 Báo cáo lỗi', reportBug, 'b');
             GM_registerMenuCommand('💡 Đề xuất tính năng', suggestFeature, 'f');
             GM_registerMenuCommand('🔧 Debug Mode', toggleDebugMode, 'd');
