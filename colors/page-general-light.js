@@ -516,6 +516,26 @@
             .action-link {
                 color: ${palette[500]} !important;
             }
+
+            #mainpart.reading-page.style-6 #rd-side_icon {
+                background-color: ${palette[800]} !important;
+            }
+
+            #rd-side_icon {
+                border: 1px solid ${palette[700]} !important;
+            }
+
+            .rd_sidebar-header {
+                background-color: ${palette[900]} !important;
+            }
+
+            .rd_sidebar main {
+                background-color: ${palette[50]} !important;
+            }
+
+            .black-click {
+                background-color: ${palette[900]} !important;
+            }
         `;
 
         GM_addStyle(css);
@@ -831,6 +851,26 @@
 
             .action-link {
                 color: ${defaultColor} !important;
+            }
+
+            #mainpart.reading-page.style-6 #rd-side_icon {
+                background-color: ${defaultPalette[800]} !important;
+            }
+
+            #rd-side_icon {
+                border: 1px solid ${defaultPalette[700]} !important;
+            }
+
+            .rd_sidebar-header {
+                background-color: ${defaultPalette[900]} !important;
+            }
+
+            .rd_sidebar main {
+                background-color: ${defaultPalette[50]} !important;
+            }
+
+            .black-click {
+                background-color: ${defaultPalette[900]} !important;
             }
         `;
 
