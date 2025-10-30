@@ -1032,7 +1032,7 @@
             }
 
             .rd_sidebar main {
-                background-color: ${palette[50]} !important;
+                background-color: ${palette[800]} !important;
             }
 
             .black-click {
@@ -1500,7 +1500,7 @@
             }
 
             .rd_sidebar main {
-                background-color: ${defaultPalette[50]} !important;
+                background-color: ${defaultPalette[800]} !important;
             }
 
             .black-click {
