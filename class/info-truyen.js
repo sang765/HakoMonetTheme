@@ -5,6 +5,8 @@
     let thumbnailEffectApplied = false;
     let retryCount = 0;
     let domObserver = null;
+    let portraitCSSApplied = false;
+    let orientationListenerAdded = false;
     
     function debugLog(...args) {
         if (DEBUG) {
@@ -33,6 +35,9 @@
         
         // Thêm thumbnail fade effect với retry mechanism
         setupThumbnailEffects();
+        
+        // Thiết lập portrait CSS redesign với orientation detection
+        setupPortraitCSSRedesign();
         
         // Lắng nghe thay đổi thiết bị (nếu có device detector)
         if (window.__deviceDetectorLoaded) {
@@ -288,6 +293,105 @@
         });
         
         debugLog('Device change listener đã được thiết lập');
+    }
+    
+    function setupPortraitCSSRedesign() {
+        debugLog('Thiết lập Portrait CSS Redesign với orientation detection');
+        
+        // Kiểm tra orientation hiện tại
+        function isPortrait() {
+            return window.innerHeight > window.innerWidth;
+        }
+        
+        // Áp dụng CSS cho portrait mode
+        function applyPortraitCSS() {
+            if (portraitCSSApplied) {
+                debugLog('Portrait CSS đã được áp dụng');
+                return;
+            }
+            
+            debugLog('Áp dụng CSS cho màn hình dọc (portrait)');
+            
+            const portraitCSS = `
+                .side-features.flex-none > div:nth-child(1) {
+                    justify-content: center;
+                }
+                .series-name-group > .series-name,
+                .series-information.mb-0.flex.flex-col,
+                .summary-wrapper.other-facts.col-12,
+                .summary-wrapper.col-12 {
+                    text-align: center;
+                }
+            `;
+            
+            GM_addStyle(portraitCSS);
+            portraitCSSApplied = true;
+            debugLog('Đã áp dụng CSS cho màn hình dọc');
+        }
+        
+        // Xóa CSS cho landscape mode
+        function removePortraitCSS() {
+            if (!portraitCSSApplied) {
+                debugLog('Portrait CSS chưa được áp dụng');
+                return;
+            }
+            
+            debugLog('Xóa CSS cho màn hình ngang (landscape)');
+            
+            // Xóa style tag chứa portrait CSS
+            const styleElements = document.querySelectorAll('style');
+            styleElements.forEach(style => {
+                if (style.textContent && style.textContent.includes('.side-features.flex-none > div:nth-child(1)')) {
+                    style.remove();
+                    debugLog('Đã xóa portrait CSS style');
+                }
+            });
+            
+            portraitCSSApplied = false;
+            debugLog('Đã xóa CSS cho màn hình ngang');
+        }
+        
+        // Kiểm tra orientation ban đầu
+        if (isPortrait()) {
+            applyPortraitCSS();
+        } else {
+            debugLog('Màn hình hiện tại là ngang, không áp dụng CSS');
+        }
+        
+        // Thêm event listener cho orientation change
+        if (!orientationListenerAdded) {
+            window.addEventListener('orientationchange', () => {
+                setTimeout(() => {
+                    if (isPortrait()) {
+                        debugLog('Phát hiện thay đổi sang màn hình dọc');
+                        applyPortraitCSS();
+                    } else {
+                        debugLog('Phát hiện thay đổi sang màn hình ngang');
+                        removePortraitCSS();
+                    }
+                }, 100); // Đợi một chút để orientation change hoàn tất
+            });
+            
+            // Thêm listener cho window resize (backup cho orientation change)
+            window.addEventListener('resize', () => {
+                setTimeout(() => {
+                    if (isPortrait()) {
+                        if (!portraitCSSApplied) {
+                            debugLog('Resize: Áp dụng CSS cho màn hình dọc');
+                            applyPortraitCSS();
+                        }
+                    } else {
+                        if (portraitCSSApplied) {
+                            debugLog('Resize: Xóa CSS cho màn hình ngang');
+                            removePortraitCSS();
+                        }
+                    }
+                }, 150);
+            });
+            
+            orientationListenerAdded = true;
+            debugLog('Orientation và resize listeners đã được thiết lập');
+        }
     }
     
     function setupThumbnailEffects() {
