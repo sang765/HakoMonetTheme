@@ -1387,6 +1387,106 @@
                 color: ${defaultColor} !important;
             }
 
+            [data-theme="dark"] .navbar {
+                background-color: ${defaultPalette[800]} !important;
+            }
+
+            .navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:hover, .navbar-default .navbar-nav > .open > a:focus {
+                background-color: ${defaultPalette[100]} !important;
+                color: ${defaultPalette[900]} !important;
+            }
+
+            [data-theme="dark"] .panel-default {
+                border-color: ${defaultPalette[700]} !important;
+            }
+
+            [data-theme="dark"] .panel {
+                background-color: ${defaultPalette[800]} !important;
+            }
+
+            .panel-default {
+                border-color: ${defaultPalette[200]} !important;
+            }
+
+            [data-theme="dark"] .panel-default > .panel-heading {
+                color: ${defaultPalette[100]} !important;
+                background-color: ${defaultPalette[800]} !important;
+                border-color: ${defaultPalette[700]} !important;
+            }
+
+            [data-theme="dark"] .panel-body {
+                background-color: ${defaultPalette[800]} !important;
+            }
+
+            #drop a {
+                background-color: ${defaultPalette[600]} !important;
+                color: ${defaultPalette[100]} !important;
+            }
+
+            [data-theme="dark"] .btn-warning {
+                color: ${defaultPalette[100]} !important;
+                background-color: ${defaultPalette[600]} !important;
+                border-color: ${defaultPalette[600]} !important;
+            }
+
+            .btn-warning {
+                color: ${defaultPalette[100]} !important;
+                background-color: ${defaultPalette[500]} !important;
+                border-color: ${defaultPalette[400]} !important;
+            }
+
+            [data-theme="dark"] .btn-warning:hover {
+                color: ${defaultPalette[100]} !important;
+                background-color: ${defaultPalette[700]} !important;
+                border-color: ${defaultPalette[700]} !important;
+            }
+
+            .btn-warning:hover, .btn-warning:focus, .btn-warning.focus, .btn-warning:active, .btn-warning.active, .open > .dropdown-toggle.btn-warning {
+                color: ${defaultPalette[100]} !important;
+                background-color: ${defaultPalette[600]} !important;
+                border-color: ${defaultPalette[500]} !important;
+            }
+
+            [data-theme="dark"] .btn-primary {
+                color: ${defaultPalette[100]} !important;
+                background-color: ${defaultPalette[700]} !important;
+                border-color: ${defaultPalette[700]} !important;
+            }
+
+            .btn-primary {
+                color: ${defaultPalette[100]} !important;
+                background-color: ${defaultPalette[500]} !important;
+                border-color: ${defaultPalette[400]} !important;
+            }
+
+            [data-theme="dark"] .btn-primary:hover {
+                color: ${defaultPalette[100]} !important;
+                background-color: ${defaultPalette[800]} !important;
+                border-color: ${defaultPalette[800]} !important;
+            }
+
+            .btn-primary:hover, .btn-primary:focus, .btn-primary.focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
+                color: ${defaultPalette[100]} !important;
+                background-color: ${defaultPalette[600]} !important;
+                border-color: ${defaultPalette[500]} !important;
+            }
+
+            #drop a:hover {
+                background-color: ${defaultPalette[700]} !important;
+            }
+
+            [data-theme="dark"] .alert-info {
+                color: ${defaultPalette[100]} !important;
+                background-color: ${defaultPalette[500]} !important;
+                border-color: ${defaultPalette[500]} !important;
+            }
+
+            .alert-info {
+                background-color: ${defaultPalette[100]} !important;
+                border-color: ${defaultPalette[200]} !important;
+                color: ${defaultPalette[800]} !important;
+            }
+
             #mainpart.reading-page.style-6 #rd-side_icon {
                 background-color: ${defaultPalette[800]} !important;
             }
