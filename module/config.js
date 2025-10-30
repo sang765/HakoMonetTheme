@@ -10,7 +10,7 @@
     }
 
     function getDefaultColor() {
-        return GM_getValue('default_color', '#00B591');
+        return GM_getValue('default_color', '#063c30');
     }
 
     function setDefaultColor(color) {

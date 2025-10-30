@@ -86,7 +86,7 @@
         // Hàm áp dụng màu sắc hiện tại
         function applyCurrentColorScheme() {
             const defaultColor = window.HMTConfig && window.HMTConfig.getDefaultColor ?
-                window.HMTConfig.getDefaultColor() : '#6c5ce7';
+                window.HMTConfig.getDefaultColor() : '#063c30';
 
             debugLog('Áp dụng màu từ config:', defaultColor);
 
@@ -471,7 +471,7 @@
         // Đếm màu với trọng số ưu tiên màu accent truyền thống
         const colorCount = {};
         let maxCount = 0;
-        let dominantColor = '#6c5ce7'; // Màu mặc định
+        let dominantColor = '#063c30'; // Màu mặc định
         
         // Phạm vi màu accent truyền thống (loại bỏ màu quá sáng và quá tối)
         const traditionalAccentRanges = [
@@ -576,7 +576,7 @@
         const data = imageData.data;
         
         let maxSaturation = 0;
-        let mostSaturatedColor = '#6c5ce7';
+        let mostSaturatedColor = '#063c30';
         
         for (let i = 0; i < data.length; i += 4) {
             const r = data[i];
@@ -1052,7 +1052,7 @@
     function applyDefaultColorScheme() {
         // Lấy màu mặc định từ config, fallback về màu cũ nếu không có
         const defaultColor = (window.HMTConfig && window.HMTConfig.getDefaultColor) ?
-            window.HMTConfig.getDefaultColor() : '#6c5ce7';
+            window.HMTConfig.getDefaultColor() : '#063c30';
         const defaultPalette = MonetAPI.generateMonetPalette(defaultColor);
 
         if (!defaultPalette) {
