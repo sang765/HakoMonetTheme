@@ -1040,6 +1040,11 @@
             .black-click {
                 background-color: ${palette[900]} !important;
             }
+
+            .rd_sidebar #chap_list li.current,
+            .rd_sidebar #chap_list li a:hover {
+                background-color: ${palette[850]} !important;
+            }
         `;
 
         GM_addStyle(css);
@@ -1509,6 +1514,11 @@
 
             .black-click {
                 background-color: ${defaultPalette[900]} !important;
+            }
+
+            .rd_sidebar #chap_list li.current,
+            .rd_sidebar #chap_list li a:hover {
+                background-color: ${defaultPalette[850]} !important;
             }
         `;
 
