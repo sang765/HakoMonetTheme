@@ -339,7 +339,7 @@
                 }
                 @media only screen and (max-width: 787px) {
                     .feature-section .series-information {
-                        margin-bottom: 0;
+                        text-align: center;
                     }
                 }
             `;
