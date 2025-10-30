@@ -318,8 +318,7 @@
                 }
                 .series-name-group > .series-name,
                 .series-information.mb-0.flex.flex-col,
-                .summary-wrapper.other-facts.col-12,
-                .summary-wrapper.col-12 {
+                .summary-wrapper.other-facts.col-12 {
                     text-align: center;
                 }
             `;
