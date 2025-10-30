@@ -139,6 +139,10 @@
                 border-radius: 0px 0px 15px 15px;
                 max-width: calc(100% - 31px);
             }
+
+            .summary-more.more-state .see_more {
+                text-align: center;
+            }
         `);
         
         debugLog('Đã cải thiện giao diện trang truyện');
