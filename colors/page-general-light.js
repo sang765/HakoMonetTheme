@@ -564,7 +564,9 @@
                 border: 1px solid ${palette[700]} !important;
             }
 
-            .rd_sidebar-header {
+            .rd_sidebar-header,
+            .rd_sidebar-name small,
+            .rd_sidebar-name h5 {
                 background-color: ${palette[900]} !important;
             }
 
@@ -1000,7 +1002,9 @@
                 border: 1px solid ${defaultPalette[700]} !important;
             }
 
-            .rd_sidebar-header {
+            .rd_sidebar-header,
+            .rd_sidebar-name small,
+            .rd_sidebar-name h5 {
                 background-color: ${defaultPalette[900]} !important;
             }
 
