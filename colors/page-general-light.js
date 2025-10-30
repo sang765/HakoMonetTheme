@@ -104,6 +104,25 @@
         return MonetAPI.isValidColor(color);
     }
 
+    // Function to lighten color for light mode by mixing with white
+    function lightenColorForLightMode(color) {
+        // Convert hex to RGB
+        const hex = color.replace('#', '');
+        const r = parseInt(hex.substr(0, 2), 16);
+        const g = parseInt(hex.substr(2, 2), 16);
+        const b = parseInt(hex.substr(4, 2), 16);
+
+        // Mix with white (90% white, 10% original color for subtle tint)
+        const mixRatio = 0.1; // 10% original color, 90% white
+        const newR = Math.round(255 * (1 - mixRatio) + r * mixRatio);
+        const newG = Math.round(255 * (1 - mixRatio) + g * mixRatio);
+        const newB = Math.round(255 * (1 - mixRatio) + b * mixRatio);
+
+        // Convert back to hex
+        const newHex = '#' + ((1 << 24) + (newR << 16) + (newG << 8) + newB).toString(16).slice(1);
+        return newHex;
+    }
+
     // Integrated CORS handling for images
     function setupImageCorsHandling() {
         if (window.__imageCorsSetup) return;
@@ -167,10 +186,14 @@
             return;
         }
 
-        const monetPalette = MonetAPI.generateMonetPalette(defaultColor);
+        // Make color lighter for light mode (mix with white to create subtle tint)
+        const lightenedColor = lightenColorForLightMode(defaultColor);
+        debugLog('Lightened color for light mode:', lightenedColor);
+
+        const monetPalette = MonetAPI.generateMonetPalette(lightenedColor);
         debugLog('Monet Palette:', monetPalette);
 
-        const isLightColor = MonetAPI.isColorLight(defaultColor);
+        const isLightColor = MonetAPI.isColorLight(lightenedColor);
         debugLog('Is light color?', isLightColor);
 
         applyMonetColorScheme(monetPalette, isLightColor);
