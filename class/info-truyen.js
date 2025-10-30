@@ -322,10 +322,12 @@
             debugLog('Áp dụng CSS cho màn hình dọc (portrait)');
             
             const portraitCSS = `
-                .side-features.flex-none > div:nth-child(1) {
+                .side-features.flex-none > div:nth-child(1),
+                .side-features .row {
                     justify-content: center;
                 }
                 .series-name-group > .series-name,
+                .feature-section .series-name-group,
                 .series-information.mb-0.flex.flex-col,
                 .summary-wrapper.other-facts.col-12 {
                     text-align: center;
@@ -333,6 +335,11 @@
                 @media only screen and (max-width: 787px) {
                     ul.list-chapters li .chapter-time {
                         display: contents;
+                    }
+                }
+                @media only screen and (max-width: 787px) {
+                    .feature-section .series-information {
+                        margin-bottom: 0;
                     }
                 }
             `;
