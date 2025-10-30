@@ -34,6 +34,7 @@
 // @resource     pagegenerallightJS ./colors/page-general-light.js
 // @resource     colorinfotruyenlight ./colors/page-info-truyen-light.js
 // @resource     themeDetectorJS ./module/theme-detector.js
+// @resource     deviceDetectorJS ./module/device-detector.js
 // @resource     configJS ./module/config.js
 // @resource     adBlockerJS ./module/ad-blocker.js
 // @resource     autoReloadJS ./module/auto-reload.js
@@ -316,7 +317,7 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
     function loadAllResources() {
         const resources = [
             'mainJS', 'monetAPIJS', 'simpleCORSJS', 'infoTruyenJS',
-            'animationJS', 'tagColorJS', 'colorinfotruyen', 'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyenlight', 'themeDetectorJS', 'configJS', 'adBlockerJS', 'autoReloadJS'
+            'animationJS', 'tagColorJS', 'colorinfotruyen', 'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyenlight', 'themeDetectorJS', 'deviceDetectorJS', 'configJS', 'adBlockerJS', 'autoReloadJS'
         ];
 
         let loadedCount = 0;

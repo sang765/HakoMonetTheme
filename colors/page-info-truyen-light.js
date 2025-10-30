@@ -131,12 +131,6 @@
 
         // Hàm phân tích màu từ ảnh bìa và áp dụng
         function analyzeAndApplyImageColor() {
-            // Thêm hiệu ứng thumbnail mờ dần
-            addThumbnailFadeEffect(coverUrl);
-
-            // Thêm CSS cho phần trên của feature-section trong suốt
-            addTransparentTopCSS();
-
             // Phân tích màu từ ảnh bìa
             analyzeImageColorTraditionalAccent(coverUrl)
                 .then(dominantColor => {
@@ -203,93 +197,7 @@
         return MonetAPI.isValidColor(color);
     }
     
-    // Hàm thêm CSS cho phần trên của feature-section trong suốt
-    function addTransparentTopCSS() {
-        GM_addStyle(`
-            .feature-section.at-series {
-                background: transparent !important;
-                border: none !important;
-            }
-            
-            /* Xóa gradient mặc định của dark mode */
-            .feature-section.at-series.clear {
-                background: transparent !important;
-                background-image: none !important;
-            }
-            
-            /* Đảm bảo nội dung vẫn hiển thị bình thường */
-            .feature-section > * {
-                position: relative;
-                z-index: 2;
-            }
-            
-            /* Tạo lớp phủ gradient để phần trên trong suốt */
-            .feature-section::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 200px;
-                background: linear-gradient(to bottom, 
-                    rgba(255, 255, 255, 0.3) 0%, 
-                    rgba(255, 255, 255, 0.7) 50%,
-                    rgba(255, 255, 255, 0.9) 100%);
-                pointer-events: none;
-                z-index: 1;
-            }
-        `);
-        
-        debugLog('Added transparent top CSS');
-    }
     
-    // Hàm thêm hiệu ứng thumbnail mờ dần
-    function addThumbnailFadeEffect(coverUrl) {
-        // Tạo phần tử cho hiệu ứng nền
-        const bgOverlay = document.createElement('div');
-        bgOverlay.className = 'betterhako-bg-overlay';
-        
-        // Thêm styles
-        GM_addStyle(`
-            .betterhako-bg-overlay {
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 350px;
-                z-index: -1;
-                background-image: url('${coverUrl}');
-                background-size: cover;
-                background-position: center;
-                filter: blur(12px) brightness(0.7);
-                mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
-                -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
-                pointer-events: none;
-            }
-            
-            #mainpart {
-                position: relative;
-                isolation: isolate;
-            }
-            
-            #mainpart > .container {
-                position: relative;
-                z-index: 1;
-            }
-        `);
-        
-        // Thêm phần tử vào DOM
-        const mainPart = document.getElementById('mainpart');
-        if (mainPart) {
-            // Kiểm tra xem overlay đã tồn tại chưa để tránh thêm nhiều lần
-            if (!document.querySelector('.betterhako-bg-overlay')) {
-                mainPart.prepend(bgOverlay);
-                debugLog('Added thumbnail fade effect');
-            }
-        } else {
-            debugLog('Cannot find #mainpart');
-        }
-    }
     
     // Hàm phân tích ảnh với focus vào accent color truyền thống
     function analyzeImageColorTraditionalAccent(imageUrl) {
