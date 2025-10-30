@@ -209,8 +209,8 @@
         const g = parseInt(hex.substr(2, 2), 16);
         const b = parseInt(hex.substr(4, 2), 16);
 
-        // Mix with white (90% white, 10% original color for subtle tint)
-        const mixRatio = 0.1; // 10% original color, 90% white
+        // Mix with white (95% white, 5% original color for very subtle tint)
+        const mixRatio = 0.05; // 5% original color, 95% white
         const newR = Math.round(255 * (1 - mixRatio) + r * mixRatio);
         const newG = Math.round(255 * (1 - mixRatio) + g * mixRatio);
         const newB = Math.round(255 * (1 - mixRatio) + b * mixRatio);
