@@ -134,6 +134,11 @@
             body:not(.dark) .list-chapters li:hover {
                 background-color: rgba(0, 0, 0, 0.03);
             }
+
+            .summary-more.more-state {
+                border-radius: 0px 0px 15px 15px;
+                max-width: calc(100% - 31px);
+            }
         `);
         
         debugLog('Đã cải thiện giao diện trang truyện');
@@ -217,7 +222,7 @@
                 }
                 
                 .betterhako-bg-overlay {
-                    height: 250px !important;
+                    height: 6%;
                 }
             `;
         } else if (isTablet) {
@@ -232,7 +237,7 @@
                 }
                 
                 .betterhako-bg-overlay {
-                    height: 300px !important;
+                    height: 10%;
                 }
             `;
         } else if (isDesktop) {
@@ -255,7 +260,7 @@
                 }
                 
                 .betterhako-bg-overlay {
-                    height: 350px !important;
+                    height: 10%;
                 }
             `;
         }
@@ -581,7 +586,6 @@
                 top: 0;
                 left: 0;
                 right: 0;
-                height: 350px;
                 z-index: -1;
                 background-image: url('${coverUrl}');
                 background-size: cover;
