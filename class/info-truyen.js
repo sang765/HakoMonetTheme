@@ -226,7 +226,7 @@
                 }
                 
                 .betterhako-bg-overlay {
-                    height: 6%;
+                    height: calc(100% - 91.5%);
                 }
             `;
         } else if (isTablet) {
@@ -241,7 +241,7 @@
                 }
                 
                 .betterhako-bg-overlay {
-                    height: 10%;
+                    height: calc(100% - 90%);
                 }
             `;
         } else if (isDesktop) {
@@ -264,7 +264,7 @@
                 }
                 
                 .betterhako-bg-overlay {
-                    height: 10%;
+                    height: calc(100% - 90%);
                 }
             `;
         }
