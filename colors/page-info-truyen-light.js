@@ -111,7 +111,7 @@
         function applyCurrentColorScheme() {
             const defaultColor = window.HMTConfig ? window.HMTConfig.getDefaultColor() : '#FCE4EC'; // Get color from config or fallback
 
-            debugLog('Applying light color scheme:', defaultColor);
+            debugLog('Applying light color scheme with config color:', defaultColor);
 
             if (!isValidColor(defaultColor)) {
                 debugLog('Invalid color, using default');
@@ -119,15 +119,15 @@
                 return;
             }
 
-            // Make color lighter for light mode (mix with white to create subtle tint)
-            const lightenedColor = lightenColorForLightMode(defaultColor);
-            debugLog('Lightened color for light mode:', lightenedColor);
+            // Create tinted white using config color for light mode
+            const tintedWhite = createTintedWhite(defaultColor);
+            debugLog('Tinted white for light mode:', tintedWhite);
 
             // Tạo Monet palette từ màu config
-            const monetPalette = MonetAPI.generateMonetPalette(lightenedColor);
+            const monetPalette = MonetAPI.generateMonetPalette(tintedWhite);
             debugLog('Monet Palette:', monetPalette);
 
-            const isLightColor = MonetAPI.isColorLight(lightenedColor);
+            const isLightColor = MonetAPI.isColorLight(tintedWhite);
             debugLog('Is light color?', isLightColor);
 
             applyMonetColorScheme(monetPalette, isLightColor);
@@ -201,23 +201,39 @@
         return MonetAPI.isValidColor(color);
     }
 
-    // Function to lighten color for light mode by mixing with white
-    function lightenColorForLightMode(color) {
+    // Function to create tinted white using config color for light mode
+    function createTintedWhite(tintColor) {
+        const BASE_WHITE = '#ffffff';    // Base white color
+        const TINT_STRENGTH = 0.1;       // 10% tint strength for subtle effect
+
         // Convert hex to RGB
-        const hex = color.replace('#', '');
-        const r = parseInt(hex.substr(0, 2), 16);
-        const g = parseInt(hex.substr(2, 2), 16);
-        const b = parseInt(hex.substr(4, 2), 16);
+        const white = hexToRgb(BASE_WHITE);
+        const tint = hexToRgb(tintColor);
 
-        // Mix with white (95% white, 5% original color for very subtle tint)
-        const mixRatio = 0.05; // 5% original color, 95% white
-        const newR = Math.round(255 * (1 - mixRatio) + r * mixRatio);
-        const newG = Math.round(255 * (1 - mixRatio) + g * mixRatio);
-        const newB = Math.round(255 * (1 - mixRatio) + b * mixRatio);
+        // Mix: 90% white + 10% tint color
+        const result = {
+            r: Math.round(white.r * (1 - TINT_STRENGTH) + tint.r * TINT_STRENGTH),
+            g: Math.round(white.g * (1 - TINT_STRENGTH) + tint.g * TINT_STRENGTH),
+            b: Math.round(white.b * (1 - TINT_STRENGTH) + tint.b * TINT_STRENGTH)
+        };
 
-        // Convert back to hex
-        const newHex = '#' + ((1 << 24) + (newR << 16) + (newG << 8) + newB).toString(16).slice(1);
-        return newHex;
+        return rgbToHex(result.r, result.g, result.b);
+    }
+
+    // Helper functions for color conversion
+    function hexToRgb(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        };
+    }
+
+    function rgbToHex(r, g, b) {
+        return '#' + [r, g, b].map(x =>
+            x.toString(16).padStart(2, '0')
+        ).join('');
     }
     
     
