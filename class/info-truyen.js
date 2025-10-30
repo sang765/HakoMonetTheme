@@ -226,7 +226,7 @@
                 }
                 
                 .betterhako-bg-overlay {
-                    height: calc(100% - 91.5%);
+                    height: calc(100% - 92.5%);
                 }
             `;
         } else if (isTablet) {
