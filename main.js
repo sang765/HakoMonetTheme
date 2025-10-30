@@ -149,6 +149,7 @@
             const imageAnalyzerJS = GM_getResourceText('imageAnalyzerJS');
             const configJS = GM_getResourceText('configJS');
             const adBlockerJS = GM_getResourceText('adBlockerJS');
+            const antiPopupJS = GM_getResourceText('antiPopupJS');
             
             // Load các module theo thứ tự
             loadScript(simpleCORSJS, 'simple-cors.js');
@@ -161,6 +162,7 @@
             loadScript(monetJS, 'monet.js');
             loadScript(configJS, 'config.js');
             loadScript(adBlockerJS, 'ad-blocker.js');
+            loadScript(antiPopupJS, 'anti-popup.js');
             loadScript(colorinfotruyen, 'page-info-truyen.js');
             
             debugLog('Tất cả module đã được tải');

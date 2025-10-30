@@ -38,6 +38,7 @@
 // @resource     configJS ./module/config.js
 // @resource     adBlockerJS ./module/ad-blocker.js
 // @resource     autoReloadJS ./module/auto-reload.js
+// @resource     antiPopupJS ./module/anti-popup.js
 // @supportURL   https://github.com/sang765/HakoMonetTheme/issues
 // @updateURL    https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js
 // @downloadURL  https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js
@@ -153,6 +154,7 @@ Chọn thiết lập cần thay đổi:
             GM_registerMenuCommand('🔄 Kiểm tra cập nhật', checkForUpdatesManual, 'u');
             GM_registerMenuCommand('🎨 Cài đặt', openColorConfig, 'c');
             GM_registerMenuCommand('🚫 Ad Blocker', openAdBlockerConfig, 'a');
+            GM_registerMenuCommand('🚫 Ad Popup Blocker', openAntiPopupConfig, 'p');
             GM_registerMenuCommand('📊 Thông tin script', showScriptInfo, 'i');
             GM_registerMenuCommand('⚙️ Thiết lập cập nhật', openUpdateSettings, 's');
             GM_registerMenuCommand('🐛 Báo cáo lỗi', reportBug, 'b');
@@ -265,6 +267,17 @@ Chọn thiết lập cần thay đổi:
             debugLog('Ad Blocker module chưa được tải');
         }
     }
+
+    function openAntiPopupConfig() {
+        // Đảm bảo anti-popup module đã được tải
+        if (typeof window.HMTAntiPopup !== 'undefined' && typeof window.HMTAntiPopup.openDialog === 'function') {
+            window.HMTAntiPopup.openDialog();
+            showNotification('Anti-Popup', 'Mở bảng cài đặt Anti-Popup...', 3000);
+        } else {
+            showNotification('Lỗi', 'Module Anti-Popup chưa được tải. Vui lòng làm mới trang.', 5000);
+            debugLog('Anti-Popup module chưa được tải');
+        }
+    }
     
     function showScriptInfo() {
         const info = `
@@ -317,7 +330,7 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
     function loadAllResources() {
         const resources = [
             'mainJS', 'monetAPIJS', 'simpleCORSJS', 'infoTruyenJS',
-            'animationJS', 'tagColorJS', 'colorinfotruyen', 'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyenlight', 'themeDetectorJS', 'deviceDetectorJS', 'configJS', 'adBlockerJS', 'autoReloadJS'
+            'animationJS', 'tagColorJS', 'colorinfotruyen', 'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyenlight', 'themeDetectorJS', 'deviceDetectorJS', 'configJS', 'adBlockerJS', 'autoReloadJS', 'antiPopupJS'
         ];
 
         let loadedCount = 0;
