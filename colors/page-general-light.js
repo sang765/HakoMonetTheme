@@ -157,7 +157,7 @@
     }
 
     function applyCurrentColorScheme() {
-        const defaultColor = '#FCE4EC'; // Light pink for subtle light mode
+        const defaultColor = window.HMTConfig ? window.HMTConfig.getDefaultColor() : '#FCE4EC'; // Get color from config or fallback
 
         debugLog('Applying light color scheme:', defaultColor);
 
