@@ -19,6 +19,7 @@ Material You theme dành cho Hako/DocLN.
 - 📱 Giao diện responsive và hiện đại
 - 🌙 Hỗ trợ dark mode (hoạt động tối ưu)
 - ⚡ Tối ưu hóa trải nghiệm đọc truyện
+- 🚫 Chặn quảng cáo popup (Ad Popup Blocker)
 - 🔔 Tự động kiểm tra cập nhật
 - 🏷️ Tag màu sắc theo thể loại
 - ✨ Hiệu ứng animation mượt mà
@@ -96,6 +97,14 @@ Sau khi cài đặt, script sẽ tự động kích hoạt khi bạn truy cập:
 
 Màu sắc chủ đề sẽ được tự động điều chỉnh dựa trên ảnh bìa của truyện bạn đang xem.
 
+### 🚫 Ad Popup Blocker
+
+Script cung cấp tính năng chặn quảng cáo popup thông minh:
+- **Chặn**: Popup quảng cáo, promotional content, newsletter signup
+- **Cho phép**: Google Login, Facebook Login, Twitter Login, các popup đăng nhập khác
+- **Truy cập**: Click vào icon script → "🚫 Ad Popup Blocker"
+- **Tùy chỉnh**: Thêm URL vào whitelist để cho phép popup cụ thể
+
 </div>
 
 ## 🖼️ Screenshot 🖼️
@@ -126,9 +135,10 @@ Màu sắc chủ đề sẽ được tự động điều chỉnh dựa trên �
 <div align="left">
 
 - Sử dụng Canvas API để phân tích màu sắc ảnh
-- ~~Ưu tiên màu tóc nhân vật để tạo palette~~  
+- ~~Ưu tiên màu tóc nhân vật để tạo palette~~
 Sử dụng pick màu truyền thống nhưng không pick màu quá sáng và quá tối.
 - Material You color scheme algorithm
+- **Ad Popup Blocker**: Chặn quảng cáo popup, bảo vệ Google/Facebook Login
 - Modular architecture dễ bảo trì và mở rộng
 
 </div>
