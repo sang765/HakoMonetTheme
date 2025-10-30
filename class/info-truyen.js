@@ -321,6 +321,11 @@
                 .summary-wrapper.other-facts.col-12 {
                     text-align: center;
                 }
+                @media only screen and (max-width: 787px) {
+                    ul.list-chapters li .chapter-time {
+                        display: contents;
+                    }
+                }
             `;
             
             GM_addStyle(portraitCSS);
