@@ -268,6 +268,9 @@
                 background-color: #007bff;
                 color: white;
             }
+            .changelog h2 {
+                color: #000;
+            }
         `;
 
         GM_addStyle(css);
@@ -286,7 +289,7 @@
                 </div>
                 <hr>
                 <div class="changelog">
-                    <h3>Nhật ký thay đổi:</h3>
+                    <h2><strong>Nhật ký thay đổi:</strong></h2>
                     <ul id="changelog-list">
                         <li>Đang tải nhật ký thay đổi...</li>
                     </ul>
