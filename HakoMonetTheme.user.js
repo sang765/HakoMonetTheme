@@ -104,6 +104,7 @@
             }, timeout);
         }
     }
+
     function fetchChangelog(currentVersion, newVersion) {
         return new Promise((resolve) => {
             // Check if we have cached changelog for this version pair
