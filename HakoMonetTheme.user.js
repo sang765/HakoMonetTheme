@@ -105,6 +105,19 @@
         }
     function fetchChangelog(currentVersion, newVersion) {
         return new Promise((resolve) => {
+            // Check if we have cached changelog for this version pair
+            const cacheKey = `changelog_${currentVersion}_${newVersion}`;
+            const cachedChangelog = GM_getValue(cacheKey, null);
+            const cacheTime = GM_getValue(`${cacheKey}_time`, 0);
+            const now = Date.now();
+
+            // Use cache if it's less than 1 hour old
+            if (cachedChangelog && (now - cacheTime) < 3600000) {
+                debugLog('Sử dụng changelog từ cache');
+                resolve(cachedChangelog);
+                return;
+            }
+
             GM_xmlhttpRequest({
                 method: 'GET',
                 url: 'https://api.github.com/repos/sang765/HakoMonetTheme/commits?per_page=20',
@@ -116,21 +129,42 @@
                         try {
                             const commits = JSON.parse(response.responseText);
                             const changelog = generateChangelog(commits, currentVersion, newVersion);
+
+                            // Cache the result
+                            GM_setValue(cacheKey, changelog);
+                            GM_setValue(`${cacheKey}_time`, now);
+
                             resolve(changelog);
                         } catch (e) {
                             debugLog('Lỗi parse JSON commits:', e);
                             resolve(['Không thể tải nhật ký thay đổi.']);
                         }
+                    } else if (response.status === 403) {
+                        // Rate limit exceeded
+                        debugLog('GitHub API rate limit exceeded');
+                        const rateLimitReset = response.responseHeaders?.['X-RateLimit-Reset'];
+                        if (rateLimitReset) {
+                            const resetTime = new Date(parseInt(rateLimitReset) * 1000);
+                            const waitMinutes = Math.ceil((resetTime - new Date()) / 60000);
+                            resolve([`API GitHub bị giới hạn tốc độ. Thử lại sau ${waitMinutes} phút.`]);
+                        } else {
+                            resolve(['API GitHub bị giới hạn tốc độ. Thử lại sau.']);
+                        }
+                    } else if (response.status === 404) {
+                        debugLog('Repository not found');
+                        resolve(['Không tìm thấy repository.']);
                     } else {
                         debugLog('Lỗi tải commits:', response.status);
                         resolve(['Không thể tải nhật ký thay đổi.']);
                     }
                 },
-                onerror: function() {
-                    resolve(['Không thể tải nhật ký thay đổi.']);
+                onerror: function(error) {
+                    debugLog('Network error khi tải commits:', error);
+                    resolve(['Lỗi mạng khi tải nhật ký thay đổi.']);
                 },
                 ontimeout: function() {
-                    resolve(['Không thể tải nhật ký thay đổi.']);
+                    debugLog('Timeout khi tải commits');
+                    resolve(['Hết thời gian tải nhật ký thay đổi.']);
                 }
             });
         });
