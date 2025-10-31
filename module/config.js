@@ -103,11 +103,6 @@
         return document.querySelector('div.col-4.col-md.feature-item.width-auto-xl') !== null;
     }
 
-    function isReadingPage() {
-        // Kiểm tra nếu đang ở trang đọc truyện dựa trên class đặc trưng
-        return document.querySelector('.rd-basic_icon.row') !== null;
-    }
-
     function createConfigDialog() {
         // Kiểm tra xem dialog đã tồn tại chưa (kiểm tra ở top window để tránh duplicate trong iframe)
         if ((window.top || window).document.querySelector('.hmt-config-dialog')) {
@@ -171,7 +166,7 @@
                         <button class="hmt-config-close">&times;</button>
                     </div>
                     <div class="hmt-config-body">
-${getColorMode() !== 'thumbnail' ? `
+${!isInfoPage() ? `
                         <div class="hmt-config-section">
                             <h4>Màu mặc định</h4>
                             <p>Chọn màu sẽ được sử dụng khi không thể lấy màu từ ảnh bìa truyện. Sử dụng thanh trượt HSL để điều chỉnh màu sắc theo ý muốn.</p>
@@ -215,7 +210,7 @@ ${getColorMode() !== 'thumbnail' ? `
                                                    id="hmt-custom-color-text"
                                                    value="${currentColor}"
                                                    class="hmt-color-text"
-                                                   placeholder="#063c30">
+                                                   placeholder="#17deb3">
                                         </div>
                                         <span class="hmt-color-picker-label">Thanh trượt HSL</span>
                                     </div>
@@ -251,7 +246,7 @@ ${getColorMode() !== 'thumbnail' ? `
                             </div>
                         </div>
 
-${!isReadingPage() ? `
+${!isInfoPage() ? `
                         <div class="hmt-config-section">
                             <h4>Chế độ màu</h4>
                             <p>Chọn loại màu để áp dụng cho theme: Mặc định sử dụng màu từ config, Thumbnail sử dụng màu lấy từ ảnh bìa truyện.</p>
@@ -266,7 +261,7 @@ ${!isReadingPage() ? `
                         </div>
 ` : ''}
 
-${getColorMode() !== 'thumbnail' ? `
+${!isInfoPage() ? `
                         <div class="hmt-config-preview">
                             <h4>Xem trước</h4>
                             <div class="hmt-preview-box" style="background-color: ${currentColor}">
@@ -1235,7 +1230,7 @@ ${getColorMode() !== 'thumbnail' ? `
 
         // Khôi phục mặc định
          resetBtn.addEventListener('click', function() {
-             const defaultColor = '#063c30';
+             const defaultColor = '#17deb3';
              debugLog('Reset màu về mặc định (preview):', defaultColor);
 
              // Cập nhật preview color
@@ -1269,7 +1264,7 @@ ${getColorMode() !== 'thumbnail' ? `
         }
 
         // Color mode dropdown
-        if (!isReadingPage()) {
+        if (!isInfoPage()) {
             const colorModeSelect = dialog.querySelector('#hmt-color-mode-select');
             if (colorModeSelect) {
                 colorModeSelect.addEventListener('change', function() {
