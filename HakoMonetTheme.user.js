@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Hako: Monet Theme
 // @namespace    https://github.com/sang765
-// @version      3.7.6
+// @version      3.7.7
 // @description  Material You theme for Hako/DocLN.
 // @description:vi Material You theme dành cho Hako/DocLN.
 // @icon         https://github.com/sang765/HakoMonetTheme/raw/main/.github/assets/logo.png
@@ -44,6 +44,7 @@
 // @downloadURL  https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js
 // @homepageURL  https://github.com/sang765/HakoMonetTheme
 // @license      MIT
+// @discord      https://discord.gg/uvQ6A3CDPq
 // ==/UserScript==
 
 (function() {
@@ -159,6 +160,7 @@ Chọn thiết lập cần thay đổi:
             GM_registerMenuCommand('⚙️ Thiết lập cập nhật', openUpdateSettings, 's');
             GM_registerMenuCommand('🐛 Báo cáo lỗi', reportBug, 'b');
             GM_registerMenuCommand('💡 Đề xuất tính năng', suggestFeature, 'f');
+            GM_registerMenuCommand('💬 Tham gia Discord', joinDiscord, 'j');
             GM_registerMenuCommand('🔧 Debug Mode', toggleDebugMode, 'd');
 
             debugLog('Đã đăng ký menu commands');
@@ -306,6 +308,18 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
         showNotification('Đề xuất tính năng', 'Mở trang đề xuất tính năng trên GitHub...', 3000);
     }
     
+    function joinDiscord() {
+        const discordURL = 'https://discord.gg/uvQ6A3CDPq';
+        try {
+            GM_openInTab(discordURL);
+            showNotification('Discord', 'Mở liên kết Discord...', 3000);
+        } catch (e) {
+            window.open(discordURL, '_blank');
+            showNotification('Discord', 'Mở Discord trong tab mới (fallback)...', 3000);
+            debugLog('GM_openInTab không khả dụng, dùng fallback window.open', e);
+        }
+    }
+
     function toggleDebugMode() {
         const currentDebug = GM_getValue('debug_mode', false);
         const newDebug = !currentDebug;
