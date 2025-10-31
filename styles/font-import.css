@@ -1,0 +1,11 @@
+/* 
+Liên kết với file .style/series-enhancement.css
+File này sử dụng để import thêm font không được sử dụng trong trang web.
+*/
+
+@font-face {
+    font-family: 'NerdFont';
+    src: url('https://cdn.jsdelivr.net/gh/ryanoasis/nerd-fonts@latest/patched-fonts/FiraCode/Regular/FiraCodeNerdFont-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
