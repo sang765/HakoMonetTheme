@@ -18,7 +18,7 @@
     
     function addAnimations() {
         GM_addStyle(`
-            @import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/refs/heads/main/styles/animation.css');
+            @import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/animation.css');
         `);
         
         debugLog('Đã thêm animations');

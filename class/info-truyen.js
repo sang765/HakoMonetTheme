@@ -61,7 +61,7 @@
     
     function enhanceSeriesPage() {
         // Cải thiện giao diện trang truyện
-        GM_addStyle(`@import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/refs/heads/main/styles/series-enhancement.css');`);
+        GM_addStyle(`@import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/series-enhancement.css');`);
 
         debugLog('Đã cải thiện giao diện trang truyện');
     }
@@ -100,14 +100,14 @@
         const isTablet = device === 'tablet';
         const isDesktop = device === 'desktop';
 
-        let css = `@import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/refs/heads/main/styles/device-base.css');`;
+        let css = `@import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-base.css');`;
 
         if (isMobile) {
-            css += `@import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/refs/heads/main/styles/device-mobile.css');`;
+            css += `@import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-mobile.css');`;
         } else if (isTablet) {
-            css += `@import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/refs/heads/main/styles/device-tablet.css');`;
+            css += `@import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-tablet.css');`;
         } else if (isDesktop) {
-            css += `@import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/refs/heads/main/styles/device-desktop.css');`;
+            css += `@import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-desktop.css');`;
         }
 
         return css;
@@ -162,7 +162,7 @@
             
             debugLog('Áp dụng CSS cho màn hình dọc (portrait)');
             
-            GM_addStyle(`@import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/refs/heads/main/styles/portrait.css');`);
+            GM_addStyle(`@import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/portrait.css');`);
             portraitCSSApplied = true;
             debugLog('Đã áp dụng CSS cho màn hình dọc');
         }
@@ -410,7 +410,7 @@
         
         // Thêm styles
         GM_addStyle(`
-            @import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/refs/heads/main/styles/thumbnail-overlay.css');
+            @import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/thumbnail-overlay.css');
             .betterhako-bg-overlay {
                 background-image: url('${coverUrl}');
                 filter: blur(12px) brightness(${brightness});
@@ -434,7 +434,7 @@
     
     // Hàm thêm CSS cho phần trên của feature-section trong suốt
     function addTransparentTopCSS() {
-        GM_addStyle(`@import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/refs/heads/main/styles/transparent-top.css');`);
+        GM_addStyle(`@import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/transparent-top.css');`);
 
         debugLog('Đã thêm CSS phần trên trong suốt');
     }
