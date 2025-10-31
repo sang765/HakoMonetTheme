@@ -104,6 +104,115 @@
             }, timeout);
         }
     }
+    function showUpdateDialog(currentVersion, newVersion) {
+        const css = `
+            .update-dialog-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            }
+            .update-dialog-content {
+                background-color: white;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                max-width: 500px;
+                width: 90%;
+            }
+            .update-icon {
+                width: 64px;
+                height: 64px;
+                margin: 0 auto 10px;
+                display: block;
+            }
+            .version-info {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            .changelog {
+                text-align: left;
+                margin-bottom: 20px;
+            }
+            .changelog ul {
+                list-style-type: none;
+                padding: 0;
+            }
+            .changelog li {
+                margin-bottom: 5px;
+            }
+            .buttons {
+                display: flex;
+                justify-content: space-between;
+            }
+            .buttons button {
+                padding: 10px 20px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+            #cancel-btn {
+                background-color: #ccc;
+            }
+            #update-btn {
+                background-color: #007bff;
+                color: white;
+            }
+        `;
+
+        GM_addStyle(css);
+
+        const overlay = document.createElement('div');
+        overlay.className = 'update-dialog-overlay';
+        overlay.innerHTML = `
+            <div class="update-dialog-content">
+                <div class="version-info">
+                    <svg class="update-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" fill="#007bff"/>
+                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22ZM12 4C16.4183 4 20 7.58172 20 12C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12C4 7.58172 7.58172 4 12 4Z" fill="#007bff"/>
+                    </svg>
+                    <p><strong>Phát hiện phiên bản mới của HakoMonetTheme</strong></p>
+                    <p style="font-size: 14px;"><span id="current-version">${currentVersion}</span> => <span id="new-version">${newVersion}</span></p>
+                </div>
+                <hr>
+                <div class="changelog">
+                    <h3>Nhật ký thay đổi:</h3>
+                    <ul id="changelog-list">
+                        <li>Đang tải nhật ký thay đổi...</li>
+                    </ul>
+                </div>
+                <hr>
+                <div class="buttons">
+                    <button id="cancel-btn">Hủy</button>
+                    <button id="update-btn">Cập nhật</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        const cancelBtn = overlay.querySelector('#cancel-btn');
+        const updateBtn = overlay.querySelector('#update-btn');
+
+        cancelBtn.addEventListener('click', () => {
+            overlay.remove();
+        });
+
+        updateBtn.addEventListener('click', () => {
+            GM_openInTab(RAW_GITHUB_URL + 'HakoMonetTheme.user.js');
+            overlay.remove();
+        });
+
+        // Placeholder for changelog
+        const changelogList = overlay.querySelector('#changelog-list');
+        changelogList.innerHTML = '<li>Changelog sẽ được cập nhật trong phiên bản tương lai.</li>';
+    }
     
     function openUpdateSettings() {
         const autoUpdateEnabled = GM_getValue('auto_update_enabled', true);
@@ -190,15 +299,7 @@ Chọn thiết lập cần thay đổi:
                         const currentVersion = GM_info.script.version;
                         
                         if (isNewerVersion(latestVersion, currentVersion)) {
-                            showNotification(
-                                'Có bản cập nhật mới!',
-                                `Phiên bản ${latestVersion} đã có sẵn. Nhấp để cập nhật.`,
-                                8000
-                            );
-                            
-                            if (confirm(`Phiên bản mới ${latestVersion} đã có sẵn! Bạn có muốn cập nhật ngay bây giờ không?`)) {
-                                GM_openInTab(RAW_GITHUB_URL + 'HakoMonetTheme.user.js');
-                            }
+                            showUpdateDialog(currentVersion, latestVersion);
                         } else {
                             showNotification('Thông tin', 'Bạn đang sử dụng phiên bản mới nhất!', 3000);
                         }
