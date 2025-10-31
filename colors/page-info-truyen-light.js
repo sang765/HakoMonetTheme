@@ -579,7 +579,8 @@
             }
             
             #mainpart,
-            #mainpart.at-index {
+            #mainpart.at-index,
+            body:not(.mce-content-body) {
                 background-color: ${palette[1000]} !important;
             }
             
@@ -709,6 +710,11 @@
             .black-click {
                 background-color: ${palette[900]} !important;
             }
+
+            [href*="/the-loai/"]:hover {
+                background-color: ${palette[500]} !important;
+                border: 1px solid ${palette[600]} !important;
+            }
         `;
         
         GM_addStyle(css);
@@ -804,7 +810,8 @@
             }
             
             #mainpart,
-            #mainpart.at-index {
+            #mainpart.at-index,
+            body:not(.mce-content-body) {
                 background-color: ${defaultPalette[1000]} !important;
             }
             
@@ -933,6 +940,11 @@
 
             .black-click {
                 background-color: ${defaultPalette[900]} !important;
+            }
+
+            [href*="/the-loai/"]:hover {
+                background-color: ${defaultPalette[500]} !important;
+                border: 1px solid ${defaultPalette[600]} !important;
             }
         `;
         
