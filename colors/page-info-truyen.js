@@ -174,11 +174,15 @@
             // Kiểm tra chế độ màu
             const colorMode = window.HMTConfig && window.HMTConfig.getColorMode ? window.HMTConfig.getColorMode() : 'default';
 
-            // Chỉ áp dụng màu thực sự nếu không phải preview mode và chế độ là default
-            if (!event.detail.isPreview && colorMode === 'default') {
+            // Chỉ áp dụng màu thực sự nếu không phải preview mode
+            if (!event.detail.isPreview) {
                 // Đợi một chút để đảm bảo màu đã được lưu vào storage
                 setTimeout(() => {
-                    applyCurrentColorScheme();
+                    if (colorMode === 'default') {
+                        applyCurrentColorScheme();
+                    } else if (colorMode === 'thumbnail') {
+                        analyzeAndApplyImageColor();
+                    }
                 }, 100);
             } else if (event.detail.isPreview) {
                 // Nếu là preview mode, áp dụng màu ngay lập tức

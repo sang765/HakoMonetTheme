@@ -215,7 +215,7 @@ ${getColorMode() !== 'thumbnail' ? `
                                                    id="hmt-custom-color-text"
                                                    value="${currentColor}"
                                                    class="hmt-color-text"
-                                                   placeholder="#17deb3">
+                                                   placeholder="#063c30">
                                         </div>
                                         <span class="hmt-color-picker-label">Thanh trượt HSL</span>
                                     </div>
@@ -1235,7 +1235,7 @@ ${getColorMode() !== 'thumbnail' ? `
 
         // Khôi phục mặc định
          resetBtn.addEventListener('click', function() {
-             const defaultColor = '#17deb3';
+             const defaultColor = '#063c30';
              debugLog('Reset màu về mặc định (preview):', defaultColor);
 
              // Cập nhật preview color
