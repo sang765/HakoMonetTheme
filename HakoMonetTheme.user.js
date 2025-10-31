@@ -315,6 +315,17 @@
         updateBtn.addEventListener('click', () => {
             GM_openInTab(RAW_GITHUB_URL + 'HakoMonetTheme.user.js');
             overlay.remove();
+
+            // Set a flag to auto-reload after 10 seconds
+            GM_setValue('pending_update_reload', true);
+            GM_setValue('pending_update_time', Date.now());
+
+            // Auto-reload after 10 seconds
+            setTimeout(() => {
+                if (GM_getValue('pending_update_reload', false)) {
+                    window.location.reload();
+                }
+            }, 10000);
         });
 
         // Load changelog
@@ -633,13 +644,25 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
 
     function initializeScript() {
         debugLog(`Bắt đầu khởi tạo ${SCRIPT_NAME} v${GM_info.script.version}`);
-        
+
+        // Check if we need to auto-reload after update
+        const pendingReload = GM_getValue('pending_update_reload', false);
+        const pendingTime = GM_getValue('pending_update_time', 0);
+        const now = Date.now();
+
+        if (pendingReload && (now - pendingTime) < 30000) { // Within 30 seconds
+            debugLog('Auto-reload sau khi cập nhật');
+            GM_deleteValue('pending_update_reload');
+            GM_deleteValue('pending_update_time');
+            showNotification('Cập nhật hoàn tất', 'Script đã được cập nhật thành công!', 3000);
+        }
+
         // Đăng ký menu commands
         registerMenuCommands();
-        
+
         // Tải tất cả resources
         const { loadedCount } = loadAllResources();
-        
+
         // Only show initialization notification if user has enabled it or if there are errors
         const showInitNotification = GM_getValue('show_init_notification', false);
         if (showInitNotification && loadedCount > 0) {
@@ -649,10 +672,10 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
                 3000
             );
         }
-        
+
         // Kiểm tra cập nhật tự động được xử lý bởi main.js
         // để tránh duplicate notifications
-        
+
         debugLog('Khởi tạo script hoàn tất');
     }
     
