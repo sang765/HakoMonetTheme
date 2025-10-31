@@ -58,11 +58,15 @@
 
     function addTagCSS() {
         // CSS cho các tag với màu sắc khác nhau
-        GM_addStyle(`
-            @import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/tag-color.css');
-        `);
-        
-        debugLog('Đã thêm CSS cho tag colors');
+        fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/tag-color.css')
+            .then(response => response.text())
+            .then(css => {
+                GM_addStyle(css);
+                debugLog('Đã thêm CSS cho tag colors');
+            })
+            .catch(error => {
+                debugLog('Lỗi khi tải tag-color.css:', error);
+            });
     }
     
     // Khởi chạy class

@@ -17,11 +17,15 @@
     }
     
     function addAnimations() {
-        GM_addStyle(`
-            @import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/animation.css');
-        `);
-        
-        debugLog('Đã thêm animations');
+        fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/animation.css')
+            .then(response => response.text())
+            .then(css => {
+                GM_addStyle(css);
+                debugLog('Đã thêm animations');
+            })
+            .catch(error => {
+                debugLog('Lỗi khi tải animation.css:', error);
+            });
     }
     
     // Khởi chạy class

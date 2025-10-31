@@ -61,9 +61,15 @@
     
     function enhanceSeriesPage() {
         // Cải thiện giao diện trang truyện
-        GM_addStyle(`@import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/series-enhancement.css');`);
-
-        debugLog('Đã cải thiện giao diện trang truyện');
+        fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/series-enhancement.css')
+            .then(response => response.text())
+            .then(css => {
+                GM_addStyle(css);
+                debugLog('Đã cải thiện giao diện trang truyện');
+            })
+            .catch(error => {
+                debugLog('Lỗi khi tải series-enhancement.css:', error);
+            });
     }
     
     function addDeviceSpecificStyles() {
@@ -89,10 +95,14 @@
             debugLog('DeviceDetector không khả dụng, sử dụng fallback detection:', currentDevice);
         }
         
-        const css = generateDeviceSpecificCSS(currentDevice);
-        GM_addStyle(css);
-        
-        debugLog(`Đã áp dụng ${currentDevice} specific styles`);
+        generateDeviceSpecificCSS(currentDevice)
+            .then(css => {
+                GM_addStyle(css);
+                debugLog(`Đã áp dụng ${currentDevice} specific styles`);
+            })
+            .catch(error => {
+                debugLog('Lỗi khi tải device specific CSS:', error);
+            });
     }
     
     function generateDeviceSpecificCSS(device) {
@@ -100,17 +110,20 @@
         const isTablet = device === 'tablet';
         const isDesktop = device === 'desktop';
 
-        let css = `@import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-base.css');`;
+        const cssPromises = [];
+
+        // Load base CSS
+        cssPromises.push(fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-base.css').then(r => r.text()));
 
         if (isMobile) {
-            css += `@import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-mobile.css');`;
+            cssPromises.push(fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-mobile.css').then(r => r.text()));
         } else if (isTablet) {
-            css += `@import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-tablet.css');`;
+            cssPromises.push(fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-tablet.css').then(r => r.text()));
         } else if (isDesktop) {
-            css += `@import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-desktop.css');`;
+            cssPromises.push(fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-desktop.css').then(r => r.text()));
         }
 
-        return css;
+        return Promise.all(cssPromises).then(cssArray => cssArray.join('\n'));
     }
     
     function setupDeviceChangeListener() {
@@ -161,10 +174,17 @@
             }
             
             debugLog('Áp dụng CSS cho màn hình dọc (portrait)');
-            
-            GM_addStyle(`@import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/portrait.css');`);
-            portraitCSSApplied = true;
-            debugLog('Đã áp dụng CSS cho màn hình dọc');
+
+            fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/portrait.css')
+                .then(response => response.text())
+                .then(css => {
+                    GM_addStyle(css);
+                    portraitCSSApplied = true;
+                    debugLog('Đã áp dụng CSS cho màn hình dọc');
+                })
+                .catch(error => {
+                    debugLog('Lỗi khi tải portrait.css:', error);
+                });
         }
         
         // Xóa CSS cho landscape mode
@@ -409,13 +429,20 @@
         }
         
         // Thêm styles
-        GM_addStyle(`
-            @import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/thumbnail-overlay.css');
-            .betterhako-bg-overlay {
-                background-image: url('${coverUrl}');
-                filter: blur(12px) brightness(${brightness});
-            }
-        `);
+        fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/thumbnail-overlay.css')
+            .then(response => response.text())
+            .then(css => {
+                GM_addStyle(`
+                    ${css}
+                    .betterhako-bg-overlay {
+                        background-image: url('${coverUrl}');
+                        filter: blur(12px) brightness(${brightness});
+                    }
+                `);
+            })
+            .catch(error => {
+                debugLog('Lỗi khi tải thumbnail-overlay.css:', error);
+            });
         
         // Thêm phần tử vào DOM với double check
         const mainPart = document.getElementById('mainpart');
@@ -434,9 +461,15 @@
     
     // Hàm thêm CSS cho phần trên của feature-section trong suốt
     function addTransparentTopCSS() {
-        GM_addStyle(`@import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/transparent-top.css');`);
-
-        debugLog('Đã thêm CSS phần trên trong suốt');
+        fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/transparent-top.css')
+            .then(response => response.text())
+            .then(css => {
+                GM_addStyle(css);
+                debugLog('Đã thêm CSS phần trên trong suốt');
+            })
+            .catch(error => {
+                debugLog('Lỗi khi tải transparent-top.css:', error);
+            });
     }
     
     // Khởi chạy class
