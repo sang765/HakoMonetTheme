@@ -153,6 +153,7 @@
                 <div class="hmt-config-content">
                     <div class="hmt-config-header">
                         <div class="hmt-header-content">
+                            <button class="hmt-config-back">← Quay lại</button>
                             <div class="hmt-logo-section">
                                 <img src="https://github.com/sang765/HakoMonetTheme/blob/main/.github/assets/logo.png?raw=true"
                                      alt="HakoMonetTheme Logo"
@@ -317,6 +318,25 @@ ${!isInfoPage() ? `
             .hmt-header-content {
                 display: flex;
                 align-items: center;
+                justify-content: space-between;
+                width: 100%;
+            }
+
+            .hmt-config-back {
+                background: rgba(255, 255, 255, 0.2);
+                border: none;
+                color: white;
+                padding: 8px 16px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 500;
+                transition: background-color 0.2s;
+                margin-right: 16px;
+            }
+
+            .hmt-config-back:hover {
+                background: rgba(255, 255, 255, 0.3);
             }
 
             .hmt-logo-section {
@@ -872,6 +892,7 @@ ${!isInfoPage() ? `
 
     function setupConfigEventListeners(dialog) {
         const closeBtn = dialog.querySelector('.hmt-config-close');
+        const backBtn = dialog.querySelector('.hmt-config-back');
         const overlay = dialog.querySelector('.hmt-config-overlay');
         const colorText = dialog.querySelector('.hmt-color-text');
         const previewBox = dialog.querySelector('.hmt-preview-box');
@@ -926,6 +947,13 @@ ${!isInfoPage() ? `
          }
 
         closeBtn.addEventListener('click', closeDialog);
+        backBtn.addEventListener('click', function() {
+            closeDialog();
+            // Open main menu after closing config dialog
+            if (typeof window.HMTMainMenu !== 'undefined' && typeof window.HMTMainMenu.openMainMenu === 'function') {
+                window.HMTMainMenu.openMainMenu();
+            }
+        });
         overlay.addEventListener('click', function(e) {
             if (e.target === overlay) {
                 closeDialog();

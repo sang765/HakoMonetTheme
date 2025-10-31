@@ -315,6 +315,7 @@
                 <div class="hmt-antipopup-content">
                     <div class="hmt-antipopup-header">
                         <div class="hmt-header-content">
+                            <button class="hmt-antipopup-back">← Quay lại</button>
                             <div class="hmt-logo-section">
                                 <div class="hmt-logo">🚫</div>
                                 <div class="hmt-title-section">
@@ -441,6 +442,25 @@
             .hmt-header-content {
                 display: flex;
                 align-items: center;
+                justify-content: space-between;
+                width: 100%;
+            }
+
+            .hmt-antipopup-back {
+                background: rgba(255, 255, 255, 0.2);
+                border: none;
+                color: white;
+                padding: 8px 16px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 500;
+                transition: background-color 0.2s;
+                margin-right: 16px;
+            }
+
+            .hmt-antipopup-back:hover {
+                background: rgba(255, 255, 255, 0.3);
             }
 
             .hmt-logo-section {
@@ -850,6 +870,7 @@
 
     function setupAntiPopupEventListeners(dialog) {
         const closeBtn = dialog.querySelector('.hmt-antipopup-close');
+        const backBtn = dialog.querySelector('.hmt-antipopup-back');
         const closeBtnFooter = dialog.querySelector('.hmt-antipopup-close-btn');
         const overlay = dialog.querySelector('.hmt-antipopup-overlay');
         const toggleInput = dialog.querySelector('.hmt-toggle-input');
@@ -863,6 +884,13 @@
         }
 
         closeBtn.addEventListener('click', closeDialog);
+        backBtn.addEventListener('click', function() {
+            closeDialog();
+            // Open main menu after closing anti-popup dialog
+            if (typeof window.HMTMainMenu !== 'undefined' && typeof window.HMTMainMenu.openMainMenu === 'function') {
+                window.HMTMainMenu.openMainMenu();
+            }
+        });
         closeBtnFooter.addEventListener('click', closeDialog);
         overlay.addEventListener('click', function(e) {
             if (e.target === overlay) {
