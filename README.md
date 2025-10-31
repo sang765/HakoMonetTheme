@@ -8,7 +8,8 @@ Material You theme dành cho Hako/DocLN.
 
 ![Tampermonkey](https://img.shields.io/badge/Tampermonkey-Supported-green.svg)
 ![Violentmonkey](https://img.shields.io/badge/Violentmonkey-Supported-green.svg)
-![License](https://img.shields.io/badge/License-MIT-yellow.svg)
+![License](https://img.shields.io/badge/License-MIT-yellow.svg)  
+![Discord](https://img.shields.io/discord/1201419657282863104?style=for-the-badge&logo=discord&logoColor=%23fff&logoSize=25&label=Tham%20gia%20Discord&color=%235865f2&link=https%3A%2F%2Fdiscord.gg%2FuvQ6A3CDPq)
 
 ## 🌟 Tính năng 🌟
 
