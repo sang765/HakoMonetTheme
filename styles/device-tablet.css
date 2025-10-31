@@ -1,0 +1,12 @@
+/* Tablet specific improvements */
+.series-cover {
+    margin-bottom: 20px;
+}
+
+.series-title {
+    font-size: 1.375rem;
+}
+
+.betterhako-bg-overlay {
+    height: calc(100% - 90%);
+}

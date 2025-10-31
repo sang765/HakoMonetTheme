@@ -1,0 +1,30 @@
+/* Mobile specific improvements */
+.series-cover {
+    margin-bottom: 16px;
+}
+
+.series-title {
+    font-size: 1.25rem;
+    line-height: 1.4;
+}
+
+.series-authors, .series-artists {
+    margin-bottom: 8px;
+}
+
+.tag-item {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+}
+
+.list-chapters {
+    border-radius: 8px;
+}
+
+.list-chapters li {
+    padding: 12px 8px;
+}
+
+.betterhako-bg-overlay {
+    height: calc(100% - 92.5%);
+}

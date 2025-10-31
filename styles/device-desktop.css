@@ -1,0 +1,20 @@
+/* Desktop specific improvements */
+.series-cover {
+    margin-bottom: 24px;
+}
+
+.series-title {
+    font-size: 1.5rem;
+}
+
+.list-chapters {
+    border-radius: 12px;
+}
+
+.list-chapters li {
+    padding: 14px 12px;
+}
+
+.betterhako-bg-overlay {
+    height: calc(100% - 90%);
+}
