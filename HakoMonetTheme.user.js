@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Hako: Monet Theme
 // @namespace    https://github.com/sang765
-// @version      3.7.8
+// @version      3.7.9
 // @description  Material You theme for Hako/DocLN.
 // @description:vi Material You theme dành cho Hako/DocLN.
 // @icon         https://github.com/sang765/HakoMonetTheme/raw/main/.github/assets/logo.png
@@ -29,6 +29,7 @@
 // @resource     infoTruyenJS ./class/info-truyen.js
 // @resource     animationJS ./class/animation.js
 // @resource     tagColorJS ./class/tag-color.js
+// @resource     fontImportJS ./class/font-import.js
 // @resource     colorinfotruyen ./colors/page-info-truyen.js
 // @resource     pagegeneralJS ./colors/page-general.js
 // @resource     pagegenerallightJS ./colors/page-general-light.js
@@ -343,7 +344,7 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
     function loadAllResources() {
         const resources = [
             'mainJS', 'monetAPIJS', 'simpleCORSJS', 'infoTruyenJS',
-            'animationJS', 'tagColorJS', 'colorinfotruyen', 'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyenlight', 'themeDetectorJS', 'deviceDetectorJS', 'configJS', 'adBlockerJS', 'autoReloadJS', 'antiPopupJS'
+            'animationJS', 'tagColorJS', 'fontImportJS', 'colorinfotruyen', 'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyenlight', 'themeDetectorJS', 'deviceDetectorJS', 'configJS', 'adBlockerJS', 'autoReloadJS', 'antiPopupJS'
         ];
 
         let loadedCount = 0;

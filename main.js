@@ -3,7 +3,6 @@
     
     const DEBUG = true;
     const CHECK_UPDATE_INTERVAL = 30 * 60 * 1000; // 30 phút
-    const VERSION = '3.7.8';
     const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/HakoMonetTheme.user.js';
     
     function debugLog(...args) {
@@ -46,9 +45,10 @@
 
                     if (versionMatch && versionMatch[1]) {
                         const latestVersion = versionMatch[1];
-                        debugLog(`Phiên bản hiện tại: ${VERSION}, Phiên bản mới nhất: ${latestVersion}`);
+                        const currentVersion = GM_info.script.version;
+                        debugLog(`Phiên bản hiện tại: ${currentVersion}, Phiên bản mới nhất: ${latestVersion}`);
 
-                        if (isNewerVersion(latestVersion, VERSION)) {
+                        if (isNewerVersion(latestVersion, currentVersion)) {
                             debugLog('Đã tìm thấy phiên bản mới!');
                             showUpdateNotification(latestVersion);
                         } else {
@@ -131,7 +131,7 @@
     
     function init() {
         debugLog('Đang khởi tạo HakoMonetTheme...');
-        debugLog(`Phiên bản: ${VERSION}`);
+        debugLog(`Phiên bản: ${GM_info.script.version}`);
         
         // Thiết lập auto update
         setupAutoUpdate();

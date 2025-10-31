@@ -1,6 +1,3 @@
-/* CSS cải thiện giao diện trang truyện */
-@import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/font-import.css');
-
 .series-cover {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     border-radius: 12px;
