@@ -61,7 +61,7 @@
                                 <div class="hmt-menu-icon">💬</div>
                                 <div class="hmt-menu-text">
                                     <h4>Tham gia Discord</h4>
-                                    <p>Cộng đồng HakoMonetTheme</p>
+                                    <p>The Mavericks</p>
                                 </div>
                             </div>
                         </div>
