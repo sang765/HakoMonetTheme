@@ -45,34 +45,6 @@
         // Kiểm tra chế độ màu
         const colorMode = window.HMTConfig && window.HMTConfig.getColorMode ? window.HMTConfig.getColorMode() : 'default';
 
-        // Nếu là trang đọc truyện và chế độ thumbnail, áp dụng màu từ thumbnail
-        if (document.querySelector('.rd-basic_icon.row') && colorMode === 'thumbnail') {
-            debugLog('Trang đọc truyện với chế độ thumbnail, áp dụng màu từ thumbnail.');
-
-            // Lấy story ID từ URL
-            const pathParts = window.location.pathname.split('/');
-            const storyId = pathParts[2];
-            if (storyId) {
-                getCoverUrlFromInfoPage(storyId)
-                    .then(coverUrl => {
-                        debugLog('Đã lấy URL ảnh bìa:', coverUrl);
-                        return analyzeImageColorTraditionalAccent(coverUrl);
-                    })
-                    .then(dominantColor => {
-                        debugLog('Màu chủ đạo từ thumbnail:', dominantColor);
-                        const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
-                        const isLightColor = MonetAPI.isColorLight(dominantColor);
-                        applyMonetColorScheme(monetPalette, isLightColor);
-                        // Thêm overlay sau khi áp dụng màu
-                        addOverlay();
-                    })
-                    .catch(error => {
-                        debugLog('Lỗi khi lấy màu từ thumbnail:', error);
-                        applyCurrentColorScheme(); // Fallback to config color
-                    });
-                return;
-            }
-        }
 
         // Kiểm tra xem có phải trang truyện không bằng cách tìm element đặc trưng
         const sideFeaturesElement = document.querySelector('div.col-4.col-md.feature-item.width-auto-xl');
@@ -104,6 +76,34 @@
             debugLog('Màu sáng?', isLightColor);
 
             applyMonetColorScheme(monetPalette, isLightColor);
+        }
+
+        // Áp dụng màu sắc lần đầu dựa trên chế độ màu
+        if (colorMode === 'thumbnail' && document.querySelector('.rd-basic_icon.row')) {
+            debugLog('Trang đọc truyện với chế độ thumbnail, áp dụng màu từ thumbnail.');
+            // Lấy story ID từ URL
+            const pathParts = window.location.pathname.split('/');
+            const storyId = pathParts[2];
+            if (storyId) {
+                getCoverUrlFromInfoPage(storyId)
+                    .then(coverUrl => {
+                        debugLog('Đã lấy URL ảnh bìa:', coverUrl);
+                        return analyzeImageColorTraditionalAccent(coverUrl);
+                    })
+                    .then(dominantColor => {
+                        debugLog('Màu chủ đạo từ thumbnail:', dominantColor);
+                        const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
+                        const isLightColor = MonetAPI.isColorLight(dominantColor);
+                        applyMonetColorScheme(monetPalette, isLightColor);
+                        // Thêm overlay sau khi áp dụng màu
+                        addOverlay();
+                    })
+                    .catch(error => {
+                        debugLog('Lỗi khi lấy màu từ thumbnail:', error);
+                        applyCurrentColorScheme(); // Fallback to config color
+                    });
+                return;
+            }
         }
 
         // Áp dụng màu sắc lần đầu
