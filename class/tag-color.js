@@ -59,7 +59,7 @@
     function addTagCSS() {
         // CSS cho các tag với màu sắc khác nhau
         GM_addStyle(`
-            @import url('https://sang765.github.io/HakoMonetTheme/styles/tag-color.css');
+            @import url('https://raw.githubusercontent.com/sang765/HakoMonetTheme/refs/heads/main/styles/tag-color.css');
         `);
         
         debugLog('Đã thêm CSS cho tag colors');
