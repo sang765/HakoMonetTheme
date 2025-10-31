@@ -103,6 +103,11 @@
         return document.querySelector('div.col-4.col-md.feature-item.width-auto-xl') !== null;
     }
 
+    function isReadingPage() {
+        // Kiểm tra nếu đang ở trang đọc truyện dựa trên class đặc trưng
+        return document.querySelector('.rd-basic_icon.row') !== null;
+    }
+
     function createConfigDialog() {
         // Kiểm tra xem dialog đã tồn tại chưa (kiểm tra ở top window để tránh duplicate trong iframe)
         if ((window.top || window).document.querySelector('.hmt-config-dialog')) {
@@ -166,7 +171,7 @@
                         <button class="hmt-config-close">&times;</button>
                     </div>
                     <div class="hmt-config-body">
-${!isInfoPage() ? `
+${!isInfoPage() && getColorMode() !== 'thumbnail' ? `
                         <div class="hmt-config-section">
                             <h4>Màu mặc định</h4>
                             <p>Chọn màu sẽ được sử dụng khi không thể lấy màu từ ảnh bìa truyện. Sử dụng thanh trượt HSL để điều chỉnh màu sắc theo ý muốn.</p>
@@ -246,7 +251,7 @@ ${!isInfoPage() ? `
                             </div>
                         </div>
 
-${!isInfoPage() ? `
+${!isInfoPage() && !isReadingPage() ? `
                         <div class="hmt-config-section">
                             <h4>Chế độ màu</h4>
                             <p>Chọn loại màu để áp dụng cho theme: Mặc định sử dụng màu từ config, Thumbnail sử dụng màu lấy từ ảnh bìa truyện.</p>
@@ -261,7 +266,7 @@ ${!isInfoPage() ? `
                         </div>
 ` : ''}
 
-${!isInfoPage() ? `
+${!isInfoPage() && !isReadingPage() ? `
                         <div class="hmt-config-preview">
                             <h4>Xem trước</h4>
                             <div class="hmt-preview-box" style="background-color: ${currentColor}">
@@ -1264,7 +1269,7 @@ ${!isInfoPage() ? `
         }
 
         // Color mode dropdown
-        if (!isInfoPage()) {
+        if (!isInfoPage() && !isReadingPage()) {
             const colorModeSelect = dialog.querySelector('#hmt-color-mode-select');
             if (colorModeSelect) {
                 colorModeSelect.addEventListener('change', function() {
