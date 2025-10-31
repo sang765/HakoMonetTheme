@@ -103,6 +103,72 @@
                 }
             }, timeout);
         }
+    function fetchChangelog(currentVersion, newVersion) {
+        return new Promise((resolve) => {
+            GM_xmlhttpRequest({
+                method: 'GET',
+                url: 'https://api.github.com/repos/sang765/HakoMonetTheme/commits?per_page=20',
+                headers: {
+                    'Accept': 'application/vnd.github.v3+json'
+                },
+                onload: function(response) {
+                    if (response.status === 200) {
+                        try {
+                            const commits = JSON.parse(response.responseText);
+                            const changelog = generateChangelog(commits, currentVersion, newVersion);
+                            resolve(changelog);
+                        } catch (e) {
+                            debugLog('Lỗi parse JSON commits:', e);
+                            resolve(['Không thể tải nhật ký thay đổi.']);
+                        }
+                    } else {
+                        debugLog('Lỗi tải commits:', response.status);
+                        resolve(['Không thể tải nhật ký thay đổi.']);
+                    }
+                },
+                onerror: function() {
+                    resolve(['Không thể tải nhật ký thay đổi.']);
+                },
+                ontimeout: function() {
+                    resolve(['Không thể tải nhật ký thay đổi.']);
+                }
+            });
+        });
+    }
+
+    function generateChangelog(commits, currentVersion, newVersion) {
+        const changelog = [];
+        let foundCurrent = false;
+        let foundNew = false;
+
+        for (const commit of commits) {
+            const message = commit.commit.message;
+            const sha = commit.sha.substring(0, 7);
+
+            // Check for version bump commits
+            if (message.includes(`bump version to ${newVersion}`)) {
+                foundNew = true;
+                changelog.push(`${message} - ${sha}`);
+            } else if (message.includes(`bump version to ${currentVersion}`)) {
+                foundCurrent = true;
+                changelog.push(`${message} - ${sha}`);
+                break; // Stop when we reach current version
+            } else if (foundNew && !foundCurrent) {
+                // Include commits between versions
+                if (message.startsWith('feat:') || message.startsWith('fix:') || message.startsWith('refactor:') ||
+                    message.startsWith('docs:') || message.startsWith('style:') || message.startsWith('perf:') ||
+                    message.startsWith('test:')) {
+                    changelog.push(`${message} - ${sha}`);
+                }
+            }
+        }
+
+        if (changelog.length === 0) {
+            changelog.push('Không có thay đổi đáng kể.');
+        }
+
+        return changelog;
+    }
     }
     function showUpdateDialog(currentVersion, newVersion) {
         const css = `
@@ -120,6 +186,7 @@
             }
             .update-dialog-content {
                 background-color: white;
+                color: black;
                 padding: 20px;
                 border-radius: 8px;
                 box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -139,6 +206,8 @@
             .changelog {
                 text-align: left;
                 margin-bottom: 20px;
+                max-height: 200px;
+                overflow-y: auto;
             }
             .changelog ul {
                 list-style-type: none;
@@ -146,6 +215,7 @@
             }
             .changelog li {
                 margin-bottom: 5px;
+                font-size: 14px;
             }
             .buttons {
                 display: flex;
@@ -209,9 +279,11 @@
             overlay.remove();
         });
 
-        // Placeholder for changelog
+        // Load changelog
         const changelogList = overlay.querySelector('#changelog-list');
-        changelogList.innerHTML = '<li>Changelog sẽ được cập nhật trong phiên bản tương lai.</li>';
+        fetchChangelog(currentVersion, newVersion).then(changelog => {
+            changelogList.innerHTML = changelog.map(item => `<li>${item}</li>`).join('');
+        });
     }
     
     function openUpdateSettings() {
