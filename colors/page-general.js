@@ -756,7 +756,8 @@
             }
 
             #mainpart,
-            #mainpart.at-index {
+            #mainpart.at-index,
+            .a6-ratio {
                 background-color: ${palette[1000]} !important;
             }
 
@@ -1147,7 +1148,8 @@
             }
 
             #mainpart,
-            #mainpart.at-index {
+            #mainpart.at-index,
+            .a6-ratio {
                 background-color: ${defaultPalette[1000]} !important;
             }
 
