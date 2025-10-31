@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Hako: Monet Theme
 // @namespace    https://github.com/sang765
-// @version      3.7.4
+// @version      3.7.5
 // @description  Material You theme for Hako/DocLN.
 // @description:vi Material You theme dành cho Hako/DocLN.
 // @icon         https://github.com/sang765/HakoMonetTheme/raw/main/.github/assets/logo.png
@@ -160,7 +160,6 @@ Chọn thiết lập cần thay đổi:
             GM_registerMenuCommand('🐛 Báo cáo lỗi', reportBug, 'b');
             GM_registerMenuCommand('💡 Đề xuất tính năng', suggestFeature, 'f');
             GM_registerMenuCommand('🔧 Debug Mode', toggleDebugMode, 'd');
-            GM_registerMenuCommand('🔄 Update Resources', updateAllResources, 'r');
 
             debugLog('Đã đăng ký menu commands');
         }
