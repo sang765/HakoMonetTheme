@@ -25,6 +25,7 @@
 // @require      https://greasyfork.org/scripts/447115-gm-config/code/GM_config.js?version=1060849
 // @resource     mainJS ./main.js
 // @resource     monetAPIJS ./api/monet.js
+// @resource     updateCheckerJS ./api/update-checker.js
 // @resource     simpleCORSJS ./module/simple-cors.js
 // @resource     infoTruyenJS ./class/info-truyen.js
 // @resource     animationJS ./class/animation.js
@@ -72,11 +73,11 @@
         // Command để kiểm tra cập nhật
         if (typeof GM_registerMenuCommand === 'function') {
             GM_registerMenuCommand('🔄 Kiểm tra cập nhật', function() {
-                if (typeof window.HMTUpdateManager !== 'undefined' && typeof window.HMTUpdateManager.checkForUpdatesManual === 'function') {
-                    window.HMTUpdateManager.checkForUpdatesManual();
+                if (typeof window.HMTUpdateChecker !== 'undefined' && typeof window.HMTUpdateChecker.checkForUpdatesManual === 'function') {
+                    window.HMTUpdateChecker.checkForUpdatesManual();
                 } else {
-                    showNotification('Lỗi', 'Module Update Manager chưa được tải. Vui lòng làm mới trang.', 5000);
-                    debugLog('Update Manager module chưa được tải');
+                    showNotification('Lỗi', 'Module Update Checker chưa được tải. Vui lòng làm mới trang.', 5000);
+                    debugLog('Update Checker module chưa được tải');
                 }
             }, 'u');
             GM_registerMenuCommand('📋 Menu chính', function() {
@@ -89,11 +90,11 @@
             }, 'm');
             GM_registerMenuCommand('📊 Thông tin script', showScriptInfo, 'i');
             GM_registerMenuCommand('⚙️ Thiết lập cập nhật', function() {
-                if (typeof window.HMTUpdateManager !== 'undefined' && typeof window.HMTUpdateManager.openUpdateSettings === 'function') {
-                    window.HMTUpdateManager.openUpdateSettings();
+                if (typeof window.HMTUpdateChecker !== 'undefined' && typeof window.HMTUpdateChecker.openUpdateSettings === 'function') {
+                    window.HMTUpdateChecker.openUpdateSettings();
                 } else {
-                    showNotification('Lỗi', 'Module Update Manager chưa được tải. Vui lòng làm mới trang.', 5000);
-                    debugLog('Update Manager module chưa được tải');
+                    showNotification('Lỗi', 'Module Update Checker chưa được tải. Vui lòng làm mới trang.', 5000);
+                    debugLog('Update Checker module chưa được tải');
                 }
             }, 's');
             GM_registerMenuCommand('🐛 Báo cáo lỗi', reportBug, 'b');
@@ -214,7 +215,7 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
     
     function loadAllResources() {
         const resources = [
-            'mainJS', 'monetAPIJS', 'simpleCORSJS', 'infoTruyenJS',
+            'mainJS', 'monetAPIJS', 'updateCheckerJS', 'simpleCORSJS', 'infoTruyenJS',
             'animationJS', 'tagColorJS', 'fontImportJS', 'colorinfotruyen', 'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyenlight', 'themeDetectorJS', 'deviceDetectorJS', 'configJS', 'adBlockerJS', 'autoReloadJS', 'antiPopupJS', 'mainMenuJS', 'updateManagerJS'
         ];
 

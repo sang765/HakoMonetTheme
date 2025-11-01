@@ -2,15 +2,13 @@
     'use strict';
 
     const DEBUG = GM_getValue('debug_mode', false);
-    const CHECK_UPDATE_INTERVAL = 30 * 60 * 1000; // 30 phút
-    const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/HakoMonetTheme.user.js';
 
     function debugLog(...args) {
         if (DEBUG) {
             console.log('[HakoMonetTheme]', ...args);
         }
     }
-    
+
     function loadScript(scriptContent, scriptName) {
         try {
             eval(scriptContent);
@@ -22,123 +20,21 @@
         }
     }
     
-    function checkForUpdates() {
-        // Kiểm tra xem người dùng có bật thông báo cập nhật không
-        const updateNotificationsEnabled = GM_getValue('update_notifications_enabled', true);
-        if (!updateNotificationsEnabled) {
-            debugLog('Thông báo cập nhật đã bị tắt bởi người dùng');
-            // Vẫn lưu thời gian kiểm tra để tránh spam requests
-            GM_setValue('lastUpdateCheck', Date.now());
-            return;
-        }
-
-        debugLog('Đang kiểm tra cập nhật...');
-
-        GM_xmlhttpRequest({
-            method: 'GET',
-            url: GITHUB_RAW_URL + '?t=' + new Date().getTime(),
-            timeout: 10000,
-            onload: function(response) {
-                if (response.status === 200) {
-                    const scriptContent = response.responseText;
-                    const versionMatch = scriptContent.match(/@version\s+([\d.]+)/);
-
-                    if (versionMatch && versionMatch[1]) {
-                        const latestVersion = versionMatch[1];
-                        const currentVersion = GM_info.script.version;
-                        debugLog(`Phiên bản hiện tại: ${currentVersion}, Phiên bản mới nhất: ${latestVersion}`);
-
-                        if (isNewerVersion(latestVersion, currentVersion)) {
-                            debugLog('Đã tìm thấy phiên bản mới!');
-                            showUpdateNotification(latestVersion);
-                        } else {
-                            debugLog('Đang sử dụng phiên bản mới nhất.');
-                        }
-
-                        // Lưu thời gian kiểm tra cuối cùng
-                        GM_setValue('lastUpdateCheck', Date.now());
-                    }
-                }
-            },
-            onerror: function(error) {
-                debugLog('Lỗi khi kiểm tra cập nhật:', error);
-                // Vẫn lưu thời gian kiểm tra để tránh spam requests
-                GM_setValue('lastUpdateCheck', Date.now());
-            },
-            ontimeout: function() {
-                debugLog('Hết thời gian kiểm tra cập nhật');
-                // Vẫn lưu thời gian kiểm tra để tránh spam requests
-                GM_setValue('lastUpdateCheck', Date.now());
-            }
-        });
-    }
-    
-    function isNewerVersion(newVersion, currentVersion) {
-        const newParts = newVersion.split('.').map(Number);
-        const currentParts = currentVersion.split('.').map(Number);
-        
-        for (let i = 0; i < Math.max(newParts.length, currentParts.length); i++) {
-            const newPart = newParts[i] || 0;
-            const currentPart = currentParts[i] || 0;
-            
-            if (newPart > currentPart) return true;
-            if (newPart < currentPart) return false;
-        }
-        
-        return false;
-    }
-    
-    function showUpdateNotification(latestVersion) {
-        if (typeof GM_notification !== 'undefined') {
-            GM_notification({
-                title: 'HakoMonetTheme - Có bản cập nhật mới',
-                text: `Phiên bản ${latestVersion} đã có sẵn. Nhấn để cập nhật.`,
-                timeout: 10000,
-                onclick: function() {
-                    window.open('https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js', '_blank');
-                }
-            });
-        } else {
-            // Fallback cho các userscript manager không hỗ trợ GM_notification
-            if (confirm(`HakoMonetTheme phiên bản ${latestVersion} đã có sẵn. Bạn có muốn cập nhật ngay bây giờ không?`)) {
-                window.open('https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js', '_blank');
-            }
-        }
-    }
-    
-    function setupAutoUpdate() {
-        // Kiểm tra xem người dùng có bật tự động kiểm tra cập nhật không
-        const autoUpdateEnabled = GM_getValue('auto_update_enabled', true);
-        if (!autoUpdateEnabled) {
-            debugLog('Tự động kiểm tra cập nhật đã bị tắt bởi người dùng');
-            return;
-        }
-
-        // Kiểm tra lần cuối cập nhật
-        const lastUpdateCheck = GM_getValue('lastUpdateCheck', 0);
-        const now = Date.now();
-
-        // Nếu chưa từng kiểm tra hoặc đã qua khoảng thời gian kiểm tra kể từ lần kiểm tra cuối
-        if (now - lastUpdateCheck > CHECK_UPDATE_INTERVAL) {
-            checkForUpdates();
-        }
-
-        // Thiết lập interval để kiểm tra định kỳ
-        setInterval(checkForUpdates, CHECK_UPDATE_INTERVAL);
-
-        debugLog('Đã thiết lập tự động kiểm tra cập nhật mỗi 30 phút');
-    }
-    
     function init() {
         debugLog('Đang khởi tạo HakoMonetTheme...');
         debugLog(`Phiên bản: ${GM_info.script.version}`);
         
         // Thiết lập auto update
-        setupAutoUpdate();
+        if (typeof window.HMTUpdateChecker !== 'undefined' && typeof window.HMTUpdateChecker.setupAutoUpdate === 'function') {
+            window.HMTUpdateChecker.setupAutoUpdate();
+        } else {
+            debugLog('Update Checker API chưa được tải');
+        }
         
         // Load các module
         try {
             const monetJS = GM_getResourceText('monetJS');
+            const updateCheckerJS = GM_getResourceText('updateCheckerJS');
             const simpleCORSJS = GM_getResourceText('simpleCORSJS');
             const themeDetectorJS = GM_getResourceText('themeDetectorJS');
             const infoTruyenJS = GM_getResourceText('infoTruyenJS');
@@ -150,8 +46,9 @@
             const configJS = GM_getResourceText('configJS');
             const adBlockerJS = GM_getResourceText('adBlockerJS');
             const antiPopupJS = GM_getResourceText('antiPopupJS');
-            
+
             // Load các module theo thứ tự
+            loadScript(updateCheckerJS, 'update-checker.js');
             loadScript(simpleCORSJS, 'simple-cors.js');
             loadScript(themeDetectorJS, 'theme-detector.js');
             loadScript(imageAnalyzerJS, 'image-analyzer.js');
@@ -166,7 +63,10 @@
             loadScript(colorinfotruyen, 'page-info-truyen.js');
             
             debugLog('Tất cả module đã được tải');
-            
+
+            // Kiểm tra cập nhật tự động được xử lý bởi update-checker API
+            // để tránh duplicate notifications
+
             // Thêm CSS cho update notification
             GM_addStyle(`
                 .hmt-update-notification {
