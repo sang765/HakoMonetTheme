@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    const DEBUG = true;
+    const DEBUG = GM_getValue('debug_mode', false);
     const TARGET_DOMAINS = ['docln', 'hako', 'i2.hako.vip', 'docln.sbs', 'docln.net', 'ln.hako.vn'];
 
     function debugLog(...args) {

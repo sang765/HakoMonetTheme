@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    const DEBUG = true;
+    const DEBUG = GM_getValue('debug_mode', false);
     const SELECTORS = [
         'div.page-top-group > a',
         'div#chapter-content.long-text.no-select.text-justify > a'

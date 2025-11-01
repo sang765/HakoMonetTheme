@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    const DEBUG = true;
+    const DEBUG = GM_getValue('debug_mode', false);
     const GITHUB_REPO = 'https://github.com/sang765/HakoMonetTheme';
     const RAW_GITHUB_URL = 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/';
 

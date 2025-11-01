@@ -1,7 +1,7 @@
 (function() {
     'use strict';
     
-    const DEBUG = true;
+    const DEBUG = GM_getValue('debug_mode', false);
     let thumbnailEffectApplied = false;
     let retryCount = 0;
     let domObserver = null;

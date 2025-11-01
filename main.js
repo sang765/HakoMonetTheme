@@ -1,10 +1,10 @@
 (function() {
     'use strict';
-    
-    const DEBUG = true;
+
+    const DEBUG = GM_getValue('debug_mode', false);
     const CHECK_UPDATE_INTERVAL = 30 * 60 * 1000; // 30 phút
     const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/HakoMonetTheme.user.js';
-    
+
     function debugLog(...args) {
         if (DEBUG) {
             console.log('[HakoMonetTheme]', ...args);
