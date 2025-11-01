@@ -716,6 +716,11 @@
                 border: 1px solid ${palette[600]} !important;
                 color: ${palette[800]} !important;
             }
+
+            .button.button-green:hover,
+            .button.button-red:hover {
+                background-color: ${palette[900]} !important;
+            }
         `;
         
         GM_addStyle(css);
@@ -947,6 +952,11 @@
                 background-color: ${defaultPalette[300]} !important;
                 border: 1px solid ${defaultPalette[600]} !important;
                 color: ${defaultPalette[800]} !important;
+            }
+
+            .button.button-green:hover,
+            .button.button-red:hover {
+                background-color: ${defaultPalette[900]} !important;
             }
         `;
         
