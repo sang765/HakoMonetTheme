@@ -712,6 +712,15 @@
                 border: 1px solid ${palette[600]} !important;
                 color: ${palette[800]} !important;
             }
+
+            .tippy-tooltip {
+                background-color: ${palette[900]} !important;
+                color: ${textColor} !important;
+            }
+
+            .tippy-tooltip[data-placement^="right"] > .tippy-arrow {
+                border-right-color: ${palette[900]} !important;
+            }
         `;
 
         GM_addStyle(css);
@@ -1161,6 +1170,15 @@
                 background-color: ${defaultPalette[300]} !important;
                 border: 1px solid ${defaultPalette[600]} !important;
                 color: ${defaultPalette[800]} !important;
+            }
+
+            .tippy-tooltip {
+                background-color: ${defaultPalette[900]} !important;
+                color: ${textColor} !important;
+            }
+
+            .tippy-tooltip[data-placement^="right"] > .tippy-arrow {
+                border-right-color: ${defaultPalette[900]} !important;
             }
         `;
 
