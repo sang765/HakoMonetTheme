@@ -20,8 +20,20 @@
         fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/animation.css')
             .then(response => response.text())
             .then(css => {
-                GM_addStyle(css);
-                debugLog('Đã thêm animations');
+                // Thêm source mapping cho debug
+                css += '\n/*# sourceMappingURL=https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/animation.css.map */';
+
+                // Tạo Blob URL cho quản lý tài nguyên hiệu quả
+                const blob = new Blob([css], { type: 'text/css' });
+                const blobUrl = URL.createObjectURL(blob);
+
+                // Tạo link element và áp dụng CSS
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = blobUrl;
+                document.head.appendChild(link);
+
+                debugLog('Đã thêm animations với Blob URL và source mapping');
             })
             .catch(error => {
                 debugLog('Lỗi khi tải animation.css:', error);

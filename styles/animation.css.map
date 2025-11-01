@@ -1,0 +1,11 @@
+{
+  "version": 3,
+  "file": "animation.css",
+  "sources": [
+    "animation.css"
+  ],
+  "sourcesContent": [
+    "/* Fade in animation */\n@keyframes fadeIn {\n    from {\n        opacity: 0;\n    }\n\n    to {\n        opacity: 1;\n    }\n}\n\n/* Slide in from top animation */\n@keyframes slideInFromTop {\n    from {\n        transform: translateY(-20px);\n        opacity: 0;\n    }\n\n    to {\n        transform: translateY(0);\n        opacity: 1;\n    }\n}\n\n/* Slide in from bottom animation */\n@keyframes slideInFromBottom {\n    from {\n        transform: translateY(20px);\n        opacity: 0;\n    }\n\n    to {\n        transform: translateY(0);\n        opacity: 1;\n    }\n}\n\n/* Pulse animation */\n@keyframes pulse {\n    0% {\n        transform: scale(1);\n    }\n\n    50% {\n        transform: scale(1.05);\n    }\n\n    100% {\n        transform: scale(1);\n    }\n}\n\n/* Hover animations */\n.series-cover {\n    transition: transform 0.3s ease, box-shadow 0.3s ease;\n}\n\n.series-cover:hover {\n    transform: translateY(-4px);\n    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);\n}\n\n.tag-item {\n    transition: all 0.2s ease;\n}\n\n.tag-item:hover {\n    transform: translateY(-2px);\n    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);\n}\n\n/* Page load animations */\n.series-cover {\n    animation: fadeIn 0.6s ease-out;\n}\n\n.feature-section {\n    animation: slideInFromTop 0.5s ease-out;\n}\n\n.basic-section {\n    animation: slideInFromBottom 0.5s ease-out 0.2s both;\n}\n\n.list-chapters {\n    animation: slideInFromBottom 0.5s ease-out 0.4s both;\n}"
+  ],
+  "mappings": "AAAA;ACAA;ADAA;AEAA;AFAA;AGAA;AHAA;AIAA;AJAA;AKAA;ALAA;AMAA;ANAA;AOAA;APAA;AQAA;ARAA;ASAA;ATAA;AUAA;AVAA;AWAA;AXAA;AYAA;AZAA;AaAA;AbAA;AcAA;AdAA;AeAA;AfAA;AgAA;AhAA;AiAA;AjAA;AkAA;AlAA;AmAA;AnAA;AoAA;ApAA;AqAA;ArAA;AsAA;AtAA;AuAA;AvAA;AwAA;AxAA;AyAA;AzAA;A0AA;A1AA;A2AA;A3AA;A4AA;A5AA;A6AA;A7AA;A8AA;A9AA;A+AA;A/AA;BAAC;BBAC;BCAC;BDAC;BEAC;BFAC;BGAC;BHAC;BIAC;BJAC;BKAC;BLAC;BMAC;BNAC;BOAC;BPAC;BQAC;BRAC;BSAC;BTAC;BUAC;BVAC;BWAC;BXAC;BYAC;BZAC;BaAC;BbAC;BcAC;BdAC;BeAC;BfAC;BgAC;BhAC;BiAC;BjAC;BkAC;BlAC;BmAC;BnAC;BoAC;BpAC;BqAC;BrAC;BsAC;BtAC;BuAC;BvAC;BwAC;BxAC;ByAC;BzAC;B0AC;B1AC;B2AC;B3AC;B4AC;B5AC;B6AC;B7AC;B8AC;B9AC;B+AC;B/AC;"
+}
