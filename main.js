@@ -46,6 +46,16 @@
             const configJS = GM_getResourceText('configJS');
             const adBlockerJS = GM_getResourceText('adBlockerJS');
             const antiPopupJS = GM_getResourceText('antiPopupJS');
+            const blacklistJS = GM_getResourceText('blacklistJS');
+
+            // Load module blacklist trước tiên (ưu tiên cao nhất)
+            loadScript(blacklistJS, 'blacklist.js');
+
+            // Kiểm tra xem có bị blacklist không
+            if (typeof window.HMTBlacklist !== 'undefined' && !window.HMTBlacklist.init()) {
+                debugLog('Trang bị blacklist, dừng tải các module khác');
+                return; // Dừng việc tải các module khác
+            }
 
             // Load các module theo thứ tự
             loadScript(updateCheckerJS, 'update-checker.js');
