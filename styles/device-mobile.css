@@ -28,10 +28,10 @@
 body:has(.text-right.pad-bottom-20) .betterhako-bg-overlay {
     height: calc(100% - 92.5%);
     min-height: 10cm;
-    max-height: 10cm;
+    max-height: 100%;
 }
 body:not(:has(.text-right.pad-bottom-20)) .betterhako-bg-overlay {
     height: calc(100% - 92.5%);
     min-height: 9.5cm;
-    max-height: 9.5cm;
+    max-height: 100%;
 }

@@ -1169,6 +1169,12 @@
             .rd_sidebar #chap_list li a:hover {
                 background-color: ${palette[850]} !important;
             }
+
+            .section-content a:hover {
+                background-color: ${palette[300]} !important;
+                border: 1px solid ${palette[600]} !important;
+                color: ${palette[800]} !important;
+            }
         `;
 
         GM_addStyle(css);
@@ -1644,6 +1650,12 @@
             .rd_sidebar #chap_list li.current,
             .rd_sidebar #chap_list li a:hover {
                 background-color: ${defaultPalette[850]} !important;
+            }
+
+            .section-content a:hover {
+                background-color: ${defaultPalette[300]} !important;
+                border: 1px solid ${defaultPalette[600]} !important;
+                color: ${defaultPalette[800]} !important;
             }
         `;
 

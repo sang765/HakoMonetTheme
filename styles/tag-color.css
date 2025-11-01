@@ -89,3 +89,13 @@
     font-size: 12px !important;
     line-height: 1.4 !important;
 }
+
+.section-content a {
+	border-radius: 20px !important;
+	display: inline-block !important;
+	padding: 5px 12px !important;
+	text-decoration: none !important;
+	transition: all 0.2s ease !important;
+	font-size: 12px !important;
+	line-height: 1.4 !important;
+}

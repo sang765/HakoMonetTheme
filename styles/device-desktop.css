@@ -14,7 +14,13 @@
 .list-chapters li {
     padding: 14px 12px;
 }
-
-.betterhako-bg-overlay {
-    height: calc(100% - 90%);
+body:has(.text-right.pad-bottom-20) .betterhako-bg-overlay {
+    height: calc(100% - 92.5%);
+    min-height: 13.7cm;
+    max-height: 100%;
+}
+body:not(:has(.text-right.pad-bottom-20)) .betterhako-bg-overlay {
+    height: calc(100% - 92.5%);
+    min-height: 12.35cm;
+    max-height: 100%;
 }
