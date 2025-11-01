@@ -697,6 +697,133 @@
             .button.button-red:hover {
                 background-color: ${palette[900]} !important;
             }
+
+            [data-theme="dark"] .navbar {
+                background-color: ${palette[800]} !important;
+            }
+
+            .navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:hover, .navbar-default .navbar-nav > .open > a:focus {
+                background-color: ${palette[100]} !important;
+                color: ${palette[900]} !important;
+            }
+
+            [data-theme="dark"] .panel-default {
+                border-color: ${palette[700]} !important;
+            }
+
+            [data-theme="dark"] .panel {
+                background-color: ${palette[800]} !important;
+            }
+
+            .panel-default {
+                border-color: ${palette[200]} !important;
+            }
+
+            [data-theme="dark"] .panel-default > .panel-heading {
+                color: ${palette[100]} !important;
+                background-color: ${palette[800]} !important;
+                border-color: ${palette[700]} !important;
+            }
+
+            [data-theme="dark"] .panel-body {
+                background-color: ${palette[800]} !important;
+            }
+
+            #drop a {
+                background-color: ${palette[600]} !important;
+                color: ${palette[100]} !important;
+            }
+
+            [data-theme="dark"] .btn-warning {
+                color: ${palette[100]} !important;
+                background-color: ${palette[600]} !important;
+                border-color: ${palette[600]} !important;
+            }
+
+            .btn-warning {
+                color: ${palette[100]} !important;
+                background-color: ${palette[500]} !important;
+                border-color: ${palette[400]} !important;
+            }
+
+            [data-theme="dark"] .btn-warning:hover {
+                color: ${palette[100]} !important;
+                background-color: ${palette[700]} !important;
+                border-color: ${palette[700]} !important;
+            }
+
+            .btn-warning:hover, .btn-warning:focus, .btn-warning.focus, .btn-warning:active, .btn-warning.active, .open > .dropdown-toggle.btn-warning {
+                color: ${palette[100]} !important;
+                background-color: ${palette[600]} !important;
+                border-color: ${palette[500]} !important;
+            }
+
+            [data-theme="dark"] .btn-primary {
+                color: ${palette[100]} !important;
+                background-color: ${palette[700]} !important;
+                border-color: ${palette[700]} !important;
+            }
+
+            .btn-primary {
+                color: ${palette[100]} !important;
+                background-color: ${palette[500]} !important;
+                border-color: ${palette[400]} !important;
+            }
+
+            [data-theme="dark"] .btn-primary:hover {
+                color: ${palette[100]} !important;
+                background-color: ${palette[800]} !important;
+                border-color: ${palette[800]} !important;
+            }
+
+            .btn-primary:hover, .btn-primary:focus, .btn-primary.focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
+                color: ${palette[100]} !important;
+                background-color: ${palette[600]} !important;
+                border-color: ${palette[500]} !important;
+            }
+
+            #drop a:hover {
+                background-color: ${palette[700]} !important;
+            }
+
+            [data-theme="dark"] .alert-info {
+                color: ${palette[100]} !important;
+                background-color: ${palette[500]} !important;
+                border-color: ${palette[500]} !important;
+            }
+
+            .alert-info {
+                background-color: ${palette[100]} !important;
+                border-color: ${palette[200]} !important;
+                color: ${palette[800]} !important;
+            }
+
+            #rd-side_icon {
+                border: 1px solid ${palette[700]} !important;
+            }
+
+            .rd_sidebar-header {
+                background-color: ${palette[900]} !important;
+            }
+
+            .rd_sidebar main {
+                background-color: ${palette[50]} !important;
+            }
+
+            .black-click {
+                background-color: ${palette[900]} !important;
+            }
+
+            [href*="/the-loai/"]:hover {
+                background-color: ${palette[300]} !important;
+                border: 1px solid ${palette[600]} !important;
+                color: ${palette[800]} !important;
+            }
+
+            .button.button-green:hover,
+            .button.button-red:hover {
+                background-color: ${palette[900]} !important;
+            }
         `;
         
         GM_addStyle(css);
