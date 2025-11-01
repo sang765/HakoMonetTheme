@@ -40,7 +40,6 @@
 // @resource     adBlockerJS ./module/ad-blocker.js
 // @resource     autoReloadJS ./module/auto-reload.js
 // @resource     antiPopupJS ./module/anti-popup.js
-// @resource     blacklistJS ./module/blacklist.js
 // @resource     mainMenuJS ./module/main-menu.js
 // @resource     updateManagerJS ./module/update-manager.js
 // @supportURL   https://github.com/sang765/HakoMonetTheme/issues
@@ -216,7 +215,7 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
     function loadAllResources() {
         const resources = [
             'mainJS', 'monetAPIJS', 'updateCheckerJS', 'simpleCORSJS', 'infoTruyenJS',
-            'animationJS', 'tagColorJS', 'fontImportJS', 'colorinfotruyen', 'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyenlight', 'themeDetectorJS', 'deviceDetectorJS', 'configJS', 'adBlockerJS', 'autoReloadJS', 'antiPopupJS', 'blacklistJS', 'mainMenuJS', 'updateManagerJS'
+            'animationJS', 'tagColorJS', 'fontImportJS', 'colorinfotruyen', 'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyenlight', 'themeDetectorJS', 'deviceDetectorJS', 'configJS', 'adBlockerJS', 'autoReloadJS', 'antiPopupJS', 'mainMenuJS', 'updateManagerJS'
         ];
 
         let loadedCount = 0;
