@@ -690,6 +690,7 @@
             [href*="/the-loai/"]:hover {
                 background-color: ${palette[300]} !important;
                 border: 1px solid ${palette[600]} !important;
+                color: ${palette[800]} !important;
             }
         `;
         
@@ -936,6 +937,7 @@
             [href*="/the-loai/"]:hover {
                 background-color: ${defaultPalette[300]} !important;
                 border: 1px solid ${defaultPalette[600]} !important;
+                color: ${defaultPalette[800]} !important;
             }
         `;
         
