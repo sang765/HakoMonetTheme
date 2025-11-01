@@ -73,11 +73,11 @@
         // Command để kiểm tra cập nhật
         if (typeof GM_registerMenuCommand === 'function') {
             GM_registerMenuCommand('🔄 Kiểm tra cập nhật', function() {
-                if (typeof window.HMTUpdateChecker !== 'undefined' && typeof window.HMTUpdateChecker.checkForUpdatesManual === 'function') {
-                    window.HMTUpdateChecker.checkForUpdatesManual();
+                if (typeof window.HMTUpdateManager !== 'undefined' && typeof window.HMTUpdateManager.checkForUpdatesManual === 'function') {
+                    window.HMTUpdateManager.checkForUpdatesManual();
                 } else {
-                    showNotification('Lỗi', 'Module Update Checker chưa được tải. Vui lòng làm mới trang.', 5000);
-                    debugLog('Update Checker module chưa được tải');
+                    showNotification('Lỗi', 'Module Update Manager chưa được tải. Vui lòng làm mới trang.', 5000);
+                    debugLog('Update Manager module chưa được tải');
                 }
             }, 'u');
             GM_registerMenuCommand('📋 Menu chính', function() {
