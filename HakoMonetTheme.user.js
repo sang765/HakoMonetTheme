@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Hako: Monet Theme
 // @namespace    https://github.com/sang765
-// @version      4.0.7
+// @version      4.0.8
 // @description  Material You theme for Hako/DocLN.
 // @description:vi Material You theme dành cho Hako/DocLN.
-// @icon         https://github.com/sang765/HakoMonetTheme/raw/main/.github/assets/logo.png
+// @icon         https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/.github/assets/logo.png
 // @author       SangsDayy
 // @match        https://docln.sbs/*
 // @match        https://docln.net/*
@@ -45,8 +45,8 @@
 // @resource     updateManagerJS ./module/update-manager.js
 // @resource     darkModePrompterJS ./module/dark-mode-prompter.js
 // @supportURL   https://github.com/sang765/HakoMonetTheme/issues
-// @updateURL    https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js
-// @downloadURL  https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js
+// @updateURL    https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/HakoMonetTheme.user.js
+// @downloadURL  https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/HakoMonetTheme.user.js
 // @homepageURL  https://github.com/sang765/HakoMonetTheme
 // @license      MIT
 // @discord      https://discord.gg/uvQ6A3CDPq
