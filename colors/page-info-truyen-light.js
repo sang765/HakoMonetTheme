@@ -503,7 +503,7 @@
             }
 
             
-            a:hover,
+            a:hover:not([href*="/the-loai/"]:hover),
             .long-text a:hover {
                 color: ${palette[500]} !important;
             }
@@ -738,7 +738,7 @@
                 transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease !important;
             }
 
-            a:hover,
+            a:hover:not([href*="/the-loai/"]:hover),
             .text-slate-500,
             .long-text a:hover,
             .long-text a {
