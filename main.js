@@ -25,9 +25,12 @@
         debugLog(`Phiên bản: ${GM_info.script.version}`);
         
         // Thiết lập auto update
+        console.log('[Main] Checking for HMTUpdateChecker');
         if (typeof window.HMTUpdateChecker !== 'undefined' && typeof window.HMTUpdateChecker.setupAutoUpdate === 'function') {
+            console.log('[Main] Calling setupAutoUpdate');
             window.HMTUpdateChecker.setupAutoUpdate();
         } else {
+            console.log('[Main] Update Checker API not loaded');
             debugLog('Update Checker API chưa được tải');
         }
         
@@ -58,6 +61,7 @@
             }
 
             // Load các module theo thứ tự
+            console.log('[Main] Loading update-checker.js');
             loadScript(updateCheckerJS, 'update-checker.js');
             loadScript(simpleCORSJS, 'simple-cors.js');
             loadScript(themeDetectorJS, 'theme-detector.js');

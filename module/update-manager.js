@@ -331,6 +331,7 @@ Chọn thiết lập cần thay đổi:
     }
 
     function checkForUpdatesManual() {
+        console.log('[UpdateManager] checkForUpdatesManual called');
         if (isCheckingForUpdate) {
             showNotification('Thông tin', 'Đang kiểm tra cập nhật...', 3000);
             return;
@@ -343,17 +344,22 @@ Chọn thiết lập cần thay đổi:
             url: RAW_GITHUB_URL + 'HakoMonetTheme.user.js?t=' + new Date().getTime(),
             timeout: 10000,
             onload: function(response) {
+                console.log('[UpdateManager] Manual check response status:', response.status);
                 if (response.status === 200) {
                     const scriptContent = response.responseText;
                     const versionMatch = scriptContent.match(/@version\s+([\d.]+)/);
+                    console.log('[UpdateManager] Manual check version match:', versionMatch);
 
                     if (versionMatch && versionMatch[1]) {
                         const latestVersion = versionMatch[1];
                         const currentVersion = GM_info.script.version;
+                        console.log('[UpdateManager] Current version:', currentVersion, 'Latest version:', latestVersion);
 
                         if (isNewerVersion(latestVersion, currentVersion)) {
+                            console.log('[UpdateManager] New version available, showing dialog');
                             showUpdateDialog(currentVersion, latestVersion);
                         } else {
+                            console.log('[UpdateManager] Already up to date');
                             showNotification('Thông tin', 'Bạn đang sử dụng phiên bản mới nhất!', 3000);
                         }
                     }
@@ -361,11 +367,13 @@ Chọn thiết lập cần thay đổi:
                 isCheckingForUpdate = false;
             },
             onerror: function(error) {
+                console.log('[UpdateManager] Manual check error:', error);
                 showNotification('Lỗi', 'Không thể kiểm tra cập nhật. Vui lòng thử lại sau.', 5000);
                 debugLog('Lỗi khi kiểm tra cập nhật:', error);
                 isCheckingForUpdate = false;
             },
             ontimeout: function() {
+                console.log('[UpdateManager] Manual check timeout');
                 showNotification('Lỗi', 'Hết thời gian kiểm tra cập nhật.', 5000);
                 isCheckingForUpdate = false;
             }
