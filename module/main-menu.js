@@ -64,6 +64,13 @@
                                     <p>The Mavericks</p>
                                 </div>
                             </div>
+                            <div class="hmt-menu-item" data-action="debug-toggle">
+                                <div class="hmt-menu-icon">🔧</div>
+                                <div class="hmt-menu-text">
+                                    <h4>Debug Mode</h4>
+                                    <p>Đang: ${GM_getValue('debug_mode', false) ? 'Bật' : 'Tắt'}</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="hmt-main-menu-footer">
@@ -354,6 +361,9 @@
                     case 'discord':
                         joinDiscord();
                         break;
+                    case 'debug-toggle':
+                        toggleDebugMode();
+                        break;
                 }
             });
         });
@@ -386,6 +396,26 @@
             window.open(discordURL, '_blank');
             showNotification('Discord', 'Mở Discord trong tab mới (fallback)...', 3000);
             debugLog('GM_openInTab không khả dụng, dùng fallback window.open', e);
+        }
+    }
+
+    function toggleDebugMode() {
+        const currentDebug = GM_getValue('debug_mode', false);
+        const newDebug = !currentDebug;
+
+        GM_setValue('debug_mode', newDebug);
+
+        showNotification(
+            'Chế độ Debug',
+            newDebug ? 'Đã bật chế độ debug' : 'Đã tắt chế độ debug',
+            3000
+        );
+
+        debugLog(`Chế độ debug ${newDebug ? 'bật' : 'tắt'}`);
+
+        // Reload để áp dụng thay đổi
+        if (confirm('Cần tải lại trang để áp dụng thay đổi. Bạn có muốn tải lại ngay bây giờ không?')) {
+            window.location.reload();
         }
     }
 

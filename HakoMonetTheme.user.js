@@ -98,7 +98,6 @@
             }, 's');
             GM_registerMenuCommand('🐛 Báo cáo lỗi', reportBug, 'b');
             GM_registerMenuCommand('💡 Đề xuất tính năng', suggestFeature, 'f');
-            GM_registerMenuCommand('🔧 Debug Mode', toggleDebugMode, 'd');
 
             debugLog('Đã đăng ký menu commands');
         }
