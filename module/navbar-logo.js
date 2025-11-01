@@ -61,9 +61,25 @@
                     svgContent = this.modifySVGColors(svgContent, color);
                 }
 
-                // Convert to data URL
-                const dataUrl = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svgContent)))}`;
-                return dataUrl;
+                // Convert to data URL with proper encoding
+                try {
+                    // Use btoa with proper UTF-8 handling
+                    const encodedContent = encodeURIComponent(svgContent);
+                    const decodedContent = unescape(encodedContent);
+                    const dataUrl = `data:image/svg+xml;base64,${btoa(decodedContent)}`;
+                    debugLog('SVG converted to data URL, length:', dataUrl.length);
+                    return dataUrl;
+                } catch (encodeError) {
+                    debugLog('Error encoding SVG to data URL:', encodeError);
+                    // Fallback: try direct btoa on the content
+                    try {
+                        const dataUrl = `data:image/svg+xml;base64,${btoa(svgContent)}`;
+                        return dataUrl;
+                    } catch (fallbackError) {
+                        debugLog('Fallback encoding also failed:', fallbackError);
+                        throw new Error('Failed to encode SVG content');
+                    }
+                }
             } catch (error) {
                 debugLog(`Error fetching/modifying SVG: ${svgPath}`, error);
                 throw error;
@@ -77,19 +93,42 @@
          */
         fetchSVGContent(svgPath) {
             return new Promise((resolve, reject) => {
+                // Handle relative paths by converting to absolute GitHub URLs
+                let absoluteUrl = svgPath;
+                if (svgPath.startsWith('@/github/assets/')) {
+                    absoluteUrl = svgPath.replace('@/github/assets/', 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/.github/assets/');
+                } else if (svgPath.startsWith('./') || svgPath.startsWith('../')) {
+                    // Convert relative paths to absolute GitHub URLs
+                    absoluteUrl = 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/' + svgPath.replace(/^\.\//, '');
+                }
+
+                debugLog('Fetching SVG from:', absoluteUrl);
+
                 GM_xmlhttpRequest({
                     method: 'GET',
-                    url: svgPath,
+                    url: absoluteUrl,
+                    headers: {
+                        'Accept': 'image/svg+xml, text/xml, */*',
+                        'Cache-Control': 'no-cache'
+                    },
                     onload: (response) => {
                         if (response.status === 200) {
+                            debugLog('SVG fetched successfully, length:', response.responseText.length);
                             resolve(response.responseText);
                         } else {
+                            debugLog('SVG fetch failed:', response.status, response.statusText);
                             reject(new Error(`HTTP ${response.status}: ${response.statusText}`));
                         }
                     },
                     onerror: (error) => {
+                        debugLog('SVG fetch network error:', error);
                         reject(new Error(`Network error: ${error}`));
-                    }
+                    },
+                    ontimeout: () => {
+                        debugLog('SVG fetch timeout');
+                        reject(new Error('Request timeout'));
+                    },
+                    timeout: 10000 // 10 second timeout
                 });
             });
         }
@@ -103,8 +142,16 @@
         modifySVGColors(svgContent, color) {
             // Replace fill attributes with the new color
             // This is a simple replacement - for more complex SVGs, you might need more sophisticated parsing
-            const colorRegex = /fill="[^"]*"/g;
-            return svgContent.replace(colorRegex, `fill="${color}"`);
+            let modifiedContent = svgContent;
+
+            // Replace fill attributes (both quoted and unquoted)
+            modifiedContent = modifiedContent.replace(/fill="[^"]*"/g, `fill="${color}"`);
+            modifiedContent = modifiedContent.replace(/fill='[^']*'/g, `fill='${color}'`);
+
+            // Also handle fill attributes without quotes (though less common)
+            modifiedContent = modifiedContent.replace(/fill=[^>\s]+/g, `fill="${color}"`);
+
+            return modifiedContent;
         }
 
         /**
@@ -356,10 +403,15 @@
                 const modifiedSVGDataUrl = await this.fetchAndModifySVG(svgPath, color);
 
                 // Apply the new background image
-                element.style.backgroundImage = `url("${modifiedSVGDataUrl}")`;
-                element.style.backgroundSize = 'contain';
-                element.style.backgroundRepeat = 'no-repeat';
-                element.style.backgroundPosition = 'center';
+                element.style.setProperty('background-image', `url("${modifiedSVGDataUrl}")`, 'important');
+                element.style.setProperty('background-size', 'contain', 'important');
+                element.style.setProperty('background-repeat', 'no-repeat', 'important');
+                element.style.setProperty('background-position', 'center', 'important');
+
+                // Ensure the element is visible and has proper dimensions
+                if (getComputedStyle(element).display === 'none') {
+                    element.style.setProperty('display', 'block', 'important');
+                }
 
                 debugLog(`Updated navbar logo for element:`, element);
                 return true;
@@ -393,12 +445,23 @@
             try {
                 // Find all navbar logo elements
                 const elements = document.querySelectorAll('.navbar-logo');
+                debugLog('Found navbar logo elements:', elements.length);
+
                 if (elements.length === 0) {
                     const error = new Error('No elements with class "navbar-logo" found');
                     debugLog(error.message);
                     if (callback) callback(false, error);
                     throw error;
                 }
+
+                // Log element details for debugging
+                elements.forEach((el, index) => {
+                    debugLog(`Element ${index}:`, el, 'Current styles:', {
+                        backgroundImage: el.style.backgroundImage,
+                        display: el.style.display,
+                        visibility: el.style.visibility
+                    });
+                });
 
                 if (revert) {
                     // Revert all elements
@@ -463,6 +526,21 @@
         },
         initialize: function() {
             debugLog('Navbar Logo module initialized');
+        },
+        // Add a test function to verify functionality
+        testConversion: function() {
+            debugLog('Testing navbar logo conversion...');
+            return navbarLogoManager.updateNavbarLogo({
+                svgPath: '@/github/assets/logo-9.svg',
+                useThemeColor: true,
+                callback: (success, error) => {
+                    if (success) {
+                        debugLog('Test conversion successful');
+                    } else {
+                        debugLog('Test conversion failed:', error);
+                    }
+                }
+            });
         }
     };
 
