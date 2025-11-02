@@ -848,6 +848,11 @@
             .button.button-red:hover {
                 background-color: ${palette[900]} !important;
             }
+
+            .ln-comment-toolkit-item:hover {
+                background-color: ${palette[700]} !important;
+                color: ${textColor} !important;
+            }
         `;
         
         GM_addStyle(css);
@@ -1084,6 +1089,11 @@
             .button.button-green:hover,
             .button.button-red:hover {
                 background-color: ${defaultPalette[900]} !important;
+            }
+
+            .ln-comment-toolkit-item:hover {
+                background-color: ${palette[700]} !important;
+                color: ${textColor} !important;
             }
         `;
         
