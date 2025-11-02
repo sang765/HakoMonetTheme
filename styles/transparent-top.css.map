@@ -2,5 +2,7 @@
   "version": 3,  
   "file": "transparent-top.css",  
   "sources": ["transparent-top.css"],  
-  "sourcesContent": [""]  
-}  
+  "sourcesContent": [".feature-section.at-series {\n    background: transparent !important;\n    border: none !important;\n}\n\n/* Xóa gradient mặc định của dark mode */\n.feature-section.at-series.clear {\n    background: transparent !important;\n    background-image: none !important;\n}\n\n/* Đảm bảo nội dung vẫn hiển thị bình thường */\n.feature-section > * {\n    position: relative;\n    z-index: 2;\n}\n\n/* Tạo lớp phủ gradient để phần trên trong suốt */\n.feature-section::before {\n    content: '';\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    height: 200px;\n    background: linear-gradient(to bottom,\n        rgba(0, 0, 0, 0.3) 0%,\n        rgba(0, 0, 0, 0.7) 50%,\n        rgba(0, 0, 0, 0.9) 100%);\n    pointer-events: none;\n    z-index: 1;\n}\n\n/* Light mode support */\nbody:not(.dark) .feature-section::before {\n    background: linear-gradient(to bottom,\n        rgba(255, 255, 255, 0.3) 0%,\n        rgba(255, 255, 255, 0.7) 50%,\n        rgba(255, 255, 255, 0.9) 100%);\n}\n"] ,
+  "names": [],
+  "mappings": "AAAA"
+}

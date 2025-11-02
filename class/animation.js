@@ -17,27 +17,33 @@
     }
     
     function addAnimations() {
-        fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/animation.css')
-            .then(response => response.text())
-            .then(css => {
-                // Thêm source mapping cho debug
-                css += '\n/*# sourceMappingURL=https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/animation.css.map */';
+        // Fetch CSS and source map simultaneously
+        Promise.all([
+            fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/animation.css').then(r => r.text()),
+            fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/animation.css.map').then(r => r.text())
+        ])
+        .then(([css, mapContent]) => {
+            // Convert source map to data URL
+            const mapDataUrl = 'data:application/json;base64,' + btoa(unescape(encodeURIComponent(mapContent)));
 
-                // Tạo Blob URL cho quản lý tài nguyên hiệu quả
-                const blob = new Blob([css], { type: 'text/css' });
-                const blobUrl = URL.createObjectURL(blob);
+            // Add source mapping as data URL
+            css += '\n/*# sourceMappingURL=' + mapDataUrl + ' */';
 
-                // Tạo link element và áp dụng CSS
-                const link = document.createElement('link');
-                link.rel = 'stylesheet';
-                link.href = blobUrl;
-                document.head.appendChild(link);
+            // Tạo Blob URL cho quản lý tài nguyên hiệu quả
+            const blob = new Blob([css], { type: 'text/css' });
+            const blobUrl = URL.createObjectURL(blob);
 
-                debugLog('Đã thêm animations với Blob URL và source mapping');
-            })
-            .catch(error => {
-                debugLog('Lỗi khi tải animation.css:', error);
-            });
+            // Tạo link element và áp dụng CSS
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = blobUrl;
+            document.head.appendChild(link);
+
+            debugLog('Đã thêm animations với Blob URL và inline source mapping');
+        })
+        .catch(error => {
+            debugLog('Lỗi khi tải animation.css hoặc source map:', error);
+        });
     }
     
     // Khởi chạy class

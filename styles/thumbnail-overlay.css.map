@@ -2,5 +2,7 @@
   "version": 3,  
   "file": "thumbnail-overlay.css",  
   "sources": ["thumbnail-overlay.css"],  
-  "sourcesContent": [""]  
-}  
+  "sourcesContent": [".betterhako-bg-overlay {\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    z-index: -1;\n    background-size: cover;\n    background-position: center;\n    filter: blur(12px);\n    mask-image: linear-gradient(to bottom, black 0%, transparent 100%);\n    -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);\n    pointer-events: none;\n}\n\n#mainpart {\n    position: relative;\n    isolation: isolate;\n}\n\n#mainpart > .container {\n    position: relative;\n    z-index: 1;\n}\n"] ,
+  "names": [],
+  "mappings": "AAAA"
+}

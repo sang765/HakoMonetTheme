@@ -1,0 +1,61 @@
+# .gitignore for HakoMonetTheme (generated from workspace layout)
+# Ignore common OS, editor, node, build, and generated files
+
+# --- Operating system files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# --- Node / JavaScript
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+
+# --- Editor / IDE
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln
+*.sln.docstates
+
+# --- Logs
+logs/
+*.log
+
+# --- Build outputs, caches, coverage
+dist/
+build/
+out/
+coverage/
+.nyc_output/
+.cache/
+.parcel-cache/
+.sass-cache/
+tmp/
+temp/
+
+# --- Generated source maps and compiled assets
+*.map
+*.css.map
+
+# --- Environment / secret files
+.env
+.env.local
+.env.*.local
+
+# --- Misc
+*.bak
+*.swp
+*.swo
+*.tmp
+*.zip
+*.tar.gz
+
+# --- Optional local histories / tooling
+.history/

@@ -1,6 +1,11 @@
-{  
-  "version": 3,  
-  "file": "device-desktop.css",  
-  "sources": ["device-desktop.css"],  
-  "sourcesContent": [""]  
-}  
+{
+  "version": 3,
+  "file": "device-desktop.css",
+  "sources": [
+    "device-desktop.css"
+  ],
+  "sourcesContent": [
+    "/* Desktop specific improvements */\n.series-cover {\n    margin-bottom: 24px;\n}\n\n.series-title {\n    font-size: 1.5rem;\n}\n\n.list-chapters {\n    border-radius: 12px;\n}\n\n.list-chapters li {\n    padding: 14px 12px;\n}\nbody:has(.text-right.pad-bottom-20) .betterhako-bg-overlay {\n    height: calc(100% - 92.5%);\n    min-height: 13.7cm;\n    max-height: 100%;\n}\nbody:not(:has(.text-right.pad-bottom-20)) .betterhako-bg-overlay {\n    height: calc(100% - 92.5%);\n    min-height: 12.35cm;\n    max-height: 100%;\n}"
+  ],
+  "mappings": "AAAA;ACAA;ADAA;AEAA;AFAA;AGAA;AHAA;AIAA;AJAA;AKAA;ALAA;AMAA;ANAA;AOAA;APAA;AQAA;ARAA;ASAA;ATAA;AUAA;AVAA;AWAA;AXAA;AYAA;AZAA;AaAA;AbAA;AcAA;AdAA;AeAA;AfAA;AgAA;AhAA;AiAA;AjAA;AkAA;AlAA;AmAA;AnAA;AoAA;ApAA;AqAA;ArAA;AsAA;AtAA;AuAA;AvAA;AwAA;AxAA;AyAA;AzAA;A0AA;A1AA;A2AA;A3AA;A4AA;A5AA;A6AA;A7AA;A8AA;A9AA;A+AA;A/AA;BAAC;BBAC;BCAC;BDAC;BEAC;BFAC;BGAC;BHAC;BIAC;BJAC;BKAC;BLAC;BMAC;BNAC;BOAC;BPAC;BQAC;BRAC;BSAC;BTAC;BUAC;BVAC;BWAC;BXAC;BYAC;BZAC;BaAC;BbAC;BcAC;BdAC;BeAC;BfAC;BgAC;BhAC;BiAC;BjAC;BkAC;BlAC;BmAC;BnAC;BoAC;BpAC;BqAC;BrAC;BsAC;BtAC;BuAC;BvAC;BwAC;BxAC;ByAC;BzAC;B0AC;B1AC;B2AC;B3AC;B4AC;B5AC;B6AC;B7AC;B8AC;B9AC;B+AC;B/AC;CAAC;CBAC;CCAC;CDAC;CEAC;CFAC;CGAC;CHAC;CIAC;CJAC;CKAC;CLAC;CMAC;CNAC;COAC;CPAC;CQAC;CRAC;CSAC;CTAC;CUAC;CVAC;CWAC;CXAC;CYAC;CZAC;CaAC;CbAC;CcAC;CdAC;CeAC;CfAC;CgAC;ChAC;CiAC;CjAC;CkAC;ClAC;CmAC;CnAC;CoAC;CpAC;CqAC;CrAC;CsAC;CtAC;CuAC;CvAC;CwAC;CxAC;CyAC;CzAC;C0AC;C1AC;C2AC;C3AC;C4AC;C5AC;C6AC;C7AC;C8AC;C9AC;C+AC;C/AC;"
+}

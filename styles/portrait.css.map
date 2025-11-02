@@ -1,6 +1,11 @@
-{  
-  "version": 3,  
-  "file": "portrait.css",  
-  "sources": ["portrait.css"],  
-  "sourcesContent": [""]  
-}  
+{
+  "version": 3,
+  "file": "portrait.css",
+  "sources": [
+    "portrait.css"
+  ],
+  "sourcesContent": [
+    "@media only screen and (max-width: 787px) {\n    .side-features.flex-none > div:nth-child(1),\n    .side-features .row {\n        justify-content: center;\n    }\n}\n@media only screen and (max-width: 787px) {\n    .series-name-group > .series-name,\n    .feature-section .series-name-group,\n    .series-information.mb-0.flex.flex-col,\n    .summary-wrapper.other-facts.col-12,\n    .feature-section .series-information {\n        text-align: center;\n    }\n}\n@media only screen and (max-width: 787px) {\n    ul.list-chapters li .chapter-time {\n        display: contents;\n    }\n}\n@media only screen and (max-width: 787px) {\n    ul.list-chapters li .chapter-time:before {\n    content: \" \";\n    font-family: \"NerdFont\";\n    font-weight: 700;\n    }\n}"
+  ],
+  "mappings": "AAAA;ACAA;ADAA;AEAA;AFAA;AGAA;AHAA;AIAA;AJAA;AKAA;ALAA;AMAA;ANAA;AOAA;APAA;AQAA;ARAA;ASAA;ATAA;AUAA;AVAA;AWAA;AXAA;AYAA;AZAA;AaAA;AbAA;AcAA;AdAA;AeAA;AfAA;AgAA;AhAA;AiAA;AjAA;AkAA;AlAA;AmAA;AnAA;AoAA;ApAA;AqAA;ArAA;AsAA;AtAA;AuAA;AvAA;AwAA;AxAA;AyAA;AzAA;A0AA;A1AA;A2AA;A3AA;A4AA;A5AA;A6AA;A7AA;A8AA;A9AA;A+AA;A/AA;BAAC;BBAC;BCAC;BDAC;BEAC;BFAC;BGAC;BHAC;BIAC;BJAC;BKAC;BLAC;BMAC;BNAC;BOAC;BPAC;BQAC;BRAC;BSAC;BTAC;BUAC;BVAC;BWAC;BXAC;BYAC;BZAC;BaAC;BbAC;BcAC;BdAC;BeAC;BfAC;BgAC;BhAC;BiAC;BjAC;BkAC;BlAC;BmAC;BnAC;BoAC;BpAC;BqAC;BrAC;BsAC;BtAC;BuAC;BvAC;BwAC;BxAC;ByAC;BzAC;B0AC;B1AC;B2AC;B3AC;B4AC;B5AC;B6AC;B7AC;B8AC;B9AC;B+AC;B/AC;CAAC;CBAC;CCAC;CDAC;CEAC;CFAC;CGAC;CHAC;CIAC;CJAC;CKAC;CLAC;CMAC;CNAC;COAC;CPAC;CQAC;CRAC;CSAC;CTAC;CUAC;CVAC;CWAC;CXAC;CYAC;CZAC;CaAC;CbAC;CcAC;CdAC;CeAC;CfAC;CgAC;ChAC;CiAC;CjAC;CkAC;ClAC;CmAC;CnAC;CoAC;CpAC;CqAC;CrAC;CsAC;CtAC;CuAC;CvAC;CwAC;CxAC;CyAC;CzAC;C0AC;C1AC;C2AC;C3AC;C4AC;C5AC;C6AC;C7AC;C8AC;C9AC;C+AC;C/AC;DAAC;DBAC;DCAC;DDAC;DEAC;DFAC;DGAC;DHAC;DIAC;DJAC;DKAC;DLAC;DMAC;DNAC;DOAC;DPAC;DQAC;DRAC;DSAC;DTAC;DUAC;DVAC;DWAC;DXAC;DYAC;DZAC;DaAC;DbAC;DcAC;DdAC;DeAC;DfAC;DgAC;DhAC;DiAC;DjAC;DkAC;DlAC;DmAC;DnAC;DoAC;DpAC;DqAC;DrAC;DsAC;DtAC;DuAC;DvAC;DwAC;DxAC;DyAC;DzAC;D0AC;D1AC;D2AC;D3AC;D4AC;D5AC;D6AC;D7AC;D8AC;D9AC;D+AC;D/AC;EAAC;EBAC;ECAC;EDAC;EEAC;EFAC;EGAC;EHAC;EIAC;EJAC;EKAC;ELAC;EMAC;ENAC;EOAC;EPAC;EQAC;ERAC;ESAC;ETAC;EUAC;EVAC;EWAC;EXAC;EYAC;EZAC;EaAC;EbAC;EcAC;EdAC;EeAC;EfAC;EgAC;EhAC;EiAC;EjAC;EkAC;ElAC;EmAC;EnAC;EoAC;EpAC;EqAC;ErAC;EsAC;EtAC;EuAC;EvAC;EwAC;ExAC;EyAC;EzAC;E0AC;E1AC;E2AC;E3AC;E4AC;E5AC;E6AC;E7AC;E8AC;E9AC;E+AC;E/AC;"
+}

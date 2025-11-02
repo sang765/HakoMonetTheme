@@ -1,3 +1,20 @@
+/**
+ * File cấu hình của HakoMonetTheme
+ *
+ * File này quản lý tất cả các cài đặt và tùy chọn của theme. Nó giúp người dùng
+ * tùy chỉnh giao diện và cách hoạt động của theme trên trang web một cách dễ dàng.
+ *
+ * Các tính năng chính:
+ * - Chọn màu sắc mặc định: Cho phép chọn màu chủ đạo khi không thể lấy màu từ ảnh bìa truyện
+ * - Ẩn cảnh báo tên miền: Ẩn các thông báo cảnh báo về tên miền không chính thức
+ * - Tắt màu trên trang đọc truyện: Ngăn theme áp dụng màu sắc vào trang đọc truyện
+ * - Chế độ màu: Chọn giữa sử dụng màu từ cấu hình hoặc từ ảnh bìa truyện
+ *
+ * Cách sử dụng:
+ * File này tự động tải khi theme khởi động và cung cấp giao diện cài đặt
+ * thông qua menu chính của HakoMonetTheme.
+ */
+
 (function() {
     'use strict';
 
@@ -103,6 +120,10 @@
         return document.querySelector('div.col-4.col-md.feature-item.width-auto-xl') !== null;
     }
 
+    function getRandomHexColor() {
+        return '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+    }
+
     function createConfigDialog() {
         // Kiểm tra xem dialog đã tồn tại chưa (kiểm tra ở top window để tránh duplicate trong iframe)
         if ((window.top || window).document.querySelector('.hmt-config-dialog')) {
@@ -183,7 +204,7 @@ ${!isInfoPage() ? `
                                             </div>
                                             <div class="hmt-hsl-controls">
                                                 <div class="hmt-hsl-slider-group">
-                                                    <label class="hmt-slider-label">Hue</label>
+                                                    <label class="hmt-slider-label">Hue (Màu sắc)</label>
                                                     <div class="hmt-slider-with-buttons">
                                                         <button class="hmt-slider-btn hmt-minus-btn" data-target="hmt-hue-slider" data-action="decrease">-</button>
                                                         <input type="range" class="hmt-color-slider hmt-hue-slider" id="hmt-hue-slider" min="0" max="360" value="${currentHsl.h}">
@@ -191,7 +212,7 @@ ${!isInfoPage() ? `
                                                     </div>
                                                 </div>
                                                 <div class="hmt-hsl-slider-group">
-                                                    <label class="hmt-slider-label">Saturation</label>
+                                                    <label class="hmt-slider-label">Saturation (Độ bão hòa)</label>
                                                     <div class="hmt-slider-with-buttons">
                                                         <button class="hmt-slider-btn hmt-minus-btn" data-target="hmt-sat-slider" data-action="decrease">-</button>
                                                         <input type="range" class="hmt-color-slider hmt-sat-slider" id="hmt-sat-slider" min="0" max="100" value="${currentHsl.s}">
@@ -199,7 +220,7 @@ ${!isInfoPage() ? `
                                                     </div>
                                                 </div>
                                                 <div class="hmt-hsl-slider-group">
-                                                    <label class="hmt-slider-label">Lightness</label>
+                                                    <label class="hmt-slider-label">Lightness (Độ sáng)</label>
                                                     <div class="hmt-slider-with-buttons">
                                                         <button class="hmt-slider-btn hmt-minus-btn" data-target="hmt-light-slider" data-action="decrease">-</button>
                                                         <input type="range" class="hmt-color-slider hmt-light-slider" id="hmt-light-slider" min="0" max="100" value="${currentHsl.l}">
@@ -223,7 +244,7 @@ ${!isInfoPage() ? `
 
                         <div class="hmt-config-section">
                             <h4>Ẩn cảnh báo tên miền</h4>
-                            <p>Ẩn các cảnh báo về tên miền không chính thức trên trang web. Tính năng này sẽ ẩn các thông báo cảnh báo màu vàng.</p>
+                            <p>Ẩn các cảnh báo về tên miền và những thứ khác trên trang web.</p>
 
                             <div class="hmt-domain-warning-toggle">
                                 <label class="hmt-toggle-label">
@@ -235,14 +256,14 @@ ${!isInfoPage() ? `
                         </div>
 
                         <div class="hmt-config-section">
-                            <h4>Tắt màu trên trang đọc truyện</h4>
-                            <p>Tắt việc áp dụng màu sắc từ theme vào trang đọc truyện (nhận biết bởi class ".rd-basic_icon.row"). Khi bật, các trang đọc truyện sẽ không bị ảnh hưởng bởi màu theme.</p>
+                            <h4>Tắt áp dụng chủ đề trên trang đọc truyện</h4>
+                            <p>Tắt việc áp dụng màu sắc từ theme vào trang đọc truyện. Khi bật, các trang đọc truyện sẽ không bị ảnh hưởng bởi màu theme.</p>
 
                             <div class="hmt-reading-page-toggle">
                                 <label class="hmt-toggle-label">
                                     <input type="checkbox" ${getDisableColorsOnReadingPage() ? 'checked' : ''} class="hmt-reading-page-toggle-input">
                                     <span class="hmt-toggle-switch"></span>
-                                    Tắt màu trên trang đọc truyện
+                                    Tắt áp dụng chủ đề trên trang đọc truyện
                                 </label>
                             </div>
                         </div>
@@ -281,6 +302,10 @@ ${!isInfoPage() ? `
 
         // Thêm CSS
         GM_addStyle(`
+            :root {
+                --random-bg-color: #ffffff; /* Mặc định, sẽ được ghi đè bởi JS */
+            }
+
             .hmt-config-overlay {
                 position: fixed;
                 top: 0;
@@ -311,7 +336,7 @@ ${!isInfoPage() ? `
                 justify-content: space-between;
                 align-items: center;
                 padding: 20px 24px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, var(--random-bg-color) 0%, var(--random-bg-color) 100%);
                 color: white;
             }
 
@@ -848,6 +873,9 @@ ${!isInfoPage() ? `
             .hmt-toggle-label input[type="checkbox"]:checked + .hmt-toggle-switch::after {
                 transform: translateX(26px);
             }
+
+            .hmt-color-mode-dropdown label {
+                color: #333;
         `);
 
         (window.top || window).document.body.appendChild(dialog);
@@ -1387,6 +1415,12 @@ ${!isInfoPage() ? `
     function initializeConfig() {
         // Áp dụng cài đặt domain warning khi khởi tạo
         applyDomainWarningVisibility();
+
+        // Thiết lập biến CSS --random-bg-color với màu ngẫu nhiên
+        const randomColor = getRandomHexColor();
+        document.documentElement.style.setProperty('--random-bg-color', randomColor);
+        debugLog('Đã thiết lập --random-bg-color:', randomColor);
+
         debugLog('Config module đã được khởi tạo');
     }
 
@@ -1400,6 +1434,7 @@ ${!isInfoPage() ? `
         setHideDomainWarning: setHideDomainWarning,
         getDisableColorsOnReadingPage: getDisableColorsOnReadingPage,
         setDisableColorsOnReadingPage: setDisableColorsOnReadingPage,
+        getRandomHexColor: getRandomHexColor,
         getColorMode: getColorMode,
         setColorMode: setColorMode,
         openConfigDialog: openConfigDialog,

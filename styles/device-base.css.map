@@ -1,6 +1,11 @@
-{  
-  "version": 3,  
-  "file": "device-base.css",  
-  "sources": ["device-base.css"],  
-  "sourcesContent": [""]  
-}  
+{
+  "version": 3,
+  "file": "device-base.css",
+  "sources": [
+    "device-base.css"
+  ],
+  "sourcesContent": [
+    "/* Base responsive styles - Mobile first approach */\n.text-right.pad-bottom-20 {\n    text-align: center !important;\n}\n\n/* Desktop override */\n@media (min-width: 768px) {\n    .text-right.pad-bottom-20 {\n        text-align: left !important;\n    }\n}"
+  ],
+  "mappings": "AAAA;ACAA;ADAA;AEAA;AFAA;AGAA;AHAA;AIAA;AJAA;AKAA;ALAA;AMAA;ANAA;AOAA;APAA;AQAA;ARAA;ASAA;ATAA;AUAA;AVAA;AWAA;AXAA;AYAA;AZAA;AaAA;AbAA;AcAA;AdAA;AeAA;AfAA;AgAA;AhAA;AiAA;AjAA;AkAA;AlAA;AmAA;AnAA;AoAA;ApAA;AqAA;ArAA;AsAA;AtAA;AuAA;AvAA;AwAA;AxAA;AyAA;AzAA;A0AA;A1AA;A2AA;A3AA;A4AA;A5AA;A6AA;A7AA;A8AA;A9AA;A+AA;A/AA;"
+}

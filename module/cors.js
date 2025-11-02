@@ -6,7 +6,7 @@
 
     function debugLog(...args) {
         if (DEBUG) {
-            console.log('[CORSSimple]', ...args);
+            console.log('[CORSMaster]', ...args);
         }
     }
 
@@ -15,13 +15,13 @@
         return TARGET_DOMAINS.some(domain => url.includes(domain));
     }
 
-    class SimpleCORSSolution {
+    class MasterCORSSolution {
         constructor() {
             this.isInitialized = false;
         }
 
         init() {
-            debugLog('Khởi tạo Simple CORS bypass...');
+            debugLog('Khởi tạo Master CORS bypass...');
 
             // Patch XMLHttpRequest nếu có thể
             this.patchXMLHttpRequest();
@@ -36,8 +36,8 @@
             this.patchCreateElement();
 
             this.isInitialized = true;
-            debugLog('Simple CORS bypass đã được khởi tạo thành công');
-            window.__corsSimpleModuleLoaded = true;
+            debugLog('Master CORS bypass đã được khởi tạo thành công');
+            window.__corsMasterModuleLoaded = true;
 
             return true;
         }
@@ -222,24 +222,24 @@
     }
 
     // Khởi tạo CORS bypass đơn giản
-    function initCORSSimple() {
-        debugLog('Khởi tạo Simple CORS bypass...');
+    function initCORSMaster() {
+        debugLog('Khởi tạo Master CORS bypass...');
 
-        const corsSolution = new SimpleCORSSolution();
+        const corsSolution = new MasterCORSSolution();
         const success = corsSolution.init();
 
         if (success) {
-            debugLog('Simple CORS bypass đã sẵn sàng hoạt động');
+            debugLog('Master CORS bypass đã sẵn sàng hoạt động');
         } else {
-            debugLog('Không thể khởi tạo Simple CORS bypass');
+            debugLog('Không thể khởi tạo Master CORS bypass');
         }
     }
 
     // Khởi chạy module
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initCORSSimple);
+        document.addEventListener('DOMContentLoaded', initCORSMaster);
     } else {
-        initCORSSimple();
+        initCORSMaster();
     }
 
 })();

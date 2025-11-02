@@ -98,13 +98,28 @@
         debugLog('Removed from whitelist:', url);
     }
 
+    // Check if URL matches whitelist patterns
+    function isWhitelisted(url) {
+        if (!url) return false;
+
+        const whitelist = getWhitelist();
+        return whitelist.some(whitelistUrl => {
+            if (whitelistUrl.includes('*')) {
+                // Handle wildcard patterns
+                const pattern = whitelistUrl.replace(/\*/g, '.*');
+                return new RegExp(pattern).test(url);
+            }
+            return url.includes(whitelistUrl);
+        });
+    }
+
     // Check if URL is safe (authentication/login related)
     function isSafePopup(url, name) {
         if (!url && !name) return false;
-        
+
         const urlString = (url || '').toLowerCase();
         const nameString = (name || '').toLowerCase();
-        
+
         return SAFE_PATTERNS.some(pattern =>
             urlString.includes(pattern) || nameString.includes(pattern)
         );
@@ -130,10 +145,9 @@
         
         window.open = function(url, name, features) {
             debugLog('Window.open called:', url, name, features);
-            
+
             // Check whitelist first
-            const whitelist = getWhitelist();
-            if (url && whitelist.includes(url)) {
+            if (url && isWhitelisted(url)) {
                 debugLog('Popup allowed (whitelisted):', url);
                 return window._originalWindowOpen(url, name, features);
             }
@@ -175,18 +189,20 @@
         const href = (element.href || '').toLowerCase();
         const className = (element.className || '').toLowerCase();
         const id = (element.id || '').toLowerCase();
-        
+        const onclick = (element.getAttribute('onclick') || '').toLowerCase();
+
         const safeKeywords = [
             'login', 'signin', 'auth', 'sign in', 'log in',
             'google', 'facebook', 'twitter', 'oauth',
             'đăng nhập', 'đăng ký', 'sign up'
         ];
-        
+
         return safeKeywords.some(keyword =>
             text.includes(keyword) ||
             href.includes(keyword) ||
             className.includes(keyword) ||
-            id.includes(keyword)
+            id.includes(keyword) ||
+            onclick.includes(keyword)
         );
     }
 
@@ -198,37 +214,54 @@
             SELECTORS.forEach(selector => {
                 const elements = document.querySelectorAll(selector);
                 elements.forEach(element => {
-                    if (element.style.display !== 'none') {
-                        // Skip if element is related to authentication/login
-                        if (isSafeElement(element)) {
-                            debugLog('Safe popup element skipped:', selector, element);
-                            return;
+                    // Skip if already processed or hidden
+                    if (element.getAttribute('data-anti-popup-processed') === 'true' ||
+                        element.style.display === 'none' ||
+                        element.offsetParent === null) {
+                        return;
+                    }
+
+                    // Skip if element is related to authentication/login
+                    if (isSafeElement(element)) {
+                        debugLog('Safe popup element skipped:', selector, element);
+                        return;
+                    }
+
+                    // Store original attributes
+                    const originalOnclick = element.getAttribute('onclick') || element.onclick;
+                    const originalHref = element.href;
+
+                    // Remove onclick handlers
+                    element.onclick = null;
+                    element.removeAttribute('onclick');
+
+                    // Store original click handler for potential restoration
+                    if (originalOnclick) {
+                        element.setAttribute('data-anti-popup-original-onclick', originalOnclick.toString());
+                    }
+
+                    // Add our own handler to block popup
+                    element.addEventListener('click', function blockPopupHandler(e) {
+                        // Check if this should be allowed
+                        const href = this.href || '';
+                        if (isWhitelisted(href) || isSafeElement(this)) {
+                            debugLog('Popup allowed via click handler:', href);
+                            return; // Allow the click
                         }
 
-                        // Store original attributes
-                        const originalOnclick = element.getclick || element.onclick;
-                        const originalHref = element.href;
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.stopImmediatePropagation();
 
-                        // Remove onclick handlers
-                        element.onclick = null;
-                        element.removeAttribute('onclick');
+                        debugLog('Ad popup trigger blocked:', selector, element);
+                        incrementBlockedCount();
 
-                        // Add our own handler to block popup
-                        element.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            
-                            debugLog('Ad popup trigger blocked:', selector, element);
-                            incrementBlockedCount();
-                            
-                            const href = this.href || 'unknown';
-                            showNotification(`Đã chặn quảng cáo popup: ${href}`, 3000);
-                        });
+                        showNotification(`Đã chặn quảng cáo popup: ${href || 'unknown'}`, 3000);
+                    }, true); // Use capture phase
 
-                        // Mark as processed
-                        element.setAttribute('data-anti-popup-processed', 'true');
-                        blockedCount++;
-                    }
+                    // Mark as processed
+                    element.setAttribute('data-anti-popup-processed', 'true');
+                    blockedCount++;
                 });
             });
 
@@ -255,12 +288,41 @@
         }
     }
 
+    // Restore original click handlers
+    function restorePopupTriggers() {
+        try {
+            const processedElements = document.querySelectorAll('[data-anti-popup-processed="true"]');
+            let restoredCount = 0;
+
+            processedElements.forEach(element => {
+                const originalOnclick = element.getAttribute('data-anti-popup-original-onclick');
+
+                if (originalOnclick) {
+                    try {
+                        element.setAttribute('onclick', originalOnclick);
+                    } catch (e) {
+                        debugLog('Error restoring onclick:', e);
+                    }
+                }
+
+                element.removeAttribute('data-anti-popup-processed');
+                element.removeAttribute('data-anti-popup-original-onclick');
+                restoredCount++;
+            });
+
+            if (restoredCount > 0) {
+                debugLog(`Restored ${restoredCount} popup triggers`);
+            }
+        } catch (error) {
+            debugLog('Error restoring popup triggers:', error);
+        }
+    }
+
     // Disable anti-popup functionality
     function disableAntiPopup() {
         try {
             restoreWindowOpen();
-            // Remove our event listeners (this is tricky without keeping references)
-            // For now, we'll just restore window.open
+            restorePopupTriggers();
             showNotification('Anti-Popup đã được tắt', 3000);
         } catch (error) {
             debugLog('Error disabling anti-popup:', error);
@@ -274,18 +336,28 @@
         }
 
         const observer = new MutationObserver(function(mutations) {
-            if (isAntiPopupEnabled()) {
-                let shouldCheckPopups = false;
-                
-                mutations.forEach(function(mutation) {
-                    if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-                        shouldCheckPopups = true;
-                    }
-                });
+            if (!isAntiPopupEnabled()) return;
 
-                if (shouldCheckPopups) {
-                    setTimeout(blockPopupTriggers, 100); // Small delay to ensure elements are added
+            let shouldCheckPopups = false;
+
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    mutation.addedNodes.forEach(node => {
+                        if (node.nodeType === 1) { // Element node
+                            if (SELECTORS.some(selector => node.matches?.(selector) || node.querySelector?.(selector))) {
+                                shouldCheckPopups = true;
+                            }
+                        }
+                    });
                 }
+            });
+
+            if (shouldCheckPopups) {
+                setTimeout(() => {
+                    if (isAntiPopupEnabled()) {
+                        blockPopupTriggers();
+                    }
+                }, 100);
             }
         });
 
@@ -857,6 +929,14 @@
                 background: #2d3748;
                 border-color: #4a5568;
                 color: #e2e8f0;
+            }
+
+            .hmt-status-item .hmt-status-value {
+                color: #333;
+            }
+
+            .hmt-stats-btn #text {
+                color: #333;
             }
         `);
 

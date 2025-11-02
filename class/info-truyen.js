@@ -61,27 +61,33 @@
     
     function enhanceSeriesPage() {
         // Cải thiện giao diện trang truyện
-        fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/series-enhancement.css')
-            .then(response => response.text())
-            .then(css => {
-                // Thêm source mapping cho debug
-                css += '\n/*# sourceMappingURL=https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/series-enhancement.css.map */';
+        // Fetch CSS and source map simultaneously
+        Promise.all([
+            fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/series-enhancement.css').then(r => r.text()),
+            fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/series-enhancement.css.map').then(r => r.text())
+        ])
+        .then(([css, mapContent]) => {
+            // Convert source map to data URL
+            const mapDataUrl = 'data:application/json;base64,' + btoa(unescape(encodeURIComponent(mapContent)));
 
-                // Tạo Blob URL cho quản lý tài nguyên hiệu quả
-                const blob = new Blob([css], { type: 'text/css' });
-                const blobUrl = URL.createObjectURL(blob);
+            // Add source mapping as data URL
+            css += '\n/*# sourceMappingURL=' + mapDataUrl + ' */';
 
-                // Tạo link element và áp dụng CSS
-                const link = document.createElement('link');
-                link.rel = 'stylesheet';
-                link.href = blobUrl;
-                document.head.appendChild(link);
+            // Tạo Blob URL cho quản lý tài nguyên hiệu quả
+            const blob = new Blob([css], { type: 'text/css' });
+            const blobUrl = URL.createObjectURL(blob);
 
-                debugLog('Đã cải thiện giao diện trang truyện với Blob URL và source mapping');
-            })
-            .catch(error => {
-                debugLog('Lỗi khi tải series-enhancement.css:', error);
-            });
+            // Tạo link element và áp dụng CSS
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = blobUrl;
+            document.head.appendChild(link);
+
+            debugLog('Đã cải thiện giao diện trang truyện với Blob URL và inline source mapping');
+        })
+        .catch(error => {
+            debugLog('Lỗi khi tải series-enhancement.css hoặc source map:', error);
+        });
     }
     
     function addDeviceSpecificStyles() {
@@ -123,22 +129,35 @@
         const isDesktop = device === 'desktop';
 
         const cssPromises = [];
+        const mapPromises = [];
 
-        // Load base CSS
+        // Load base CSS and source map
         cssPromises.push(fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-base.css').then(r => r.text()));
+        mapPromises.push(fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-base.css.map').then(r => r.text()));
 
         if (isMobile) {
             cssPromises.push(fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-mobile.css').then(r => r.text()));
+            mapPromises.push(fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-mobile.css.map').then(r => r.text()));
         } else if (isTablet) {
             cssPromises.push(fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-tablet.css').then(r => r.text()));
+            mapPromises.push(fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-tablet.css.map').then(r => r.text()));
         } else if (isDesktop) {
             cssPromises.push(fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-desktop.css').then(r => r.text()));
+            mapPromises.push(fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-desktop.css.map').then(r => r.text()));
         }
 
-        return Promise.all(cssPromises).then(cssArray => {
+        return Promise.all([...cssPromises, ...mapPromises]).then(results => {
+            const cssArray = results.slice(0, cssPromises.length);
+            const mapArray = results.slice(cssPromises.length);
+
             let combinedCss = cssArray.join('\n');
-            // Thêm source mapping cho debug
-            combinedCss += '\n/*# sourceMappingURL=https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-' + (isMobile ? 'mobile' : isTablet ? 'tablet' : 'desktop') + '.css.map */';
+
+            // Add source maps as data URLs
+            mapArray.forEach((mapContent, index) => {
+                const mapDataUrl = 'data:application/json;base64,' + btoa(unescape(encodeURIComponent(mapContent)));
+                combinedCss += '\n/*# sourceMappingURL=' + mapDataUrl + ' */';
+            });
+
             return combinedCss;
         });
     }
@@ -192,28 +211,34 @@
             
             debugLog('Áp dụng CSS cho màn hình dọc (portrait)');
 
-            fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/portrait.css')
-                .then(response => response.text())
-                .then(css => {
-                    // Thêm source mapping cho debug
-                    css += '\n/*# sourceMappingURL=https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/portrait.css.map */';
+            // Fetch CSS and source map simultaneously
+            Promise.all([
+                fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/portrait.css').then(r => r.text()),
+                fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/portrait.css.map').then(r => r.text())
+            ])
+            .then(([css, mapContent]) => {
+                // Convert source map to data URL
+                const mapDataUrl = 'data:application/json;base64,' + btoa(unescape(encodeURIComponent(mapContent)));
 
-                    // Tạo Blob URL cho quản lý tài nguyên hiệu quả
-                    const blob = new Blob([css], { type: 'text/css' });
-                    const blobUrl = URL.createObjectURL(blob);
+                // Add source mapping as data URL
+                css += '\n/*# sourceMappingURL=' + mapDataUrl + ' */';
 
-                    // Tạo link element và áp dụng CSS
-                    const link = document.createElement('link');
-                    link.rel = 'stylesheet';
-                    link.href = blobUrl;
-                    document.head.appendChild(link);
+                // Tạo Blob URL cho quản lý tài nguyên hiệu quả
+                const blob = new Blob([css], { type: 'text/css' });
+                const blobUrl = URL.createObjectURL(blob);
 
-                    portraitCSSApplied = true;
-                    debugLog('Đã áp dụng CSS cho màn hình dọc với Blob URL và source mapping');
-                })
-                .catch(error => {
-                    debugLog('Lỗi khi tải portrait.css:', error);
-                });
+                // Tạo link element và áp dụng CSS
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = blobUrl;
+                document.head.appendChild(link);
+
+                portraitCSSApplied = true;
+                debugLog('Đã áp dụng CSS cho màn hình dọc với Blob URL và inline source mapping');
+            })
+            .catch(error => {
+                debugLog('Lỗi khi tải portrait.css hoặc source map:', error);
+            });
         }
         
         // Xóa CSS cho landscape mode
@@ -458,32 +483,38 @@
         }
         
         // Thêm styles
-        fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/thumbnail-overlay.css')
-            .then(response => response.text())
-            .then(css => {
-                // Thêm source mapping cho debug
-                css += '\n/*# sourceMappingURL=https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/thumbnail-overlay.css.map */';
+        // Fetch CSS and source map simultaneously
+        Promise.all([
+            fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/thumbnail-overlay.css').then(r => r.text()),
+            fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/thumbnail-overlay.css.map').then(r => r.text())
+        ])
+        .then(([css, mapContent]) => {
+            // Convert source map to data URL
+            const mapDataUrl = 'data:application/json;base64,' + btoa(unescape(encodeURIComponent(mapContent)));
 
-                // Tạo Blob URL cho quản lý tài nguyên hiệu quả
-                const blob = new Blob([css + `
-                    .betterhako-bg-overlay {
-                        background-image: url('${coverUrl}');
-                        filter: blur(12px) brightness(${brightness});
-                    }
-                `], { type: 'text/css' });
-                const blobUrl = URL.createObjectURL(blob);
+            // Add source mapping as data URL
+            css += '\n/*# sourceMappingURL=' + mapDataUrl + ' */';
 
-                // Tạo link element và áp dụng CSS
-                const link = document.createElement('link');
-                link.rel = 'stylesheet';
-                link.href = blobUrl;
-                document.head.appendChild(link);
+            // Tạo Blob URL cho quản lý tài nguyên hiệu quả
+            const blob = new Blob([css + `
+                .betterhako-bg-overlay {
+                    background-image: url('${coverUrl}');
+                    filter: blur(12px) brightness(${brightness});
+                }
+            `], { type: 'text/css' });
+            const blobUrl = URL.createObjectURL(blob);
 
-                debugLog('Đã thêm hiệu ứng thumbnail mờ dần với Blob URL và source mapping');
-            })
-            .catch(error => {
-                debugLog('Lỗi khi tải thumbnail-overlay.css:', error);
-            });
+            // Tạo link element và áp dụng CSS
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = blobUrl;
+            document.head.appendChild(link);
+
+            debugLog('Đã thêm hiệu ứng thumbnail mờ dần với Blob URL và inline source mapping');
+        })
+        .catch(error => {
+            debugLog('Lỗi khi tải thumbnail-overlay.css hoặc source map:', error);
+        });
         
         // Thêm phần tử vào DOM với double check
         const mainPart = document.getElementById('mainpart');
@@ -502,27 +533,33 @@
     
     // Hàm thêm CSS cho phần trên của feature-section trong suốt
     function addTransparentTopCSS() {
-        fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/transparent-top.css')
-            .then(response => response.text())
-            .then(css => {
-                // Thêm source mapping cho debug
-                css += '\n/*# sourceMappingURL=https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/transparent-top.css.map */';
+        // Fetch CSS and source map simultaneously
+        Promise.all([
+            fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/transparent-top.css').then(r => r.text()),
+            fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/transparent-top.css.map').then(r => r.text())
+        ])
+        .then(([css, mapContent]) => {
+            // Convert source map to data URL
+            const mapDataUrl = 'data:application/json;base64,' + btoa(unescape(encodeURIComponent(mapContent)));
 
-                // Tạo Blob URL cho quản lý tài nguyên hiệu quả
-                const blob = new Blob([css], { type: 'text/css' });
-                const blobUrl = URL.createObjectURL(blob);
+            // Add source mapping as data URL
+            css += '\n/*# sourceMappingURL=' + mapDataUrl + ' */';
 
-                // Tạo link element và áp dụng CSS
-                const link = document.createElement('link');
-                link.rel = 'stylesheet';
-                link.href = blobUrl;
-                document.head.appendChild(link);
+            // Tạo Blob URL cho quản lý tài nguyên hiệu quả
+            const blob = new Blob([css], { type: 'text/css' });
+            const blobUrl = URL.createObjectURL(blob);
 
-                debugLog('Đã thêm CSS phần trên trong suốt với Blob URL và source mapping');
-            })
-            .catch(error => {
-                debugLog('Lỗi khi tải transparent-top.css:', error);
-            });
+            // Tạo link element và áp dụng CSS
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = blobUrl;
+            document.head.appendChild(link);
+
+            debugLog('Đã thêm CSS phần trên trong suốt với Blob URL và inline source mapping');
+        })
+        .catch(error => {
+            debugLog('Lỗi khi tải transparent-top.css hoặc source map:', error);
+        });
     }
     
     // Khởi chạy class

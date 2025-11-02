@@ -57,13 +57,6 @@
                                     <p>Chặn popup quảng cáo</p>
                                 </div>
                             </div>
-                            <div class="hmt-menu-item" data-action="discord">
-                                <div class="hmt-menu-icon">💬</div>
-                                <div class="hmt-menu-text">
-                                    <h4>Tham gia Discord</h4>
-                                    <p>The Mavericks</p>
-                                </div>
-                            </div>
                             <div class="hmt-menu-item" data-action="debug-toggle">
                                 <div class="hmt-menu-icon">🔧</div>
                                 <div class="hmt-menu-text">
@@ -71,7 +64,17 @@
                                     <p>Đang: ${GM_getValue('debug_mode', false) ? 'Bật' : 'Tắt'}</p>
                                 </div>
                             </div>
+                            <div class="hmt-menu-item" data-action="discord">
+                                <div class="hmt-menu-icon">💬</div>
+                                <div class="hmt-menu-text">
+                                    <h4>Tham gia Discord</h4>
+                                    <p>The Mavericks</p>
+                                </div>
+                            </div>
                         </div>
+                    </div>
+                    <div class="hmt-script-version">
+                        Phiên bản: ${GM_info.script.version}
                     </div>
                     <div class="hmt-main-menu-footer">
                         <button class="hmt-main-menu-close-btn">Đóng</button>

@@ -480,6 +480,10 @@
             body.dark .hmt-adblocker-footer {
                 background: #1a202c;
             }
+
+            .hmt-adblocker-status .hmt-status-value {
+                color: #4a4a4a;
+            }
         `);
 
         document.body.appendChild(dialog);

@@ -25,7 +25,7 @@
 // @resource     mainJS ./main.js
 // @resource     monetAPIJS ./api/monet.js
 // @resource     updateCheckerJS ./api/update-checker.js
-// @resource     simpleCORSJS ./module/simple-cors.js
+// @resource     CORSJS ./module/cors.js
 // @resource     infoTruyenJS ./class/info-truyen.js
 // @resource     animationJS ./class/animation.js
 // @resource     tagColorJS ./class/tag-color.js
@@ -44,6 +44,7 @@
 // @resource     navbarLogoJS ./module/navbar-logo.js
 // @resource     updateManagerJS ./module/update-manager.js
 // @resource     darkModePrompterJS ./module/dark-mode-prompter.js
+// @resource     fullscreenJS ./module/fullscreen.js
 // @supportURL   https://github.com/sang765/HakoMonetTheme/issues
 // @updateURL    https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/HakoMonetTheme.user.js
 // @downloadURL  https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/HakoMonetTheme.user.js
@@ -216,8 +217,8 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
     
     function loadAllResources() {
         const resources = [
-            'mainJS', 'monetAPIJS', 'updateCheckerJS', 'simpleCORSJS', 'infoTruyenJS',
-            'animationJS', 'tagColorJS', 'fontImportJS', 'colorinfotruyen', 'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyenlight', 'themeDetectorJS', 'deviceDetectorJS', 'configJS', 'adBlockerJS', 'autoReloadJS', 'antiPopupJS', 'mainMenuJS', 'navbarLogoJS', 'updateManagerJS', 'darkModePrompterJS'
+            'mainJS', 'monetAPIJS', 'updateCheckerJS', 'CORSJS', 'infoTruyenJS',
+            'animationJS', 'tagColorJS', 'fontImportJS', 'colorinfotruyen', 'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyenlight', 'themeDetectorJS', 'deviceDetectorJS', 'configJS', 'adBlockerJS', 'autoReloadJS', 'antiPopupJS', 'mainMenuJS', 'navbarLogoJS', 'updateManagerJS', 'darkModePrompterJS', 'fullscreenJS'
         ];
 
         let loadedCount = 0;
