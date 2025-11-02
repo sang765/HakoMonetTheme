@@ -40,10 +40,6 @@ coverage/
 tmp/
 temp/
 
-# --- Generated source maps and compiled assets
-*.map
-*.css.map
-
 # --- Environment / secret files
 .env
 .env.local

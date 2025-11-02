@@ -1,0 +1,9 @@
+{
+  "version": 3,
+  "sources": ["reading-page-mobile.scss"],
+  "names": [],
+  "mappings": "AAAA;EACE,QAAQ;EACR,SAAS;EACT,YAAY;EACZ,WAAW;AACb",
+  "file": "reading-page-mobile.css",
+  "sourcesContent": [".rd_sd-button_item {\\n  float: left;\\n  padding: 14px 10px;\\n  text-align: center;\\n  width: 14.28%;\\n}"],
+  "sourceRoot": ""
+}

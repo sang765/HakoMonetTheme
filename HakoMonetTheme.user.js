@@ -27,6 +27,7 @@
 // @resource     updateCheckerJS ./api/update-checker.js
 // @resource     CORSJS ./module/cors.js
 // @resource     infoTruyenJS ./class/info-truyen.js
+// @resource     readingPageJS ./class/reading-page.js
 // @resource     animationJS ./class/animation.js
 // @resource     tagColorJS ./class/tag-color.js
 // @resource     fontImportJS ./class/font-import.js
