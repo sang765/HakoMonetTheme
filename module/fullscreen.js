@@ -15,8 +15,8 @@
         fullscreenButton.className = 'rd_sd-button_item';
         fullscreenButton.setAttribute('data-affect', '#');
         fullscreenButton.innerHTML = `
-            <svg class="svg-inline--fa fa-expand" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="expand" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
-                <path fill="currentColor" d="M352 0c-12.9 0-23.1 10.2-23.1 23.1v46.3H23.1C10.2 69.4 0 79.6 0 92.5s10.2 23.1 23.1 23.1h305.8v46.3c0 12.9 10.2 23.1 23.1 23.1s23.1-10.2 23.1-23.1V23.1C375.1 10.2 364.9 0 352 0zM464 167.1H158.2c-12.9 0-23.1 10.2-23.1 23.1s10.2 23.1 23.1 23.1H464c12.9 0 23.1-10.2 23.1-23.1S476.9 167.1 464 167.1zM464 256H158.2c-12.9 0-23.1 10.2-23.1 23.1s10.2 23.1 23.1 23.1H464c12.9 0 23.1-10.2 23.1-23.1S476.9 256 464 256zM464 344.9H158.2c-12.9 0-23.1 10.2-23.1 23.1s10.2 23.1 23.1 23.1H464c12.9 0 23.1-10.2 23.1-23.1S476.9 344.9 464 344.9z"></path>
+            <svg class="svg-inline--fa fa-expand" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="expand" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" data-fa-i2svg="" fill="none">
+                <path d="M4 4V3H3v1zm7.293 8.707a1 1 0 0 0 1.414-1.414zM5 10V4H3v6zM4 5h6V3H4zm-.707-.293 8 8 1.414-1.414-8-8z" fill="currentColor"/><path d="M4 20v1H3v-1zm7.293-8.707a1 1 0 0 1 1.414 1.414zM5 14v6H3v-6zm-1 5h6v2H4zm-.707.293 8-8 1.414 1.414-8 8z" fill="currentColor"/><path d="M20 4V3h1v1zm-7.293 8.707a1 1 0 0 1-1.414-1.414zM19 10V4h2v6zm1-5h-6V3h6zm.707-.293-8 8-1.414-1.414 8-8z" fill="currentColor"/><path d="M20 20v1h1v-1zm-7.293-8.707a1 1 0 0 0-1.414 1.414zM19 14v6h2v-6zm1 5h-6v2h6zm.707.293-8-8-1.414 1.414 8 8z" fill="currentColor"/>
             </svg>
         `;
 
