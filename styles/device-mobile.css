@@ -37,6 +37,9 @@ body:not(:has(.text-right.pad-bottom-20)) .betterhako-bg-overlay {
 }
 @media only screen and (max-width: 980px) {
   .rd_sd-button_item {
+    float: left;
+    padding: 14px 10px;
+    text-align: center;
     width: 14.28%;
   }
 }
