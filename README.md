@@ -47,6 +47,10 @@ Material You theme dành cho Hako/DocLN.
 - [Tampermonkey](https://www.tampermonkey.net/) (Khuyến nghị)
 - Hoặc [Violentmonkey](https://violentmonkey.github.io/get-it/) (Ưu tiên cho chromium từ phiên bản 138 trở lên)
 
+</div>
+</div>
+
+> [!NOTE]  
 > Nếu bạn sử dụng Tampermonkey `(Manifest V3)` trên **Chromium 138** trở lên. Bạn sẽ cần phải vào trang [extension](chrome://extensions) để bật developer mode sau vào chi tiết của Tampermonkey để cấp quyền "Cho phép sử dụng các tập tin thực thi" như vậy sẽ mất nhiều thời gian và **rất phức tạp** với những **người dùng cơ bản** nên Violentmonkey sẽ là giải pháp ưu tiên hơn cho Chromium 138.
 > ![SS 1](https://www.tampermonkey.net/images/chrome_extensions.jpg)  
 > ![SS 2](https://www.tampermonkey.net/images/developer_mode.jpg)
@@ -55,14 +59,13 @@ Material You theme dành cho Hako/DocLN.
 > Chi tiết bạn có thể đọc [Tampermonkey FAQ #209](https://www.tampermonkey.net/faq.php?locale=en#Q209) nếu bạn biết Tiếng Anh.
 
 ### Bước 2: Cài đặt script
-Nhấp vào [raw userscript](https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js) và nhấn "Install"  
+Nhấp vào [raw userscript](https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/HakoMonetTheme.user.js) và nhấn "Install"  
 ![Install Userscript](/.github/assets/Install_us.jpg)
 
 ### Bước 3: Cấp quyền cross-origin cho userscript
 Khi vào bất kỳ trang web nào của Hako thì sẽ thông báo như ở dưới hình hiện lên. Hãy ấn "Always allow domain" và tận hưởng thành quả.  
 ![Userscript Ask](/.github/assets/userscript_asking.jpg)
 
-</div>
 
 ## 🔄 Cập nhật 🔄
 
