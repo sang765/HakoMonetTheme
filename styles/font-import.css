@@ -1,7 +1,7 @@
 @font-face {
-    font-family: 'NerdFont';
-    src: url('https://cdn.jsdelivr.net/gh/ryanoasis/nerd-fonts@latest/patched-fonts/FiraCode/Regular/FiraCodeNerdFont-Regular.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
+  font-family: "NerdFont";
+  src: url("https://cdn.jsdelivr.net/gh/ryanoasis/nerd-fonts@latest/patched-fonts/FiraCode/Regular/FiraCodeNerdFont-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
 }
 /*# sourceMappingURL=font-import.css.map */

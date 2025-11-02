@@ -1,81 +1,81 @@
 .series-cover {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    border-radius: 12px;
-    overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .basic-section, .board-list, .board_categ-list, .detail-list, .feature-section, .index-top_notification, .mail-page .mail-detail-list, .modal-content, .page-breadcrumb, .private-tabs, .profile-feature, .series-users, .showcase-item, .sub-index-style {
-    border-radius: 15px;
+  border-radius: 15px;
 }
 
 .feature-section {
-    border-radius: 12px;
-    overflow: hidden;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .series-title {
-    font-weight: 700;
-    margin-bottom: 8px;
+  font-weight: 700;
+  margin-bottom: 8px;
 }
 
 .series-authors, .series-artists {
-    margin-bottom: 12px;
+  margin-bottom: 12px;
 }
 
 .series-tags {
-    margin-top: 16px;
+  margin-top: 16px;
 }
 
 .tag-item {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 20px;
-    margin: 0 8px 8px 0;
-    font-size: 0.875rem;
-    font-weight: 500;
-    transition: all 0.2s ease;
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin: 0 8px 8px 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
 .tag-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .list-chapters {
-    border-radius: 12px;
-    overflow: hidden;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .list-chapters li {
-    transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .list-chapters li:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .text-right.pad-bottom-20 {
-    text-align: center !important;
+  text-align: center !important;
 }
 
 /* Responsive design cho desktop */
 @media (min-width: 768px) {
-    .text-right.pad-bottom-20 {
-        text-align: left !important;
-    }
+  .text-right.pad-bottom-20 {
+    text-align: left !important;
+  }
 }
-
 /* Light mode support */
 body:not(.dark) .list-chapters li:hover {
-    background-color: rgba(0, 0, 0, 0.03);
+  background-color: rgba(0, 0, 0, 0.03);
 }
 
 .summary-more.more-state {
-    border-radius: 0px 0px 15px 15px;
-    max-width: calc(100% - 31px);
+  border-radius: 0px 0px 15px 15px;
+  max-width: calc(100% - 31px);
 }
 
 .summary-more.more-state .see_more {
-    text-align: center;
+  text-align: center;
 }
+
 /*# sourceMappingURL=series-enhancement.css.map */

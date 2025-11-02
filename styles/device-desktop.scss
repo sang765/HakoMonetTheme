@@ -1,30 +1,27 @@
 /* Desktop specific improvements */
 .series-cover {
-  margin-bottom: 24px;
+    margin-bottom: 24px;
 }
 
 .series-title {
-  font-size: 1.5rem;
+    font-size: 1.5rem;
 }
 
 .list-chapters {
-  border-radius: 12px;
+    border-radius: 12px;
 }
 
 .list-chapters li {
-  padding: 14px 12px;
+    padding: 14px 12px;
 }
-
 body:has(.text-right.pad-bottom-20) .betterhako-bg-overlay {
-  height: 7.5%;
-  min-height: 13.7cm;
-  max-height: 100%;
+    height: calc(100% - 92.5%);
+    min-height: 13.7cm;
+    max-height: 100%;
 }
-
 body:not(:has(.text-right.pad-bottom-20)) .betterhako-bg-overlay {
-  height: 7.5%;
-  min-height: 12.35cm;
-  max-height: 100%;
+    height: calc(100% - 92.5%);
+    min-height: 12.35cm;
+    max-height: 100%;
 }
-
 /*# sourceMappingURL=device-desktop.css.map */

@@ -1,24 +1,25 @@
 .betterhako-bg-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: -1;
-    background-size: cover;
-    background-position: center;
-    filter: blur(12px);
-    mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
-    pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: -1;
+  background-size: cover;
+  background-position: center;
+  filter: blur(12px);
+  mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+  pointer-events: none;
 }
 
 #mainpart {
-    position: relative;
-    isolation: isolate;
+  position: relative;
+  isolation: isolate;
 }
 
 #mainpart > .container {
-    position: relative;
-    z-index: 1;
+  position: relative;
+  z-index: 1;
 }
+
 /*# sourceMappingURL=thumbnail-overlay.css.map */

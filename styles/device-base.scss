@@ -1,12 +1,12 @@
 /* Base responsive styles - Mobile first approach */
 .text-right.pad-bottom-20 {
-  text-align: center !important;
+    text-align: center !important;
 }
 
 /* Desktop override */
 @media (min-width: 768px) {
-  .text-right.pad-bottom-20 {
-    text-align: left !important;
-  }
+    .text-right.pad-bottom-20 {
+        text-align: left !important;
+    }
 }
 /*# sourceMappingURL=device-base.css.map */

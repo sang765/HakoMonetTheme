@@ -49,9 +49,9 @@
 [href*="/the-loai/wars"]:not([href*="?page="]),
 [href*="/the-loai/web-novel"]:not([href*="?page="]),
 [href*="/the-loai/workplace"]:not([href*="?page="]) {
-  background-color: #d4edda !important;
-  border: 1px solid #c3e6cb !important;
-  color: #155724 !important;
+    background-color: #d4edda !important;
+    border: 1px solid #c3e6cb !important;
+    color: #155724 !important;
 }
 
 [href*="/the-loai/age-gap"]:not([href*="?page="]),
@@ -65,39 +65,38 @@
 [href*="/the-loai/shonen-ai"]:not([href*="?page="]),
 [href*="/the-loai/yuri"]:not([href*="?page="]),
 [href*="/the-loai/yandere"]:not([href*="?page="]) {
-  background-color: #fff3cd !important;
-  border: 1px solid #ffeaa7 !important;
-  color: #856404 !important;
+    background-color: #fff3cd !important;
+    border: 1px solid #ffeaa7 !important;
+    color: #856404 !important;
 }
 
 [href*="/the-loai/adult"]:not([href*="?page="]),
 [href*="/the-loai/mature"]:not([href*="?page="]) {
-  background-color: #f8d7da !important;
-  border: 1px solid #f5c6cb !important;
-  color: #721c24 !important;
-  font-weight: bold !important;
+    background-color: #f8d7da !important;
+    border: 1px solid #f5c6cb !important;
+    color: #721c24 !important;
+    font-weight: bold !important;
 }
 
 .feature-section .series-gerne-item {
-  border-radius: 20px !important;
-  display: inline-block !important;
-  margin-bottom: 10px !important;
-  margin-right: 10px !important;
-  padding: 5px 12px !important;
-  text-decoration: none !important;
-  transition: all 0.2s ease !important;
-  font-size: 12px !important;
-  line-height: 1.4 !important;
+    border-radius: 20px !important;
+    display: inline-block !important;
+    margin-bottom: 10px !important;
+    margin-right: 10px !important;
+    padding: 5px 12px !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+    font-size: 12px !important;
+    line-height: 1.4 !important;
 }
 
 .section-content a {
-  border-radius: 20px !important;
-  display: inline-block !important;
-  padding: 5px 12px !important;
-  text-decoration: none !important;
-  transition: all 0.2s ease !important;
-  font-size: 12px !important;
-  line-height: 1.4 !important;
+	border-radius: 20px !important;
+	display: inline-block !important;
+	padding: 5px 12px !important;
+	text-decoration: none !important;
+	transition: all 0.2s ease !important;
+	font-size: 12px !important;
+	line-height: 1.4 !important;
 }
-
 /*# sourceMappingURL=tag-color.css.map */
