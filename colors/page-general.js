@@ -702,20 +702,14 @@
                 color: ${isLight ? '#000' : '#fff'} !important;
             }
 
-            .series-type,
             .series-owner.group-mem,
             .ln-comment-form input.button {
                 background-color: ${palette[500]} !important;
             }
 
-            .series-type,
             .ln-comment-form input.button,
             .series-users .series-owner_name a {
                 color: ${textColor} !important;
-            }
-
-            .feature-section .series-type:before {
-                border-top-color: ${palette[500]} !important;
             }
 
             .navbar-logo-wrapper .navbar-logo {
@@ -1232,20 +1226,14 @@
                 color: #fff !important;
             }
 
-            .series-type,
             .series-owner.group-mem,
             .ln-comment-form input.button {
                 background-color: ${defaultColor} !important;
             }
 
-            .series-type,
             .ln-comment-form input.button,
             .series-users .series-owner_name a {
                 color: #fff !important;
-            }
-
-            .feature-section .series-type:before {
-                border-top-color: ${defaultColor} !important;
             }
 
             .navbar-logo-wrapper .navbar-logo {
