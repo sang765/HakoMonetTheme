@@ -1182,6 +1182,12 @@
             :is(.dark .dark\:ring-cyan-900) {
                 --tw-ring-color: ${palette[900]} !important;
             }
+
+            .button-blue {
+              background-color: ${palette[500]};
+              border-color: ${palette[700]};
+              color: ${textColor};
+            }
         `;
 
         GM_addStyle(css);
@@ -1670,6 +1676,12 @@
 
             :is(.dark .dark\:ring-cyan-900) {
                 --tw-ring-color: ${defaultPalette[900]} !important;
+            }
+
+            .button-blue {
+              background-color: ${defaultPalette[500]};
+              border-color: ${defaultPalette[700]};
+              color: ${textColor};
             }
         `;
 

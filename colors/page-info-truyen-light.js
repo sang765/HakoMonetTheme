@@ -527,6 +527,7 @@
             
             .series-type,
             .series-owner.group-mem,
+            .series-users .series-owner.group-admin,
             .ln-comment-form input.button {
                 background-color: ${palette[500]} !important;
             }
@@ -900,6 +901,7 @@
             
             .series-type,
             .series-owner.group-mem,
+            .series-users .series-owner.group-admin,
             .ln-comment-form input.button {
                 background-color: ${defaultColor} !important;
             }

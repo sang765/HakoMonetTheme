@@ -719,6 +719,12 @@
             .ring-cyan-500 {
               --tw-ring-color: ${palette[500]} !important;
             }
+
+            .button-blue {
+              background-color: ${palette[500]};
+              border-color: ${palette[700]};
+              color: ${textColor};
+            }
         `;
 
         GM_addStyle(css);
@@ -1175,6 +1181,12 @@
 
             .ring-cyan-500 {
                 --tw-ring-color: ${defaultColor} !important;
+            }
+
+            .button-blue {
+                background-color: ${defaultPalette[500]};
+                border-color: ${defaultPalette[700]};
+                color: ${textColor};
             }
         `;
 
