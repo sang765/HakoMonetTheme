@@ -4,7 +4,8 @@
 
 # Hako: Monet Theme
 
-Material You theme dành cho Hako/DocLN.
+~~Material You theme dành cho Hako/DocLN.~~  
+KHÔNG CHỈ ĐƠN GIẢN LÀ MỘT THEME. NÓ CÒN HƠN THẾ NỮA!!!
 
 ![Tampermonkey](https://img.shields.io/badge/Tampermonkey-Supported-green.svg)
 ![Violentmonkey](https://img.shields.io/badge/Violentmonkey-Supported-green.svg)
