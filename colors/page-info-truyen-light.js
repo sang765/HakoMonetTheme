@@ -853,6 +853,10 @@
                 background-color: ${palette[700]} !important;
                 color: ${textColor} !important;
             }
+
+            .ring-cyan-500 {
+              --tw-ring-color: ${palette[500]} !important;
+            }
         `;
         
         GM_addStyle(css);
@@ -1092,8 +1096,12 @@
             }
 
             .ln-comment-toolkit-item:hover {
-                background-color: ${palette[700]} !important;
+                background-color: ${defaultPalette[700]} !important;
                 color: ${textColor} !important;
+            }
+
+            .ring-cyan-500 {
+              --tw-ring-color: ${defaultPalette[500]} !important;
             }
         `;
         

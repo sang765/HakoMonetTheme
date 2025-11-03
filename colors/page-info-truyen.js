@@ -828,7 +828,11 @@
             .ln-comment-toolkit-item:hover {
                 background-color: ${palette[700]} !important;
                 color: ${textColor} !important;
-                }
+            }
+
+            :is(.dark .dark\:ring-cyan-900) {
+                --tw-ring-color: ${palette[900]} !important;
+            }
         `;
         
         GM_addStyle(css);
@@ -1085,6 +1089,10 @@
             .ln-comment-toolkit-item:hover {
                 background-color: ${palette[700]} !important;
                 color: ${textColor} !important;
+            }
+
+            :is(.dark .dark\:ring-cyan-900) {
+                --tw-ring-color: ${defaultPalette[900]} !important;
             }
         `;
         

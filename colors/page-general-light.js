@@ -715,6 +715,10 @@
             .tippy-tooltip[data-placement^="right"] > .tippy-arrow {
                 border-right-color: ${palette[900]} !important;
             }
+
+            .ring-cyan-500 {
+              --tw-ring-color: ${palette[500]} !important;
+            }
         `;
 
         GM_addStyle(css);
@@ -1167,6 +1171,10 @@
 
             .tippy-tooltip[data-placement^="right"] > .tippy-arrow {
                 border-right-color: ${defaultPalette[900]} !important;
+            }
+
+            .ring-cyan-500 {
+                --tw-ring-color: ${defaultColor} !important;
             }
         `;
 
