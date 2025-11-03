@@ -137,12 +137,12 @@
                 message.includes(`version ${newVersion}`) ||
                 message.match(new RegExp(`v?${newVersion.replace(/\./g, '\\.')}`, 'i'))) {
                 foundNew = true;
-                changelog.push(`${message} - [\`${shortSha}\`](${commitUrl})`);
+                changelog.push(`\`${message}\` - [\`${shortSha}\`](${commitUrl})`);
             } else if (message.includes(`bump version to ${currentVersion}`) ||
                        message.includes(`version ${currentVersion}`) ||
                        message.match(new RegExp(`v?${currentVersion.replace(/\./g, '\\.')}`, 'i'))) {
                 foundCurrent = true;
-                changelog.push(`${message} - [\`${shortSha}\`](${commitUrl})`);
+                changelog.push(`\`${message}\` - [\`${shortSha}\`](${commitUrl})`);
                 break; // Stop when we reach current version
             } else if (foundNew && !foundCurrent) {
                 // Include commits between versions
@@ -152,7 +152,7 @@
                     message.startsWith('ci:') || message.startsWith('revert:') ||
                     message.includes('update') || message.includes('add') || message.includes('remove') ||
                     message.includes('change') || message.includes('improve') || message.includes('fix')) {
-                    changelog.push(`${message} - [\`${shortSha}\`](${commitUrl})`);
+                    changelog.push(`\`${message}\` - [\`${shortSha}\`](${commitUrl})`);
                 }
             }
         }
@@ -166,7 +166,7 @@
                 const sha = commit.sha;
                 const shortSha = sha.substring(0, 7);
                 const commitUrl = `https://github.com/sang765/HakoMonetTheme/commit/${sha}`;
-                changelog.push(`${message} - [\`${shortSha}\`](${commitUrl})`);
+                changelog.push(`\`${message}\` - [\`${shortSha}\`](${commitUrl})`);
             }
         }
 
@@ -236,8 +236,6 @@
             .changelog {
                 text-align: left;
                 margin-bottom: 24px;
-                max-height: 250px;
-                overflow-y: auto;
                 background: rgba(0, 0, 0, 0.02);
                 border-radius: 8px;
                 padding: 16px;
@@ -247,6 +245,8 @@
                 list-style-type: none;
                 padding: 0;
                 margin: 0;
+                max-height: 250px;
+                overflow-y: auto;
             }
             .changelog li {
                 margin-bottom: 8px;
@@ -255,6 +255,20 @@
                 padding: 4px 8px;
                 border-radius: 4px;
                 transition: background-color 0.2s ease;
+            }
+            .changelog li code {
+                background: rgba(0,0,0,0.1);
+                padding: 2px 4px;
+                border-radius: 3px;
+                font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+                font-size: 13px;
+            }
+            .changelog li a {
+                color: #007bff;
+                text-decoration: none;
+            }
+            .changelog li a:hover {
+                text-decoration: underline;
             }
             .changelog li:hover {
                 background: rgba(0, 123, 255, 0.05);
@@ -404,7 +418,44 @@
         // Load changelog
         const changelogList = overlay.querySelector('#changelog-list');
         fetchChangelog(currentVersion, newVersion).then(changelog => {
-            changelogList.innerHTML = changelog.map(item => `<li>${item}</li>`).join('');
+            // Full Discord markdown parser
+            const parseMarkdown = (text) => {
+                return text
+                    // Headers (# ## ###)
+                    .replace(/^### (.*$)/gm, '<h3 style="font-size: 14px; font-weight: bold; margin: 8px 0 4px 0; color: #007bff;">$1</h3>')
+                    .replace(/^## (.*$)/gm, '<h2 style="font-size: 16px; font-weight: bold; margin: 10px 0 6px 0; color: #007bff;">$1</h2>')
+                    .replace(/^# (.*$)/gm, '<h1 style="font-size: 18px; font-weight: bold; margin: 12px 0 8px 0; color: #007bff;">$1</h1>')
+                    // Subtext (-#)
+                    .replace(/^-# (.*$)/gm, '<small style="color: #6c757d; font-size: 12px; display: block; margin: 4px 0;">$1</small>')
+                    // Strikethrough (~~text~~)
+                    .replace(/~~(.*?)~~/g, '<del style="text-decoration: line-through;">$1</del>')
+                    // Underline with bold/italic combinations (__***text***__, __**text**__, __*text*__, __text__)
+                    .replace(/___(.*?)___/g, '<u><strong><em>$1</em></strong></u>')
+                    .replace(/__\*\*\*(.*?)\*\*\*__/g, '<u><strong><em>$1</em></strong></u>')
+                    .replace(/__\*\*(.*?)\*\*__/g, '<u><strong>$1</strong></u>')
+                    .replace(/__\*(.*?)\*__/g, '<u><em>$1</em></u>')
+                    .replace(/__(.*?)__/g, '<u>$1</u>')
+                    // Bold with italic (***text***, **_text_**, *_text_*, *text*)
+                    .replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
+                    .replace(/\*\*_([^_]+)_\*\*/g, '<strong><em>$1</em></strong>')
+                    .replace(/\*_([^_]+)_\*/g, '<strong><em>$1</em></strong>')
+                    .replace(/\*_(.*?)_\*/g, '<strong><em>$1</em></strong>')
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    // Italic with underscore (_text_)
+                    .replace(/_([^_]+)_/g, '<em>$1</em>')
+                    // Links [text](url)
+                    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" style="color: #007bff; text-decoration: none;">$1</a>')
+                    // Inline code (`text`)
+                    .replace(/`(.*?)`/g, '<code style="background: rgba(0,0,0,0.1); padding: 2px 4px; border-radius: 3px; font-family: \'SFMono-Regular\', Consolas, \'Liberation Mono\', Menlo, monospace; font-size: 13px;">$1</code>')
+                    // Block quotes (> text, >>> text)
+                    .replace(/^> (.*$)/gm, '<blockquote style="border-left: 4px solid #007bff; padding-left: 8px; margin: 8px 0; color: #6c757d; font-style: italic;">$1</blockquote>')
+                    .replace(/^>>> (.*$)/gm, '<blockquote style="border-left: 4px solid #007bff; padding: 8px; margin: 8px 0; background: rgba(0,123,255,0.05); border-radius: 4px; color: #6c757d; font-style: italic;">$1</blockquote>')
+                    // Code blocks (```text```)
+                    .replace(/```([\s\S]*?)```/g, '<pre style="background: rgba(0,0,0,0.05); padding: 8px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1); overflow-x: auto; font-family: \'SFMono-Regular\', Consolas, \'Liberation Mono\', Menlo, monospace; font-size: 12px; margin: 8px 0;"><code>$1</code></pre>');
+            };
+
+            changelogList.innerHTML = changelog.map(item => `<li>${parseMarkdown(item)}</li>`).join('');
             updatePerfInfo();
         });
 
