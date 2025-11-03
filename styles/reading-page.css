@@ -8,4 +8,8 @@
     width: 12.5% !important;
   }
 }
-/*# sourceMappingURL=https://sang765.github.io/HakoMonetTheme/styles/reading-page-mobile.css.map */
+a#rd-fullscreen_icon {
+  padding: 16px;
+}
+
+/*# sourceMappingURL=reading-page.css.map */

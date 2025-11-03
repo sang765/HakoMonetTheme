@@ -26,8 +26,8 @@
     function addReadingPageCSS() {
         // Fetch CSS and source map simultaneously
         Promise.all([
-            fetch(FOLDER_URL + 'reading-page-mobile.css').then(r => r.text()),
-            fetch(FOLDER_URL + 'reading-page-mobile.css.map').then(r => r.text())
+            fetch(FOLDER_URL + 'reading-page.css').then(r => r.text()),
+            fetch(FOLDER_URL + 'reading-page.css.map').then(r => r.text())
         ])
         .then(([css, mapContent]) => {
             // Convert source map to data URL
@@ -46,10 +46,10 @@
             link.href = blobUrl;
             document.head.appendChild(link);
 
-            debugLog('Đã thêm reading page mobile CSS với Blob URL và inline source mapping');
+            debugLog('Đã thêm reading page CSS với Blob URL và inline source mapping');
         })
         .catch(error => {
-            debugLog('Lỗi khi tải reading-page-mobile.css hoặc source map:', error);
+            debugLog('Lỗi khi tải reading-page.css hoặc source map:', error);
         });
     }
     
