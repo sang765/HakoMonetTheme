@@ -81,8 +81,6 @@
                         <div class="hmt-footer-version-info">
                             <div class="hmt-version-info">
                                 <span class="hmt-script-version" id="hmt-version-display">Phiên bản: <strong>${GM_info.script.version}</strong></span>
-                            </div>
-                            <div class="hmt-update-check">
                                 <a href="#" class="hmt-check-updates-link">Kiểm tra cập nhật</a>
                             </div>
                         </div>

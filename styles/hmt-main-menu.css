@@ -178,19 +178,10 @@
   display: flex;
   align-items: flex-start;
   padding-top: 2px;
+  flex: 1;
 }
 
-.hmt-info-icon {
-  flex-shrink: 0;
-  opacity: 0.7;
-}
 
-.hmt-footer-version {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-}
 
 .hmt-script-version {
   font-size: 14px;
@@ -207,11 +198,6 @@
   content: " (Bạn đang sử dụng phiên bản cũ)";
   color: #dc3545;
   font-weight: 500;
-}
-
-.hmt-update-check {
-  display: flex;
-  align-items: center;
 }
 
 .hmt-check-updates-link {
