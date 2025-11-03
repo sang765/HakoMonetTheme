@@ -535,6 +535,159 @@ Chọn thiết lập cần thay đổi:
         debugLog('Đã cập nhật thiết lập cập nhật');
     }
 
+    function showUpToDateDialog(currentVersion) {
+        const css = `
+            .up-to-date-dialog-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+                backdrop-filter: blur(2px);
+                animation: fadeIn 0.3s ease-out;
+            }
+            .up-to-date-dialog-content {
+                background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+                color: black;
+                padding: 24px;
+                border-radius: 16px;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+                max-width: 480px;
+                width: 90%;
+                animation: slideUp 0.4s ease-out;
+                border: 1px solid rgba(0, 0, 0, 0.1);
+                text-align: center;
+            }
+            .up-to-date-icon {
+                width: 72px;
+                height: 72px;
+                margin: 0 auto 16px;
+                display: block;
+                filter: drop-shadow(0 4px 8px rgba(40, 167, 69, 0.3));
+            }
+            .version-info {
+                margin-bottom: 24px;
+            }
+            .version-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+                color: white;
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-size: 14px;
+                font-weight: 600;
+                margin-top: 8px;
+                box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+            }
+            .message {
+                font-size: 16px;
+                color: #495057;
+                margin-bottom: 24px;
+                line-height: 1.5;
+            }
+            .buttons {
+                display: flex;
+                gap: 12px;
+                justify-content: center;
+            }
+            .buttons button {
+                padding: 12px 24px;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 600;
+                font-size: 14px;
+                transition: all 0.2s ease;
+                min-width: 120px;
+            }
+            #close-btn {
+                background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+                color: white;
+                box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+            }
+            #close-btn:hover {
+                background: linear-gradient(135deg, #1e7e34 0%, #155724 100%);
+                transform: translateY(-1px);
+                box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
+            }
+            #settings-btn {
+                background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+                color: white;
+                border: 1px solid rgba(0, 0, 0, 0.1);
+            }
+            #settings-btn:hover {
+                background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            @keyframes slideUp {
+                from { transform: translateY(30px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+        `;
+
+        GM_addStyle(css);
+
+        const overlay = document.createElement('div');
+        overlay.className = 'up-to-date-dialog-overlay';
+        overlay.innerHTML = `
+            <div class="up-to-date-dialog-content">
+                <svg class="up-to-date-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#28a745" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="version-info">
+                    <p><strong>✅ Phiên bản hiện tại đã là mới nhất</strong></p>
+                    <div class="version-badge">
+                        <span>${currentVersion}</span>
+                    </div>
+                </div>
+                <div class="message">
+                    Bạn đang sử dụng phiên bản mới nhất của HakoMonetTheme.
+                    Script sẽ tiếp tục tự động kiểm tra cập nhật định kỳ.
+                </div>
+                <div class="buttons">
+                    <button id="settings-btn">⚙️ Thiết lập</button>
+                    <button id="close-btn">✅ Đã hiểu</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        const closeBtn = overlay.querySelector('#close-btn');
+        const settingsBtn = overlay.querySelector('#settings-btn');
+
+        closeBtn.addEventListener('click', () => {
+            overlay.remove();
+            debugLog('User closed up-to-date dialog');
+        });
+
+        settingsBtn.addEventListener('click', () => {
+            overlay.remove();
+            openUpdateSettings();
+            debugLog('User opened update settings from up-to-date dialog');
+        });
+
+        // Auto-close after 10 seconds
+        setTimeout(() => {
+            if (overlay.parentElement) {
+                overlay.remove();
+                debugLog('Up-to-date dialog auto-closed after 10 seconds');
+            }
+        }, 10 * 1000);
+    }
+
     function checkForUpdatesManual() {
         console.log('[UpdateManager] checkForUpdatesManual called');
         if (isCheckingForUpdate) {
@@ -564,8 +717,8 @@ Chọn thiết lập cần thay đổi:
                             console.log('[UpdateManager] New version available, showing dialog');
                             showUpdateDialog(currentVersion, latestVersion);
                         } else {
-                            console.log('[UpdateManager] Already up to date');
-                            showNotification('Thông tin', 'Bạn đang sử dụng phiên bản mới nhất!', 3000);
+                            console.log('[UpdateManager] Already up to date, showing up-to-date dialog');
+                            showUpToDateDialog(currentVersion);
                         }
                     }
                 }
