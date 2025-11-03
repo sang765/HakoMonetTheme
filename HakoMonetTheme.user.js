@@ -5,7 +5,7 @@
 // @description  Material You theme for Hako/DocLN.
 // @description:vi Material You theme dành cho Hako/DocLN.
 // @icon         https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/.github/assets/logo.png
-// @author       SangsDayy
+// @author       sang765
 // @match        https://docln.sbs/*
 // @match        https://docln.net/*
 // @match        https://ln.hako.vn/*
@@ -20,8 +20,15 @@
 // @grant        GM_deleteValue
 // @grant        GM_listValues
 // @grant        GM_openInTab
+// @grant        unsafeWindow
 // @connect      *
-// @run-at       document-end
+// @run-at       document-start
+// @supportURL   https://github.com/sang765/HakoMonetTheme/issues
+// @updateURL    https://sang765.github.io/HakoMonetTheme/HakoMonetTheme.user.js
+// @downloadURL  https://sang765.github.io/HakoMonetTheme/HakoMonetTheme.user.js
+// @homepageURL  https://github.com/sang765/HakoMonetTheme
+// @license      MIT
+// @discord      https://discord.gg/uvQ6A3CDPq
 // @resource     mainJS ./main.js
 // @resource     monetAPIJS ./api/monet.js
 // @resource     updateCheckerJS ./api/update-checker.js
@@ -46,12 +53,6 @@
 // @resource     updateManagerJS ./module/update-manager.js
 // @resource     darkModePrompterJS ./module/dark-mode-prompter.js
 // @resource     fullscreenJS ./module/fullscreen.js
-// @supportURL   https://github.com/sang765/HakoMonetTheme/issues
-// @updateURL    https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/HakoMonetTheme.user.js
-// @downloadURL  https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/HakoMonetTheme.user.js
-// @homepageURL  https://github.com/sang765/HakoMonetTheme
-// @license      MIT
-// @discord      https://discord.gg/uvQ6A3CDPq
 // ==/UserScript==
 
 (function() {
@@ -60,7 +61,7 @@
     const DEBUG = GM_getValue('debug_mode', false);
     const SCRIPT_NAME = 'Hako: Monet Theme';
     const GITHUB_REPO = 'https://github.com/sang765/HakoMonetTheme';
-    const RAW_GITHUB_URL = 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/';
+    const RAW_GITHUB_URL = 'https://sang765.github.io/HakoMonetTheme';
 
     let isCheckingForUpdate = false;
 
