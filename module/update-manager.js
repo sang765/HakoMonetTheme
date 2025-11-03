@@ -128,23 +128,45 @@
 
         for (const commit of commits) {
             const message = commit.commit.message;
-            const sha = commit.sha.substring(0, 7);
+            const sha = commit.sha;
+            const shortSha = sha.substring(0, 7);
+            const commitUrl = `https://github.com/sang765/HakoMonetTheme/commit/${sha}`;
 
             // Check for version bump commits
-            if (message.includes(`bump version to ${newVersion}`)) {
+            if (message.includes(`bump version to ${newVersion}`) ||
+                message.includes(`version ${newVersion}`) ||
+                message.match(new RegExp(`v?${newVersion.replace(/\./g, '\\.')}`, 'i'))) {
                 foundNew = true;
-                changelog.push(`${message} - ${sha}`);
-            } else if (message.includes(`bump version to ${currentVersion}`)) {
+                changelog.push(`${message} - [\`${shortSha}\`](${commitUrl})`);
+            } else if (message.includes(`bump version to ${currentVersion}`) ||
+                       message.includes(`version ${currentVersion}`) ||
+                       message.match(new RegExp(`v?${currentVersion.replace(/\./g, '\\.')}`, 'i'))) {
                 foundCurrent = true;
-                changelog.push(`${message} - ${sha}`);
+                changelog.push(`${message} - [\`${shortSha}\`](${commitUrl})`);
                 break; // Stop when we reach current version
             } else if (foundNew && !foundCurrent) {
                 // Include commits between versions
                 if (message.startsWith('feat:') || message.startsWith('fix:') || message.startsWith('refactor:') ||
                     message.startsWith('docs:') || message.startsWith('style:') || message.startsWith('perf:') ||
-                    message.startsWith('test:')) {
-                    changelog.push(`${message} - ${sha}`);
+                    message.startsWith('test:') || message.startsWith('chore:') || message.startsWith('build:') ||
+                    message.startsWith('ci:') || message.startsWith('revert:') ||
+                    message.includes('update') || message.includes('add') || message.includes('remove') ||
+                    message.includes('change') || message.includes('improve') || message.includes('fix')) {
+                    changelog.push(`${message} - [\`${shortSha}\`](${commitUrl})`);
                 }
+            }
+        }
+
+        // If no specific version commits found, include recent commits
+        if (changelog.length === 0 && commits.length > 0) {
+            debugLog('No version-specific commits found, including recent commits');
+            const recentCommits = commits.slice(0, Math.min(10, commits.length));
+            for (const commit of recentCommits) {
+                const message = commit.commit.message;
+                const sha = commit.sha;
+                const shortSha = sha.substring(0, 7);
+                const commitUrl = `https://github.com/sang765/HakoMonetTheme/commit/${sha}`;
+                changelog.push(`${message} - [\`${shortSha}\`](${commitUrl})`);
             }
         }
 
