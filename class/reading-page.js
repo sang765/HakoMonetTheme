@@ -2,7 +2,8 @@
     'use strict';
     
     const DEBUG = GM_getValue('debug_mode', false);
-    
+    const FOLDER_URL = 'https://sang765.github.io/HakoMonetTheme/styles/';
+
     function debugLog(...args) {
         if (DEBUG) {
             console.log('[ReadingPage]', ...args);
@@ -25,8 +26,8 @@
     function addReadingPageCSS() {
         // Fetch CSS and source map simultaneously
         Promise.all([
-            fetch('https://sang765.github.io/HakoMonetTheme/styles/reading-page-mobile.css').then(r => r.text()),
-            fetch('https://sang765.github.io/HakoMonetTheme/styles/reading-page-mobile.css.map').then(r => r.text())
+            fetch(FOLDER_URL + 'reading-page-mobile.css').then(r => r.text()),
+            fetch(FOLDER_URL + 'reading-page-mobile.css.map').then(r => r.text())
         ])
         .then(([css, mapContent]) => {
             // Convert source map to data URL

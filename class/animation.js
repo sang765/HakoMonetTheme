@@ -2,6 +2,7 @@
     'use strict';
     
     const DEBUG = GM_getValue('debug_mode', false);
+    const FOLDER_URL = 'https://sang765.github.io/HakoMonetTheme/styles/';
     
     function debugLog(...args) {
         if (DEBUG) {
@@ -19,8 +20,8 @@
     function addAnimations() {
         // Fetch CSS and source map simultaneously
         Promise.all([
-            fetch('https://sang765.github.io/HakoMonetTheme/styles/animation.css').then(r => r.text()),
-            fetch('https://sang765.github.io/HakoMonetTheme/styles/animation.css.map').then(r => r.text())
+            fetch(FOLDER_URL + 'animation.css').then(r => r.text()),
+            fetch(FOLDER_URL + 'animation.css.map').then(r => r.text())
         ])
         .then(([css, mapContent]) => {
             // Convert source map to data URL
