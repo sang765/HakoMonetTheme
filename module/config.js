@@ -53,18 +53,22 @@
         GM_setValue('hide_domain_warning', hide);
         debugLog('Đã lưu cài đặt ẩn cảnh báo tên miền:', hide);
 
-        // Cập nhật cookie storage
         if (hide) {
-            (window.top || window).document.cookie = "globalwarning=false; path=/; SameSite=Lax;";
-            (window.top || window).document.cookie = "globalwarning2=false; path=/; SameSite=Lax;";
-            debugLog('Đã thêm cookie globalwarning=false và globalwarning2=false');
+            const farFuture = new Date('9999-12-31T23:59:59Z');
+            const cookieOptions = `path=/; SameSite=Lax; expires=${farFuture.toUTCString()}; max-age=2147483647`;
+        
+            (window.top || window).document.cookie = `globalwarning=false; ${cookieOptions}`;
+            (window.top || window).document.cookie = `globalwarning2=false; ${cookieOptions}`;
+            debugLog('Đã thêm cookie vĩnh viễn globalwarning=false và globalwarning2=false');
         } else {
-            (window.top || window).document.cookie = "globalwarning=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax;";
-            (window.top || window).document.cookie = "globalwarning2=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax;";
+            const pastDate = new Date(0);
+            const deleteOptions = `expires=${pastDate.toUTCString()}; path=/; SameSite=Lax; max-age=-1`;
+            
+            (window.top || window).document.cookie = `globalwarning=; ${deleteOptions}`;
+            (window.top || window).document.cookie = `globalwarning2=; ${deleteOptions}`;
             debugLog('Đã xóa cookie globalwarning và globalwarning2');
         }
 
-        // Áp dụng thay đổi ngay lập tức
         applyDomainWarningVisibility();
     }
 
