@@ -2,6 +2,7 @@
     'use strict';
 
     const DEBUG = GM_getValue('debug_mode', false);
+    const FOLDER_URL = 'https://sang765.github.io/HakoMonetTheme/styles/';
 
     function debugLog(...args) {
         if (DEBUG) {
@@ -77,17 +78,9 @@
                         </div>
                     </div>
                     <div class="hmt-main-menu-footer">
-                        <div class="hmt-footer-left">
-                            <svg class="hmt-info-icon" fill="#666" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 52 52" enable-background="new 0 0 52 52" xml:space="preserve">
-                                <path d="M26,2C12.7,2,2,12.7,2,26s10.7,24,24,24s24-10.7,24-24S39.3,2,26,2z M26,14.1c1.7,0,3,1.3,3,3s-1.3,3-3,3
-                                s-3-1.3-3-3S24.3,14.1,26,14.1z M31,35.1c0,0.5-0.4,0.9-1,0.9h-3c-0.4,0-3,0-3,0h-2c-0.5,0-1-0.3-1-0.9v-2c0-0.5,0.4-1.1,1-1.1l0,0
-                                c0.5,0,1-0.3,1-0.9v-4c0-0.5-0.4-1.1-1-1.1l0,0c-0.5,0-1-0.3-1-0.9v-2c0-0.5,0.4-1.1,1-1.1h6c0.5,0,1,0.5,1,1.1v8
-                                c0,0.5,0.4,0.9,1,0.9l0,0c0.5,0,1,0.5,1,1.1V35.1z"/>
-                            </svg>
-                        </div>
-                        <div class="hmt-footer-right">
+                        <div class="hmt-footer-version-info">
                             <div class="hmt-version-info">
-                                <span class="hmt-script-version" id="hmt-version-display">Phiên bản: ${GM_info.script.version}</span>
+                                <span class="hmt-script-version" id="hmt-version-display">Phiên bản: <strong>${GM_info.script.version}</strong></span>
                             </div>
                             <div class="hmt-update-check">
                                 <a href="#" class="hmt-check-updates-link">Kiểm tra cập nhật</a>
@@ -99,289 +92,38 @@
             </div>
         `;
 
-        // Thêm CSS
-        GM_addStyle(`
-            .hmt-main-menu-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(0, 0, 0, 0.5);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 10001;
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            }
+        function HMTMainMenuStyles() {
+        // Fetch CSS and source map simultaneously
+        Promise.all([
+            fetch(FOLDER_URL + 'hmt-main-menu.css').then(r => r.text()),
+            fetch(FOLDER_URL + 'hmt-main-menu.css.map').then(r => r.text())
+        ])
+        .then(([css, mapContent]) => {
+            // Convert source map to data URL
+            const mapDataUrl = 'data:application/json;base64,' + btoa(unescape(encodeURIComponent(mapContent)));
 
-            .hmt-main-menu-content {
-                background: white;
-                border-radius: 12px;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-                width: 90%;
-                max-width: 600px;
-                max-height: 90vh;
-                overflow: hidden;
-                animation: hmtMainMenuSlideIn 0.3s ease-out;
-            }
+            // Add source mapping as data URL
+            css += '\n/*# sourceMappingURL=' + mapDataUrl + ' */';
 
-            .hmt-main-menu-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 20px 24px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-            }
+            // Tạo Blob URL cho quản lý tài nguyên hiệu quả
+            const blob = new Blob([css], { type: 'text/css' });
+            const blobUrl = URL.createObjectURL(blob);
 
-            .hmt-header-content {
-                display: flex;
-                align-items: center;
-            }
+            // Tạo link element và áp dụng CSS
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = blobUrl;
+            document.head.appendChild(link);
 
-            .hmt-logo-section {
-                display: flex;
-                align-items: center;
-                gap: 16px;
-            }
+            debugLog('Đã thêm main menu CSS với Blob URL và inline source mapping');
+        })
+        .catch(error => {
+            debugLog('Lỗi khi tải hmt-main-menu.css hoặc source map:', error);
+        });
+    }
 
-            .hmt-logo {
-                width: 48px;
-                height: 48px;
-                border-radius: 12px;
-                object-fit: cover;
-                border: 2px solid rgba(255, 255, 255, 0.2);
-                transition: transform 0.3s ease;
-                background: rgba(255, 255, 255, 0.1);
-            }
-
-            .hmt-logo:hover {
-                transform: scale(1.05);
-            }
-
-            .hmt-logo:not([src]),
-            .hmt-logo[src=""] {
-                background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-weight: bold;
-                font-size: 16px;
-                color: white;
-            }
-
-            .hmt-logo:not([src])::after,
-            .hmt-logo[src=""]::after {
-                content: "🎨";
-                font-size: 20px;
-            }
-
-            .hmt-title-section h3 {
-                margin: 0;
-                font-size: 20px;
-                font-weight: 700;
-                letter-spacing: -0.5px;
-            }
-
-            .hmt-subtitle {
-                font-size: 14px;
-                opacity: 0.9;
-                font-weight: 400;
-                margin-top: 2px;
-                display: block;
-            }
-
-            .hmt-main-menu-close {
-                background: rgba(255, 255, 255, 0.2);
-                border: none;
-                color: white;
-                width: 32px;
-                height: 32px;
-                border-radius: 50%;
-                cursor: pointer;
-                font-size: 18px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: background-color 0.2s;
-            }
-
-            .hmt-main-menu-close:hover {
-                background: rgba(255, 255, 255, 0.3);
-            }
-
-            .hmt-main-menu-body {
-                padding: 24px;
-            }
-
-            .hmt-menu-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                gap: 16px;
-            }
-
-            .hmt-menu-item {
-                display: flex;
-                align-items: center;
-                padding: 16px;
-                background: #f8f9fa;
-                border-radius: 8px;
-                cursor: pointer;
-                transition: all 0.2s;
-                border: 2px solid transparent;
-            }
-
-            .hmt-menu-item:hover {
-                background: #e9ecef;
-                border-color: #667eea;
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
-            }
-
-            .hmt-menu-icon {
-                width: 48px;
-                height: 48px;
-                border-radius: 12px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 20px;
-                color: white;
-                margin-right: 16px;
-                flex-shrink: 0;
-            }
-
-            .hmt-menu-text h4 {
-                margin: 0 0 4px 0;
-                color: #333;
-                font-size: 16px;
-                font-weight: 600;
-            }
-
-            .hmt-menu-text p {
-                margin: 0;
-                color: #666;
-                font-size: 14px;
-                line-height: 1.4;
-            }
-
-            .hmt-main-menu-footer {
-                padding: 20px 24px;
-                background: #f8f9fa;
-                display: flex;
-                justify-content: space-between;
-                align-items: flex-start;
-            }
-
-            .hmt-footer-left {
-                display: flex;
-                align-items: flex-start;
-                padding-top: 2px;
-            }
-
-            .hmt-info-icon {
-                flex-shrink: 0;
-                opacity: 0.7;
-            }
-
-            .hmt-footer-right {
-                display: flex;
-                flex-direction: column;
-                align-items: flex-end;
-                gap: 4px;
-            }
-
-            .hmt-script-version {
-                font-size: 14px;
-                color: #666;
-                font-weight: 500;
-            }
-
-            .hmt-script-version.outdated {
-                color: #dc3545;
-                font-weight: 600;
-            }
-
-            .hmt-script-version.outdated::after {
-                content: " (Bạn đang sử dụng phiên bản cũ)";
-                color: #dc3545;
-                font-weight: 500;
-            }
-
-            .hmt-update-check {
-                display: flex;
-                align-items: center;
-            }
-
-            .hmt-check-updates-link {
-                font-size: 14px;
-                color: #007bff;
-                text-decoration: none;
-                font-weight: 500;
-                transition: color 0.2s ease;
-            }
-
-            .hmt-check-updates-link:hover {
-                color: #0056b3;
-                text-decoration: underline;
-            }
-
-            .hmt-main-menu-close-btn {
-                padding: 10px 20px;
-                background: #6c757d;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                font-size: 14px;
-                font-weight: 600;
-                cursor: pointer;
-                transition: all 0.2s;
-            }
-
-            .hmt-main-menu-close-btn:hover {
-                background: #5a6268;
-                transform: translateY(-1px);
-            }
-
-            @keyframes hmtMainMenuSlideIn {
-                from {
-                    opacity: 0;
-                    transform: scale(0.9) translateY(-20px);
-                }
-                to {
-                    opacity: 1;
-                    transform: scale(1) translateY(0);
-                }
-            }
-
-            /* Dark mode support */
-            body.dark .hmt-main-menu-content {
-                background: #2d3748;
-                color: #e2e8f0;
-            }
-
-            body.dark .hmt-menu-item {
-                background: #1a202c;
-            }
-
-            body.dark .hmt-menu-item:hover {
-                background: #2d3748;
-            }
-
-            body.dark .hmt-menu-text h4 {
-                color: #e2e8f0;
-            }
-
-            body.dark .hmt-menu-text p {
-                color: #a0aec0;
-            }
-
-            body.dark .hmt-main-menu-footer {
-                background: #1a202c;
-            }
-        `);
+        // Add styles before appending dialog
+        HMTMainMenuStyles();
 
         document.body.appendChild(dialog);
 
