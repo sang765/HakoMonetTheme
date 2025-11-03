@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Hako: Monet Theme
 // @namespace    https://github.com/sang765
-// @version      4.2.8
+// @version      4.2.9
 // @description  Material You theme for Hako/DocLN.
 // @description:vi Material You theme dành cho Hako/DocLN.
 // @icon         https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/.github/assets/logo.png
