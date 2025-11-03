@@ -77,11 +77,13 @@
         // Command để kiểm tra cập nhật
         if (typeof GM_registerMenuCommand === 'function') {
             GM_registerMenuCommand('🔄 Kiểm tra cập nhật', function() {
-                if (typeof window.HMTUpdateManager !== 'undefined' && typeof window.HMTUpdateManager.checkForUpdatesManual === 'function') {
+                if (typeof window.HMTUpdateChecker !== 'undefined' && typeof window.HMTUpdateChecker.checkForUpdatesManual === 'function') {
+                    window.HMTUpdateChecker.checkForUpdatesManual();
+                } else if (typeof window.HMTUpdateManager !== 'undefined' && typeof window.HMTUpdateManager.checkForUpdatesManual === 'function') {
                     window.HMTUpdateManager.checkForUpdatesManual();
                 } else {
-                    showNotification('Lỗi', 'Module Update Manager chưa được tải. Vui lòng làm mới trang.', 5000);
-                    debugLog('Update Manager module chưa được tải');
+                    showNotification('Lỗi', 'Module Update Checker hoặc Update Manager chưa được tải. Vui lòng làm mới trang.', 5000);
+                    debugLog('Update Checker or Update Manager module chưa được tải');
                 }
             }, 'u');
             GM_registerMenuCommand('📋 Menu chính', function() {
@@ -94,11 +96,11 @@
             }, 'm');
             GM_registerMenuCommand('📊 Thông tin script', showScriptInfo, 'i');
             GM_registerMenuCommand('⚙️ Thiết lập cập nhật', function() {
-                if (typeof window.HMTUpdateChecker !== 'undefined' && typeof window.HMTUpdateChecker.openUpdateSettings === 'function') {
-                    window.HMTUpdateChecker.openUpdateSettings();
+                if (typeof window.HMTUpdateManager !== 'undefined' && typeof window.HMTUpdateManager.openUpdateSettings === 'function') {
+                    window.HMTUpdateManager.openUpdateSettings();
                 } else {
-                    showNotification('Lỗi', 'Module Update Checker chưa được tải. Vui lòng làm mới trang.', 5000);
-                    debugLog('Update Checker module chưa được tải');
+                    showNotification('Lỗi', 'Module Update Manager chưa được tải. Vui lòng làm mới trang.', 5000);
+                    debugLog('Update Manager module chưa được tải');
                 }
             }, 's');
             GM_registerMenuCommand('🐛 Báo cáo lỗi', reportBug, 'b');
