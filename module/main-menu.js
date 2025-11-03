@@ -251,12 +251,38 @@
         const versionDisplay = document.querySelector('#hmt-version-display');
         if (!versionDisplay) return;
 
+        const currentVersion = GM_info.script.version;
+        const latestVersion = GM_getValue('latest_version', null);
         const isOutdated = GM_getValue('version_outdated', false);
-        if (isOutdated) {
+
+        // Clear outdated flag if current version is up to date or newer than stored latest version
+        if (latestVersion && !isNewerVersion(latestVersion, currentVersion)) {
+            GM_setValue('version_outdated', false);
+            GM_deleteValue('latest_version');
+            debugLog('Cleared outdated flag - user has updated to latest version');
+        }
+
+        const shouldShowOutdated = GM_getValue('version_outdated', false);
+        if (shouldShowOutdated) {
             versionDisplay.classList.add('outdated');
         } else {
             versionDisplay.classList.remove('outdated');
         }
+    }
+
+    function isNewerVersion(newVersion, currentVersion) {
+        const newParts = newVersion.split('.').map(Number);
+        const currentParts = currentVersion.split('.').map(Number);
+
+        for (let i = 0; i < Math.max(newParts.length, currentParts.length); i++) {
+            const newPart = newParts[i] || 0;
+            const currentPart = currentParts[i] || 0;
+
+            if (newPart > currentPart) return true;
+            if (newPart < currentPart) return false;
+        }
+
+        return false;
     }
 
     function joinDiscord() {
