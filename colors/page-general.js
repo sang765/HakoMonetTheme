@@ -1188,6 +1188,11 @@
               border-color: ${palette[700]};
               color: ${textColor};
             }
+
+            .button-blue:hover {
+                background-color: ${textColor};
+                color: ${palette[500]};
+            }
         `;
 
         GM_addStyle(css);
@@ -1682,6 +1687,11 @@
               background-color: ${defaultPalette[500]};
               border-color: ${defaultPalette[700]};
               color: ${textColor};
+            }
+
+            .button-blue:hover {
+                background-color: ${textColor};
+                color: ${defaultPalette[500]};
             }
         `;
 

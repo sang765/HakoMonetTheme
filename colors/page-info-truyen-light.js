@@ -858,6 +858,17 @@
             .ring-cyan-500 {
               --tw-ring-color: ${palette[500]} !important;
             }
+
+            .button-blue {
+                background-color: ${palette[500]};
+                border-color: ${palette[700]};
+                color: ${textColor};
+            }
+
+            .button-blue:hover {
+                background-color: ${textColor};
+                color: ${palette[500]};
+            }
         `;
         
         GM_addStyle(css);
@@ -1104,6 +1115,17 @@
 
             .ring-cyan-500 {
               --tw-ring-color: ${defaultPalette[500]} !important;
+            }
+
+            .button-blue {
+                background-color: ${defaultPalette[500]};
+                border-color: ${defaultPalette[700]};
+                color: ${textColor};
+            }
+
+            .button-blue:hover {
+                background-color: ${textColor};
+                color: ${defaultPalette[500]};
             }
         `;
         
