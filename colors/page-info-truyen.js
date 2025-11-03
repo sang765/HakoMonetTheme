@@ -845,6 +845,12 @@
                 background-color: ${textColor};
                 color: ${palette[500]};
             }
+
+            .noti-unread {
+              background-color: ${palette[500]};
+              border-bottom: 1px solid ${palette[700]};
+              color: ${textColor};
+            }
         `;
         
         GM_addStyle(css);
@@ -1117,6 +1123,12 @@
             .button-blue:hover {
                 background-color: ${textColor};
                 color: ${defaultPalette[500]};
+            }
+
+            .noti-unread {
+              background-color: ${defaultPalette[500]};
+              border-bottom: 1px solid ${defaultPalette[700]};
+              color: ${textColor};
             }
         `;
         
