@@ -19,8 +19,8 @@
     function addFontImport() {
         // Fetch CSS and source map simultaneously
         Promise.all([
-            fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/font-import.css').then(r => r.text()),
-            fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/font-import.css.map').then(r => r.text())
+            fetch('https://sang765.github.io/HakoMonetTheme/styles/font-import.css').then(r => r.text()),
+            fetch('https://sang765.github.io/HakoMonetTheme/styles/font-import.css.map').then(r => r.text())
         ])
         .then(([css, mapContent]) => {
             // Convert source map to data URL

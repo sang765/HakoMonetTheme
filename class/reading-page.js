@@ -25,8 +25,8 @@
     function addReadingPageCSS() {
         // Fetch CSS and source map simultaneously
         Promise.all([
-            fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/reading-page-mobile.css').then(r => r.text()),
-            fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/reading-page-mobile.css.map').then(r => r.text())
+            fetch('https://sang765.github.io/HakoMonetTheme/styles/reading-page-mobile.css').then(r => r.text()),
+            fetch('https://sang765.github.io/HakoMonetTheme/styles/reading-page-mobile.css.map').then(r => r.text())
         ])
         .then(([css, mapContent]) => {
             // Convert source map to data URL

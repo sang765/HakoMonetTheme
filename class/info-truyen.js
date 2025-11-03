@@ -63,8 +63,8 @@
         // Cải thiện giao diện trang truyện
         // Fetch CSS and source map simultaneously
         Promise.all([
-            fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/series-enhancement.css').then(r => r.text()),
-            fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/series-enhancement.css.map').then(r => r.text())
+            fetch('https://sang765.github.io/HakoMonetTheme/styles/series-enhancement.css').then(r => r.text()),
+            fetch('https://sang765.github.io/HakoMonetTheme/styles/series-enhancement.css.map').then(r => r.text())
         ])
         .then(([css, mapContent]) => {
             // Convert source map to data URL
@@ -132,18 +132,18 @@
         const mapPromises = [];
 
         // Load base CSS and source map
-        cssPromises.push(fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-base.css').then(r => r.text()));
-        mapPromises.push(fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-base.css.map').then(r => r.text()));
+        cssPromises.push(fetch('https://sang765.github.io/HakoMonetTheme/styles/device-base.css').then(r => r.text()));
+        mapPromises.push(fetch('https://sang765.github.io/HakoMonetTheme/styles/device-base.css.map').then(r => r.text()));
 
         if (isMobile) {
-            cssPromises.push(fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-mobile.css').then(r => r.text()));
-            mapPromises.push(fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-mobile.css.map').then(r => r.text()));
+            cssPromises.push(fetch('https://sang765.github.io/HakoMonetTheme/styles/device-mobile.css').then(r => r.text()));
+            mapPromises.push(fetch('https://sang765.github.io/HakoMonetTheme/styles/device-mobile.css.map').then(r => r.text()));
         } else if (isTablet) {
-            cssPromises.push(fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-tablet.css').then(r => r.text()));
-            mapPromises.push(fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-tablet.css.map').then(r => r.text()));
+            cssPromises.push(fetch('https://sang765.github.io/HakoMonetTheme/styles/device-tablet.css').then(r => r.text()));
+            mapPromises.push(fetch('https://sang765.github.io/HakoMonetTheme/styles/device-tablet.css.map').then(r => r.text()));
         } else if (isDesktop) {
-            cssPromises.push(fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-desktop.css').then(r => r.text()));
-            mapPromises.push(fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/device-desktop.css.map').then(r => r.text()));
+            cssPromises.push(fetch('https://sang765.github.io/HakoMonetTheme/styles/device-desktop.css').then(r => r.text()));
+            mapPromises.push(fetch('https://sang765.github.io/HakoMonetTheme/styles/device-desktop.css.map').then(r => r.text()));
         }
 
         return Promise.all([...cssPromises, ...mapPromises]).then(results => {
@@ -213,8 +213,8 @@
 
             // Fetch CSS and source map simultaneously
             Promise.all([
-                fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/portrait.css').then(r => r.text()),
-                fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/portrait.css.map').then(r => r.text())
+                fetch('https://sang765.github.io/HakoMonetTheme/styles/portrait.css').then(r => r.text()),
+                fetch('https://sang765.github.io/HakoMonetTheme/styles/portrait.css.map').then(r => r.text())
             ])
             .then(([css, mapContent]) => {
                 // Convert source map to data URL
@@ -485,8 +485,8 @@
         // Thêm styles
         // Fetch CSS and source map simultaneously
         Promise.all([
-            fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/thumbnail-overlay.css').then(r => r.text()),
-            fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/thumbnail-overlay.css.map').then(r => r.text())
+            fetch('https://sang765.github.io/HakoMonetTheme/styles/thumbnail-overlay.css').then(r => r.text()),
+            fetch('https://sang765.github.io/HakoMonetTheme/styles/thumbnail-overlay.css.map').then(r => r.text())
         ])
         .then(([css, mapContent]) => {
             // Convert source map to data URL
@@ -535,8 +535,8 @@
     function addTransparentTopCSS() {
         // Fetch CSS and source map simultaneously
         Promise.all([
-            fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/transparent-top.css').then(r => r.text()),
-            fetch('https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/transparent-top.css.map').then(r => r.text())
+            fetch('https://sang765.github.io/HakoMonetTheme/styles/transparent-top.css').then(r => r.text()),
+            fetch('https://sang765.github.io/HakoMonetTheme/styles/transparent-top.css.map').then(r => r.text())
         ])
         .then(([css, mapContent]) => {
             // Convert source map to data URL

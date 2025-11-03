@@ -99,7 +99,6 @@
             body:not(.dark) .monet-editor .reset-btn:hover {
                 background: rgba(0, 0, 0, 0.2);
             }
-            /*# sourceMappingURL=https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/styles/monet-editor.css.map */
         `;
 
         // Tạo Blob URL cho quản lý tài nguyên hiệu quả
