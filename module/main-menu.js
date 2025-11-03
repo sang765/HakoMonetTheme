@@ -15,6 +15,9 @@
             return;
         }
 
+        // Kiểm tra cập nhật khi mở menu
+        checkForUpdatesOnMenuOpen();
+
         const dialog = document.createElement('div');
         dialog.className = 'hmt-main-menu-dialog';
         dialog.innerHTML = `
@@ -73,10 +76,11 @@
                             </div>
                         </div>
                     </div>
-                    <div class="hmt-script-version">
-                        Phiên bản: ${GM_info.script.version}
-                    </div>
                     <div class="hmt-main-menu-footer">
+                        <div class="hmt-footer-left">
+                            <span class="hmt-script-version" id="hmt-version-display">Phiên bản: ${GM_info.script.version}</span>
+                            <a href="#" class="hmt-check-updates-link">Kiểm tra cập nhật</a>
+                        </div>
                         <button class="hmt-main-menu-close-btn">Đóng</button>
                     </div>
                 </div>
@@ -255,7 +259,44 @@
                 padding: 20px 24px;
                 background: #f8f9fa;
                 display: flex;
-                justify-content: flex-end;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .hmt-footer-left {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+            }
+
+            .hmt-script-version {
+                font-size: 14px;
+                color: #666;
+                font-weight: 500;
+            }
+
+            .hmt-script-version.outdated {
+                color: #dc3545;
+                font-weight: 600;
+            }
+
+            .hmt-script-version.outdated::after {
+                content: " (Bạn đang sử dụng phiên bản cũ)";
+                color: #dc3545;
+                font-weight: 500;
+            }
+
+            .hmt-check-updates-link {
+                font-size: 14px;
+                color: #007bff;
+                text-decoration: none;
+                font-weight: 500;
+                transition: color 0.2s ease;
+            }
+
+            .hmt-check-updates-link:hover {
+                color: #0056b3;
+                text-decoration: underline;
             }
 
             .hmt-main-menu-close-btn {
@@ -324,12 +365,23 @@
         const closeBtnFooter = dialog.querySelector('.hmt-main-menu-close-btn');
         const overlay = dialog.querySelector('.hmt-main-menu-overlay');
         const menuItems = dialog.querySelectorAll('.hmt-menu-item');
+        const checkUpdatesLink = dialog.querySelector('.hmt-check-updates-link');
 
         closeBtn.addEventListener('click', closeDialog);
         closeBtnFooter.addEventListener('click', closeDialog);
         overlay.addEventListener('click', function(e) {
             if (e.target === overlay) {
                 closeDialog();
+            }
+        });
+
+        checkUpdatesLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            closeDialog();
+            if (typeof window.HMTUpdateManager !== 'undefined' && typeof window.HMTUpdateManager.checkForUpdatesManual === 'function') {
+                window.HMTUpdateManager.checkForUpdatesManual();
+            } else {
+                showNotification('Lỗi', 'Module cập nhật chưa được tải. Vui lòng làm mới trang.', 5000);
             }
         });
 
@@ -387,7 +439,55 @@
             };
         }
 
+        // Update version display after dialog is created
+        updateVersionDisplay();
+
         debugLog('Đã tạo main menu dialog');
+    }
+
+    function checkForUpdatesOnMenuOpen() {
+        // Chỉ kiểm tra nếu chưa kiểm tra trong 5 phút
+        const lastCheck = GM_getValue('last_menu_update_check', 0);
+        const now = Date.now();
+        const checkInterval = 5 * 60 * 1000; // 5 phút
+
+        if (now - lastCheck < checkInterval) {
+            debugLog('Bỏ qua kiểm tra cập nhật khi mở menu (đã kiểm tra gần đây)');
+            return;
+        }
+
+        GM_setValue('last_menu_update_check', now);
+
+        if (typeof window.HMTUpdateChecker !== 'undefined' && typeof window.HMTUpdateChecker.checkForUpdates === 'function') {
+            debugLog('Kiểm tra cập nhật khi mở menu...');
+            window.HMTUpdateChecker.checkForUpdates(function(latestVersion) {
+                if (latestVersion) {
+                    // Có phiên bản mới, đánh dấu là outdated
+                    GM_setValue('version_outdated', true);
+                    GM_setValue('latest_version', latestVersion);
+                    debugLog(`Phát hiện phiên bản mới: ${latestVersion}`);
+                } else {
+                    // Phiên bản hiện tại là mới nhất
+                    GM_setValue('version_outdated', false);
+                    GM_deleteValue('latest_version');
+                    debugLog('Đang sử dụng phiên bản mới nhất');
+                }
+            });
+        } else {
+            debugLog('UpdateChecker module chưa được tải');
+        }
+    }
+
+    function updateVersionDisplay() {
+        const versionDisplay = document.querySelector('#hmt-version-display');
+        if (!versionDisplay) return;
+
+        const isOutdated = GM_getValue('version_outdated', false);
+        if (isOutdated) {
+            versionDisplay.classList.add('outdated');
+        } else {
+            versionDisplay.classList.remove('outdated');
+        }
     }
 
     function joinDiscord() {
