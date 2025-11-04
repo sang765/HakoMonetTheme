@@ -79,7 +79,6 @@
         dialog.className = DIALOG_CLASS;
 
         const debugStatus = GM_getValue('debug_mode', false) ? 'Bật' : 'Tắt';
-        const currentVersion = GM_info.script.version;
 
         dialog.innerHTML = `
             <div class="${OVERLAY_CLASS}">
@@ -140,7 +139,7 @@
                     <div class="hmt-main-menu-footer">
                         <div class="hmt-footer-version-info">
                             <div class="hmt-version-info">
-                                <div class="hmt-script-version" id="${VERSION_DISPLAY_ID}">Phiên bản: <strong>${currentVersion}</strong></div>
+                                <div class="hmt-script-version" id="${VERSION_DISPLAY_ID}">Phiên bản: <strong>Loading...</strong></div>
                                 <a href="#" class="${CHECK_UPDATES_LINK_CLASS}">Kiểm tra cập nhật</a>
                             </div>
                         </div>
