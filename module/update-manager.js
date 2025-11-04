@@ -412,7 +412,7 @@
 
         updateBtn.addEventListener('click', () => {
             // Check for multiple CDN fallbacks
-            performSmartUpdate(newVersion, overlay);
+            performSmartUpdate(newVersion, overlay, currentVersion);
         });
 
         // Load changelog
@@ -468,7 +468,7 @@
         }, 5 * 60 * 1000);
     }
 
-    function performSmartUpdate(newVersion, overlay) {
+    function performSmartUpdate(newVersion, overlay, currentVersion) {
         const updateSources = [
             { name: 'GitHub Raw', url: RAW_GITHUB_URL + 'HakoMonetTheme.user.js' },
             { name: 'jsDelivr CDN', url: 'https://cdn.jsdelivr.net/gh/sang765/HakoMonetTheme@main/HakoMonetTheme.user.js' },
@@ -499,9 +499,17 @@
                         GM_openInTab(source.url);
                         overlay.remove();
 
+                        // Clear version state before update to force fresh check after reload
+                        GM_deleteValue('version_outdated');
+                        GM_deleteValue('latest_version');
+                        GM_deleteValue('last_menu_update_check');
+                        GM_deleteValue('lastUpdateCheck');
+
                         // Set a flag to auto-reload after 10 seconds
                         GM_setValue('pending_update_reload', true);
                         GM_setValue('pending_update_time', Date.now());
+                        GM_setValue('updated_from_version', currentVersion);
+                        GM_setValue('updated_to_version', newVersion);
 
                         // Auto-reload after 10 seconds with progress feedback
                         let countdown = 10;
@@ -780,6 +788,10 @@ Chọn thiết lập cần thay đổi:
                     typeof window.HMTMainMenu.updateVersionDisplay === 'function') {
                     setTimeout(() => window.HMTMainMenu.updateVersionDisplay(), 100);
                 }
+
+                // Clear version cache to ensure fresh version detection on next check
+                GM_deleteValue('version_cache_' + latestVersion);
+                GM_deleteValue('version_cache_' + latestVersion + '_time');
             },
             onerror: function(error) {
                 console.log('[UpdateManager] Manual check error:', error);

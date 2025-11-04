@@ -304,13 +304,29 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
         // Check if we need to auto-reload after update
         const pendingReload = GM_getValue('pending_update_reload', false);
         const pendingTime = GM_getValue('pending_update_time', 0);
+        const updatedFromVersion = GM_getValue('updated_from_version', null);
+        const updatedToVersion = GM_getValue('updated_to_version', null);
         const now = Date.now();
 
         if (pendingReload && (now - pendingTime) < 30000) { // Within 30 seconds
             debugLog('Auto-reload sau khi cập nhật');
             GM_deleteValue('pending_update_reload');
             GM_deleteValue('pending_update_time');
-            showNotification('Cập nhật hoàn tất', 'Script đã được cập nhật thành công!', 3000);
+
+            let updateMessage = 'Script đã được cập nhật thành công!';
+            if (updatedFromVersion && updatedToVersion) {
+                updateMessage = `Script đã được cập nhật từ ${updatedFromVersion} lên ${updatedToVersion}!`;
+                GM_deleteValue('updated_from_version');
+                GM_deleteValue('updated_to_version');
+            }
+
+            showNotification('Cập nhật hoàn tất', updateMessage, 5000);
+
+            // Force update version display after successful update
+            if (typeof window.HMTMainMenu !== 'undefined' &&
+                typeof window.HMTMainMenu.updateVersionDisplay === 'function') {
+                setTimeout(() => window.HMTMainMenu.updateVersionDisplay(), 500);
+            }
         }
 
         // Đăng ký menu commands

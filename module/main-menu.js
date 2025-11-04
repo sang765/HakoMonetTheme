@@ -387,6 +387,10 @@
                 return;
             }
 
+            // Update the displayed version text to match current installed version
+            const versionText = `Phiên bản: <strong>${currentVersion}</strong>`;
+            versionDisplay.innerHTML = versionText;
+
             // Clear outdated flag if current version is up to date or newer
             if (latestVersion && typeof latestVersion === 'string' &&
                 !isNewerVersion(latestVersion, currentVersion)) {
@@ -402,7 +406,7 @@
                 versionDisplay.classList.remove('outdated');
             }
 
-            debugLog('Version display updated');
+            debugLog('Version display updated to current version:', currentVersion);
         } catch (error) {
             debugLog('Error updating version display:', error);
         }
