@@ -851,7 +851,6 @@
                 </div>
                 <div class="buttons">
                     <button id="skip-btn">⏭️ Bỏ qua</button>
-                    <button id="cancel-btn">❌ Hủy</button>
                     <button id="update-btn">⬇️ Cập nhật</button>
                 </div>
                 <div class="performance-info" id="perf-info"></div>

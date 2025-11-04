@@ -174,7 +174,7 @@
         const notification = document.createElement('div');
         notification.className = 'hmt-update-notification';
         notification.onclick = function() {
-            window.open('https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js', '_blank');
+            window.open('https://sang765.github.io/HakoMonetTheme/HakoMonetTheme.user.js', '_blank');
             this.remove();
         };
         
