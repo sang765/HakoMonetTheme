@@ -899,6 +899,10 @@
             // Enhanced markdown parser với syntax highlighting
             const parseMarkdown = (text) => {
                 return text
+                    // Support line breaks in changelog messages
+                    .replace(/\n/g, '<br>')
+                    .replace(/<br>- /g, '<br>• ')
+
                     // Headers với enhanced styling
                     .replace(/^### (.*$)/gm, '<h3 style="font-size: 14px; font-weight: bold; margin: 12px 0 6px 0; color: #007bff; border-bottom: 1px solid rgba(0,123,255,0.2); padding-bottom: 4px;">$1</h3>')
                     .replace(/^## (.*$)/gm, '<h2 style="font-size: 16px; font-weight: bold; margin: 16px 0 8px 0; color: #007bff; background: rgba(0,123,255,0.05); padding: 4px 8px; border-radius: 4px;">$1</h2>')
