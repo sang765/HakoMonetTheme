@@ -774,6 +774,12 @@ Chọn thiết lập cần thay đổi:
                     }
                 }
                 isCheckingForUpdate = false;
+
+                // Update main menu version display after manual check
+                if (typeof window.HMTMainMenu !== 'undefined' &&
+                    typeof window.HMTMainMenu.updateVersionDisplay === 'function') {
+                    setTimeout(() => window.HMTMainMenu.updateVersionDisplay(), 100);
+                }
             },
             onerror: function(error) {
                 console.log('[UpdateManager] Manual check error:', error);

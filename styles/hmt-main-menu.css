@@ -181,7 +181,16 @@
   flex: 1;
 }
 
+.hmt-info-icon {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
 
+.hmt-version-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
 .hmt-script-version {
   font-size: 14px;
