@@ -1014,10 +1014,17 @@
                 speed: 'medium'
             },
             {
+                name: 'GitHub Pages',
+                url: 'https://sang765.github.io/HakoMonetTheme/HakoMonetTheme.user.js',
+                region: 'global',
+                reliability: 0.98,
+                speed: 'fast'
+            },
+            {
                 name: 'jsDelivr CDN',
                 url: 'https://cdn.jsdelivr.net/gh/sang765/HakoMonetTheme@main/HakoMonetTheme.user.js',
                 region: 'global',
-                reliability: 0.98,
+                reliability: 0.92,
                 speed: 'fast'
             },
             {
@@ -1026,13 +1033,6 @@
                 region: 'global',
                 reliability: 0.90,
                 speed: 'medium'
-            },
-            {
-                name: 'GitHub Pages',
-                url: 'https://sang765.github.io/HakoMonetTheme/HakoMonetTheme.user.js',
-                region: 'global',
-                reliability: 0.92,
-                speed: 'fast'
             },
             {
                 name: 'RawGit CDN',
