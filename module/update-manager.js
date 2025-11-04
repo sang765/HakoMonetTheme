@@ -1474,13 +1474,15 @@ Chọn thiết lập cần thay đổi:
             timeout: 10000,
             onload: function(response) {
                 console.log('[UpdateManager] Manual check response status:', response.status);
+                let latestVersion = null;
+
                 if (response.status === 200) {
                     const scriptContent = response.responseText;
                     const versionMatch = scriptContent.match(/@version\s+([\d.]+)/);
                     console.log('[UpdateManager] Manual check version match:', versionMatch);
 
                     if (versionMatch && versionMatch[1]) {
-                        const latestVersion = versionMatch[1];
+                        latestVersion = versionMatch[1];
                         const currentVersion = GM_info.script.version;
                         console.log('[UpdateManager] Current version:', currentVersion, 'Latest version:', latestVersion);
 
@@ -1502,8 +1504,10 @@ Chọn thiết lập cần thay đổi:
                 }
 
                 // Clear version cache to ensure fresh version detection on next check
-                GM_deleteValue('version_cache_' + latestVersion);
-                GM_deleteValue('version_cache_' + latestVersion + '_time');
+                if (latestVersion) {
+                    GM_deleteValue('version_cache_' + latestVersion);
+                    GM_deleteValue('version_cache_' + latestVersion + '_time');
+                }
             },
             onerror: function(error) {
                 console.log('[UpdateManager] Manual check error:', error);
