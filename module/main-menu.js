@@ -365,6 +365,26 @@
     }
 
     /**
+     * Extracts current version from GM_info script metadata
+     * @returns {string} The current version string
+     */
+    function getCurrentVersion() {
+        try {
+            // Extract version from script header comment
+            const scriptContent = GM_info.scriptMetaStr || '';
+            const versionMatch = scriptContent.match(/\/\/\s*@version\s+([^\s]+)/);
+            if (versionMatch && versionMatch[1]) {
+                return versionMatch[1];
+            }
+            // Fallback to GM_info.script.version
+            return GM_info.script.version;
+        } catch (error) {
+            debugLog('Error extracting version:', error);
+            return GM_info.script.version;
+        }
+    }
+
+    /**
      * Updates the version display with error handling
      * Reads version state from GM storage set by UpdateChecker/UpdateManager
      */
@@ -376,7 +396,7 @@
                 return;
             }
 
-            const currentVersion = GM_info.script.version;
+            const currentVersion = getCurrentVersion();
             const latestVersion = GM_getValue('latest_version', null);
             const isOutdated = GM_getValue('version_outdated', false);
 

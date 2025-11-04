@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Hako: Monet Theme
 // @namespace    https://github.com/sang765
-// @version      4.3.7
+// @version      4.3.8
 // @description  Material You theme for Hako/DocLN.
 // @description:vi Material You theme dành cho Hako/DocLN.
 // @icon         https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/.github/assets/logo.png
@@ -159,10 +159,27 @@
     }
     
 
+    function getCurrentVersion() {
+        try {
+            // Extract version from script header comment
+            const scriptContent = GM_info.scriptMetaStr || '';
+            const versionMatch = scriptContent.match(/\/\/\s*@version\s+([^\s]+)/);
+            if (versionMatch && versionMatch[1]) {
+                return versionMatch[1];
+            }
+            // Fallback to GM_info.script.version
+            return GM_info.script.version;
+        } catch (error) {
+            debugLog('Error extracting version:', error);
+            return GM_info.script.version;
+        }
+    }
+
     function showScriptInfo() {
+        const currentVersion = getCurrentVersion();
         const info = `
 Tên: ${GM_info.script.name}
-Phiên bản: ${GM_info.script.version}
+Phiên bản: ${currentVersion}
 Tác giả: ${GM_info.script.author}
 Mô tả: ${GM_info.script.description}
 
@@ -172,7 +189,7 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
 GitHub: ${GITHUB_REPO}
 Báo cáo lỗi: ${GITHUB_REPO}/issues
         `.trim();
-        
+
         alert(info);
         debugLog('Hiển thị thông tin script');
     }
