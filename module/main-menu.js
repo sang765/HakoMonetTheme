@@ -140,7 +140,7 @@
                     <div class="hmt-main-menu-footer">
                         <div class="hmt-footer-version-info">
                             <div class="hmt-version-info">
-                                <span class="hmt-script-version" id="${VERSION_DISPLAY_ID}">Phiên bản: <strong>${currentVersion}</strong></span>
+                                <div class="hmt-script-version" id="${VERSION_DISPLAY_ID}">Phiên bản: <strong>${currentVersion}</strong></div>
                                 <a href="#" class="${CHECK_UPDATES_LINK_CLASS}">Kiểm tra cập nhật</a>
                             </div>
                         </div>
