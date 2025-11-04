@@ -23,7 +23,10 @@
     function init() {
         debugLog('Đang khởi tạo HakoMonetTheme...');
         debugLog(`Phiên bản: ${GM_info.script.version}`);
-        
+
+        // Đăng ký Service Worker trước khi tải các module khác
+        registerServiceWorker();
+
         // Thiết lập auto update
         console.log('[Main] Checking for HMTUpdateChecker');
         if (typeof window.HMTUpdateChecker !== 'undefined' && typeof window.HMTUpdateChecker.setupAutoUpdate === 'function') {
@@ -177,15 +180,15 @@
             window.open('https://sang765.github.io/HakoMonetTheme/HakoMonetTheme.user.js', '_blank');
             this.remove();
         };
-        
+
         notification.innerHTML = `
             <h4>Có bản cập nhật mới!</h4>
             <p>Phiên bản ${latestVersion} đã có sẵn. Nhấn để cập nhật.</p>
             <button class="close-btn" onclick="event.stopPropagation(); this.parentElement.remove()">×</button>
         `;
-        
+
         document.body.appendChild(notification);
-        
+
         // Tự động ẩn sau 15 giây
         setTimeout(() => {
             if (notification.parentElement) {
@@ -193,6 +196,159 @@
             }
         }, 15000);
     }
+
+    // Service Worker registration and management
+    function registerServiceWorker() {
+        if ('serviceWorker' in navigator) {
+            const swPath = '/api/service-worker.js';
+
+            navigator.serviceWorker.register(swPath)
+                .then(registration => {
+                    debugLog('Service Worker registered successfully');
+
+                    // Setup push notifications for story updates
+                    setupPushNotifications(registration);
+
+                    // Monitor service worker updates
+                    registration.addEventListener('updatefound', () => {
+                        debugLog('Service Worker update found');
+                        const newWorker = registration.installing;
+                        if (newWorker) {
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    debugLog('Service Worker updated, will activate on next page load');
+                                    showServiceWorkerUpdateNotification();
+                                }
+                            });
+                        }
+                    });
+
+                    // Listen for messages from service worker
+                    navigator.serviceWorker.addEventListener('message', handleServiceWorkerMessage);
+                })
+                .catch(error => {
+                    debugLog('Service Worker registration failed:', error);
+                });
+        } else {
+            debugLog('Service Worker not supported');
+        }
+    }
+
+    function setupPushNotifications(registration) {
+        // Request notification permission for story updates
+        if ('Notification' in window && Notification.permission === 'default') {
+            setTimeout(() => {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        debugLog('Push notifications enabled for story updates');
+                        GM_setValue('push_notifications_enabled', true);
+                    }
+                });
+            }, 5000); // Delay to avoid being intrusive
+        }
+    }
+
+    function showServiceWorkerUpdateNotification() {
+        const notification = document.createElement('div');
+        notification.className = 'hmt-update-notification';
+        notification.style.background = 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)';
+
+        notification.innerHTML = `
+            <h4>Service Worker đã cập nhật</h4>
+            <p>Cải thiện hiệu suất offline và caching. Thay đổi sẽ có hiệu lực khi làm mới trang.</p>
+            <button class="close-btn" onclick="this.parentElement.remove()">×</button>
+        `;
+
+        document.body.appendChild(notification);
+
+        // Tự động ẩn sau 10 giây
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 10000);
+    }
+
+    function handleServiceWorkerMessage(event) {
+        const { type, data } = event.data;
+
+        switch (type) {
+            case 'CACHE_STATUS':
+                debugLog('Cache status update:', data);
+                break;
+            case 'OFFLINE_READY':
+                showOfflineReadyNotification();
+                break;
+            case 'SYNC_COMPLETE':
+                debugLog('Background sync completed:', data);
+                break;
+        }
+    }
+
+    function showOfflineReadyNotification() {
+        const notification = document.createElement('div');
+        notification.className = 'hmt-update-notification';
+        notification.style.background = 'linear-gradient(135deg, #2196F3 0%, #1976D2 100%)';
+
+        notification.innerHTML = `
+            <h4>Sẵn sàng hoạt động offline</h4>
+            <p>HakoMonetTheme đã cache nội dung cần thiết để hoạt động offline.</p>
+            <button class="close-btn" onclick="this.parentElement.remove()">×</button>
+        `;
+
+        document.body.appendChild(notification);
+
+        // Tự động ẩn sau 8 giây
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 8000);
+    }
+
+    // Service Worker communication helpers
+    window.HMTServiceWorker = {
+        preloadThumbnails: function(urls, priority = 'normal') {
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({
+                    type: 'PRELOAD_THUMBNAILS',
+                    data: { urls, priority }
+                });
+            }
+        },
+
+        cacheStoryData: function(storyId, data) {
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({
+                    type: 'CACHE_STORY_DATA',
+                    data: { storyId, data }
+                });
+            }
+        },
+
+        clearCache: function(cacheType = null) {
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({
+                    type: 'CLEAR_CACHE',
+                    data: { cacheType }
+                });
+            }
+        },
+
+        getCacheStatus: function() {
+            return new Promise((resolve) => {
+                if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                    const channel = new MessageChannel();
+                    channel.port1.onmessage = (event) => resolve(event.data);
+                    navigator.serviceWorker.controller.postMessage({
+                        type: 'GET_CACHE_STATUS'
+                    }, [channel.port2]);
+                } else {
+                    resolve(null);
+                }
+            });
+        }
+    };
     
     // Khởi chạy
     if (document.readyState === 'loading') {

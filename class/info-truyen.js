@@ -33,10 +33,13 @@
         
         // Thêm thiết bị cụ thể responsive styles (không đợi device detector)
         addDeviceSpecificStyles();
-        
+
         // Thêm thumbnail fade effect với retry mechanism
         setupThumbnailEffects();
-        
+
+        // Cache story data for offline access
+        setTimeout(cacheCurrentStoryData, 2000); // Delay to ensure page is fully loaded
+
         // Thiết lập portrait CSS redesign với orientation detection
         setupPortraitCSSRedesign();
         
@@ -309,39 +312,39 @@
     
     function setupThumbnailEffects() {
         debugLog('Thiết lập thumbnail effects với retry mechanism và MutationObserver');
-        
+
         retryCount = 0;
         const maxRetries = 15; // Tăng số lần thử
         const retryDelay = 300; // Giảm thời gian chờ
         const maxTotalTime = 10000; // 10 seconds timeout
-        
+
         const startTime = Date.now();
-        
+
         function attemptSetup() {
             retryCount++;
             debugLog(`Lần thử ${retryCount}/${maxRetries}: Thiết lập thumbnail effects`);
-            
+
             // Kiểm tra timeout tổng thể
             if (Date.now() - startTime > maxTotalTime) {
                 debugLog('Đã vượt quá thời gian timeout, bỏ qua thumbnail effect');
                 cleanupObserver();
                 return;
             }
-            
+
             // Kiểm tra xem đã áp dụng chưa
             if (thumbnailEffectApplied || document.querySelector('.betterhako-bg-overlay')) {
                 debugLog('Thumbnail effect đã được áp dụng trước đó');
                 cleanupObserver();
                 return;
             }
-            
+
             // Kiểm tra các điều kiện cần thiết
             const coverElement = document.querySelector('.series-cover .img-in-ratio');
             const mainPart = document.getElementById('mainpart');
-            
+
             if (!coverElement || !mainPart) {
                 debugLog(`Chưa tìm thấy đủ elements: cover=${!!coverElement}, mainpart=${!!mainPart}`);
-                
+
                 if (retryCount < maxRetries) {
                     setTimeout(attemptSetup, retryDelay);
                 } else {
@@ -357,7 +360,7 @@
 
             if (!coverUrl) {
                 debugLog('Chưa có URL ảnh bìa, thử lại...');
-                
+
                 if (retryCount < maxRetries) {
                     setTimeout(attemptSetup, retryDelay);
                 } else {
@@ -385,8 +388,11 @@
             // Tất cả điều kiện đã sẵn sàng
             applyThumbnailEffects(coverUrl);
             cleanupObserver();
+
+            // Service Worker integration: Preload related thumbnails
+            preloadRelatedThumbnails(coverUrl);
         }
-        
+
         // Bắt đầu thử
         attemptSetup();
     }
@@ -561,6 +567,77 @@
         .catch(error => {
             debugLog('Lỗi khi tải transparent-top.css hoặc source map:', error);
         });
+    }
+
+    // Service Worker integration: Preload related thumbnails
+    function preloadRelatedThumbnails(coverUrl) {
+        debugLog('Service Worker: Preloading related thumbnails');
+
+        // Find other thumbnail images on the page
+        const thumbnailElements = document.querySelectorAll('.series-cover .img-in-ratio, .story-item img, .thumbnail img');
+        const thumbnailUrls = [];
+
+        thumbnailElements.forEach(element => {
+            let url = null;
+
+            if (element.style.backgroundImage) {
+                url = element.style.backgroundImage.replace(/url\(['"]?(.*?)['"]?\)/i, '$1');
+            } else if (element.src) {
+                url = element.src;
+            }
+
+            if (url && url !== coverUrl && !thumbnailUrls.includes(url)) {
+                thumbnailUrls.push(url);
+            }
+        });
+
+        // Limit to 10 thumbnails to avoid overloading
+        const urlsToPreload = thumbnailUrls.slice(0, 10);
+
+        if (urlsToPreload.length > 0 && window.HMTServiceWorker) {
+            debugLog(`Service Worker: Preloading ${urlsToPreload.length} thumbnails`);
+            window.HMTServiceWorker.preloadThumbnails(urlsToPreload, 'high');
+
+            // Also register background sync for additional thumbnails
+            if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
+                navigator.serviceWorker.ready.then(registration => {
+                    registration.sync.register('hmt-thumbnail-preload').catch(err => {
+                        debugLog('Background sync registration failed:', err);
+                    });
+                });
+            }
+        }
+    }
+
+    // Cache story data for offline access
+    function cacheCurrentStoryData() {
+        debugLog('Service Worker: Caching current story data');
+
+        // Extract story information from the page
+        const storyTitle = document.querySelector('h1, .series-title')?.textContent?.trim();
+        const storyAuthor = document.querySelector('.author, .series-author')?.textContent?.trim();
+        const storyDescription = document.querySelector('.description, .series-description')?.textContent?.trim();
+        const storyGenres = Array.from(document.querySelectorAll('.genre, .tag')).map(el => el.textContent?.trim()).filter(Boolean);
+        const storyStatus = document.querySelector('.status, .series-status')?.textContent?.trim();
+
+        if (storyTitle && window.HMTServiceWorker) {
+            const storyData = {
+                title: storyTitle,
+                author: storyAuthor,
+                description: storyDescription,
+                genres: storyGenres,
+                status: storyStatus,
+                url: window.location.href,
+                cachedAt: new Date().toISOString(),
+                coverUrl: document.querySelector('.series-cover .img-in-ratio')?.style?.backgroundImage?.replace(/url\(['"]?(.*?)['"]?\)/i, '$1')
+            };
+
+            // Generate a simple story ID from URL
+            const storyId = btoa(window.location.href).replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
+
+            window.HMTServiceWorker.cacheStoryData(storyId, storyData);
+            debugLog('Service Worker: Story data cached for offline access');
+        }
     }
     
     // Khởi chạy class
