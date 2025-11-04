@@ -859,7 +859,6 @@
 
         document.body.appendChild(overlay);
 
-        const cancelBtn = overlay.querySelector('#cancel-btn');
         const updateBtn = overlay.querySelector('#update-btn');
         const skipBtn = overlay.querySelector('#skip-btn');
         const perfInfo = overlay.querySelector('#perf-info');
@@ -871,12 +870,6 @@
             perfInfo.textContent = `⚡ Dialog loaded in ${loadTime}ms`;
         };
         updatePerfInfo();
-
-        cancelBtn.addEventListener('click', () => {
-            overlay.remove();
-            // Log user interaction
-            debugLog('User cancelled update dialog');
-        });
 
         skipBtn.addEventListener('click', () => {
             // Skip this version
