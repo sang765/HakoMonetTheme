@@ -1035,8 +1035,8 @@
                 speed: 'medium'
             },
             {
-                name: 'Statically CDN',
-                url: 'https://cdn.statically.io/gh/sang765/HakoMonetTheme/main/HakoMonetTheme.user.js',
+                name: 'GitHub Pages',
+                url: 'https://sang765.github.io/HakoMonetTheme/HakoMonetTheme.user.js',
                 region: 'global',
                 reliability: 0.92,
                 speed: 'fast'
