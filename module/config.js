@@ -201,11 +201,13 @@
             html2canvas(document.body, {
                 useCORS: true,
                 allowTaint: true,
-                scale: 1,
+                scale: 0.8, // Giảm scale để tối ưu hiệu suất
                 width: window.innerWidth,
                 height: window.innerHeight,
                 x: 0,
-                y: 0
+                y: 0,
+                backgroundColor: null, // Không có background để tránh artifacts
+                logging: false // Tắt logging của html2canvas
             }).then(function(screenshot) {
                 const captureTime = performance.now() - captureStartTime;
                 debugLog('[ColorPicker] Capture screenshot thành công, thời gian:', captureTime.toFixed(2), 'ms');
@@ -232,6 +234,9 @@
             // Phát hiện thiết bị touch
             const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
+            // Cache màu để tối ưu hiệu suất
+            const colorCache = {};
+
             // Hàm lấy màu từ vị trí với tối ưu hóa hiệu suất
             function getColorAtPosition(x, y) {
                 if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) {
@@ -239,20 +244,26 @@
                     return null;
                 }
 
-                const pixelStartTime = performance.now();
-                const pixel = ctx.getImageData(x, y, 1, 1).data;
-                const pixelTime = performance.now() - pixelStartTime;
+                // Tối ưu hóa: sử dụng ImageData cache cho các vị trí gần nhau
+                const cacheKey = `${Math.floor(x/10)}_${Math.floor(y/10)}`;
+                if (!colorCache[cacheKey]) {
+                    const pixelStartTime = performance.now();
+                    const pixel = ctx.getImageData(x, y, 1, 1).data;
+                    const pixelTime = performance.now() - pixelStartTime;
 
-                const r = pixel[0];
-                const g = pixel[1];
-                const b = pixel[2];
-                const hex = '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+                    const r = pixel[0];
+                    const g = pixel[1];
+                    const b = pixel[2];
+                    const hex = '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 
-                if (DEBUG) {
-                    debugLog('[ColorPicker] Pixel time:', pixelTime.toFixed(3), 'ms at', x, y, '->', hex);
+                    colorCache[cacheKey] = { r, g, b, hex };
+
+                    if (DEBUG) {
+                        debugLog('[ColorPicker] Pixel time:', pixelTime.toFixed(3), 'ms at', x, y, '->', hex);
+                    }
                 }
 
-                return { r, g, b, hex };
+                return colorCache[cacheKey];
             }
 
             // Hàm cập nhật zoom lens với hiệu ứng mượt mà

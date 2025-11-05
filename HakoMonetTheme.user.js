@@ -53,6 +53,9 @@
 // @resource     updateManagerJS ./module/update-manager.js
 // @resource     darkModePrompterJS ./module/dark-mode-prompter.js
 // @resource     fullscreenJS ./module/fullscreen.js
+// @resource     html2canvasJS ./api/html2canvas.min.js
+// @connect      html2canvas.hertzen.com
+// @connect      hertzen.com
 // ==/UserScript==
 
 (function() {
