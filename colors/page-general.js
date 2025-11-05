@@ -1211,7 +1211,7 @@
                 border: 1px solid ${palette[800]} !important;
             }
 
-            .profile-showcase header span.number, {
+            .profile-showcase header span.number {
                 background-color: ${palette[800]} !important;
                 color: ${textColor} !important;
             }
@@ -1741,7 +1741,7 @@
                 border: 1px solid ${defaultPalette[800]} !important;
             }
 
-            .profile-showcase header span.number, {
+            .profile-showcase header span.number {
                 background-color: ${defaultPalette[800]} !important;
                 color: ${textColor} !important;
             }
