@@ -139,27 +139,6 @@
         ).join('');
     }
 
-    // Function to generate paletteRGB from hex color with optional shade number
-    function generatePaletteRGB(hexColor, shadeNumber = 500) {
-        // If MonetAPI is available, use the palette shade
-        if (window.MonetAPI && window.MonetAPI.generateMonetPalette) {
-            const palette = MonetAPI.generateMonetPalette(hexColor);
-            if (palette && palette[shadeNumber]) {
-                const rgb = hexToRgb(palette[shadeNumber]);
-                return `${rgb.r}, ${rgb.g}, ${rgb.b}`;
-            }
-        }
-        // Fallback to direct color conversion
-        const rgb = hexToRgb(hexColor);
-        return `${rgb.r}, ${rgb.g}, ${rgb.b}`;
-    }
-
-    // Function to generate defaultPaletteRGB from default color with optional shade number
-    function generateDefaultPaletteRGB(shadeNumber = 500) {
-        const defaultColor = '#FCE4EC'; // Light mode default color
-        return generatePaletteRGB(defaultColor, shadeNumber);
-    }
-
     // Integrated CORS handling for images
     function setupImageCorsHandling() {
         if (window.__imageCorsSetup) return;

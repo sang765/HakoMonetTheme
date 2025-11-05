@@ -261,37 +261,6 @@
         return MonetAPI.isValidColor(color);
     }
 
-    function hexToRgb(hex) {
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16)
-        };
-    }
-
-    // Function to generate paletteRGB from hex color with optional shade number
-    function generatePaletteRGB(hexColor, shadeNumber = 500) {
-        // If MonetAPI is available, use the palette shade
-        if (window.MonetAPI && window.MonetAPI.generateMonetPalette) {
-            const palette = MonetAPI.generateMonetPalette(hexColor);
-            if (palette && palette[shadeNumber]) {
-                const rgb = hexToRgb(palette[shadeNumber]);
-                return `${rgb.r}, ${rgb.g}, ${rgb.b}`;
-            }
-        }
-        // Fallback to direct color conversion
-        const rgb = hexToRgb(hexColor);
-        return `${rgb.r}, ${rgb.g}, ${rgb.b}`;
-    }
-
-    // Function to generate defaultPaletteRGB from default color with optional shade number
-    function generateDefaultPaletteRGB(shadeNumber = 500) {
-        const defaultColor = (window.HMTConfig && window.HMTConfig.getDefaultColor) ?
-            window.HMTConfig.getDefaultColor() : '#063c30';
-        return generatePaletteRGB(defaultColor, shadeNumber);
-    }
-
     // Integrated CORS handling for images
     function setupImageCorsHandling() {
         if (window.__imageCorsSetup) return;
@@ -1791,7 +1760,7 @@
             }
 
             .profile-cover:hover .p-c_wrapper {
-                background-color: rgba(${rgb(defaultPalette[500])}, 0.6);
+                background-color: rgba(${rgb(palette[500])}, 0.6);
                 color: ${textColor};
             }
         `;
