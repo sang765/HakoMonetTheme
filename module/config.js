@@ -30,6 +30,15 @@
         return GM_getValue('default_color', '#063c30');
     }
 
+    function getLastPickedColor() {
+        return GM_getValue('last_picked_color', null);
+    }
+
+    function setLastPickedColor(color) {
+        GM_setValue('last_picked_color', color);
+        debugLog('[Config] Đã lưu màu đã pick cuối cùng:', color);
+    }
+
     function setDefaultColor(color) {
         GM_setValue('default_color', color);
         debugLog('Đã lưu màu mặc định:', color);
@@ -132,7 +141,9 @@
     }
 
     function createScreenColorPicker(callback) {
-        debugLog('Tạo screen color picker');
+        debugLog('[ColorPicker] Bắt đầu tạo screen color picker');
+
+        const startTime = performance.now();
 
         // Tạo overlay toàn màn hình
         const overlay = document.createElement('div');
@@ -142,14 +153,14 @@
         const canvas = document.createElement('canvas');
         canvas.className = 'hmt-color-picker-canvas';
 
-        // Tạo zoom lens
+        // Tạo zoom lens lớn hơn
         const zoomLens = document.createElement('div');
         zoomLens.className = 'hmt-color-picker-zoom';
 
-        // Tạo info panel
+        // Tạo info panel với thông tin chi tiết hơn
         const infoPanel = document.createElement('div');
         infoPanel.className = 'hmt-color-picker-info';
-        infoPanel.textContent = 'Loading...';
+        infoPanel.textContent = 'Đang chuẩn bị...';
 
         // Tạo instructions
         const instructions = document.createElement('div');
@@ -162,7 +173,7 @@
 
         const selectBtn = document.createElement('button');
         selectBtn.className = 'hmt-color-picker-btn select';
-        selectBtn.textContent = 'Chọn';
+        selectBtn.textContent = 'Chọn màu';
 
         const cancelBtn = document.createElement('button');
         cancelBtn.className = 'hmt-color-picker-btn cancel';
@@ -177,9 +188,16 @@
         overlay.appendChild(instructions);
         overlay.appendChild(controls);
 
+        debugLog('[ColorPicker] Đã tạo UI elements, thời gian:', performance.now() - startTime, 'ms');
+
         // Lấy screenshot của trang
         // Sử dụng html2canvas nếu có, nếu không thì tạo canvas trắng
         if (typeof html2canvas !== 'undefined') {
+            debugLog('[ColorPicker] html2canvas khả dụng, bắt đầu capture screenshot');
+            infoPanel.textContent = 'Đang chụp màn hình...';
+
+            const captureStartTime = performance.now();
+
             html2canvas(document.body, {
                 useCORS: true,
                 allowTaint: true,
@@ -189,14 +207,21 @@
                 x: 0,
                 y: 0
             }).then(function(screenshot) {
-            debugLog('Đã capture screenshot');
+                const captureTime = performance.now() - captureStartTime;
+                debugLog('[ColorPicker] Capture screenshot thành công, thời gian:', captureTime.toFixed(2), 'ms');
 
-            const ctx = canvas.getContext('2d');
-            canvas.width = screenshot.width;
-            canvas.height = screenshot.height;
-            ctx.drawImage(screenshot, 0, 0);
+                const ctx = canvas.getContext('2d');
+                canvas.width = screenshot.width;
+                canvas.height = screenshot.height;
 
-            infoPanel.textContent = 'Di chuột để xem màu • Click để chọn';
+                const drawStartTime = performance.now();
+                ctx.drawImage(screenshot, 0, 0);
+                const drawTime = performance.now() - drawStartTime;
+
+                debugLog('[ColorPicker] Vẽ canvas hoàn thành, thời gian:', drawTime.toFixed(2), 'ms');
+                debugLog('[ColorPicker] Canvas size:', canvas.width, 'x', canvas.height);
+
+                infoPanel.textContent = 'Sẵn sàng! Di chuột để xem màu';
 
             let isPicking = false;
             let isDragging = false;
@@ -207,50 +232,76 @@
             // Phát hiện thiết bị touch
             const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-            // Hàm lấy màu từ vị trí
+            // Hàm lấy màu từ vị trí với tối ưu hóa hiệu suất
             function getColorAtPosition(x, y) {
                 if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) {
+                    debugLog('[ColorPicker] Vị trí ngoài canvas:', x, y);
                     return null;
                 }
+
+                const pixelStartTime = performance.now();
                 const pixel = ctx.getImageData(x, y, 1, 1).data;
+                const pixelTime = performance.now() - pixelStartTime;
+
                 const r = pixel[0];
                 const g = pixel[1];
                 const b = pixel[2];
                 const hex = '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+
+                if (DEBUG) {
+                    debugLog('[ColorPicker] Pixel time:', pixelTime.toFixed(3), 'ms at', x, y, '->', hex);
+                }
+
                 return { r, g, b, hex };
             }
 
-            // Hàm cập nhật zoom lens
+            // Hàm cập nhật zoom lens với hiệu ứng mượt mà
             function updateZoomLens(x, y) {
                 const color = getColorAtPosition(x, y);
-                if (!color) return;
+                if (!color) {
+                    zoomLens.style.display = 'none';
+                    return;
+                }
 
                 selectedColor = color;
+
+                // Cập nhật info panel với hiệu ứng
+                infoPanel.classList.add('updating');
                 infoPanel.textContent = `RGB(${color.r}, ${color.g}, ${color.b}) ${color.hex}`;
+                setTimeout(() => infoPanel.classList.remove('updating'), 150);
 
-                // Cập nhật vị trí zoom lens
+                // Cập nhật vị trí zoom lens với transition mượt mà
                 zoomLens.style.display = 'block';
-                zoomLens.style.left = (x - 60) + 'px';
-                zoomLens.style.top = (y - 60) + 'px';
+                zoomLens.style.left = (x - 80) + 'px'; // Điều chỉnh cho lens lớn hơn
+                zoomLens.style.top = (y - 80) + 'px';
 
-                // Vẽ zoom area
-                const zoomSize = 40;
+                // Vẽ zoom area với hiệu ứng mượt mà
+                const zoomSize = 60; // Zoom lớn hơn
                 let zoomCtx = zoomLens.getContext('2d');
                 if (!zoomCtx) {
                     zoomLens.innerHTML = '';
                     const zoomCanvas = document.createElement('canvas');
-                    zoomCanvas.width = 120;
-                    zoomCanvas.height = 120;
+                    zoomCanvas.width = 160;
+                    zoomCanvas.height = 160;
                     zoomLens.appendChild(zoomCanvas);
                     zoomCtx = zoomCanvas.getContext('2d');
                 }
 
-                zoomCtx.clearRect(0, 0, 120, 120);
-                zoomCtx.drawImage(
-                    canvas,
-                    x - zoomSize/2, y - zoomSize/2, zoomSize, zoomSize,
-                    0, 0, 120, 120
-                );
+                // Thêm hiệu ứng fade và scale
+                zoomLens.style.opacity = '0.7';
+                zoomLens.style.transform = 'scale(0.9)';
+
+                requestAnimationFrame(() => {
+                    zoomCtx.clearRect(0, 0, 160, 160);
+                    zoomCtx.drawImage(
+                        canvas,
+                        x - zoomSize/2, y - zoomSize/2, zoomSize, zoomSize,
+                        0, 0, 160, 160
+                    );
+
+                    zoomLens.style.opacity = '1';
+                    zoomLens.style.transform = 'scale(1)';
+                });
             }
 
             // Khởi tạo vị trí lens ở giữa màn hình
@@ -265,28 +316,33 @@
                     currentX = e.clientX - rect.left;
                     currentY = e.clientY - rect.top;
 
+                    debugLog('[ColorPicker] Mouse move to:', currentX, currentY);
                     updateZoomLens(currentX, currentY);
                 });
 
                 // Xử lý click để chọn màu (desktop)
-                overlay.addEventListener('click', function(e) {
-                    if (isPicking) return;
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    const rect = canvas.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-
-                    const color = getColorAtPosition(x, y);
-                    if (color) {
-                        debugLog('Đã chọn màu từ click:', color.hex);
-                        if (callback) {
-                            callback(color.hex);
+                    overlay.addEventListener('click', function(e) {
+                        if (isPicking) return;
+                        e.preventDefault();
+                        e.stopPropagation();
+    
+                        const rect = canvas.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+    
+                        debugLog('[ColorPicker] Click event at:', x, y);
+    
+                        const color = getColorAtPosition(x, y);
+                        if (color) {
+                            debugLog('[ColorPicker] Đã chọn màu từ click:', color.hex);
+                            if (callback) {
+                                callback(color.hex);
+                            }
+                            overlay.remove();
+                        } else {
+                            debugLog('[ColorPicker] Click ngoài canvas, bỏ qua');
                         }
-                        overlay.remove();
-                    }
-                });
+                    });
             } else {
                 // Mobile: Touch events
                 overlay.addEventListener('touchmove', function(e) {
@@ -322,6 +378,7 @@
                 isDragging = true;
                 zoomLens.classList.add('dragging');
                 document.body.style.cursor = 'grabbing';
+                debugLog('[ColorPicker] Bắt đầu drag lens');
             });
 
             zoomLens.addEventListener('touchstart', function(e) {
@@ -366,6 +423,7 @@
                     isDragging = false;
                     zoomLens.classList.remove('dragging');
                     document.body.style.cursor = '';
+                    debugLog('[ColorPicker] Kết thúc drag lens');
                 }
             });
 
@@ -381,7 +439,9 @@
                 if (isPicking) return;
                 isPicking = true;
 
-                debugLog('Đã chọn màu từ nút Select:', selectedColor.hex);
+                debugLog('[ColorPicker] Đã chọn màu từ nút Select:', selectedColor.hex);
+                debugLog('[ColorPicker] RGB:', selectedColor.r, selectedColor.g, selectedColor.b);
+
                 if (callback) {
                     callback(selectedColor.hex);
                 }
@@ -390,36 +450,64 @@
 
             // Xử lý nút Cancel
             cancelBtn.addEventListener('click', function() {
-                debugLog('Hủy color picker');
+                debugLog('[ColorPicker] Người dùng hủy color picker');
                 overlay.remove();
             });
 
         }).catch(function(error) {
-            debugLog('Lỗi khi capture screenshot:', error);
-            infoPanel.textContent = 'Lỗi: Không thể capture màn hình';
-            setTimeout(() => overlay.remove(), 2000);
+            debugLog('[ColorPicker] Lỗi khi capture screenshot:', error);
+            debugLog('[ColorPicker] Chi tiết lỗi:', error.message, error.stack);
+
+            infoPanel.textContent = 'Lỗi: Không thể capture màn hình - thử fallback';
+
+            // Thử fallback với canvas trắng
+            setTimeout(() => {
+                createFallbackCanvas(canvas, infoPanel, overlay);
+            }, 1000);
         });
     } else {
-        // Fallback: Tạo canvas trắng với thông báo
-        debugLog('html2canvas không khả dụng, tạo fallback canvas');
+        debugLog('[ColorPicker] html2canvas không khả dụng, sử dụng fallback canvas');
+        createFallbackCanvas(canvas, infoPanel, overlay);
+    }
+
+    function createFallbackCanvas(canvas, infoPanel, overlay) {
+        debugLog('[ColorPicker] Tạo fallback canvas trắng');
 
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        // Tô nền trắng
-        ctx.fillStyle = '#ffffff';
+        // Tô nền gradient để có màu đa dạng
+        const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+        gradient.addColorStop(0, '#ff0000');   // Đỏ
+        gradient.addColorStop(0.16, '#ffff00'); // Vàng
+        gradient.addColorStop(0.33, '#00ff00'); // Xanh lá
+        gradient.addColorStop(0.5, '#00ffff');  // Xanh dương nhạt
+        gradient.addColorStop(0.66, '#0000ff'); // Xanh dương
+        gradient.addColorStop(0.83, '#ff00ff'); // Tím
+        gradient.addColorStop(1, '#ff0000');   // Đỏ
+
+        ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // Vẽ text thông báo
-        ctx.fillStyle = '#333333';
-        ctx.font = '24px Arial';
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 2;
+        ctx.font = 'bold 20px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText('Không thể capture màn hình', canvas.width / 2, canvas.height / 2 - 50);
-        ctx.fillText('(html2canvas không khả dụng)', canvas.width / 2, canvas.height / 2);
-        ctx.fillText('Click để chọn màu trắng mặc định', canvas.width / 2, canvas.height / 2 + 50);
+        ctx.strokeText('FALLBACK MODE', canvas.width / 2, canvas.height / 2 - 80);
+        ctx.fillText('FALLBACK MODE', canvas.width / 2, canvas.height / 2 - 80);
 
-        infoPanel.textContent = 'html2canvas không khả dụng - Click để chọn màu trắng';
+        ctx.font = '16px Arial';
+        ctx.strokeText('html2canvas không khả dụng', canvas.width / 2, canvas.height / 2 - 40);
+        ctx.fillText('html2canvas không khả dụng', canvas.width / 2, canvas.height / 2 - 40);
+
+        ctx.strokeText('Sử dụng gradient màu để chọn', canvas.width / 2, canvas.height / 2);
+        ctx.fillText('Sử dụng gradient màu để chọn', canvas.width / 2, canvas.height / 2);
+
+        infoPanel.textContent = 'Fallback mode: Chọn màu từ gradient';
+        debugLog('[ColorPicker] Fallback canvas đã được tạo');
     }
 
         // Ngăn navigation khi đang pick màu
@@ -438,7 +526,7 @@
         // Xử lý ESC để hủy
         function handleKeydown(e) {
             if (e.key === 'Escape') {
-                debugLog('Hủy color picker');
+                debugLog('[ColorPicker] Người dùng nhấn ESC để hủy');
                 overlay.remove();
                 document.removeEventListener('keydown', handleKeydown);
                 document.removeEventListener('click', preventNavigation, true);
@@ -452,7 +540,8 @@
         // Thêm overlay vào document
         (window.top || window).document.body.appendChild(overlay);
 
-        debugLog('Đã tạo screen color picker');
+        const totalTime = performance.now() - startTime;
+        debugLog('[ColorPicker] Color picker đã được tạo hoàn thành, tổng thời gian:', totalTime.toFixed(2), 'ms');
     }
 
     function isInfoPage() {
@@ -904,17 +993,18 @@ ${!isInfoPage() ? `
 
             .hmt-color-picker-zoom {
                 position: absolute;
-                width: 120px;
-                height: 120px;
-                border: 2px solid white;
+                width: 160px;
+                height: 160px;
+                border: 3px solid white;
                 border-radius: 50%;
-                background: rgba(255, 255, 255, 0.9);
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                background: rgba(255, 255, 255, 0.95);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
                 pointer-events: none;
                 display: none;
                 overflow: hidden;
                 cursor: move;
                 z-index: 10003;
+                transition: transform 0.1s ease-out;
             }
 
             .hmt-color-picker-zoom::after {
@@ -938,15 +1028,22 @@ ${!isInfoPage() ? `
                 position: absolute;
                 top: 20px;
                 left: 20px;
-                background: rgba(0, 0, 0, 0.8);
+                background: rgba(0, 0, 0, 0.9);
                 color: white;
-                padding: 12px 16px;
-                border-radius: 8px;
+                padding: 14px 18px;
+                border-radius: 10px;
                 font-family: monospace;
-                font-size: 14px;
+                font-size: 15px;
                 font-weight: 600;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
                 pointer-events: none;
+                transition: all 0.3s ease;
+                backdrop-filter: blur(4px);
+            }
+
+            .hmt-color-picker-info.updating {
+                background: rgba(0, 0, 0, 0.95);
+                transform: scale(1.02);
             }
 
             .hmt-color-picker-instructions {
@@ -1754,14 +1851,17 @@ ${!isInfoPage() ? `
                 e.preventDefault();
                 e.stopPropagation();
 
-                debugLog('Mở screen color picker');
+                debugLog('[ColorPicker] Người dùng click nút screen color picker');
 
                 // Tạm ẩn config dialog
                 dialog.style.display = 'none';
 
                 // Mở screen color picker
                 createScreenColorPicker(function(selectedColor) {
-                    debugLog('Đã chọn màu từ màn hình:', selectedColor);
+                    debugLog('[ColorPicker] Màu đã được chọn từ screen picker:', selectedColor);
+
+                    // Lưu màu đã pick vào config
+                    setLastPickedColor(selectedColor);
 
                     // Cập nhật preview color
                     previewColor = selectedColor;
@@ -1777,6 +1877,8 @@ ${!isInfoPage() ? `
                     currentHue = hsl.h;
                     currentSat = hsl.s;
                     currentLight = hsl.l;
+
+                    debugLog('[ColorPicker] HSL values:', hsl);
 
                     // Cập nhật giá trị sliders
                     if (hueSlider) hueSlider.value = currentHue;
@@ -1836,31 +1938,31 @@ ${!isInfoPage() ? `
         }
 
         // Lưu cài đặt
-         saveBtn.addEventListener('click', function() {
-             const selectedColor = previewColor; // Lưu màu đang preview
-             debugLog('Lưu cài đặt màu:', selectedColor);
-             if (isValidHexColor(selectedColor)) {
-                 // Thực sự lưu màu vào storage và phát sự kiện chính thức
-                 setDefaultColor(selectedColor);
+          saveBtn.addEventListener('click', function() {
+              const selectedColor = previewColor; // Lưu màu đang preview
+              debugLog('[Config] Lưu cài đặt màu:', selectedColor);
+              if (isValidHexColor(selectedColor)) {
+                  // Thực sự lưu màu vào storage và phát sự kiện chính thức
+                  setDefaultColor(selectedColor);
 
-                 // Cập nhật tất cả các elements UI với màu đã lưu
-                 syncUIWithColor(selectedColor);
+                  // Cập nhật tất cả các elements UI với màu đã lưu
+                  syncUIWithColor(selectedColor);
 
-                 showNotification('Đã lưu cài đặt màu sắc!', 3000);
+                  showNotification('Đã lưu cài đặt màu sắc!', 3000);
 
-                 // Tự động reload trang sau khi lưu cài đặt
-                 setTimeout(() => {
-                     location.reload();
-                 }, 1000); // Đợi 1 giây để notification hiển thị trước khi reload
+                  // Tự động reload trang sau khi lưu cài đặt
+                  setTimeout(() => {
+                      location.reload();
+                  }, 1000); // Đợi 1 giây để notification hiển thị trước khi reload
 
-                 closeDialog();
-             } else {
-                 debugLog('Màu không hợp lệ khi lưu:', selectedColor);
-                 showNotification('Màu không hợp lệ! Vui lòng nhập mã màu HEX đúng định dạng.', 5000);
+                  closeDialog();
+              } else {
+                  debugLog('[Config] Màu không hợp lệ khi lưu:', selectedColor);
+                  showNotification('Màu không hợp lệ! Vui lòng nhập mã màu HEX đúng định dạng.', 5000);
 
-                 // Không cần gắn lại sự kiện vì đã loại bỏ preset
-             }
-         });
+                  // Không cần gắn lại sự kiện vì đã loại bỏ preset
+              }
+          });
 
          debugLog('Hoàn thành setup event listeners');
 
@@ -2013,6 +2115,8 @@ ${!isInfoPage() ? `
     window.HMTConfig = {
         getDefaultColor: getDefaultColor,
         setDefaultColor: setDefaultColor,
+        getLastPickedColor: getLastPickedColor,
+        setLastPickedColor: setLastPickedColor,
         getHideDomainWarning: getHideDomainWarning,
         setHideDomainWarning: setHideDomainWarning,
         getDisableColorsOnReadingPage: getDisableColorsOnReadingPage,
