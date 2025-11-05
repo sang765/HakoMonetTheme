@@ -963,7 +963,7 @@
             }
         }, nextCheckDelay);
 
-        debugLog(`📅 Next idle check scheduled in ${Math.round(nextCheckDelay / 60000)} minutes`);
+        // debugLog(`📅 Next idle check scheduled in ${Math.round(nextCheckDelay / 60000)} minutes`);
     }
 
     function predictNextActiveHour(activeHours) {
