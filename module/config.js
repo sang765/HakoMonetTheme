@@ -302,15 +302,15 @@
 
                 // Vẽ zoom area với hiệu ứng mượt mà
                 const zoomSize = 60; // Zoom lớn hơn
-                let zoomCtx = zoomLens.getContext('2d');
-                if (!zoomCtx) {
+                let zoomCanvas = zoomLens.querySelector('canvas');
+                if (!zoomCanvas) {
                     zoomLens.innerHTML = '';
-                    const zoomCanvas = document.createElement('canvas');
+                    zoomCanvas = document.createElement('canvas');
                     zoomCanvas.width = 160;
                     zoomCanvas.height = 160;
                     zoomLens.appendChild(zoomCanvas);
-                    zoomCtx = zoomCanvas.getContext('2d');
                 }
+                const zoomCtx = zoomCanvas.getContext('2d');
 
                 // Thêm hiệu ứng fade và scale
                 zoomLens.style.opacity = '0.7';
