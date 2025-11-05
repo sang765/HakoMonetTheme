@@ -509,6 +509,12 @@
                 color: ${textColor} !important;
             }
 
+            .button.to-contact.button-green:hover {
+                background-color: ${textColor} !important;
+                color: ${palette[400]} !important;
+                border-color: ${palette[400]} !important;
+            }
+
             .profile-nav {
                 background-color: ${palette[800]} !important;
             }
@@ -735,6 +741,19 @@
               background-color: ${palette[500]};
               border-bottom: 1px solid ${palette[700]};
               color: ${textColor};
+            }
+
+            .bg-gray-200 {
+                background-color: ${palette[200]} !important;
+            }
+
+            .profile-showcase header span.number,
+            .profile-showcase header, ol.list-volume li {
+                background-color: ${palette[800]} !important;
+            }
+
+            .statistic-top {
+                border-bottom-color: ${palette[800]} !important;
             }
         `;
 
@@ -1003,7 +1022,13 @@
             .button-green {
                 background-color: ${defaultPalette[400]} !important;
                 border-color: ${defaultPalette[600]} !important;
-                color: #000 !important;
+                color: ${textColor} !important;
+            }
+
+            .button.to-contact.button-green:hover {
+                background-color: ${textColor} !important;
+                color: ${defaultPalette[400]} !important;
+                border-color: ${defaultPalette[400]} !important;
             }
 
             .profile-nav {
@@ -1209,6 +1234,19 @@
               background-color: ${defaultPalette[500]};
               border-bottom: 1px solid ${defaultPalette[700]};
               color: ${textColor};
+            }
+
+            .bg-gray-200 {
+                background-color: ${defaultPalette[200]} !important;
+            }
+
+            .profile-showcase header span.number,
+            .profile-showcase header, ol.list-volume li {
+                background-color: ${defaultPalette[800]} !important;
+            }
+
+            .statistic-top {
+                border-bottom-color: ${defaultPalette[800]} !important;
             }
         `;
 

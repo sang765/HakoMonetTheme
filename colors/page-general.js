@@ -954,7 +954,7 @@
                 color: ${palette[400]} !important;
             }
 
-            :is(.dark .dark\:ring-cyan-900) {
+            :is(.dark .dark\\:ring-cyan-900) {
                 --tw-ring-color: ${palette[800]} !important;
             }
 
@@ -968,6 +968,12 @@
                 color: ${textColor} !important;
             }
 
+            .button.to-contact.button-green:hover {
+                background-color: ${textColor} !important;
+                color: ${palette[400]} !important;
+                border-color: ${palette[400]} !important;
+            }
+
             .profile-nav {
                 background-color: ${palette[800]} !important;
             }
@@ -976,7 +982,7 @@
                 background-color: ${palette[500]} !important;
             }
 
-            :is(.dark .dark\:bg-gray-700) {
+            :is(.dark .dark\\:bg-gray-700) {
                 background-color: ${palette[700]} !important;
             }
 
@@ -1179,7 +1185,7 @@
                 border-right-color: ${palette[900]} !important;
             }
 
-            :is(.dark .dark\:ring-cyan-900) {
+            :is(.dark .dark\\:ring-cyan-900) {
                 --tw-ring-color: ${palette[900]} !important;
             }
 
@@ -1198,6 +1204,19 @@
               background-color: ${palette[500]};
               border-bottom: 1px solid ${palette[700]};
               color: ${textColor};
+            }
+
+            :is(.dark .dark\\:bg-gray-700) {
+                background-color: ${palette[900]} !important;
+            }
+
+            .profile-showcase header span.number,
+            .profile-showcase header, ol.list-volume li {
+                background-color: ${palette[800]} !important;
+            }
+
+            .statistic-top {
+                border-bottom-color: ${palette[800]} !important;
             }
         `;
 
@@ -1487,14 +1506,20 @@
                 color: ${defaultPalette[400]} !important;
             }
 
-            :is(.dark .dark\:ring-cyan-900) {
+            :is(.dark .dark\\:ring-cyan-900) {
                 --tw-ring-color: ${defaultPalette[800]} !important;
             }
 
             .button-green {
                 background-color: ${defaultPalette[400]} !important;
                 border-color: ${defaultPalette[600]} !important;
-                color: #fff !important;
+                color: ${textColor} !important;
+            }
+
+            .button.to-contact.button-green:hover {
+                background-color: ${textColor} !important;
+                color: ${defaultPalette[400]} !important;
+                border-color: ${defaultPalette[400]} !important;
             }
 
             .profile-nav {
@@ -1505,7 +1530,7 @@
                 background-color: ${defaultColor} !important;
             }
 
-            :is(.dark .dark\:bg-gray-700) {
+            :is(.dark .dark\\:bg-gray-700) {
                 background-color: ${defaultPalette[700]} !important;
             }
 
@@ -1685,7 +1710,7 @@
                 border-right-color: ${defaultPalette[900]} !important;
             }
 
-            :is(.dark .dark\:ring-cyan-900) {
+            :is(.dark .dark\\:ring-cyan-900) {
                 --tw-ring-color: ${defaultPalette[900]} !important;
             }
 
@@ -1704,6 +1729,19 @@
               background-color: ${defaultColor[500]};
               border-bottom: 1px solid ${defaultPalette[700]};
               color: ${textColor};
+            }
+
+            :is(.dark .dark\\:bg-gray-700) {
+                background-color: ${defaultPalette[900]} !important;
+            }
+
+            .profile-showcase header span.number,
+            .profile-showcase header, ol.list-volume li {
+                background-color: ${defaultPalette[800]} !important;
+            }
+
+            .statistic-top {
+                border-bottom-color: ${defaultPalette[800]} !important;
             }
         `;
 
