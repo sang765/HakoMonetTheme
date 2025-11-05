@@ -147,54 +147,84 @@
 
         const startTime = performance.now();
 
-        // Tạo overlay toàn màn hình
-        const overlay = document.createElement('div');
-        overlay.className = 'hmt-color-picker-overlay';
+        // Kiểm tra và sử dụng EyeDropper API nếu có (Chrome, Edge, etc.)
+        if ('EyeDropper' in window) {
+            debugLog('[ColorPicker] EyeDropper API khả dụng, sử dụng native color picker');
 
-        // Tạo canvas để hiển thị screenshot
-        const canvas = document.createElement('canvas');
-        canvas.className = 'hmt-color-picker-canvas';
+            const eyeDropper = new EyeDropper();
 
-        // Tạo zoom lens lớn hơn
-        const zoomLens = document.createElement('div');
-        zoomLens.className = 'hmt-color-picker-zoom';
+            // Hiển thị thông báo cho người dùng
+            showNotification('Mở công cụ chọn màu màn hình. Nhấp vào bất kỳ điểm nào trên màn hình để chọn màu.', 5000);
 
-        // Tạo info panel với thông tin chi tiết hơn
-        const infoPanel = document.createElement('div');
-        infoPanel.className = 'hmt-color-picker-info';
-        infoPanel.textContent = 'Đang chuẩn bị...';
+            eyeDropper.open().then(result => {
+                debugLog('[ColorPicker] Đã chọn màu từ EyeDropper:', result.sRGBHex);
+                if (callback) {
+                    callback(result.sRGBHex);
+                }
+            }).catch(err => {
+                debugLog('[ColorPicker] EyeDropper bị hủy hoặc lỗi:', err);
+                if (err.name !== 'AbortError') {
+                    showNotification('Lỗi khi chọn màu từ màn hình. Sử dụng phương pháp dự phòng.', 3000);
+                    // Fallback to html2canvas
+                    createFallbackColorPicker(callback);
+                }
+            });
 
-        // Tạo instructions
-        const instructions = document.createElement('div');
-        instructions.className = 'hmt-color-picker-instructions';
-        instructions.textContent = 'Kéo lens để di chuyển • ESC để hủy';
+            return; // Exit early if EyeDropper is used
+        }
 
-        // Tạo controls cho mobile
-        const controls = document.createElement('div');
-        controls.className = 'hmt-color-picker-controls';
+        // Fallback to html2canvas or manual picker
+        createFallbackColorPicker(callback);
 
-        const selectBtn = document.createElement('button');
-        selectBtn.className = 'hmt-color-picker-btn select';
-        selectBtn.textContent = 'Chọn màu';
+        function createFallbackColorPicker(callback) {
+            // Tạo overlay toàn màn hình
+            const overlay = document.createElement('div');
+            overlay.className = 'hmt-color-picker-overlay';
 
-        const cancelBtn = document.createElement('button');
-        cancelBtn.className = 'hmt-color-picker-btn cancel';
-        cancelBtn.textContent = 'Hủy';
+            // Tạo canvas để hiển thị screenshot
+            const canvas = document.createElement('canvas');
+            canvas.className = 'hmt-color-picker-canvas';
 
-        controls.appendChild(cancelBtn);
-        controls.appendChild(selectBtn);
+            // Tạo zoom lens lớn hơn
+            const zoomLens = document.createElement('div');
+            zoomLens.className = 'hmt-color-picker-zoom';
 
-        overlay.appendChild(canvas);
-        overlay.appendChild(zoomLens);
-        overlay.appendChild(infoPanel);
-        overlay.appendChild(instructions);
-        overlay.appendChild(controls);
+            // Tạo info panel với thông tin chi tiết hơn
+            const infoPanel = document.createElement('div');
+            infoPanel.className = 'hmt-color-picker-info';
+            infoPanel.textContent = 'Đang chuẩn bị...';
 
-        debugLog('[ColorPicker] Đã tạo UI elements, thời gian:', performance.now() - startTime, 'ms');
+            // Tạo instructions
+            const instructions = document.createElement('div');
+            instructions.className = 'hmt-color-picker-instructions';
+            instructions.textContent = 'Kéo lens để di chuyển • ESC để hủy';
 
-        // Lấy screenshot của trang
-        // Sử dụng html2canvas nếu có, nếu không thì tạo canvas trắng
-        if (typeof html2canvas !== 'undefined') {
+            // Tạo controls cho mobile
+            const controls = document.createElement('div');
+            controls.className = 'hmt-color-picker-controls';
+
+            const selectBtn = document.createElement('button');
+            selectBtn.className = 'hmt-color-picker-btn select';
+            selectBtn.textContent = 'Chọn màu';
+
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'hmt-color-picker-btn cancel';
+            cancelBtn.textContent = 'Hủy';
+
+            controls.appendChild(cancelBtn);
+            controls.appendChild(selectBtn);
+
+            overlay.appendChild(canvas);
+            overlay.appendChild(zoomLens);
+            overlay.appendChild(infoPanel);
+            overlay.appendChild(instructions);
+            overlay.appendChild(controls);
+
+            debugLog('[ColorPicker] Đã tạo UI elements cho fallback, thời gian:', performance.now() - startTime, 'ms');
+
+            // Lấy screenshot của trang
+            // Sử dụng html2canvas nếu có, nếu không thì tạo canvas trắng
+            if (typeof html2canvas !== 'undefined') {
             if (typeof window.Logger !== 'undefined') {
                 window.Logger.info('colorPicker', 'html2canvas khả dụng, bắt đầu capture screenshot');
             } else {
@@ -571,6 +601,7 @@
 
         const totalTime = performance.now() - startTime;
         debugLog('[ColorPicker] Color picker đã được tạo hoàn thành, tổng thời gian:', totalTime.toFixed(2), 'ms');
+        }
     }
 
     function isInfoPage() {
