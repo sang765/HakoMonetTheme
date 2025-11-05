@@ -270,17 +270,26 @@
         };
     }
 
-    // Function to generate paletteRGB from hex color
-    function generatePaletteRGB(hexColor) {
+    // Function to generate paletteRGB from hex color with optional shade number
+    function generatePaletteRGB(hexColor, shadeNumber = 500) {
+        // If MonetAPI is available, use the palette shade
+        if (window.MonetAPI && window.MonetAPI.generateMonetPalette) {
+            const palette = MonetAPI.generateMonetPalette(hexColor);
+            if (palette && palette[shadeNumber]) {
+                const rgb = hexToRgb(palette[shadeNumber]);
+                return `${rgb.r}, ${rgb.g}, ${rgb.b}`;
+            }
+        }
+        // Fallback to direct color conversion
         const rgb = hexToRgb(hexColor);
         return `${rgb.r}, ${rgb.g}, ${rgb.b}`;
     }
 
-    // Function to generate defaultPaletteRGB from default color
-    function generateDefaultPaletteRGB() {
+    // Function to generate defaultPaletteRGB from default color with optional shade number
+    function generateDefaultPaletteRGB(shadeNumber = 500) {
         const defaultColor = (window.HMTConfig && window.HMTConfig.getDefaultColor) ?
             window.HMTConfig.getDefaultColor() : '#063c30';
-        return generatePaletteRGB(defaultColor);
+        return generatePaletteRGB(defaultColor, shadeNumber);
     }
 
     // Integrated CORS handling for images
@@ -1245,6 +1254,11 @@
             .statistic-top {
                 border-bottom-color: ${palette[800]} !important;
             }
+
+            .profile-cover:hover .p-c_wrapper {
+                background-color: rgba(${rgb(palette[500])}, 0.6);
+                color: ${textColor};
+            }
         `;
 
         GM_addStyle(css);
@@ -1774,6 +1788,11 @@
 
             .statistic-top {
                 border-bottom-color: ${defaultPalette[800]} !important;
+            }
+
+            .profile-cover:hover .p-c_wrapper {
+                background-color: rgba(${rgb(defaultPalette[500])}, 0.6);
+                color: ${textColor};
             }
         `;
 
