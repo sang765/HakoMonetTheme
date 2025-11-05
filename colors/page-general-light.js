@@ -760,11 +760,6 @@
             .statistic-top {
                 border-bottom-color: ${palette[800]} !important;
             }
-
-            .profile-cover:hover .p-c_wrapper {
-                background-color: rgba(${rgb(palette[500])}, 0.6);
-                color: ${textColor};
-            }
         `;
 
         GM_addStyle(css);
@@ -1262,11 +1257,6 @@
 
             .statistic-top {
                 border-bottom-color: ${defaultPalette[800]} !important;
-            }
-
-            .profile-cover:hover .p-c_wrapper {
-                background-color: rgba(${rgb(defaultPalette[500])}, 0.6);
-                color: ${textColor};
             }
         `;
 
