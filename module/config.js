@@ -204,17 +204,31 @@
 
             const captureStartTime = performance.now();
 
-            html2canvas(document.body, {
+            // Tối ưu hóa html2canvas options dựa trên device info
+            const html2canvasOptions = {
                 useCORS: true,
                 allowTaint: true,
-                scale: 0.8, // Giảm scale để tối ưu hiệu suất
+                scale: typeof window.DeviceDetector !== 'undefined' && window.DeviceDetector.getPixelRatio() > 1 ? 0.6 : 0.8, // Giảm scale hơn cho retina displays
                 width: window.innerWidth,
                 height: window.innerHeight,
                 x: 0,
                 y: 0,
-                backgroundColor: null, // Không có background để tránh artifacts
-                logging: false // Tắt logging của html2canvas
-            }).then(function(screenshot) {
+                backgroundColor: '#ffffff', // Đặt background trắng để đảm bảo render chính xác
+                logging: false, // Tắt logging của html2canvas
+                imageTimeout: 0, // Không timeout cho images
+                removeContainer: false, // Giữ container để tránh lỗi render
+                foreignObjectRendering: false, // Tắt foreign object rendering để tránh lỗi
+                // Tối ưu hóa cho mobile devices
+                ...(typeof window.DeviceDetector !== 'undefined' && window.DeviceDetector.isMobile() && {
+                    scale: 0.5, // Scale thấp hơn cho mobile
+                    width: Math.min(window.innerWidth, 1024), // Giới hạn width cho mobile
+                    height: Math.min(window.innerHeight, 768) // Giới hạn height cho mobile
+                })
+            };
+
+            debugLog('[ColorPicker] html2canvas options:', html2canvasOptions);
+
+            html2canvas(document.body, html2canvasOptions).then(function(screenshot) {
                 const captureTime = performance.now() - captureStartTime;
                 if (typeof window.Logger !== 'undefined') {
                     window.Logger.performance('colorPicker', 'Capture screenshot', captureStartTime, performance.now());
@@ -245,8 +259,17 @@
             let currentY = canvas.height / 2;
             let selectedColor = { r: 255, g: 255, b: 255, hex: '#ffffff' };
 
-            // Phát hiện thiết bị touch
-            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            // Phát hiện thiết bị touch - sử dụng DeviceDetector nếu có
+            const isTouchDevice = typeof window.DeviceDetector !== 'undefined'
+                ? window.DeviceDetector.isTouchDevice()
+                : ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+
+            // Thêm debug info về device detection
+            debugLog('[ColorPicker] Device detection:', {
+                isTouchDevice: isTouchDevice,
+                deviceType: typeof window.DeviceDetector !== 'undefined' ? window.DeviceDetector.getCurrentDevice() : 'unknown',
+                pixelRatio: typeof window.DeviceDetector !== 'undefined' ? window.DeviceDetector.getPixelRatio() : window.devicePixelRatio
+            });
 
             // Cache màu để tối ưu hiệu suất
             const colorCache = {};
