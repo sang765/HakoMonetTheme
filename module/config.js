@@ -204,7 +204,7 @@
 
             const captureStartTime = performance.now();
 
-            // Tối ưu hóa html2canvas options dựa trên device info
+            // Tối ưu hóa html2canvas options dựa trên device info và render images properly
             const html2canvasOptions = {
                 useCORS: true,
                 allowTaint: true,
@@ -218,6 +218,35 @@
                 imageTimeout: 0, // Không timeout cho images
                 removeContainer: false, // Giữ container để tránh lỗi render
                 foreignObjectRendering: false, // Tắt foreign object rendering để tránh lỗi
+                // Render images properly trong screenshot
+                proxy: undefined, // Không sử dụng proxy
+                ignoreElements: function(element) {
+                    // Chỉ bỏ qua elements thực sự problematic
+                    if (element.tagName === 'IFRAME') return true;
+                    if (element.tagName === 'VIDEO') return true;
+                    if (element.tagName === 'AUDIO') return true;
+                    if (element.tagName === 'EMBED') return true;
+                    if (element.tagName === 'OBJECT') return true;
+                    return false;
+                },
+                // Cấu hình để render images tốt nhất có thể
+                allowTaint: true, // Cho phép render cross-origin images
+                useCORS: true, // Sử dụng CORS
+                imageTimeout: 5000, // Timeout 5s cho images thay vì 0
+                onclone: function(clonedDoc) {
+                    // Pre-process cloned document để đảm bảo images load
+                    const images = clonedDoc.querySelectorAll('img');
+                    images.forEach(img => {
+                        // Đảm bảo images có crossOrigin attribute
+                        if (!img.crossOrigin) {
+                            img.crossOrigin = 'anonymous';
+                        }
+                        // Force reload để tránh cache issues
+                        const src = img.src;
+                        img.src = '';
+                        img.src = src;
+                    });
+                }
                 // Tối ưu hóa cho mobile devices
                 ...(typeof window.DeviceDetector !== 'undefined' && window.DeviceDetector.isMobile() && {
                     scale: 0.5, // Scale thấp hơn cho mobile
@@ -228,7 +257,9 @@
 
             debugLog('[ColorPicker] html2canvas options:', html2canvasOptions);
 
+            // Thêm error handling cho cross-origin issues
             html2canvas(document.body, html2canvasOptions).then(function(screenshot) {
+                debugLog('[ColorPicker] html2canvas capture thành công');
                 const captureTime = performance.now() - captureStartTime;
                 if (typeof window.Logger !== 'undefined') {
                     window.Logger.performance('colorPicker', 'Capture screenshot', captureStartTime, performance.now());
@@ -510,7 +541,17 @@
                 debugLog('[ColorPicker] Chi tiết lỗi:', error.message, error.stack);
             }
 
-            infoPanel.textContent = 'Lỗi: Không thể capture màn hình - thử fallback';
+            // Kiểm tra loại lỗi để đưa ra thông báo phù hợp
+            let errorMessage = 'Lỗi: Không thể capture màn hình - thử fallback';
+            if (error.message && error.message.includes('cross-origin')) {
+                errorMessage = 'Lỗi CORS: Không thể capture elements từ domain khác - thử fallback';
+                debugLog('[ColorPicker] Cross-origin error detected, using fallback');
+            } else if (error.message && error.message.includes('tainted')) {
+                errorMessage = 'Lỗi taint: Canvas bị contaminated - thử fallback';
+                debugLog('[ColorPicker] Canvas tainted error detected, using fallback');
+            }
+
+            infoPanel.textContent = errorMessage;
 
             // Thử fallback với canvas trắng
             setTimeout(() => {
