@@ -1207,12 +1207,16 @@
             }
 
             :is(.dark .dark\\:bg-gray-700) {
-                background-color: ${palette[900]} !important;
+                background-color: ${palette[1000]} !important;
             }
 
-            .profile-showcase header span.number,
-            .profile-showcase header, ol.list-volume li {
+            .profile-showcase header span.number, {
                 background-color: ${palette[800]} !important;
+                color: ${textColor} !important;
+            }
+
+            .profile-showcase header, ol.list-volume li {
+                border-bottom-color: ${palette[800]} !important;
             }
 
             .statistic-top {
@@ -1735,9 +1739,13 @@
                 background-color: ${defaultPalette[900]} !important;
             }
 
-            .profile-showcase header span.number,
-            .profile-showcase header, ol.list-volume li {
+            .profile-showcase header span.number, {
                 background-color: ${defaultPalette[800]} !important;
+                color: ${textColor} !important;
+            }
+
+            .profile-showcase header, ol.list-volume li {
+                border-bottom-color: ${defaultPalette[800]} !important;
             }
 
             .statistic-top {

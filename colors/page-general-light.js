@@ -747,9 +747,13 @@
                 background-color: ${palette[200]} !important;
             }
 
-            .profile-showcase header span.number,
-            .profile-showcase header, ol.list-volume li {
+            .profile-showcase header span.number, {
                 background-color: ${palette[800]} !important;
+                color: ${textColor} !important;
+            }
+
+            .profile-showcase header, ol.list-volume li {
+                border-bottom-color: ${palette[800]} !important;
             }
 
             .statistic-top {
@@ -1240,9 +1244,13 @@
                 background-color: ${defaultPalette[200]} !important;
             }
 
-            .profile-showcase header span.number,
-            .profile-showcase header, ol.list-volume li {
+            .profile-showcase header span.number, {
                 background-color: ${defaultPalette[800]} !important;
+                color: ${textColor} !important;
+            }
+
+            .profile-showcase header, ol.list-volume li {
+                border-bottom-color: ${defaultPalette[800]} !important;
             }
 
             .statistic-top {
