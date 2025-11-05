@@ -878,8 +878,99 @@
               border-bottom: 1px solid ${palette[700]};
               color: ${textColor};
             }
+
+            /* TinyMCE Editor Styles */
+            .tox-tinymce {
+                border: 2px solid ${palette[200]} !important;
+            }
+            .tox:not(.tox-tinymce-inline) .tox-editor-header {
+                background-color: ${palette[100]} !important;
+            }
+            .tox .tox-toolbar-overlord {
+                background-color: ${palette[100]} !important;
+            }
+            .tox .tox-toolbar, .tox .tox-toolbar__overflow, .tox .tox-toolbar__primary {
+                background-color: ${palette[100]} !important;
+            }
+            .tox .tox-tbtn--active, .tox .tox-tbtn--enabled, .tox .tox-tbtn--enabled:focus, .tox .tox-tbtn--enabled:hover {
+                background: ${palette[500]} !important;
+                color: ${textColor} !important;
+            }
+            .tox .tox-tbtn {
+                background: ${palette[100]} !important;
+                color: ${textColor} !important;
+            }
+            .tox .tox-tbtn--disabled, .tox .tox-tbtn--disabled:hover, .tox .tox-tbtn:disabled, .tox .tox-tbtn:disabled:hover {
+                background: ${palette[100]} !important;
+                color: rgba(${textColor},.5) !important;
+            }
+            .tox .tox-tbtn:hover {
+                background: ${palette[200]} !important;
+                color: ${textColor} !important;
+            }
+            .mce-content-body {
+                background-color: ${palette[100]} !important;
+                color: ${textColor} !important;
+            }
+            .tox .tox-statusbar {
+                background-color: ${palette[100]} !important;
+                color: rgba(${textColor},.75) !important;
+            }
+            .tox .tox-dialog-wrap__backdrop {
+                background-color: rgba(${palette[100]}, .75) !important;
+            }
+            .tox .tox-dialog {
+                background-color: ${palette[100]} !important;
+                border-color: ${palette[200]} !important;
+                box-shadow: 0 16px 16px -10px rgba(${palette[100]}, .15),0 0 40px 1px rgba(${palette[100]}, .15) !important;
+            }
+            .tox .tox-dialog__header {
+                background-color: ${palette[100]} !important;
+                color: ${textColor} !important;
+            }
+            .tox .tox-button--secondary {
+                background-color: ${palette[200]} !important;
+                border-color: ${palette[200]} !important;
+                color: ${textColor} !important;
+            }
+            .tox .tox-button--secondary:hover:not(:disabled) {
+                background-color: ${palette[100]} !important;
+                border-color: ${palette[100]} !important;
+                color: ${textColor} !important;
+            }
+            .tox .tox-button {
+                background-color: ${palette[500]} !important;
+                border-color: ${palette[500]} !important;
+                color: ${textColor} !important;
+            }
+            .tox .tox-button:hover:not(:disabled) {
+                background-color: ${palette[700]} !important;
+                border-color: ${palette[700]} !important;
+                color: ${textColor} !important;
+            }
+            .tox .tox-dialog__body-nav-item--active {
+                border-bottom: 2px solid ${palette[300]} !important;
+                color: ${palette[300]} !important;
+            }
+            .tox .tox-listboxfield .tox-listbox--select, .tox .tox-textarea, .tox .tox-textarea-wrap .tox-textarea:focus, .tox .tox-textfield, .tox .tox-toolbar-textfield {
+                background-color: ${palette[100]} !important;
+                border-color: ${palette[200]} !important;
+                color: ${textColor} !important;
+            }
+            .tox .tox-custom-editor:focus-within, .tox .tox-listboxfield .tox-listbox--select:focus, .tox .tox-textarea-wrap:focus-within, .tox .tox-textarea:focus, .tox .tox-textfield:focus {
+                background-color: ${palette[100]} !important;
+                border-color: ${palette[500]} !important;
+                box-shadow: 0 0 0 1px ${palette[500]} !important;
+            }
+            .bg-indigo-600 {
+                --tw-bg-opacity: 1;
+                background-color: rgb(${palette[500]}/var(--tw-bg-opacity)) !important;
+            }
+            .statistic-list, .feature-section .summary-wrapper, .statistic-list .block-wide.at-mobile {
+                border-top-color: ${palette[200]} !important;
+            }
         `;
-        
+
         GM_addStyle(css);
         debugLog('Applied light Monet theme with dominant color:', palette[500]);
     }
@@ -1143,8 +1234,99 @@
               border-bottom: 1px solid ${defaultPalette[700]};
               color: ${textColor};
             }
+
+            /* TinyMCE Editor Styles */
+            .tox-tinymce {
+                border: 2px solid ${defaultPalette[700]} !important;
+            }
+            .tox:not(.tox-tinymce-inline) .tox-editor-header {
+                background-color: ${defaultPalette[800]} !important;
+            }
+            .tox .tox-toolbar-overlord {
+                background-color: ${defaultPalette[800]} !important;
+            }
+            .tox .tox-toolbar, .tox .tox-toolbar__overflow, .tox .tox-toolbar__primary {
+                background-color: ${defaultPalette[800]} !important;
+            }
+            .tox .tox-tbtn--active, .tox .tox-tbtn--enabled, .tox .tox-tbtn--enabled:focus, .tox .tox-tbtn--enabled:hover {
+                background: ${defaultColor} !important;
+                color: ${textColor} !important;
+            }
+            .tox .tox-tbtn {
+                background: ${defaultPalette[800]} !important;
+                color: ${textColor} !important;
+            }
+            .tox .tox-tbtn--disabled, .tox .tox-tbtn--disabled:hover, .tox .tox-tbtn:disabled, .tox .tox-tbtn:disabled:hover {
+                background: ${defaultPalette[800]} !important;
+                color: rgba(${textColor},.5) !important;
+            }
+            .tox .tox-tbtn:hover {
+                background: ${defaultPalette[700]} !important;
+                color: ${textColor} !important;
+            }
+            .mce-content-body {
+                background-color: ${defaultPalette[800]} !important;
+                color: ${textColor} !important;
+            }
+            .tox .tox-statusbar {
+                background-color: ${defaultPalette[800]} !important;
+                color: rgba(${textColor},.75) !important;
+            }
+            .tox .tox-dialog-wrap__backdrop {
+                background-color: rgba(${defaultPalette[800]}, .75) !important;
+            }
+            .tox .tox-dialog {
+                background-color: ${defaultPalette[800]} !important;
+                border-color: ${defaultPalette[700]} !important;
+                box-shadow: 0 16px 16px -10px rgba(${defaultPalette[800]}, .15),0 0 40px 1px rgba(${defaultPalette[800]}, .15) !important;
+            }
+            .tox .tox-dialog__header {
+                background-color: ${defaultPalette[800]} !important;
+                color: ${textColor} !important;
+            }
+            .tox .tox-button--secondary {
+                background-color: ${defaultPalette[700]} !important;
+                border-color: ${defaultPalette[700]} !important;
+                color: ${textColor} !important;
+            }
+            .tox .tox-button--secondary:hover:not(:disabled) {
+                background-color: ${defaultPalette[600]} !important;
+                border-color: ${defaultPalette[600]} !important;
+                color: ${textColor} !important;
+            }
+            .tox .tox-button {
+                background-color: ${defaultColor} !important;
+                border-color: ${defaultColor} !important;
+                color: ${textColor} !important;
+            }
+            .tox .tox-button:hover:not(:disabled) {
+                background-color: ${defaultPalette[700]} !important;
+                border-color: ${defaultPalette[700]} !important;
+                color: ${textColor} !important;
+            }
+            .tox .tox-dialog__body-nav-item--active {
+                border-bottom: 2px solid ${defaultPalette[400]} !important;
+                color: ${defaultPalette[400]} !important;
+            }
+            .tox .tox-listboxfield .tox-listbox--select, .tox .tox-textarea, .tox .tox-textarea-wrap .tox-textarea:focus, .tox .tox-textfield, .tox .tox-toolbar-textfield {
+                background-color: ${defaultPalette[800]} !important;
+                border-color: ${defaultPalette[700]} !important;
+                color: ${textColor} !important;
+            }
+            .tox .tox-custom-editor:focus-within, .tox .tox-listboxfield .tox-listbox--select:focus, .tox .tox-textarea-wrap:focus-within, .tox .tox-textarea:focus, .tox .tox-textfield:focus {
+                background-color: ${defaultPalette[800]} !important;
+                border-color: ${defaultColor} !important;
+                box-shadow: 0 0 0 1px ${defaultColor} !important;
+            }
+            .bg-indigo-600 {
+                --tw-bg-opacity: 1;
+                background-color: rgb(${defaultColor}/var(--tw-bg-opacity)) !important;
+            }
+            .statistic-list, .feature-section .summary-wrapper, .statistic-list .block-wide.at-mobile {
+                border-top-color: ${defaultPalette[700]} !important;
+            }
         `;
-        
+
         GM_addStyle(css);
         debugLog('Applied default light color scheme:', defaultColor);
     }
