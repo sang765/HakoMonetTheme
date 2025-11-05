@@ -51,6 +51,7 @@
             const tagColorJS = GM_getResourceText('tagColorJS');
             const colorinfotruyen = GM_getResourceText('colorinfotruyen');
             const imageAnalyzerJS = GM_getResourceText('imageAnalyzerJS');
+            const html2canvasJS = GM_getResourceText('html2canvasJS');
             const configJS = GM_getResourceText('configJS');
             const adBlockerJS = GM_getResourceText('adBlockerJS');
             const antiPopupJS = GM_getResourceText('antiPopupJS');
@@ -72,6 +73,7 @@
             loadScript(simpleCORSJS, 'simple-cors.js');
             loadScript(themeDetectorJS, 'theme-detector.js');
             loadScript(imageAnalyzerJS, 'image-analyzer.js');
+            loadScript(html2canvasJS, 'html2canvas.min.js');
             loadScript(infoTruyenJS, 'info-truyen.js');
             loadScript(tagColorJS, 'tag-color.js');
             loadScript(monetAPIJS, 'monet.js');

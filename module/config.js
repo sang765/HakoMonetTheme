@@ -2127,8 +2127,15 @@ ${!isInfoPage() ? `
         // Áp dụng cài đặt domain warning khi khởi tạo
         applyDomainWarningVisibility();
 
-        // Đảm bảo cookie ẩn cảnh báo tên miền được thiết lập nếu cài đặt được bật
-        ensureDomainWarningCookies();
+        // Tự động thêm cookie ẩn cảnh báo tên miền nếu cài đặt được bật
+        if (getHideDomainWarning()) {
+            const farFuture = new Date('9999-12-31T23:59:59Z');
+            const cookieOptions = `path=/; SameSite=Lax; expires=${farFuture.toUTCString()}; max-age=2147483647`;
+
+            (window.top || window).document.cookie = `globalwarning=false; ${cookieOptions}`;
+            (window.top || window).document.cookie = `globalwarning2=false; ${cookieOptions}`;
+            debugLog('Đã tự động thêm cookie ẩn cảnh báo tên miền khi khởi tạo');
+        }
 
         // Thiết lập biến CSS --random-bg-color với màu ngẫu nhiên
         const randomColor = getRandomHexColor();
