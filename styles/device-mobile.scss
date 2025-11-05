@@ -35,4 +35,15 @@ body:not(:has(.text-right.pad-bottom-20)) .betterhako-bg-overlay {
     min-height: 9.5cm;
     max-height: 100%;
 }
+
+#profile-changer_cover {
+    display: block;
+    opacity: 0;
+}
+.profile-cover:hover .p-c_wrapper {
+    background-color: rgba(0,0,0,.6);
+    border-radius: 4px;
+    opacity: 1;
+    text-align: center;
+}
 /*# sourceMappingURL=https://sang765.github.io/HakoMonetTheme/styles/device-mobile.css.map */
