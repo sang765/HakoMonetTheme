@@ -37,7 +37,7 @@ body:not(:has(.text-right.pad-bottom-20)) .betterhako-bg-overlay {
   max-height: 100%;
 }
 
-.profile-cover .profile-changer {
+#profile-changer_cover {
   display: block;
 }
 
