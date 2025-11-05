@@ -41,13 +41,4 @@ body:not(:has(.text-right.pad-bottom-20)) .betterhako-bg-overlay {
   display: block;
 }
 
-.profile-cover .p-c_wrapper i {
-  opacity: 0.5;
-}
-
-.profile-cover:hover .p-c_wrapper,
-.profile-cover:hover .p-c_wrapper i {
-  opacity: 1;
-}
-
 /*# sourceMappingURL=device-mobile.css.map */
