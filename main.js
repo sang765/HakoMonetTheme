@@ -4,7 +4,9 @@
     const DEBUG = GM_getValue('debug_mode', false);
 
     function debugLog(...args) {
-        if (DEBUG) {
+        if (DEBUG && typeof window.Logger !== 'undefined') {
+            window.Logger.log('main', ...args);
+        } else if (DEBUG) {
             console.log('[HakoMonetTheme]', ...args);
         }
     }

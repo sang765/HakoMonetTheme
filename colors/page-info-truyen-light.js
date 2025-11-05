@@ -5,7 +5,9 @@
     const TARGET_DOMAINS = ['docln', 'hako', 'i2.hako.vip', 'docln.sbs', 'docln.net', 'ln.hako.vn'];
 
     function debugLog(...args) {
-        if (DEBUG) {
+        if (DEBUG && typeof window.Logger !== 'undefined') {
+            window.Logger.log('pageInfoTruyenLight', ...args);
+        } else if (DEBUG) {
             console.log('[PageInfoTruyenLight]', ...args);
         }
     }

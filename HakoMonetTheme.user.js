@@ -68,11 +68,112 @@
 
     let isCheckingForUpdate = false;
 
-    function debugLog(...args) {
-        if (DEBUG) {
-            console.log(`[${SCRIPT_NAME}]`, ...args);
+    // Enhanced console logging with colors
+    const Logger = {
+        // Color schemes for different log levels
+        styles: {
+            log: 'color: #6c757d; background: #f8f9fa; padding: 2px 4px; border-radius: 3px;',
+            info: 'color: #0d6efd; background: #e7f3ff; padding: 2px 4px; border-radius: 3px; font-weight: bold;',
+            warn: 'color: #fd7e14; background: #fff3cd; padding: 2px 4px; border-radius: 3px; font-weight: bold;',
+            error: 'color: #dc3545; background: #f8d7da; padding: 2px 4px; border-radius: 3px; font-weight: bold;',
+            success: 'color: #198754; background: #d1edff; padding: 2px 4px; border-radius: 3px; font-weight: bold;',
+            debug: 'color: #6f42c1; background: #f3f0ff; padding: 2px 4px; border-radius: 3px; font-style: italic;'
+        },
+
+        // Module-specific prefixes with colors
+        prefixes: {
+            main: '%c[HakoMonetTheme]',
+            config: '%c[Config]',
+            colorPicker: '%c[ColorPicker]',
+            updateChecker: '%c[UpdateChecker]',
+            themeDetector: '%c[ThemeDetector]',
+            deviceDetector: '%c[DeviceDetector]',
+            adBlocker: '%c[AdBlocker]',
+            antiPopup: '%c[AntiPopup]',
+            fullscreen: '%c[Fullscreen]',
+            mainMenu: '%c[MainMenu]',
+            navbarLogo: '%c[NavbarLogo]',
+            updateManager: '%c[UpdateManager]',
+            darkModePrompter: '%c[DarkModePrompter]',
+            readingPage: '%c[ReadingPage]',
+            infoTruyen: '%c[InfoTruyen]',
+            tagColor: '%c[TagColor]',
+            animation: '%c[Animation]',
+            fontImport: '%c[FontImport]',
+            pageGeneral: '%c[PageGeneral]',
+            pageGeneralLight: '%c[PageGeneralLight]',
+            pageInfoTruyen: '%c[PageInfoTruyen]',
+            pageInfoTruyenLight: '%c[PageInfoTruyenLight]',
+            corsMaster: '%c[CORSMaster]'
+        },
+
+        // Enhanced logging functions
+        log: function(module, ...args) {
+            if (!DEBUG) return;
+            const prefix = this.prefixes[module] || `%c[${module.toUpperCase()}]`;
+            const style = this.styles.log;
+            console.log(`${prefix} %c${args.shift() || ''}`, style, this.styles.log, ...args);
+        },
+
+        info: function(module, ...args) {
+            if (!DEBUG) return;
+            const prefix = this.prefixes[module] || `%c[${module.toUpperCase()}]`;
+            const style = this.styles.info;
+            console.info(`${prefix} %c${args.shift() || ''}`, style, this.styles.info, ...args);
+        },
+
+        warn: function(module, ...args) {
+            if (!DEBUG) return;
+            const prefix = this.prefixes[module] || `%c[${module.toUpperCase()}]`;
+            const style = this.styles.warn;
+            console.warn(`${prefix} %c${args.shift() || ''}`, style, this.styles.warn, ...args);
+        },
+
+        error: function(module, ...args) {
+            const prefix = this.prefixes[module] || `%c[${module.toUpperCase()}]`;
+            const style = this.styles.error;
+            console.error(`${prefix} %c${args.shift() || ''}`, style, this.styles.error, ...args);
+        },
+
+        success: function(module, ...args) {
+            if (!DEBUG) return;
+            const prefix = this.prefixes[module] || `%c[${module.toUpperCase()}]`;
+            const style = this.styles.success;
+            console.log(`${prefix} %c${args.shift() || ''}`, style, this.styles.success, ...args);
+        },
+
+        debug: function(module, ...args) {
+            if (!DEBUG) return;
+            const prefix = this.prefixes[module] || `%c[${module.toUpperCase()}]`;
+            const style = this.styles.debug;
+            console.debug(`${prefix} %c${args.shift() || ''}`, style, this.styles.debug, ...args);
+        },
+
+        // Performance logging
+        performance: function(module, operation, startTime, endTime) {
+            if (!DEBUG) return;
+            const duration = endTime - startTime;
+            const durationStyle = duration > 100 ? this.styles.warn : duration > 50 ? this.styles.info : this.styles.success;
+            console.log(`${this.prefixes[module]} %c${operation} completed in ${duration.toFixed(2)}ms`, this.styles.log, durationStyle);
+        },
+
+        // Color picker specific logging
+        colorPicker: function(level, ...args) {
+            if (!DEBUG) return;
+            const prefix = this.prefixes.colorPicker;
+            const style = this.styles[level] || this.styles.log;
+            const method = level === 'error' ? 'error' : level === 'warn' ? 'warn' : level === 'info' ? 'info' : 'log';
+            console[method](`${prefix} %c${args.shift() || ''}`, style, this.styles[level] || this.styles.log, ...args);
         }
+    };
+
+    // Legacy debugLog function for backward compatibility
+    function debugLog(...args) {
+        Logger.log('main', ...args);
     }
+
+    // Expose Logger globally for modules
+    window.Logger = Logger;
     
 
 

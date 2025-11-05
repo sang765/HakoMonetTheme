@@ -21,7 +21,9 @@
     const DEBUG = GM_getValue('debug_mode', false);
 
     function debugLog(...args) {
-        if (DEBUG) {
+        if (DEBUG && typeof window.Logger !== 'undefined') {
+            window.Logger.log('config', ...args);
+        } else if (DEBUG) {
             console.log('[Config]', ...args);
         }
     }
@@ -193,7 +195,11 @@
         // Lấy screenshot của trang
         // Sử dụng html2canvas nếu có, nếu không thì tạo canvas trắng
         if (typeof html2canvas !== 'undefined') {
-            debugLog('[ColorPicker] html2canvas khả dụng, bắt đầu capture screenshot');
+            if (typeof window.Logger !== 'undefined') {
+                window.Logger.info('colorPicker', 'html2canvas khả dụng, bắt đầu capture screenshot');
+            } else {
+                debugLog('[ColorPicker] html2canvas khả dụng, bắt đầu capture screenshot');
+            }
             infoPanel.textContent = 'Đang chụp màn hình...';
 
             const captureStartTime = performance.now();
@@ -210,7 +216,11 @@
                 logging: false // Tắt logging của html2canvas
             }).then(function(screenshot) {
                 const captureTime = performance.now() - captureStartTime;
-                debugLog('[ColorPicker] Capture screenshot thành công, thời gian:', captureTime.toFixed(2), 'ms');
+                if (typeof window.Logger !== 'undefined') {
+                    window.Logger.performance('colorPicker', 'Capture screenshot', captureStartTime, performance.now());
+                } else {
+                    debugLog('[ColorPicker] Capture screenshot thành công, thời gian:', captureTime.toFixed(2), 'ms');
+                }
 
                 const ctx = canvas.getContext('2d');
                 canvas.width = screenshot.width;
@@ -220,8 +230,12 @@
                 ctx.drawImage(screenshot, 0, 0);
                 const drawTime = performance.now() - drawStartTime;
 
-                debugLog('[ColorPicker] Vẽ canvas hoàn thành, thời gian:', drawTime.toFixed(2), 'ms');
-                debugLog('[ColorPicker] Canvas size:', canvas.width, 'x', canvas.height);
+                if (typeof window.Logger !== 'undefined') {
+                    window.Logger.debug('colorPicker', `Canvas size: ${canvas.width}x${canvas.height}`);
+                } else {
+                    debugLog('[ColorPicker] Vẽ canvas hoàn thành, thời gian:', drawTime.toFixed(2), 'ms');
+                    debugLog('[ColorPicker] Canvas size:', canvas.width, 'x', canvas.height);
+                }
 
                 infoPanel.textContent = 'Sẵn sàng! Di chuột để xem màu';
 
@@ -466,8 +480,12 @@
             });
 
         }).catch(function(error) {
-            debugLog('[ColorPicker] Lỗi khi capture screenshot:', error);
-            debugLog('[ColorPicker] Chi tiết lỗi:', error.message, error.stack);
+            if (typeof window.Logger !== 'undefined') {
+                window.Logger.error('colorPicker', 'Lỗi khi capture screenshot:', error);
+            } else {
+                debugLog('[ColorPicker] Lỗi khi capture screenshot:', error);
+                debugLog('[ColorPicker] Chi tiết lỗi:', error.message, error.stack);
+            }
 
             infoPanel.textContent = 'Lỗi: Không thể capture màn hình - thử fallback';
 
