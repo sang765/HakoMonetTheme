@@ -235,6 +235,18 @@
             x.toString(16).padStart(2, '0')
         ).join('');
     }
+
+    // Function to generate paletteRGB from hex color
+    function generatePaletteRGB(hexColor) {
+        const rgb = hexToRgb(hexColor);
+        return `${rgb.r}, ${rgb.g}, ${rgb.b}`;
+    }
+
+    // Function to generate defaultPaletteRGB from default color
+    function generateDefaultPaletteRGB() {
+        const defaultColor = '#FCE4EC'; // Light mode default color
+        return generatePaletteRGB(defaultColor);
+    }
     
     
     

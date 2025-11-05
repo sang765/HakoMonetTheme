@@ -139,6 +139,18 @@
         ).join('');
     }
 
+    // Function to generate paletteRGB from hex color
+    function generatePaletteRGB(hexColor) {
+        const rgb = hexToRgb(hexColor);
+        return `${rgb.r}, ${rgb.g}, ${rgb.b}`;
+    }
+
+    // Function to generate defaultPaletteRGB from default color
+    function generateDefaultPaletteRGB() {
+        const defaultColor = '#FCE4EC'; // Light mode default color
+        return generatePaletteRGB(defaultColor);
+    }
+
     // Integrated CORS handling for images
     function setupImageCorsHandling() {
         if (window.__imageCorsSetup) return;

@@ -261,6 +261,28 @@
         return MonetAPI.isValidColor(color);
     }
 
+    function hexToRgb(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        };
+    }
+
+    // Function to generate paletteRGB from hex color
+    function generatePaletteRGB(hexColor) {
+        const rgb = hexToRgb(hexColor);
+        return `${rgb.r}, ${rgb.g}, ${rgb.b}`;
+    }
+
+    // Function to generate defaultPaletteRGB from default color
+    function generateDefaultPaletteRGB() {
+        const defaultColor = (window.HMTConfig && window.HMTConfig.getDefaultColor) ?
+            window.HMTConfig.getDefaultColor() : '#063c30';
+        return generatePaletteRGB(defaultColor);
+    }
+
     // Integrated CORS handling for images
     function setupImageCorsHandling() {
         if (window.__imageCorsSetup) return;
