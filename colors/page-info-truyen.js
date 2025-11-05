@@ -852,6 +852,10 @@
               border-bottom: 1px solid ${palette[700]};
               color: ${textColor};
             }
+
+            .statistic-list, .feature-section .summary-wrapper, .statistic-list .block-wide.at-mobile {
+                border-top-color: ${palette[200]} !important;
+            }
         `;
 
         GM_addStyle(css);
@@ -1129,6 +1133,10 @@
               background-color: ${defaultPalette[500]};
               border-bottom: 1px solid ${defaultPalette[700]};
               color: ${textColor};
+            }
+
+            .statistic-list, .feature-section .summary-wrapper, .statistic-list .block-wide.at-mobile {
+                border-top-color: ${defaultPalette[200]} !important;
             }
         `;
 
