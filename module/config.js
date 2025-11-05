@@ -131,6 +131,330 @@
         }
     }
 
+    function createScreenColorPicker(callback) {
+        debugLog('Tạo screen color picker');
+
+        // Tạo overlay toàn màn hình
+        const overlay = document.createElement('div');
+        overlay.className = 'hmt-color-picker-overlay';
+
+        // Tạo canvas để hiển thị screenshot
+        const canvas = document.createElement('canvas');
+        canvas.className = 'hmt-color-picker-canvas';
+
+        // Tạo zoom lens
+        const zoomLens = document.createElement('div');
+        zoomLens.className = 'hmt-color-picker-zoom';
+
+        // Tạo info panel
+        const infoPanel = document.createElement('div');
+        infoPanel.className = 'hmt-color-picker-info';
+        infoPanel.textContent = 'Loading...';
+
+        // Tạo instructions
+        const instructions = document.createElement('div');
+        instructions.className = 'hmt-color-picker-instructions';
+        instructions.textContent = 'Kéo lens để di chuyển • ESC để hủy';
+
+        // Tạo controls cho mobile
+        const controls = document.createElement('div');
+        controls.className = 'hmt-color-picker-controls';
+
+        const selectBtn = document.createElement('button');
+        selectBtn.className = 'hmt-color-picker-btn select';
+        selectBtn.textContent = 'Chọn';
+
+        const cancelBtn = document.createElement('button');
+        cancelBtn.className = 'hmt-color-picker-btn cancel';
+        cancelBtn.textContent = 'Hủy';
+
+        controls.appendChild(cancelBtn);
+        controls.appendChild(selectBtn);
+
+        overlay.appendChild(canvas);
+        overlay.appendChild(zoomLens);
+        overlay.appendChild(infoPanel);
+        overlay.appendChild(instructions);
+        overlay.appendChild(controls);
+
+        // Lấy screenshot của trang
+        // Sử dụng html2canvas nếu có, nếu không thì tạo canvas trắng
+        if (typeof html2canvas !== 'undefined') {
+            html2canvas(document.body, {
+                useCORS: true,
+                allowTaint: true,
+                scale: 1,
+                width: window.innerWidth,
+                height: window.innerHeight,
+                x: 0,
+                y: 0
+            }).then(function(screenshot) {
+            debugLog('Đã capture screenshot');
+
+            const ctx = canvas.getContext('2d');
+            canvas.width = screenshot.width;
+            canvas.height = screenshot.height;
+            ctx.drawImage(screenshot, 0, 0);
+
+            infoPanel.textContent = 'Di chuột để xem màu • Click để chọn';
+
+            let isPicking = false;
+            let isDragging = false;
+            let currentX = canvas.width / 2;
+            let currentY = canvas.height / 2;
+            let selectedColor = { r: 255, g: 255, b: 255, hex: '#ffffff' };
+
+            // Phát hiện thiết bị touch
+            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+            // Hàm lấy màu từ vị trí
+            function getColorAtPosition(x, y) {
+                if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) {
+                    return null;
+                }
+                const pixel = ctx.getImageData(x, y, 1, 1).data;
+                const r = pixel[0];
+                const g = pixel[1];
+                const b = pixel[2];
+                const hex = '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+                return { r, g, b, hex };
+            }
+
+            // Hàm cập nhật zoom lens
+            function updateZoomLens(x, y) {
+                const color = getColorAtPosition(x, y);
+                if (!color) return;
+
+                selectedColor = color;
+                infoPanel.textContent = `RGB(${color.r}, ${color.g}, ${color.b}) ${color.hex}`;
+
+                // Cập nhật vị trí zoom lens
+                zoomLens.style.display = 'block';
+                zoomLens.style.left = (x - 60) + 'px';
+                zoomLens.style.top = (y - 60) + 'px';
+
+                // Vẽ zoom area
+                const zoomSize = 40;
+                let zoomCtx = zoomLens.getContext('2d');
+                if (!zoomCtx) {
+                    zoomLens.innerHTML = '';
+                    const zoomCanvas = document.createElement('canvas');
+                    zoomCanvas.width = 120;
+                    zoomCanvas.height = 120;
+                    zoomLens.appendChild(zoomCanvas);
+                    zoomCtx = zoomCanvas.getContext('2d');
+                }
+
+                zoomCtx.clearRect(0, 0, 120, 120);
+                zoomCtx.drawImage(
+                    canvas,
+                    x - zoomSize/2, y - zoomSize/2, zoomSize, zoomSize,
+                    0, 0, 120, 120
+                );
+            }
+
+            // Khởi tạo vị trí lens ở giữa màn hình
+            updateZoomLens(currentX, currentY);
+
+            // Xử lý di chuyển chuột (desktop)
+            if (!isTouchDevice) {
+                overlay.addEventListener('mousemove', function(e) {
+                    if (isPicking || isDragging) return;
+
+                    const rect = canvas.getBoundingClientRect();
+                    currentX = e.clientX - rect.left;
+                    currentY = e.clientY - rect.top;
+
+                    updateZoomLens(currentX, currentY);
+                });
+
+                // Xử lý click để chọn màu (desktop)
+                overlay.addEventListener('click', function(e) {
+                    if (isPicking) return;
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const rect = canvas.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+
+                    const color = getColorAtPosition(x, y);
+                    if (color) {
+                        debugLog('Đã chọn màu từ click:', color.hex);
+                        if (callback) {
+                            callback(color.hex);
+                        }
+                        overlay.remove();
+                    }
+                });
+            } else {
+                // Mobile: Touch events
+                overlay.addEventListener('touchmove', function(e) {
+                    if (isPicking || isDragging) return;
+                    e.preventDefault();
+
+                    const rect = canvas.getBoundingClientRect();
+                    const touch = e.touches[0];
+                    currentX = touch.clientX - rect.left;
+                    currentY = touch.clientY - rect.top;
+
+                    updateZoomLens(currentX, currentY);
+                }, { passive: false });
+
+                // Mobile: Tap để teleport lens
+                overlay.addEventListener('touchstart', function(e) {
+                    if (isPicking || isDragging) return;
+                    e.preventDefault();
+
+                    const rect = canvas.getBoundingClientRect();
+                    const touch = e.touches[0];
+                    currentX = touch.clientX - rect.left;
+                    currentY = touch.clientY - rect.top;
+
+                    updateZoomLens(currentX, currentY);
+                }, { passive: false });
+            }
+
+            // Xử lý drag lens
+            zoomLens.addEventListener('mousedown', function(e) {
+                if (isTouchDevice) return;
+                e.preventDefault();
+                isDragging = true;
+                zoomLens.classList.add('dragging');
+                document.body.style.cursor = 'grabbing';
+            });
+
+            zoomLens.addEventListener('touchstart', function(e) {
+                if (!isTouchDevice) return;
+                e.preventDefault();
+                isDragging = true;
+                zoomLens.classList.add('dragging');
+            }, { passive: false });
+
+            document.addEventListener('mousemove', function(e) {
+                if (!isDragging) return;
+
+                const rect = canvas.getBoundingClientRect();
+                currentX = e.clientX - rect.left;
+                currentY = e.clientY - rect.top;
+
+                // Giới hạn trong canvas
+                currentX = Math.max(0, Math.min(canvas.width, currentX));
+                currentY = Math.max(0, Math.min(canvas.height, currentY));
+
+                updateZoomLens(currentX, currentY);
+            });
+
+            document.addEventListener('touchmove', function(e) {
+                if (!isDragging) return;
+                e.preventDefault();
+
+                const rect = canvas.getBoundingClientRect();
+                const touch = e.touches[0];
+                currentX = touch.clientX - rect.left;
+                currentY = touch.clientY - rect.top;
+
+                // Giới hạn trong canvas
+                currentX = Math.max(0, Math.min(canvas.width, currentX));
+                currentY = Math.max(0, Math.min(canvas.height, currentY));
+
+                updateZoomLens(currentX, currentY);
+            }, { passive: false });
+
+            document.addEventListener('mouseup', function() {
+                if (isDragging) {
+                    isDragging = false;
+                    zoomLens.classList.remove('dragging');
+                    document.body.style.cursor = '';
+                }
+            });
+
+            document.addEventListener('touchend', function() {
+                if (isDragging) {
+                    isDragging = false;
+                    zoomLens.classList.remove('dragging');
+                }
+            });
+
+            // Xử lý nút Select
+            selectBtn.addEventListener('click', function() {
+                if (isPicking) return;
+                isPicking = true;
+
+                debugLog('Đã chọn màu từ nút Select:', selectedColor.hex);
+                if (callback) {
+                    callback(selectedColor.hex);
+                }
+                overlay.remove();
+            });
+
+            // Xử lý nút Cancel
+            cancelBtn.addEventListener('click', function() {
+                debugLog('Hủy color picker');
+                overlay.remove();
+            });
+
+        }).catch(function(error) {
+            debugLog('Lỗi khi capture screenshot:', error);
+            infoPanel.textContent = 'Lỗi: Không thể capture màn hình';
+            setTimeout(() => overlay.remove(), 2000);
+        });
+    } else {
+        // Fallback: Tạo canvas trắng với thông báo
+        debugLog('html2canvas không khả dụng, tạo fallback canvas');
+
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Tô nền trắng
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Vẽ text thông báo
+        ctx.fillStyle = '#333333';
+        ctx.font = '24px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Không thể capture màn hình', canvas.width / 2, canvas.height / 2 - 50);
+        ctx.fillText('(html2canvas không khả dụng)', canvas.width / 2, canvas.height / 2);
+        ctx.fillText('Click để chọn màu trắng mặc định', canvas.width / 2, canvas.height / 2 + 50);
+
+        infoPanel.textContent = 'html2canvas không khả dụng - Click để chọn màu trắng';
+    }
+
+        // Ngăn navigation khi đang pick màu
+        function preventNavigation(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+
+        // Thêm event listeners để ngăn navigation
+        document.addEventListener('click', preventNavigation, true);
+        document.addEventListener('mousedown', preventNavigation, true);
+        document.addEventListener('mouseup', preventNavigation, true);
+        document.addEventListener('contextmenu', preventNavigation, true);
+
+        // Xử lý ESC để hủy
+        function handleKeydown(e) {
+            if (e.key === 'Escape') {
+                debugLog('Hủy color picker');
+                overlay.remove();
+                document.removeEventListener('keydown', handleKeydown);
+                document.removeEventListener('click', preventNavigation, true);
+                document.removeEventListener('mousedown', preventNavigation, true);
+                document.removeEventListener('mouseup', preventNavigation, true);
+                document.removeEventListener('contextmenu', preventNavigation, true);
+            }
+        }
+        document.addEventListener('keydown', handleKeydown);
+
+        // Thêm overlay vào document
+        (window.top || window).document.body.appendChild(overlay);
+
+        debugLog('Đã tạo screen color picker');
+    }
+
     function isInfoPage() {
         // Kiểm tra nếu đang ở trang thông tin truyện dựa trên element đặc trưng từ colors/page-info-truyen.js
         return document.querySelector('div.col-4.col-md.feature-item.width-auto-xl') !== null;
@@ -217,6 +541,11 @@ ${!isInfoPage() ? `
                                             <div class="hmt-color-picker-display">
                                                 <div class="hmt-color-preview" id="hmt-color-preview"></div>
                                                 <span class="hmt-color-value" id="hmt-color-value">${currentColor}</span>
+                                                <button class="hmt-screen-color-picker-btn" title="Chọn màu từ màn hình">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
+                                                    </svg>
+                                                </button>
                                             </div>
                                             <div class="hmt-hsl-controls">
                                                 <div class="hmt-hsl-slider-group">
@@ -519,6 +848,196 @@ ${!isInfoPage() ? `
                 align-items: center;
                 gap: 12px;
                 margin-bottom: 16px;
+            }
+
+            .hmt-screen-color-picker-btn {
+                width: 32px;
+                height: 32px;
+                border: 2px solid #e9ecef;
+                border-radius: 6px;
+                background: #f8f9fa;
+                color: #495057;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s;
+                user-select: none;
+                margin-left: 8px;
+            }
+
+            .hmt-screen-color-picker-btn:hover {
+                background: #e9ecef;
+                border-color: #667eea;
+                color: #667eea;
+            }
+
+            .hmt-screen-color-picker-btn:active {
+                transform: scale(0.95);
+            }
+
+            .hmt-screen-color-picker-btn svg {
+                width: 16px;
+                height: 16px;
+            }
+
+            .hmt-color-picker-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.8);
+                z-index: 10002;
+                cursor: crosshair;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .hmt-color-picker-canvas {
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+                pointer-events: none;
+            }
+
+            .hmt-color-picker-zoom {
+                position: absolute;
+                width: 120px;
+                height: 120px;
+                border: 2px solid white;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.9);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                pointer-events: none;
+                display: none;
+                overflow: hidden;
+                cursor: move;
+                z-index: 10003;
+            }
+
+            .hmt-color-picker-zoom::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 4px;
+                height: 4px;
+                background: red;
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                box-shadow: 0 0 0 2px white;
+            }
+
+            .hmt-color-picker-zoom.dragging {
+                cursor: grabbing;
+            }
+
+            .hmt-color-picker-info {
+                position: absolute;
+                top: 20px;
+                left: 20px;
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 12px 16px;
+                border-radius: 8px;
+                font-family: monospace;
+                font-size: 14px;
+                font-weight: 600;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                pointer-events: none;
+            }
+
+            .hmt-color-picker-instructions {
+                position: absolute;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                font-size: 14px;
+                text-align: center;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                pointer-events: none;
+            }
+
+            .hmt-color-picker-controls {
+                position: absolute;
+                bottom: 20px;
+                left: 20px;
+                right: 20px;
+                display: flex;
+                gap: 12px;
+                justify-content: center;
+                pointer-events: none;
+            }
+
+            .hmt-color-picker-controls > * {
+                pointer-events: auto;
+            }
+
+            .hmt-color-picker-btn {
+                padding: 12px 24px;
+                border: none;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s;
+                min-width: 100px;
+            }
+
+            .hmt-color-picker-btn.select {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+            }
+
+            .hmt-color-picker-btn.select:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            }
+
+            .hmt-color-picker-btn.cancel {
+                background: #f8f9fa;
+                color: #666;
+                border: 1px solid #ddd;
+            }
+
+            .hmt-color-picker-btn.cancel:hover {
+                background: #e9ecef;
+                color: #333;
+            }
+
+            /* Mobile responsive */
+            @media (max-width: 768px) {
+                .hmt-color-picker-info {
+                    top: 10px;
+                    left: 10px;
+                    right: 10px;
+                    font-size: 12px;
+                    padding: 8px 12px;
+                }
+
+                .hmt-color-picker-instructions {
+                    bottom: 80px;
+                    font-size: 12px;
+                    padding: 8px 16px;
+                }
+
+                .hmt-color-picker-controls {
+                    bottom: 10px;
+                    left: 10px;
+                    right: 10px;
+                }
+
+                .hmt-color-picker-btn {
+                    flex: 1;
+                    padding: 14px 20px;
+                    font-size: 14px;
+                }
             }
 
             .hmt-color-preview {
@@ -1012,6 +1531,7 @@ ${!isInfoPage() ? `
         const satSlider = dialog.querySelector('#hmt-sat-slider');
         const lightSlider = dialog.querySelector('#hmt-light-slider');
         const sliderButtons = dialog.querySelectorAll('.hmt-slider-btn');
+        const screenColorPickerBtn = dialog.querySelector('.hmt-screen-color-picker-btn');
 
         // Hàm chuyển đổi HEX sang HSL
         function hexToHsl(hex) {
@@ -1228,17 +1748,61 @@ ${!isInfoPage() ? `
             });
         });
 
-        // Khởi tạo màu ban đầu - đồng bộ với màu hiện tại
-         debugLog('Khởi tạo color picker tùy chỉnh');
-         debugLog('Color preview element:', !!colorPreview);
-         debugLog('Color value element:', !!colorValue);
-         debugLog('Hue slider element:', !!hueSlider);
-         debugLog('Sat slider element:', !!satSlider);
-         debugLog('Light slider element:', !!lightSlider);
-         debugLog('Slider buttons count:', sliderButtons.length);
+        // Xử lý screen color picker button
+        if (screenColorPickerBtn) {
+            screenColorPickerBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
 
-         // Đồng bộ các elements với màu hiện tại (không gửi sự kiện preview)
-         syncUIWithColor(currentColor);
+                debugLog('Mở screen color picker');
+
+                // Tạm ẩn config dialog
+                dialog.style.display = 'none';
+
+                // Mở screen color picker
+                createScreenColorPicker(function(selectedColor) {
+                    debugLog('Đã chọn màu từ màn hình:', selectedColor);
+
+                    // Cập nhật preview color
+                    previewColor = selectedColor;
+
+                    // Cập nhật tất cả các elements UI
+                    syncUIWithColor(selectedColor);
+
+                    // Áp dụng màu preview ngay lập tức
+                    applyPreviewColor(selectedColor);
+
+                    // Chuyển đổi hex sang HSL và cập nhật sliders
+                    const hsl = hexToHsl(selectedColor);
+                    currentHue = hsl.h;
+                    currentSat = hsl.s;
+                    currentLight = hsl.l;
+
+                    // Cập nhật giá trị sliders
+                    if (hueSlider) hueSlider.value = currentHue;
+                    if (satSlider) satSlider.value = currentSat;
+                    if (lightSlider) lightSlider.value = currentLight;
+
+                    // Hiện lại config dialog
+                    dialog.style.display = '';
+
+                    showNotification('Đã chọn màu từ màn hình!', 2000);
+                });
+            });
+        }
+
+        // Khởi tạo màu ban đầu - đồng bộ với màu hiện tại
+          debugLog('Khởi tạo color picker tùy chỉnh');
+          debugLog('Color preview element:', !!colorPreview);
+          debugLog('Color value element:', !!colorValue);
+          debugLog('Hue slider element:', !!hueSlider);
+          debugLog('Sat slider element:', !!satSlider);
+          debugLog('Light slider element:', !!lightSlider);
+          debugLog('Slider buttons count:', sliderButtons.length);
+          debugLog('Screen color picker button:', !!screenColorPickerBtn);
+
+          // Đồng bộ các elements với màu hiện tại (không gửi sự kiện preview)
+          syncUIWithColor(currentColor);
 
         // Xử lý text input
         if (colorText) {
@@ -1458,7 +2022,8 @@ ${!isInfoPage() ? `
         setColorMode: setColorMode,
         openConfigDialog: openConfigDialog,
         initialize: initializeConfig,
-        ensureDomainWarningCookies: ensureDomainWarningCookies
+        ensureDomainWarningCookies: ensureDomainWarningCookies,
+        createScreenColorPicker: createScreenColorPicker
     };
 
     // Khởi tạo config khi module load
