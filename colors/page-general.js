@@ -1208,6 +1208,7 @@
 
             :is(.dark .dark\\:bg-gray-700) {
                 background-color: ${palette[1000]} !important;
+                border: 1px solid ${palette[800]} !important;
             }
 
             .profile-showcase header span.number, {
@@ -1737,6 +1738,7 @@
 
             :is(.dark .dark\\:bg-gray-700) {
                 background-color: ${defaultPalette[900]} !important;
+                border: 1px solid ${defaultPalette[800]} !important;
             }
 
             .profile-showcase header span.number, {

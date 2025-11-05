@@ -745,6 +745,7 @@
 
             .bg-gray-200 {
                 background-color: ${palette[200]} !important;
+                border: 1px solid ${palette[300]} !important;
             }
 
             .profile-showcase header span.number, {
@@ -1242,6 +1243,7 @@
 
             .bg-gray-200 {
                 background-color: ${defaultPalette[200]} !important;
+                border: 1px solid ${defaultPalette[300]} !important;
             }
 
             .profile-showcase header span.number, {
