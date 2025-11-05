@@ -119,6 +119,18 @@
         });
     }
 
+    function ensureDomainWarningCookies() {
+        const shouldHide = getHideDomainWarning();
+        if (shouldHide) {
+            const farFuture = new Date('9999-12-31T23:59:59Z');
+            const cookieOptions = `path=/; SameSite=Lax; expires=${farFuture.toUTCString()}; max-age=2147483647`;
+
+            (window.top || window).document.cookie = `globalwarning=false; ${cookieOptions}`;
+            (window.top || window).document.cookie = `globalwarning2=false; ${cookieOptions}`;
+            debugLog('Đã thêm cookie vĩnh viễn globalwarning=false và globalwarning2=false');
+        }
+    }
+
     function isInfoPage() {
         // Kiểm tra nếu đang ở trang thông tin truyện dựa trên element đặc trưng từ colors/page-info-truyen.js
         return document.querySelector('div.col-4.col-md.feature-item.width-auto-xl') !== null;
@@ -1420,6 +1432,9 @@ ${!isInfoPage() ? `
         // Áp dụng cài đặt domain warning khi khởi tạo
         applyDomainWarningVisibility();
 
+        // Đảm bảo cookie ẩn cảnh báo tên miền được thiết lập nếu cài đặt được bật
+        ensureDomainWarningCookies();
+
         // Thiết lập biến CSS --random-bg-color với màu ngẫu nhiên
         const randomColor = getRandomHexColor();
         document.documentElement.style.setProperty('--random-bg-color', randomColor);
@@ -1442,7 +1457,8 @@ ${!isInfoPage() ? `
         getColorMode: getColorMode,
         setColorMode: setColorMode,
         openConfigDialog: openConfigDialog,
-        initialize: initializeConfig
+        initialize: initializeConfig,
+        ensureDomainWarningCookies: ensureDomainWarningCookies
     };
 
     // Khởi tạo config khi module load
