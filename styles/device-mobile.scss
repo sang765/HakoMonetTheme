@@ -36,14 +36,14 @@ body:not(:has(.text-right.pad-bottom-20)) .betterhako-bg-overlay {
     max-height: 100%;
 }
 
-#profile-changer_cover {
+.profile-cover .profile-changer {
     display: block;
-    opacity: 0;
 }
-.profile-cover:hover .p-c_wrapper {
-    background-color: rgba(0,0,0,.6);
-    border-radius: 4px;
+.profile-cover .p-c_wrapper i {
+    opacity: .5;
+}
+.profile-cover:hover .p-c_wrapper,
+.profile-cover:hover .p-c_wrapper i{
     opacity: 1;
-    text-align: center;
 }
 /*# sourceMappingURL=https://sang765.github.io/HakoMonetTheme/styles/device-mobile.css.map */
