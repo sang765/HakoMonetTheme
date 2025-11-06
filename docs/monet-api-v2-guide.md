@@ -16,385 +16,770 @@ MonetAPI v2.0 là phiên bản nâng cấp toàn diện của hệ thống màu 
 ```
 api/
 ├── monet.js              # MonetAPI v2.0-integrated (V1 + V2 combined)
-├── monet-v2.js          # Original V2 standalone (preserved)
 └── monet-test.js        # Comprehensive test suite
 ```
 
-### 🌐 API Access Methods
-```javascript
-// Method 1: Direct v2 namespace access
-const enhanced = MonetAPI.v2.generateMaterialPalette('#3F51B5');
+---
 
-// Method 2: v2 prefixed convenience methods
+## 🎯 Color Extraction Methods v2.0
+
+### 1. Sử Dụng API v2 để Trích Xuất HEX
+
+#### Từ Base Color
+```javascript
+// Tạo enhanced palette từ màu cơ sở
 const palette = MonetAPI.v2CreateEnhancedPalette('#3F51B5');
-const harmonies = MonetAPI.v2GetColorHarmonies('#3F51B5');
 
-// Method 3: Unified utility methods
-const formatted = MonetAPI.formatColor('#3F51B5', 'rgb');
+// Trích xuất HEX color ở tone cụ thể
+const primaryHex = palette[500].hex;      // "#3F51B5"
+const lightHex = palette[300].hex;        // "#7986CB"
+const darkHex = palette[700].hex;         // "#3949AB"
+
+// Sử dụng unified formatColor method
+const formattedHex = MonetAPI.formatColor('#3F51B5', 'hex');  // "#3F51B5"
 ```
 
----
-
-## 🎯 Quick Start Guide
-
-### Basic v2.0 Usage
+#### Trích Xuất HEX từ RGB
 ```javascript
-// Enhanced palette generation
-const enhancedPalette = MonetAPI.v2CreateEnhancedPalette('#3F51B5');
-const color = enhancedPalette[500];
+// Sử dụng v2 utility class
+const rgb = { r: 63, g: 81, b: 181 };
+const hex = MonetAPI.v2ColorUtils.rgbToHex(rgb.r, rgb.g, rgb.b);
+console.log(hex);  // "#3F51B5"
 
-// Access multiple color formats
-console.log(color.hex);      // "#3F51B5"
-console.log(color.rgb);      // {r: 63, g: 81, b: 181}
-console.log(color.hsl);      // {h: 239, s: 48, l: 48}
-console.log(color.rgba(0.8)); // "rgba(63, 81, 181, 0.8)"
-
-// Built-in color analysis
-console.log(color.isLight());              // false
-console.log(color.getOptimalTextColor());  // "#FFFFFF"
-console.log(color.contrast('#FFFFFF'));   // 3.45
+// Hoặc từ color object
+const palette = MonetAPI.v2CreateEnhancedPalette('#3F51B5');
+const colorHex = palette[500].hex;  // "#3F51B5"
 ```
 
-### Integration với v1.0
+### 2. Sử Dụng API v2 để Trích Xuất RGB
+
+#### Từ HEX Color
 ```javascript
-// v1.0 methods vẫn hoạt động bình thường
-const v1Palette = MonetAPI.generateMonetPalette('#3F51B5');
-const v1Rgba = MonetAPI.paletteToRgba(v1Palette, 500, 0.8);
+// Trích xuất RGB từ hex
+const rgb = MonetAPI.v2ColorUtils.hexToRgb('#3F51B5');
+console.log(rgb);  // { r: 63, g: 81, b: 181 }
 
-// v2.0 enhanced features
-const v2Enhanced = MonetAPI.v2CreateEnhancedPalette('#3F51B5');
-const v2Accessibility = MonetAPI.v2CheckAccessibility('#3F51B5');
+// Sử dụng enhanced palette
+const palette = MonetAPI.v2CreateEnhancedPalette('#3F51B5');
+const rgbFromPalette = palette[500].rgb;  // { r: 63, g: 81, b: 181 }
 
-// Kết hợp cả hai
-function createCompleteTheme(baseColor) {
-    const v1Palette = MonetAPI.generateMonetPalette(baseColor);
-    const v2Enhanced = MonetAPI.v2CreateEnhancedPalette(baseColor);
-    
-    return {
-        // v1.0 compatibility
-        primary: v1Palette[500],
-        overlay: MonetAPI.paletteToRgba(v1Palette, 500, 0.1),
-        
-        // v2.0 enhancements
-        onPrimary: v2Enhanced[500].getOptimalTextColor(),
-        harmonies: MonetAPI.v2GetColorHarmonies(baseColor),
-        accessibility: v2Accessibility.violations.length === 0
-    };
-}
+// Sử dụng unified formatColor method
+const formattedRgb = MonetAPI.formatColor('#3F51B5', 'rgb');  // "rgb(63, 81, 181)"
 ```
 
----
-
-## 🎨 Advanced Color Science
-
-### Color Harmony Analysis
+#### Từ HSL Color
 ```javascript
+const hsl = { h: 239, s: 48, l: 48 };
+const rgb = MonetAPI.v2ColorUtils.hslToRgb(hsl.h, hsl.s, hsl.l);
+console.log(rgb);  // { r: 63, g: 81, b: 181 }
+```
+
+### 3. Sử Dụng API v2 để Trích Xuất RGBA
+
+#### Từ Enhanced Palette
+```javascript
+const palette = MonetAPI.v2CreateEnhancedPalette('#3F51B5');
+
+// Phương thức RGBA từ color object
+const rgba50 = palette[500].rgba(0.5);    // "rgba(63, 81, 181, 0.5)"
+const rgba80 = palette[500].rgba(0.8);    // "rgba(63, 81, 181, 0.8)"
+const rgba100 = palette[500].rgba(1.0);   // "rgba(63, 81, 181, 1)"
+
+// Sử dụng unified formatColor method
+const formattedRgba = MonetAPI.formatColor('#3F51B5', 'rgba');  // "rgba(63, 81, 181, 1)"
+
+// Với palette-level utilities
+const quickRgba = palette.getRGBA(500, 0.7);  // "rgba(63, 81, 181, 0.7)"
+```
+
+#### Từ Base Color với Alpha
+```javascript
+// Direct extraction với alpha
 const baseColor = '#3F51B5';
+const palette = MonetAPI.v2CreateEnhancedPalette(baseColor);
 
-// Get all harmony schemes
-const harmonies = MonetAPI.v2GetColorHarmonies(baseColor);
-console.log(harmonies);
-// {
-//   complementary: "#B5313F",
-//   analogous: ["#3F51B5", "#513FB5", "#513FB5", "#B53F7A"],
-//   triadic: ["#3F51B5", "#B53F3F", "#3FB553"],
-//   splitComplementary: ["#3F51B5", "#B53F7A", "#B5813F"]
-// }
-
-// Generate harmony palette
-const harmonyPalette = MonetAPI.v2GenerateHarmonyPalette(baseColor, 'triadic');
+// Different alpha values for different use cases
+const overlay = palette[500].rgba(0.1);    // Very transparent
+const surface = palette[500].rgba(0.8);    // Semi-transparent
+const solid = palette[500].rgba(1.0);      // Fully opaque
 ```
 
-### Color Blending & Mixing
-```javascript
-// Direct color blending
-const blended = MonetAPI.v2ColorUtils.blendColors('#3F51B5', '#FF5722', 0.3);
-// 30% FF5722 + 70% 3F51B5
+### 4. Sử Dụng API v2 để Trích Xuất HSL
 
-// Enhanced palette blending
+#### Từ HEX Color
+```javascript
+// Trích xuất HSL từ hex
+const rgb = MonetAPI.v2ColorUtils.hexToRgb('#3F51B5');
+const hsl = MonetAPI.v2ColorUtils.rgbToHsl(rgb.r, rgb.g, rgb.b);
+console.log(hsl);  // { h: 239, s: 48, l: 48 }
+
+// Sử dụng enhanced palette
 const palette = MonetAPI.v2CreateEnhancedPalette('#3F51B5');
-const mixedColor = palette[500].blend('#FF5722', 0.5);
+const hslFromPalette = palette[500].hsl;  // { h: 239, s: 48, l: 48 }
 
-// Advanced color formats
-console.log(MonetAPI.v2FormatColor('#3F51B5', 'hsl'));     // "hsl(239, 48%, 48%)"
-console.log(MonetAPI.v2FormatColor('#3F51B5', 'hsla'));    // "hsla(239, 48%, 48%, 1)"
+// Sử dụng unified formatColor method
+const formattedHsl = MonetAPI.formatColor('#3F51B5', 'hsl');  // "hsl(239, 48%, 48%)"
 ```
 
----
-
-## ⚡ Performance & Caching System
-
-### Intelligent Caching
+#### Từ RGB Color
 ```javascript
-// Automatic caching for performance
-const palette1 = MonetAPI.v2CreateEnhancedPalette('#3F51B5');  // Cache miss - generate new
-const palette2 = MonetAPI.v2CreateEnhancedPalette('#3F51B5');  // Cache hit - instant return
-
-// Cache statistics
-const stats = MonetAPI.v2GetCacheStats();
-console.log(stats);
-// {
-//   size: 1,
-//   maxSize: 100,
-//   entries: [{"key": "material_#3F51B5_", "age": 1234, "ttl": 300000}]
-// }
-
-// Cache management
-MonetAPI.v2ClearCache();
-MonetAPI.v2PreloadColors(['#3F51B5', '#FF5722', '#4CAF50']);
+const rgb = { r: 63, g: 81, b: 181 };
+const hsl = MonetAPI.v2ColorUtils.rgbToHsl(rgb.r, rgb.g, rgb.b);
+console.log(hsl);  // { h: 239, s: 48, l: 48 }
 ```
 
-### Custom Palette Options
-```javascript
-// Advanced palette generation options
-const customPalette = MonetAPI.v2CreateEnhancedPalette('#3F51B5', {
-    algorithm: 'material3',     // 'material3', 'material2', 'custom'
-    chromaFactor: 1.2,         // 0.1 - 2.0 (saturation multiplier)
-    temperature: 10,           // -100 to 100 (warm/cool adjustment)
-    tones: [100, 300, 500, 700, 900]  // Custom tone selection
-});
-```
-
----
-
-## 🎭 Smart Theme Management
-
-### System Theme Detection
-```javascript
-// Automatic theme detection
-const currentTheme = MonetAPI.v2GetCurrentTheme();  // 'auto', 'light', 'dark'
-console.log('System theme:', MonetAPI.v2.systemTheme);  // 'light' or 'dark'
-
-// Set theme preference
-MonetAPI.v2SetThemePreference('dark');
-
-// Listen for theme changes
-document.addEventListener('monetThemeChanged', (event) => {
-    console.log('Theme changed:', event.detail);
-    // event.detail: { systemTheme, currentTheme, effectiveTheme }
-});
-```
-
-### Time-based Color Adaptation
-```javascript
-// Automatic color temperature adjustment
-const timeAdjusted = MonetAPI.v2AdaptToTime('#3F51B5');
-// Morning (7-17): Cooler colors
-// Evening/Night (18-6): Warmer colors
-
-// Manual temperature control
-const warmPalette = MonetAPI.v2CreateEnhancedPalette('#3F51B5', { temperature: 20 });
-const coolPalette = MonetAPI.v2CreateEnhancedPalette('#3F51B5', { temperature: -20 });
-```
-
----
-
-## 🔧 Developer Experience
-
-### Debug Panel & Analysis
-```javascript
-// Create interactive debug panel
-const debugPanel = MonetAPI.v2CreateColorDebugger();
-
-// Detailed color analysis
-MonetAPI.v2LogColorAnalysis('#3F51B5', 'Primary Color Analysis');
-// Console output includes:
-// - Material palette breakdown
-// - Color harmony relationships
-// - Accessibility compliance
-// - Theme adaptation status
-```
-
-### Enhanced Color Objects
+#### HSL với Alpha (HSLA)
 ```javascript
 const palette = MonetAPI.v2CreateEnhancedPalette('#3F51B5');
 
-// Rich color object with multiple representations
-const color = palette[500];
+// HSLA extraction
+const hsla50 = palette[500].hsla(0.5);  // "hsla(239, 48%, 48%, 0.5)"
+const hsla80 = palette[500].hsla(0.8);  // "hsla(239, 48%, 48%, 0.8)"
 
-// Direct format access
-console.log(color.hex);              // "#3F51B5"
-console.log(color.rgb);              // {r: 63, g: 81, b: 181}
-console.log(color.hsl);              // {h: 239, s: 48, l: 48}
-console.log(color.luminance);        // 0.134
-
-// Color manipulation methods
-console.log(color.isLight());                    // false
-console.log(color.getOptimalTextColor());        // "#FFFFFF"
-console.log(color.contrast('#FFFFFF'));         // 3.45
-console.log(color.blend('#FF5722', 0.5));       // Blended color
-
-// Quick format conversion
-console.log(color.rgba(0.8));      // "rgba(63, 81, 181, 0.8)"
-console.log(color.hsla(0.9));      // "hsla(239, 48%, 48%, 0.9)"
-
-// Palette-level utilities
-console.log(palette.getRGBA(500, 0.8));      // Quick rgba access
-console.log(palette.getHSLA(700, 0.9));      // Quick hsla access
-console.log(palette.getContrast(500, 900));  // Inter-color contrast
+// Sử dụng unified formatColor method
+const formattedHsla = MonetAPI.formatColor('#3F51B5', 'hsla');  // "hsla(239, 48%, 48%, 1)"
 ```
 
 ---
 
-## ♿ Accessibility & Standards
+## 🎨 Canvas API Integration
 
-### WCAG Compliance Analysis
+### Phân Tích Màu từ Image
+
 ```javascript
-const accessibility = MonetAPI.v2CheckAccessibility('#3F51B5');
-console.log(accessibility);
-// {
-//   palette: enhancedPalette,
-//   recommendations: [...],
-//   violations: [...],
-//   wcagCompliance: [
-//     {
-//       ratio: 4.32,
-//       passes: { normal: false, large: true },
-//       level: "AA",
-//       recommendation: "Increase contrast ratio",
-//       context: "Light background, dark text",
-//       background: "#F3F4F6",
-//       foreground: "#1F2937"
-//     }
-//   ],
-//   optimizedPalette: enhancedPalette
-// }
+function extractDominantColorFromImage(imageUrl) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'Anonymous';
+        
+        img.onload = function() {
+            // Tạo canvas để phân tích màu
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = img.width;
+            canvas.height = img.height;
+            
+            // Vẽ image lên canvas
+            ctx.drawImage(img, 0, 0);
+            
+            // Lấy pixel data
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            
+            // Phân tích màu phổ biến nhất
+            const colorMap = new Map();
+            
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i];
+                const g = data[i + 1];
+                const b = data[i + 2];
+                const a = data[i + 3];
+                
+                // Bỏ qua pixel trong suốt
+                if (a < 128) continue;
+                
+                // Quantize màu để giảm noise
+                const quantizedR = Math.round(r / 32) * 32;
+                const quantizedG = Math.round(g / 32) * 32;
+                const quantizedB = Math.round(b / 32) * 32;
+                
+                const colorKey = `${quantizedR},${quantizedG},${quantizedB}`;
+                colorMap.set(colorKey, (colorMap.get(colorKey) || 0) + 1);
+            }
+            
+            // Tìm màu xuất hiện nhiều nhất
+            let dominantColor = null;
+            let maxCount = 0;
+            
+            for (const [color, count] of colorMap.entries()) {
+                if (count > maxCount) {
+                    maxCount = count;
+                    dominantColor = color;
+                }
+            }
+            
+            if (dominantColor) {
+                const [r, g, b] = dominantColor.split(',').map(Number);
+                const hex = MonetAPI.v2ColorUtils.rgbToHex(r, g, b);
+                
+                // Tạo palette từ màu được trích xuất
+                const palette = MonetAPI.v2CreateEnhancedPalette(hex);
+                
+                resolve({
+                    originalRGB: { r, g, b },
+                    hex: hex,
+                    palette: palette,
+                    analysis: {
+                        dominantColor: hex,
+                        confidence: maxCount / (data.length / 4)
+                    }
+                });
+            } else {
+                reject(new Error('Could not extract dominant color'));
+            }
+        };
+        
+        img.onerror = function() {
+            reject(new Error('Failed to load image'));
+        };
+        
+        img.src = imageUrl;
+    });
+}
 
-// Use accessibility-optimized palette
-const accessiblePalette = accessibility.optimizedPalette;
+// Sử dụng
+extractDominantColorFromImage('https://example.com/image.jpg')
+    .then(result => {
+        console.log('Extracted color:', result.hex);
+        console.log('Generated palette:', result.palette);
+        
+        // Áp dụng vào theme
+        const theme = createThemeFromPalette(result.palette);
+        GM_addStyle(theme);
+    })
+    .catch(error => {
+        console.error('Color extraction failed:', error);
+    });
 ```
 
-### Color Blindness Support
+### Phân Tích Màu từ Canvas Pixel
+
 ```javascript
-// Simulate different types of color blindness
-const simulations = {
-    deuteranopia: MonetAPI.v2AccessibilityAnalyzer.simulateColorBlindness('#3F51B5', 'deuteranopia'),
-    protanopia: MonetAPI.v2AccessibilityAnalyzer.simulateColorBlindness('#3F51B5', 'protanopia'),
-    tritanopia: MonetAPI.v2AccessibilityAnalyzer.simulateColorBlindness('#3F51B5', 'tritanopia')
-};
-
-// Automatic optimal text color selection
-const optimalText = MonetAPI.v2AccessibilityAnalyzer.getOptimalTextColor('#3F51B5');
-console.log(optimalText);  // "#000000" or "#FFFFFF" based on best contrast
-```
-
----
-
-## 🛠 Advanced Usage Patterns
-
-### Complete Theme System
-```javascript
-class AdvancedThemeManager {
-    constructor(baseColor) {
-        this.baseColor = baseColor;
-        this.setupThemeListeners();
+function analyzeCanvasColors(canvas, options = {}) {
+    const ctx = canvas.getContext('2d');
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
+    
+    const {
+        sampleRate = 4,  // Phân tích mỗi pixel thứ n
+        minAlpha = 128,  // Bỏ qua pixel có alpha thấp
+        quantizeLevel = 32  // Mức độ quantization
+    } = options;
+    
+    const colorFrequency = new Map();
+    
+    for (let i = 0; i < data.length; i += 4 * sampleRate) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const a = data[i + 3];
+        
+        if (a < minAlpha) continue;
+        
+        // Quantize để giảm noise
+        const qr = Math.round(r / quantizeLevel) * quantizeLevel;
+        const qg = Math.round(g / quantizeLevel) * quantizeLevel;
+        const qb = Math.round(b / quantizeLevel) * quantizeLevel;
+        
+        const colorKey = MonetAPI.v2ColorUtils.rgbToHex(qr, qg, qb);
+        colorFrequency.set(colorKey, (colorFrequency.get(colorKey) || 0) + 1);
     }
     
-    setupThemeListeners() {
-        document.addEventListener('monetThemeChanged', (event) => {
-            this.updateTheme(event.detail.effectiveTheme);
+    // Sắp xếp theo frequency
+    const sortedColors = Array.from(colorFrequency.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10);  // Top 10 màu phổ biến nhất
+    
+    return {
+        dominantColors: sortedColors.map(([color, freq]) => ({
+            color: color,
+            frequency: freq,
+            percentage: (freq / (data.length / 4 / sampleRate)) * 100
+        })),
+        
+        // Tạo palette từ màu chủ đạo
+        generatePalette: function() {
+            if (sortedColors.length > 0) {
+                const dominantColor = sortedColors[0][0];
+                return MonetAPI.v2CreateEnhancedPalette(dominantColor);
+            }
+            return null;
+        }
+    };
+}
+
+// Sử dụng với canvas có sẵn
+const canvas = document.getElementById('imageCanvas');
+const analysis = analyzeCanvasColors(canvas, {
+    sampleRate: 2,      // Phân tích chi tiết hơn
+    minAlpha: 64,       // Bao gồm cả pixel semi-transparent
+    quantizeLevel: 16   // Quantization mịn hơn
+});
+
+console.log('Top colors:', analysis.dominantColors);
+const palette = analysis.generatePalette();
+```
+
+---
+
+## 🔗 Integration v1.0 và v2.0
+
+### Migration Strategy
+
+#### Progressive Enhancement Pattern
+```javascript
+class HybridColorManager {
+    constructor() {
+        this.v1Palette = null;
+        this.v2Enhanced = null;
+        this.currentColor = '#3F51B5';
+    }
+    
+    // Tạo palette với cả v1 và v2
+    generatePalette(baseColor) {
+        this.currentColor = baseColor;
+        
+        // v1.0 - luôn hoạt động
+        this.v1Palette = MonetAPI.generateMonetPalette(baseColor);
+        
+        // v2.0 - enhanced features (optional)
+        try {
+            this.v2Enhanced = MonetAPI.v2CreateEnhancedPalette(baseColor);
+        } catch (error) {
+            console.warn('v2.0 not available, using v1.0 only');
+            this.v2Enhanced = null;
+        }
+        
+        return this.getPalette();
+    }
+    
+    // Unified API
+    getPalette() {
+        const base = {
+            // v1.0 methods
+            primary: this.v1Palette[500],
+            light: this.v1Palette[300],
+            dark: this.v1Palette[700],
+            
+            // v1.0 RGBA method
+            overlay: MonetAPI.paletteToRgba(this.v1Palette, 500, 0.1)
+        };
+        
+        // Thêm v2.0 enhancements nếu có
+        if (this.v2Enhanced) {
+            base.v2Enhanced = this.v2Enhanced;
+            base.onPrimary = this.v2Enhanced[500].getOptimalTextColor();
+            base.harmonies = MonetAPI.v2GetColorHarmonies(this.currentColor);
+            base.accessibility = MonetAPI.v2CheckAccessibility(this.currentColor);
+            
+            // Enhanced color methods
+            base.getRGBA = (tone, alpha) => this.v2Enhanced[tone].rgba(alpha);
+            base.getHSLA = (tone, alpha) => this.v2Enhanced[tone].hsla(alpha);
+            base.getContrast = (tone1, tone2) => this.v2Enhanced.getContrast(tone1, tone2);
+        }
+        
+        return base;
+    }
+    
+    // Fallback method khi v2 không khả dụng
+    getRGBAFallback(tone, alpha) {
+        if (this.v2Enhanced && this.v2Enhanced[tone]) {
+            return this.v2Enhanced[tone].rgba(alpha);
+        }
+        return MonetAPI.paletteToRgba(this.v1Palette, tone, alpha);
+    }
+}
+
+// Sử dụng
+const colorManager = new HybridColorManager();
+const theme = colorManager.generatePalette('#3F51B5');
+
+// v1.0 methods
+console.log(theme.primary);           // "#3F51B5"
+console.log(theme.overlay);           // "rgba(63, 81, 181, 0.1)"
+
+// v2.0 enhancements (nếu có)
+console.log(theme.onPrimary);         // "#FFFFFF"
+console.log(theme.getRGBA(500, 0.8)); // "rgba(63, 81, 181, 0.8)"
+```
+
+#### Compatibility Wrapper
+```javascript
+// Wrapper để đảm bảo compatibility
+class MonetAPIWrapper {
+    static getPalette(color, options = {}) {
+        // Ưu tiên v2.0 nếu có sẵn
+        if (MonetAPI.v2CreateEnhancedPalette) {
+            return MonetAPI.v2CreateEnhancedPalette(color, options);
+        }
+        
+        // Fallback to v1.0
+        return MonetAPI.generateMonetPalette(color);
+    }
+    
+    static getRGBA(palette, tone, alpha) {
+        // Thử v2.0 method trước
+        if (palette && palette[tone] && typeof palette[tone].rgba === 'function') {
+            return palette[tone].rgba(alpha);
+        }
+        
+        // Fallback to v1.0
+        return MonetAPI.paletteToRgba(palette, tone, alpha);
+    }
+    
+    static formatColor(color, format) {
+        // Thử v2.0 method trước
+        if (MonetAPI.v2FormatColor) {
+            return MonetAPI.v2FormatColor(color, format);
+        }
+        
+        // Manual conversion for v1.0
+        switch (format) {
+            case 'hex':
+                return color;
+            case 'rgb':
+            case 'rgba':
+                const rgb = MonetAPI.hexToRgb(color);
+                return format === 'rgba' ? 
+                    `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1)` :
+                    `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+            default:
+                return color;
+        }
+    }
+}
+
+// Sử dụng wrapper
+const palette = MonetAPIWrapper.getPalette('#3F51B5');
+const rgba = MonetAPIWrapper.getRGBA(palette, 500, 0.8);
+const formatted = MonetAPIWrapper.formatColor('#3F51B5', 'rgb');
+```
+
+---
+
+## ⚡ Performance Optimization v2.0
+
+### 1. Caching Strategy
+
+#### Intelligent Caching
+```javascript
+class OptimizedColorService {
+    constructor() {
+        this.customCache = new Map();
+        this.usageStats = new Map();
+        this.maxCustomCacheSize = 50;
+    }
+    
+    // Preload colors để optimize performance
+    preloadColors(colorArray) {
+        // Sử dụng v2 preloading system
+        MonetAPI.v2PreloadColors(colorArray);
+        
+        // Custom caching cho frequently used colors
+        colorArray.forEach(color => {
+            if (!this.customCache.has(color)) {
+                const palette = MonetAPI.v2CreateEnhancedPalette(color);
+                this.customCache.set(color, {
+                    palette: palette,
+                    timestamp: Date.now(),
+                    accessCount: 0
+                });
+            }
         });
     }
     
-    updateTheme(effectiveTheme) {
-        const palette = MonetAPI.v2CreateEnhancedPalette(this.baseColor);
-        const accessibility = MonetAPI.v2CheckAccessibility(this.baseColor);
-        const harmonies = MonetAPI.v2GetColorHarmonies(this.baseColor);
-        const isDark = effectiveTheme === 'dark';
-        
-        const css = `
-            :root {
-                --primary: ${palette[500].hex};
-                --primary-light: ${palette[300].hex};
-                --primary-dark: ${palette[700].hex};
-                
-                /* Surface colors */
-                --surface: ${isDark ? palette[800].hex : palette[100].hex};
-                --surface-variant: ${isDark ? palette[700].hex : palette[200].hex};
-                --background: ${isDark ? palette[900].hex : palette[50].hex};
-                
-                /* Text colors */
-                --on-primary: ${palette[500].getOptimalTextColor()};
-                --on-surface: ${isDark ? palette[100].hex : palette[900].hex};
-                
-                /* RGBA versions */
-                --primary-overlay: ${palette[500].rgba(0.1)};
-                --scrim: ${palette[900].rgba(0.6)};
-                
-                /* Harmony colors */
-                --complementary: ${harmonies.complementary};
-                --analogous: ${harmonies.analogous[1]};
-                
-                /* Accessibility status */
-                --accessibility-compliant: ${accessibility.violations.length === 0};
-            }
-            
-            /* Auto-adjust for accessibility issues */
-            ${accessibility.violations.length > 0 ? `
-            .accessibility-fix {
-                color: ${isDark ? '#FFFFFF' : '#000000'} !important;
-            }
-            ` : ''}
-            
-            /* Responsive adjustments */
-            @media (max-width: 768px) {
-                --primary-overlay: ${palette[500].rgba(0.6)};
-            }
-        `;
-        
-        GM_addStyle(css);
-    }
-    
-    changeBaseColor(newColor) {
-        this.baseColor = newColor;
-        MonetAPI.v2LogColorAnalysis(newColor, 'Color Changed');
-        this.updateTheme(MonetAPI.v2GetCurrentTheme());
-    }
-}
-```
-
-### Performance Optimization Pattern
-```javascript
-class OptimizedColorManager {
-    constructor() {
-        this.paletteCache = new Map();
-        this.usageStats = new Map();
-    }
-    
+    // Get palette với caching
     getPalette(baseColor) {
         const normalizedColor = baseColor.toLowerCase();
         
-        // Track usage for optimization
+        // Track usage
         this.usageStats.set(normalizedColor, 
             (this.usageStats.get(normalizedColor) || 0) + 1);
+        
+        // Check custom cache first
+        if (this.customCache.has(normalizedColor)) {
+            const cached = this.customCache.get(normalizedColor);
+            cached.accessCount++;
+            return cached.palette;
+        }
         
         // Use v2 caching system
         const palette = MonetAPI.v2CreateEnhancedPalette(normalizedColor);
         
+        // Add to custom cache if frequently used
+        if (this.usageStats.get(normalizedColor) > 3) {
+            this.addToCustomCache(normalizedColor, palette);
+        }
+        
         return palette;
     }
     
-    preloadPopularColors(colors) {
-        // Use v2 preloading system
-        MonetAPI.v2PreloadColors(colors);
-        
-        // Additional custom caching
-        colors.forEach(color => {
-            if (!this.paletteCache.has(color)) {
-                this.paletteCache.set(color, 
-                    MonetAPI.v2CreateEnhancedPalette(color));
+    addToCustomCache(color, palette) {
+        if (this.customCache.size >= this.maxCustomCacheSize) {
+            // Remove least used entry
+            let leastUsed = null;
+            let minAccess = Infinity;
+            
+            for (const [key, value] of this.customCache.entries()) {
+                if (value.accessCount < minAccess) {
+                    minAccess = value.accessCount;
+                    leastUsed = key;
+                }
             }
+            
+            if (leastUsed) {
+                this.customCache.delete(leastUsed);
+            }
+        }
+        
+        this.customCache.set(color, {
+            palette: palette,
+            timestamp: Date.now(),
+            accessCount: 0
         });
     }
     
-    getCacheInfo() {
+    // Cleanup unused entries
+    cleanupCache() {
+        const now = Date.now();
+        const maxAge = 10 * 60 * 1000; // 10 minutes
+        
+        for (const [color, cached] of this.customCache.entries()) {
+            if (now - cached.timestamp > maxAge && cached.accessCount < 2) {
+                this.customCache.delete(color);
+            }
+        }
+        
+        // Also cleanup v2 cache
+        MonetAPI.v2ClearCache();
+    }
+    
+    // Get cache statistics
+    getStats() {
         return {
-            v2Cache: MonetAPI.v2GetCacheStats(),
             customCache: {
-                size: this.paletteCache.size,
-                usageStats: Object.fromEntries(this.usageStats)
+                size: this.customCache.size,
+                maxSize: this.maxCustomCacheSize,
+                entries: Array.from(this.customCache.entries()).map(([color, cached]) => ({
+                    color,
+                    age: Date.now() - cached.timestamp,
+                    accessCount: cached.accessCount
+                }))
+            },
+            v2Cache: MonetAPI.v2GetCacheStats(),
+            usageStats: Object.fromEntries(this.usageStats)
+        };
+    }
+}
+```
+
+### 2. Memory Management
+
+```javascript
+class MemoryOptimizedColorManager {
+    constructor() {
+        this.paletteCache = new Map();
+        this.colorReferences = new WeakMap();
+        this.maxCacheSize = 30;
+    }
+    
+    // LRU Cache với WeakMap cho memory efficiency
+    getPalette(baseColor) {
+        const cacheKey = this.normalizeColor(baseColor);
+        
+        if (this.paletteCache.has(cacheKey)) {
+            // Move to end (most recently used)
+            const palette = this.paletteCache.get(cacheKey);
+            this.paletteCache.delete(cacheKey);
+            this.paletteCache.set(cacheKey, palette);
+            return palette;
+        }
+        
+        // Generate new palette
+        const palette = MonetAPI.v2CreateEnhancedPalette(baseColor);
+        
+        // Implement LRU eviction
+        if (this.paletteCache.size >= this.maxCacheSize) {
+            const firstKey = this.paletteCache.keys().next().value;
+            this.paletteCache.delete(firstKey);
+        }
+        
+        this.paletteCache.set(cacheKey, palette);
+        return palette;
+    }
+    
+    // Clear cache periodically
+    scheduleCleanup() {
+        setInterval(() => {
+            // Clear v2 cache
+            MonetAPI.v2ClearCache();
+            
+            // Clear custom cache if memory pressure
+            if (performance.memory) {
+                const memInfo = performance.memory;
+                if (memInfo.usedJSHeapSize / memInfo.jsHeapSizeLimit > 0.8) {
+                    this.paletteCache.clear();
+                    console.log('Memory pressure detected, cleared color cache');
+                }
+            }
+        }, 5 * 60 * 1000); // 5 minutes
+    }
+    
+    normalizeColor(color) {
+        return color.toLowerCase().trim();
+    }
+}
+```
+
+### 3. Batch Operations
+
+```javascript
+class BatchColorProcessor {
+    constructor() {
+        this.batchQueue = [];
+        this.processing = false;
+    }
+    
+    // Queue multiple color operations
+    queuePaletteGeneration(baseColor, callback) {
+        this.batchQueue.push({ baseColor, callback });
+        
+        if (!this.processing) {
+            this.processBatch();
+        }
+    }
+    
+    async processBatch() {
+        this.processing = true;
+        const batch = [...this.batchQueue];
+        this.batchQueue = [];
+        
+        try {
+            // Process in smaller chunks to avoid blocking
+            const chunkSize = 5;
+            for (let i = 0; i < batch.length; i += chunkSize) {
+                const chunk = batch.slice(i, i + chunkSize);
+                await Promise.all(chunk.map(async ({ baseColor, callback }) => {
+                    try {
+                        const palette = MonetAPI.v2CreateEnhancedPalette(baseColor);
+                        callback(null, palette);
+                    } catch (error) {
+                        callback(error, null);
+                    }
+                }));
+                
+                // Yield to main thread
+                await new Promise(resolve => setTimeout(resolve, 16));
+            }
+        } catch (error) {
+            console.error('Batch processing error:', error);
+        } finally {
+            this.processing = false;
+        }
+    }
+    
+    // Process multiple colors at once
+    async generateMultiplePalettes(colors) {
+        // Use v2 preloading for better performance
+        MonetAPI.v2PreloadColors(colors);
+        
+        const palettes = new Map();
+        
+        for (const color of colors) {
+            try {
+                const palette = MonetAPI.v2CreateEnhancedPalette(color);
+                palettes.set(color, palette);
+            } catch (error) {
+                console.warn(`Failed to generate palette for ${color}:`, error);
+                // Fallback to v1.0
+                try {
+                    const fallbackPalette = MonetAPI.generateMonetPalette(color);
+                    palettes.set(color, fallbackPalette);
+                } catch (fallbackError) {
+                    console.error(`Fallback also failed for ${color}:`, fallbackError);
+                }
+            }
+        }
+        
+        return palettes;
+    }
+}
+```
+
+### 4. Performance Monitoring
+
+```javascript
+class ColorPerformanceMonitor {
+    constructor() {
+        this.metrics = {
+            paletteGeneration: [],
+            cacheHits: 0,
+            cacheMisses: 0,
+            errors: []
+        };
+    }
+    
+    // Monitor v2.0 performance
+    monitorV2Performance() {
+        const originalCreateEnhancedPalette = MonetAPI.v2CreateEnhancedPalette;
+        
+        MonetAPI.v2CreateEnhancedPalette = (baseColor, options) => {
+            const startTime = performance.now();
+            
+            try {
+                const result = originalCreateEnhancedPalette(baseColor, options);
+                const endTime = performance.now();
+                
+                this.recordMetric('paletteGeneration', {
+                    duration: endTime - startTime,
+                    color: baseColor,
+                    cacheHit: result._fromCache || false,
+                    timestamp: Date.now()
+                });
+                
+                return result;
+            } catch (error) {
+                const endTime = performance.now();
+                this.recordMetric('errors', {
+                    duration: endTime - startTime,
+                    color: baseColor,
+                    error: error.message,
+                    timestamp: Date.now()
+                });
+                throw error;
             }
         };
+    }
+    
+    recordMetric(type, data) {
+        this.metrics[type].push(data);
+        
+        // Keep only recent data
+        const maxEntries = 100;
+        if (this.metrics[type].length > maxEntries) {
+            this.metrics[type] = this.metrics[type].slice(-maxEntries);
+        }
+    }
+    
+    getPerformanceReport() {
+        const generationMetrics = this.metrics.paletteGeneration;
+        
+        if (generationMetrics.length === 0) {
+            return { message: 'No performance data available' };
+        }
+        
+        const avgDuration = generationMetrics.reduce((sum, m) => sum + m.duration, 0) / generationMetrics.length;
+        const cacheHitRate = generationMetrics.filter(m => m.cacheHit).length / generationMetrics.length;
+        
+        return {
+            averageGenerationTime: `${avgDuration.toFixed(2)}ms`,
+            cacheHitRate: `${(cacheHitRate * 100).toFixed(1)}%`,
+            totalGenerations: generationMetrics.length,
+            recentMetrics: generationMetrics.slice(-5),
+            errors: this.metrics.errors.slice(-5)
+        };
+    }
+    
+    // Setup monitoring
+    setup() {
+        this.monitorV2Performance();
+        
+        // Periodic reporting
+        setInterval(() => {
+            const report = this.getPerformanceReport();
+            console.log('Color Performance Report:', report);
+        }, 60000); // Every minute
     }
 }
 ```
@@ -403,203 +788,65 @@ class OptimizedColorManager {
 
 ## 📊 API Reference v2.0
 
-### Core v2.0 Methods
+### Core Color Extraction Methods
 ```javascript
-// Enhanced palette generation
-MonetAPI.v2CreateEnhancedPalette(baseColor, options)
-MonetAPI.v2GenerateHarmonyPalette(baseColor, scheme)
+// HEX extraction
+MonetAPI.v2CreateEnhancedPalette(color).tone.hex
+MonetAPI.v2ColorUtils.rgbToHex(r, g, b)
+MonetAPI.formatColor(color, 'hex')
 
-// Color harmony analysis
-MonetAPI.v2GetColorHarmonies(baseColor)
+// RGB extraction  
+MonetAPI.v2CreateEnhancedPalette(color).tone.rgb
+MonetAPI.v2ColorUtils.hexToRgb(hex)
+MonetAPI.formatColor(color, 'rgb')
 
-// Accessibility features
-MonetAPI.v2CheckAccessibility(baseColor)
+// RGBA extraction
+MonetAPI.v2CreateEnhancedPalette(color).tone.rgba(alpha)
+MonetAPI.v2CreateEnhancedPalette(color).getRGBA(tone, alpha)
+MonetAPI.formatColor(color, 'rgba')
 
-// Theme management
-MonetAPI.v2GetCurrentTheme()
-MonetAPI.v2SetThemePreference(preference)
+// HSL extraction
+MonetAPI.v2CreateEnhancedPalette(color).tone.hsl
+MonetAPI.v2ColorUtils.rgbToHsl(r, g, b)
+MonetAPI.v2ColorUtils.hslToRgb(h, s, l)
+MonetAPI.formatColor(color, 'hsl')
 
-// Performance utilities
+// HSLA extraction
+MonetAPI.v2CreateEnhancedPalette(color).tone.hsla(alpha)
+MonetAPI.formatColor(color, 'hsla')
+```
+
+### Canvas Integration Methods
+```javascript
+// Canvas color analysis
+analyzeCanvasColors(canvas, options)
+extractDominantColorFromImage(imageUrl)
+```
+
+### Performance & Caching
+```javascript
 MonetAPI.v2GetCacheStats()
 MonetAPI.v2ClearCache()
 MonetAPI.v2PreloadColors(colorArray)
-
-// Color utilities
-MonetAPI.v2FormatColor(color, format)
-MonetAPI.v2AdaptToTime(color)
-
-// Developer tools
-MonetAPI.v2CreateColorDebugger()
-MonetAPI.v2LogColorAnalysis(color, context)
-```
-
-### Utility Classes
-```javascript
-// Access to utility classes
-MonetAPI.v2ColorUtils              // Static color utilities
-MonetAPI.v2AccessibilityAnalyzer   // Accessibility analysis
-MonetAPI.v2ColorHarmonyAnalyzer    // Color harmony analysis
-MonetAPI.v2Cache                   // Cache management
-```
-
-### v2 Namespace
-```javascript
-// Direct access to v2 core class
-MonetAPI.v2.generateMaterialPalette(baseColor, options)
-MonetAPI.v2.getColorHarmonies(baseColor)
-MonetAPI.v2.checkAccessibility(baseColor)
-// ... all v2 methods available
-```
-
----
-
-## 🚀 Migration Guide v1.0 → v2.0
-
-### Simple Migration
-```javascript
-// v1.0 code (still works)
-const palette = MonetAPI.generateMonetPalette('#3F51B5');
-const rgba = MonetAPI.paletteToRgba(palette, 500, 0.8);
-
-// Enhanced v2.0 equivalent
-const enhanced = MonetAPI.v2CreateEnhancedPalette('#3F51B5');
-const color = enhanced[500];
-const rgba_v2 = color.rgba(0.8);
-
-// Backward compatibility check
-console.log(MonetAPI.version);  // "2.0-integrated"
-console.log(rgba === rgba_v2);  // true - same output
-```
-
-### Progressive Enhancement Pattern
-```javascript
-function createModernTheme(baseColor) {
-    // v1.0 methods - guaranteed to work
-    const v1Palette = MonetAPI.generateMonetPalette(baseColor);
-    const v1Overlay = MonetAPI.paletteToRgba(v1Palette, 500, 0.1);
-    
-    // v2.0 enhancements - when available
-    const enhancements = {
-        enhanced: null,
-        accessibility: null,
-        harmonies: null
-    };
-    
-    try {
-        enhancements.enhanced = MonetAPI.v2CreateEnhancedPalette(baseColor);
-        enhancements.accessibility = MonetAPI.v2CheckAccessibility(baseColor);
-        enhancements.harmonies = MonetAPI.v2GetColorHarmonies(baseColor);
-    } catch (error) {
-        console.warn('v2.0 features not available:', error);
-    }
-    
-    return {
-        // v1.0 base functionality
-        primary: v1Palette[500],
-        overlay: v1Overlay,
-        
-        // v2.0 enhancements (optional)
-        ...enhancements,
-        
-        // Unified API
-        getPrimaryRGBA: (alpha = 1) => 
-            enhancements.enhanced ? 
-                enhancements.enhanced[500].rgba(alpha) : 
-                MonetAPI.paletteToRgba(v1Palette, 500, alpha)
-    };
-}
-```
-
----
-
-## 🐛 Debugging v2.0
-
-### Enable Debug Mode
-```javascript
-// Enable debug logging
-if (typeof GM_setValue === 'function') {
-    GM_setValue('debug_mode', true);
-}
-
-// Manual debug commands
-MonetAPI.v2LogColorAnalysis('#3F51B5', 'Debug Session');
-
-// Create debug panel
-const panel = MonetAPI.v2CreateColorDebugger();
-```
-
-### Performance Monitoring
-```javascript
-// Cache monitoring
-setInterval(() => {
-    const stats = MonetAPI.v2GetCacheStats();
-    console.log(`Cache: ${stats.size}/${stats.maxSize} entries`);
-    
-    if (stats.size > stats.maxSize * 0.8) {
-        console.warn('Cache nearing capacity, consider cleanup');
-        MonetAPI.v2ClearCache();
-    }
-}, 60000); // Check every minute
-```
-
----
-
-## 🔮 Best Practices
-
-### 1. Performance Optimization
-```javascript
-// Preload frequently used colors
-MonetAPI.v2PreloadColors(['#3F51B5', '#FF5722', '#4CAF50']);
-
-// Use specific tones when possible
-const minimalPalette = MonetAPI.v2CreateEnhancedPalette('#3F51B5', {
-    tones: [100, 300, 500, 700, 900]
-});
-
-// Monitor cache usage
-const stats = MonetAPI.v2GetCacheStats();
-```
-
-### 2. Accessibility First
-```javascript
-// Always check accessibility
-const accessibility = MonetAPI.v2CheckAccessibility(baseColor);
-if (accessibility.violations.length > 0) {
-    console.warn('Accessibility violations detected:', accessibility.violations);
-    // Use optimized palette
-    baseColor = accessibility.optimizedPalette[500].hex;
-}
-```
-
-### 3. Error Handling
-```javascript
-try {
-    const palette = MonetAPI.v2CreateEnhancedPalette('#3F51B5');
-    const accessibility = MonetAPI.v2CheckAccessibility('#3F51B5');
-} catch (error) {
-    // Fallback to v1.0
-    const palette = MonetAPI.generateMonetPalette('#3F51B5');
-    console.error('v2.0 features unavailable, using v1.0 fallback:', error);
-}
 ```
 
 ---
 
 ## 🏁 Kết Luận
 
-MonetAPI v2.0 cung cấp một hệ thống màu sắc toàn diện với:
+MonetAPI v2.0 cung cấp hệ thống trích xuất màu toàn diện với:
 
-### ✨ Core Benefits
-- **🚀 Performance**: Intelligent caching system
-- **🎨 Advanced Color Science**: HSL models, color harmony
-- **♿ Accessibility**: WCAG compliance, color blindness support
-- **🛠 Developer Experience**: Debug tools, comprehensive analysis
-- **🔄 Backward Compatibility**: 100% compatible với v1.0
+### ✨ Color Extraction Features
+- **🎨 Multiple Formats**: HEX, RGB, RGBA, HSL, HSLA extraction
+- **⚡ Canvas Integration**: Direct analysis from images and canvas
+- **🔄 v1.0 Compatibility**: Seamless integration with legacy methods
+- **🚀 Performance Optimized**: Intelligent caching and batch processing
+- **♿ Developer Friendly**: Comprehensive error handling and monitoring
 
 ### 🎯 Use Cases
-- **Design Systems**: Comprehensive color management
-- **Accessibility Compliance**: Automatic WCAG checking
-- **Performance Optimization**: Intelligent caching
-- **Developer Productivity**: Debug tools and analysis
+- **Image Processing**: Extract dominant colors from images
+- **Theme Generation**: Create cohesive color schemes
+- **Design Systems**: Consistent color management across components
+- **Performance**: Optimized for high-frequency color operations
 
-MonetAPI v2.0 sẵn sàng để nâng cao trải nghiệm màu sắc trong mọi project!
+MonetAPI v2.0 sẵn sàng để xử lý mọi nhu cầu về màu sắc trong các ứng dụng hiện đại!
