@@ -47,7 +47,6 @@
 ### Bước 1: Cài đặt extension userscript
 - [Tampermonkey](https://www.tampermonkey.net/) (Khuyến nghị)
 - Hoặc [Violentmonkey](https://violentmonkey.github.io/get-it/) (Ưu tiên cho chromium từ phiên bản 138 trở lên)
-
 </div>
 </div>
 
@@ -67,6 +66,7 @@ Nhấp vào [raw userscript](https://sang765.github.io/HakoMonetTheme/HakoMonetT
 Khi vào bất kỳ trang web nào của Hako thì sẽ thông báo như ở dưới hình hiện lên. Hãy ấn "Always allow domain" và tận hưởng thành quả.  
 ![Userscript Ask](/.github/assets/userscript_asking.jpg)
 
+<div align="center">
 
 ## 🔄 Cập nhật 🔄
 
@@ -95,23 +95,23 @@ Nếu bạn gặp vấn đề hoặc có đề xuất cải tiến, vui lòng:
 
 <div align="left">
 
-### Với người dùng phổ thông:  
-- Chỉ cần vào trang web và tận hưởng thành quả. Nếu cần update màu theme chỉ cần mở script manager extension của bạn lên rồi click "Menu chính > Cài đặt".   
+### Với người dùng phổ thông:
+- Chỉ cần vào trang web và tận hưởng thành quả. Nếu cần update màu theme chỉ cần mở script manager extension của bạn lên rồi click "Menu chính > Cài đặt".
 
 ### Với devenloper và phát triển repository:
-- Vui lòng dọc:
- - [Hướng dẫn API chung](./docs/monet-api-guide.md)
- - [Hướng dẫn sử dụng MonetAPI v1](./docs/monet-api-v1-guide.md)
- - [Hướng dẫn sử dụng MonetAPI v2](./docs/monet-api-v2-guide.md)
+- Vui lòng đọc:
+  - [Hướng dẫn API chung](./docs/monet-api-guide.md)
+  - [Hướng dẫn sử dụng MonetAPI v1](./docs/monet-api-v1-guide.md)
+  - [Hướng dẫn sử dụng MonetAPI v2](./docs/monet-api-v2-guide.md)
 
 </div>
 
 ## 🖼️ Screenshot 🖼️
 
-### 📱 **Trên Mobile** 📱
+### 📱 **Trên Mobile (Update lần cuối: 26/09/2025)** 📱
 
 | | | |
-|---|---|---|
+|:---:|:---:|:---:|
 | ![Novel 1](/.github/assets/Novel-1.png) | ![Novel 2](/.github/assets/Novel-2.png) | ![Novel 3](/.github/assets/Novel-3.png) | 
 | **Preview Novel 1 (18+)** | **Peview Novel 2** | **Peview Novel 3** | 
 | ![Novel 3-1](/.github/assets/3-1.png) | ![Novel 3-2](/.github/assets/3-2.png) | ![Novel 3-3](/.github/assets/3-3.png) |
@@ -122,7 +122,7 @@ Nếu bạn gặp vấn đề hoặc có đề xuất cải tiến, vui lòng:
 ### 💻 **Trên Desktop** 💻
 
 | | | |
-|---|---|---|
+|:---:|:---:|:---:|
 | ![Desktop Home](/.github/assets/desktop-home.png) | ![Desktop Info Truyen](/.github/assets/desktop-info-truyen.png) | ![Desktop Info Truyen GIF](/.github/assets/desktop-info-truyen.gif) |
 | **Preview Trang Chủ** | **Peview Trang Thông Tin Truyện** | **Trang Thông Tin Truyện - GIF** | 
 | ![Desktop Settings GIF](/.github/assets/desktop-settings.gif) | ![Desktop Block Banner GIF](/.github/assets/desktop-block-banner.gif) | |
