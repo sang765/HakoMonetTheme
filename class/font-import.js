@@ -20,8 +20,8 @@
     function addFontImport() {
         // Fetch CSS and source map simultaneously
         Promise.all([
-            fetch(FOLDER_URL + 'font-import.css').then(r => r.text()),
-            fetch(FOLDER_URL + 'font-import.css.map').then(r => r.text())
+            fetch(FOLDER_URL + 'font/font-import.css').then(r => r.text()),
+            fetch(FOLDER_URL + 'font/font-import.css.map').then(r => r.text())
         ])
         .then(([css, mapContent]) => {
             // Convert source map to data URL
@@ -43,7 +43,7 @@
             debugLog('Đã thêm font import CSS với Blob URL và inline source mapping');
         })
         .catch(error => {
-            debugLog('Lỗi khi tải font-import.css hoặc source map:', error);
+            debugLog('Lỗi khi tải font/font-import.css hoặc source map:', error);
         });
     }
 

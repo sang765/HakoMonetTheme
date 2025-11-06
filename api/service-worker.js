@@ -106,9 +106,9 @@
 
         const essentialResources = [
             // Core styles and scripts
-            'https://sang765.github.io/HakoMonetTheme/styles/series-enhancement.css',
-            'https://sang765.github.io/HakoMonetTheme/styles/thumbnail-overlay.css',
-            'https://sang765.github.io/HakoMonetTheme/styles/transparent-top.css',
+            'https://sang765.github.io/HakoMonetTheme/styles/info-truyen/series-enhancement.css',
+            'https://sang765.github.io/HakoMonetTheme/styles/info-truyen/hmt-thumbnail-overlay.css',
+            'https://sang765.github.io/HakoMonetTheme/styles/info-truyen/transparent-top.css',
             // Update checker API
             '/api/github-commits-cache',
             '/api/version-info-cache'

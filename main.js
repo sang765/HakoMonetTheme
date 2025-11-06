@@ -57,6 +57,7 @@
             const antiPopupJS = GM_getResourceText('antiPopupJS');
             const blacklistJS = GM_getResourceText('blacklistJS');
             const fullscreenJS = GM_getResourceText('fullscreenJS');
+            const deviceCSSLoaderJS = GM_getResourceText('deviceCSSLoaderJS');
 
             // Load module blacklist trước tiên (ưu tiên cao nhất)
             loadScript(blacklistJS, 'blacklist.js');
@@ -84,6 +85,7 @@
             loadScript(antiPopupJS, 'anti-popup.js');
             loadScript(fullscreenJS, 'fullscreen.js');
             loadScript(colorinfotruyen, 'page-info-truyen.js');
+            loadScript(deviceCSSLoaderJS, 'device-css-loader.js');
             
             debugLog('Tất cả module đã được tải');
 

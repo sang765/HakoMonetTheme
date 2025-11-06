@@ -20,8 +20,8 @@
     function addAnimations() {
         // Fetch CSS and source map simultaneously
         Promise.all([
-            fetch(FOLDER_URL + 'animation.css').then(r => r.text()),
-            fetch(FOLDER_URL + 'animation.css.map').then(r => r.text())
+            fetch(FOLDER_URL + 'animation/animation.css').then(r => r.text()),
+            fetch(FOLDER_URL + 'animation/animation.css.map').then(r => r.text())
         ])
         .then(([css, mapContent]) => {
             // Convert source map to data URL
@@ -43,7 +43,7 @@
             debugLog('Đã thêm animations với Blob URL và inline source mapping');
         })
         .catch(error => {
-            debugLog('Lỗi khi tải animation.css hoặc source map:', error);
+            debugLog('Lỗi khi tải animation/animation.css hoặc source map:', error);
         });
     }
     

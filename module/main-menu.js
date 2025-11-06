@@ -4,8 +4,8 @@
     // Constants for better maintainability and readability
     const DEBUG = GM_getValue('debug_mode', false);
     const FOLDER_URL = 'https://sang765.github.io/HakoMonetTheme/styles/';
-    const CSS_FILE = 'hmt-main-menu.css';
-    const CSS_MAP_FILE = 'hmt-main-menu.css.map';
+    const CSS_FILE = 'userscript/mainmenu/hmt-main-menu.css';
+    const CSS_MAP_FILE = 'userscript/mainmenu/hmt-main-menu.css.map';
     const DIALOG_CLASS = 'hmt-main-menu-dialog';
     const OVERLAY_CLASS = 'hmt-main-menu-overlay';
     const MENU_GRID_CLASS = 'hmt-menu-grid';

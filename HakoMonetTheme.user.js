@@ -53,6 +53,7 @@
 // @resource     updateManagerJS ./module/update-manager.js
 // @resource     darkModePrompterJS ./module/dark-mode-prompter.js
 // @resource     fullscreenJS ./module/fullscreen.js
+// @resource     deviceCSSLoaderJS ./module/device-css-loader.js
 // @resource     html2canvasJS ./api/html2canvas.min.js
 // @connect      html2canvas.hertzen.com
 // @connect      hertzen.com
@@ -324,7 +325,11 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
     function loadAllResources() {
         const resources = [
             'mainJS', 'monetAPIJS', 'updateCheckerJS', 'CORSJS', 'infoTruyenJS',
-            'animationJS', 'tagColorJS', 'fontImportJS', 'colorinfotruyen', 'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyenlight', 'themeDetectorJS', 'deviceDetectorJS', 'configJS', 'adBlockerJS', 'autoReloadJS', 'antiPopupJS', 'mainMenuJS', 'navbarLogoJS', 'updateManagerJS', 'darkModePrompterJS', 'fullscreenJS', 'readingPageJS'
+            'animationJS', 'tagColorJS', 'fontImportJS', 'colorinfotruyen',
+            'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyenlight', 'themeDetectorJS',
+            'deviceDetectorJS', 'configJS', 'adBlockerJS', 'autoReloadJS', 'antiPopupJS',
+            'mainMenuJS', 'navbarLogoJS', 'updateManagerJS', 'darkModePrompterJS', 'fullscreenJS',
+            'readingPageJS', 'deviceCSSLoaderJS'
         ];
 
         let loadedCount = 0;

@@ -67,8 +67,8 @@
         // Cải thiện giao diện trang truyện
         // Fetch CSS and source map simultaneously
         Promise.all([
-            fetch(FOLDER_URL + 'series-enhancement.css').then(r => r.text()),
-            fetch(FOLDER_URL + 'series-enhancement.css.map').then(r => r.text())
+            fetch(FOLDER_URL + 'info-truyen/series-enhancement.css').then(r => r.text()),
+            fetch(FOLDER_URL + 'info-truyen/series-enhancement.css.map').then(r => r.text())
         ])
         .then(([css, mapContent]) => {
             // Convert source map to data URL
@@ -90,7 +90,7 @@
             debugLog('Đã cải thiện giao diện trang truyện với Blob URL và inline source mapping');
         })
         .catch(error => {
-            debugLog('Lỗi khi tải series-enhancement.css hoặc source map:', error);
+            debugLog('Lỗi khi tải info-truyen/series-enhancement.css hoặc source map:', error);
         });
     }
     
@@ -136,18 +136,18 @@
         const mapPromises = [];
 
         // Load base CSS and source map
-        cssPromises.push(fetch(FOLDER_URL + 'device-base.css').then(r => r.text()));
-        mapPromises.push(fetch(FOLDER_URL + 'device-base.css.map').then(r => r.text()));
+        cssPromises.push(fetch(FOLDER_URL + 'info-truyen/device-base.css').then(r => r.text()));
+        mapPromises.push(fetch(FOLDER_URL + 'info-truyen/device-base.css.map').then(r => r.text()));
 
         if (isMobile) {
-            cssPromises.push(fetch(FOLDER_URL + 'device-mobile.css').then(r => r.text()));
-            mapPromises.push(fetch(FOLDER_URL + 'device-mobile.css.map').then(r => r.text()));
+            cssPromises.push(fetch(FOLDER_URL + 'info-truyen/device-mobile.css').then(r => r.text()));
+            mapPromises.push(fetch(FOLDER_URL + 'info-truyen/device-mobile.css.map').then(r => r.text()));
         } else if (isTablet) {
-            cssPromises.push(fetch(FOLDER_URL + 'device-tablet.css').then(r => r.text()));
-            mapPromises.push(fetch(FOLDER_URL + 'device-tablet.css.map').then(r => r.text()));
+            cssPromises.push(fetch(FOLDER_URL + 'info-truyen/device-tablet.css').then(r => r.text()));
+            mapPromises.push(fetch(FOLDER_URL + 'info-truyen/device-tablet.css.map').then(r => r.text()));
         } else if (isDesktop) {
-            cssPromises.push(fetch(FOLDER_URL + 'device-desktop.css').then(r => r.text()));
-            mapPromises.push(fetch(FOLDER_URL + 'device-desktop.css.map').then(r => r.text()));
+            cssPromises.push(fetch(FOLDER_URL + 'info-truyen/device-desktop.css').then(r => r.text()));
+            mapPromises.push(fetch(FOLDER_URL + 'info-truyen/device-desktop.css.map').then(r => r.text()));
         }
 
         return Promise.all([...cssPromises, ...mapPromises]).then(results => {
@@ -217,8 +217,8 @@
 
             // Fetch CSS and source map simultaneously
             Promise.all([
-                fetch(FOLDER_URL + 'portrait.css').then(r => r.text()),
-                fetch(FOLDER_URL + 'portrait.css.map').then(r => r.text())
+                fetch(FOLDER_URL + 'info-truyen/portrait.css').then(r => r.text()),
+                fetch(FOLDER_URL + 'info-truyen/portrait.css.map').then(r => r.text())
             ])
             .then(([css, mapContent]) => {
                 // Convert source map to data URL
@@ -492,8 +492,8 @@
         // Thêm styles
         // Fetch CSS and source map simultaneously
         Promise.all([
-            fetch(FOLDER_URL + 'thumbnail-overlay.css').then(r => r.text()),
-            fetch(FOLDER_URL + 'thumbnail-overlay.css.map').then(r => r.text())
+            fetch(FOLDER_URL + 'info-truyen/hmt-thumbnail-overlay.css').then(r => r.text()),
+            fetch(FOLDER_URL + 'info-truyen/hmt-thumbnail-overlay.css.map').then(r => r.text())
         ])
         .then(([css, mapContent]) => {
             // Convert source map to data URL
@@ -520,7 +520,7 @@
             debugLog('Đã thêm hiệu ứng thumbnail mờ dần với Blob URL và inline source mapping');
         })
         .catch(error => {
-            debugLog('Lỗi khi tải thumbnail-overlay.css hoặc source map:', error);
+            debugLog('Lỗi khi tải info-truyen/hmt-thumbnail-overlay.css hoặc source map:', error);
         });
         
         // Thêm phần tử vào DOM với double check
@@ -542,8 +542,8 @@
     function addTransparentTopCSS() {
         // Fetch CSS and source map simultaneously
         Promise.all([
-            fetch(FOLDER_URL + 'transparent-top.css').then(r => r.text()),
-            fetch(FOLDER_URL + 'transparent-top.css.map').then(r => r.text())
+            fetch(FOLDER_URL + 'info-truyen/transparent-top.css').then(r => r.text()),
+            fetch(FOLDER_URL + 'info-truyen/transparent-top.css.map').then(r => r.text())
         ])
         .then(([css, mapContent]) => {
             // Convert source map to data URL
@@ -565,7 +565,7 @@
             debugLog('Đã thêm CSS phần trên trong suốt với Blob URL và inline source mapping');
         })
         .catch(error => {
-            debugLog('Lỗi khi tải transparent-top.css hoặc source map:', error);
+            debugLog('Lỗi khi tải info-truyen/transparent-top.css hoặc source map:', error);
         });
     }
 
