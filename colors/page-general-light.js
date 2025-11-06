@@ -761,7 +761,7 @@
             }
                 
             .profile-feature .profile-function.at-mobile {
-                border-top-color: ${palette[800]} !important;
+                border-top-color: ${palette[1000]} !important;
             }
 
             .tns-nav .tns-nav-active {
@@ -1282,7 +1282,7 @@
             }
 
             .profile-feature .profile-function.at-mobile {
-                border-top-color: ${defaultPalette[800]} !important;
+                border-top-color: ${defaultPalette[1000]} !important;
             }
 
             .tns-nav .tns-nav-active {
