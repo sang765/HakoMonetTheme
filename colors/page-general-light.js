@@ -772,7 +772,8 @@
                 background-color: ${defaultPalette[800]} !important;
             }
 
-            .popular-thumb-item .thumb-detail {
+            .popular-thumb-item .thumb-detail,
+            .feature-item .thumb-detail {
                 background: linear-gradient(180deg,transparent 0,${MonetAPI.paletteToRgba(defaultPalette, 500, .8)} 67%,${MonetAPI.paletteToRgba(defaultPalette, 800, .8)});
             }
 
@@ -1274,6 +1275,19 @@
 
             .profile-feature .profile-function.at-mobile {
                 border-top-color: ${defaultPalette[800]} !important;
+            }
+
+            .tns-nav .tns-nav-active {
+                background-color: ${defaultPalette[500]} !important;
+            }
+
+            .tns-nav button {
+                background-color: ${defaultPalette[800]} !important;
+            }
+
+            .popular-thumb-item .thumb-detail,
+            .feature-item .thumb-detail {
+                background: linear-gradient(180deg,transparent 0,${MonetAPI.paletteToRgba(defaultPalette, 500, .8)} 67%,${MonetAPI.paletteToRgba(defaultPalette, 800, .8)});
             }
         `;
 
