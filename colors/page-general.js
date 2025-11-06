@@ -1244,9 +1244,13 @@
             }
 
             .rank-circle-item:first-of-type .rank-number,
-            .rank-circle-item:first-of-type .series-detail,
             .rank-circle-item:first-of-type .series-title {
                 background-color: ${palette[500]} !important;
+                color: ${textColor} !important;
+            }
+
+            .rank-circle-item:first-of-type .series-detail {
+                color: ${palette[500]} !important;
             }
         `;
 
@@ -1796,9 +1800,13 @@
             }
 
             .rank-circle-item:first-of-type .rank-number,
-            .rank-circle-item:first-of-type .series-detail,
             .rank-circle-item:first-of-type .series-title {
                 background-color: ${defaultPalette[500]} !important;
+                color: ${textColor} !important;
+            }
+
+            .rank-circle-item:first-of-type .series-detail {
+                color: ${defaultPalette[500]} !important;
             }
         `;
 
