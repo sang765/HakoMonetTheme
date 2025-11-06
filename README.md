@@ -60,7 +60,7 @@
 > Chi tiết bạn có thể đọc [Tampermonkey FAQ #209](https://www.tampermonkey.net/faq.php?locale=en#Q209) nếu bạn biết Tiếng Anh.
 
 ### Bước 2: Cài đặt script
-Nhấp vào [raw userscript](https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/HakoMonetTheme.user.js) và nhấn "Install"  
+Nhấp vào [raw userscript](https://sang765.github.io/HakoMonetTheme/HakoMonetTheme.user.js) và nhấn "Install"  
 ![Install Userscript](/.github/assets/Install_us.jpg)
 
 ### Bước 3: Cấp quyền cross-origin cho userscript
