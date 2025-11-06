@@ -143,6 +143,36 @@ Nếu bạn gặp vấn đề hoặc có đề xuất cải tiến, vui lòng:
 
 </div>
 
+## ❓ Hỏi đáp thường gặp ("mà không ai hỏi :)))") ❓
+
+<div align="left">
+
+### 1. Script này có an toàn không?
+- Có, script này chỉ thay đổi giao diện người dùng và không thu thập dữ liệu cá nhân. Và source code ở đây thì bạn lo lắng gì nữa đúng không?
+
+### 2. Làm thế nào để báo cáo lỗi?
+- Bạn có thể tạo một issue mới trên GitHub và mô tả chi tiết về lỗi bạn gặp phải.
+
+### 3. Script có hỗ trợ nhiều ngôn ngữ không?
+- Hiện tại, script chỉ hỗ trợ tiếng Việt. Nói thẳng ra là thằng chủ repository nó bị ngu nên không biết viết multilanguage :v
+
+### 4. Tôi có thể tùy chỉnh màu sắc không?
+- Màu sắc được tự động phân tích từ ảnh bìa truyện, tuy nhiên bạn có thể điều chỉnh một số cài đặt trong phần "Cài đặt Userscript".
+
+### 5. Script có hoạt động trên tất cả các trình duyệt không?
+- Script được thiết kế để hoạt động trên các trình duyệt hỗ trợ Tampermonkey hoặc Violentmonkey.
+
+### 6. Tôi có thể sử dụng script này trên điện thoại không?
+- Có, script hoạt động trên cả trình duyệt di động hỗ trợ extension để cài đặt script manager.
+
+### 7. Vậy trình duyệt nào hỗ trợ extension trên điện thoại?
+- Hmm... Android bên chromium thì có Kiwi Browser, Yandex Browser, v.v... Còn iOS thì có iCab Mobile, Aloha Browser, v.v...
+
+### 8. Làm thế nào để tắt script nếu tôi không muốn sử dụng nữa?
+- Bạn có thể tắt hoặc gỡ bỏ script thông qua dashboard của Tampermonkey/Violentmonkey.
+
+</div>
+
 ## 📜 License 📜
 
 <div align="center">

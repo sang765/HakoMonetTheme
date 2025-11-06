@@ -777,8 +777,7 @@
                 background: linear-gradient(180deg,transparent 0,${MonetAPI.paletteToRgba(palette, 500, .8)} 67%,${MonetAPI.paletteToRgba(palette, 800, .8)});
             }
 
-            .rank-circle-item:first-of-type .rank-number,
-            .rank-circle-item:first-of-type .series-title {
+            .rank-circle-item:first-of-type .rank-number {
                 background-color: ${palette[500]} !important;
                 color: ${textColor} !important;
             }
@@ -1299,8 +1298,7 @@
                 background: linear-gradient(180deg,transparent 0,${MonetAPI.paletteToRgba(defaultPalette, 500, .8)} 67%,${MonetAPI.paletteToRgba(defaultPalette, 800, .8)});
             }
 
-            .rank-circle-item:first-of-type .rank-number,
-            .rank-circle-item:first-of-type .series-title {
+            .rank-circle-item:first-of-type .rank-number {
                 background-color: ${defaultPalette[500]} !important;
                 color: ${textColor} !important;
             }
