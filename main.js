@@ -48,6 +48,7 @@
             const infoTruyenJS = GM_getResourceText('infoTruyenJS');
             const animationJS = GM_getResourceText('animationJS');
             const monetAPIJS = GM_getResourceText('monetAPIJS');
+            const monetTestJS = GM_getResourceText('monetTestJS');
             const tagColorJS = GM_getResourceText('tagColorJS');
             const colorinfotruyen = GM_getResourceText('colorinfotruyen');
             const imageAnalyzerJS = GM_getResourceText('imageAnalyzerJS');
@@ -78,6 +79,7 @@
             loadScript(infoTruyenJS, 'info-truyen.js');
             loadScript(tagColorJS, 'tag-color.js');
             loadScript(monetAPIJS, 'monet.js');
+            loadScript(monetTestJS, 'monet-test.js');
             loadScript(animationJS, 'animation.js');
             loadScript(monetJS, 'monet.js');
             loadScript(configJS, 'config.js');

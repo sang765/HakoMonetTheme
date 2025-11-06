@@ -1,4 +1,4 @@
-# MonetAPI v2.0 - Hướng Dẫn Hệ Thống Màu Nâng Cao
+# MonetAPI v2.0 (Mới) - Hướng Dẫn Hệ Thống Màu Nâng Cao
 
 ## 🚀 Tổng Quan MonetAPI v2.0
 
@@ -16,7 +16,7 @@ MonetAPI v2.0 là phiên bản nâng cấp toàn diện của hệ thống màu 
 ```
 api/
 ├── monet.js              # MonetAPI v2.0-integrated (V1 + V2 combined)
-└── monet-test.js        # Comprehensive test suite
+└── monet-test.js        # Dùng để kiểm tra tính tương thích của trình duyệt với MonetAPI
 ```
 
 ---
