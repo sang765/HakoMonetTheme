@@ -1248,7 +1248,7 @@
                 color: ${textColor} !important;
             }
 
-            .rank-circle-item:first-of-type .series-detail {
+            .rank-cirle .rank-circle-item:first-of-type .series-detail, .rank-cirle .rank-circle-item:first-of-type .series-title {
                 color: ${palette[500]} !important;
             }
         `;
