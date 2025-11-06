@@ -448,7 +448,7 @@ const formatted = MonetAPIWrapper.formatColor('#3F51B5', 'rgb');
 
 ---
 
-## ⚡ Performance Optimization v2.0
+## ⚡ Tối ưu hóa khi sử dụng API v2.0
 
 ### 1. Caching Strategy
 
