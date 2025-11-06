@@ -853,8 +853,13 @@
               color: ${textColor};
             }
 
-            .statistic-list, .feature-section .summary-wrapper, .statistic-list .block-wide.at-mobile {
+            .statistic-list, .feature-section .summary-wrapper,
+            .statistic-list .block-wide.at-mobile {
                 border-top-color: ${palette[200]} !important;
+            }
+
+            .statistic-list .block-wide.at-mobile {
+                border-bottom-color: ${palette[200]} !important;
             }
         `;
 
@@ -1135,8 +1140,13 @@
               color: ${textColor};
             }
 
-            .statistic-list, .feature-section .summary-wrapper, .statistic-list .block-wide.at-mobile {
+            .statistic-list, .feature-section .summary-wrapper,
+            .statistic-list .block-wide.at-mobile {
                 border-top-color: ${defaultPalette[200]} !important;
+            }
+
+            .statistic-list .block-wide.at-mobile {
+                border-bottom-color: ${defaultPalette[200]} !important;
             }
         `;
 

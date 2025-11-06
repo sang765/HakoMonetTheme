@@ -95,20 +95,14 @@ Nếu bạn gặp vấn đề hoặc có đề xuất cải tiến, vui lòng:
 
 <div align="left">
 
-Sau khi cài đặt, script sẽ tự động kích hoạt khi bạn truy cập:
-- Trang chi tiết truyện (`/truyen/*`)
-- Trang sáng tác (`/sang-tac/*`)
-- Trang AI dịch (`/ai-dich/*`)
+### Với người dùng phổ thông:  
+- Chỉ cần vào trang web và tận hưởng thành quả. Nếu cần update màu theme chỉ cần mở script manager extension của bạn lên rồi click "Menu chính > Cài đặt".   
 
-Màu sắc chủ đề sẽ được tự động điều chỉnh dựa trên ảnh bìa của truyện bạn đang xem.
-
-### 🚫 Ad Popup Blocker
-
-Script cung cấp tính năng chặn quảng cáo popup thông minh:
-- **Chặn**: Popup quảng cáo, promotional content, newsletter signup
-- **Cho phép**: Google Login, Facebook Login, Twitter Login, các popup đăng nhập khác
-- **Truy cập**: Click vào icon script → "🚫 Ad Popup Blocker"
-- **Tùy chỉnh**: Thêm URL vào whitelist để cho phép popup cụ thể
+### Với devenloper và phát triển repository:
+- Vui lòng dọc:
+ - [Hướng dẫn API chung](./docs/monet-api-guide.md)
+ - [Hướng dẫn sử dụng MonetAPI v1](./docs/monet-api-v1-guide.md)
+ - [Hướng dẫn sử dụng MonetAPI v2](./docs/monet-api-v2-guide.md)
 
 </div>
 

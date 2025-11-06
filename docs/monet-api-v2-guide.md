@@ -1,16 +1,16 @@
-# MonetAPI v2.0 - Advanced Color System Guide
+# MonetAPI v2.0 - Hướng Dẫn Hệ Thống Màu Nâng Cao
 
 ## 🚀 Tổng Quan MonetAPI v2.0
 
 MonetAPI v2.0 là phiên bản nâng cấp toàn diện của hệ thống màu sắc HakoMonetTheme, cung cấp các tính năng nâng cao cho color science, performance optimization, và developer experience.
 
 ### ✨ Tính Năng v2.0
-- **🎨 Advanced Color Science**: HSL color models, color harmony analysis
-- **⚡ Performance & Caching**: Intelligent caching system với 5min TTL
-- **🎭 Smart Theme Integration**: Automatic system theme detection
-- **🔧 Developer Tools**: Debug panel, color analysis, live preview
-- **♿ Accessibility & Standards**: WCAG compliance checking, color blindness simulation
-- **🔄 Backward Compatible**: 100% compatible với v1.0 methods
+- **🎨 Khoa Học Màu Nâng Cao**: Mô hình màu HSL, phân tích sự hài hòa màu sắc
+- **⚡ Hiệu Suất & Bộ Nhớ Đệm**: Hệ thống bộ nhớ đệm thông minh với TTL 5 phút
+- **🎭 Tích Hợp Chủ Đề Thông Minh**: Phát hiện chủ đề hệ thống tự động
+- **🔧 Công Cụ Phát Triển**: Bảng điều khiển gỡ lỗi, phân tích màu, xem trước trực tiếp
+- **♿ Khả Năng Truy Cập & Tiêu Chuẩn**: Kiểm tra tuân thủ WCAG, mô phỏng mù màu
+- **🔄 Tương Thích Ngược**: 100% tương thích với các phương thức v1.0
 
 ### 📁 Cấu Trúc File Hiện Tại
 ```
@@ -21,7 +21,7 @@ api/
 
 ---
 
-## 🎯 Color Extraction Methods v2.0
+## 🎯 Phương Pháp Trích Xuất Màu v2.0
 
 ### 1. Sử Dụng API v2 để Trích Xuất HEX
 
@@ -142,7 +142,7 @@ const formattedHsla = MonetAPI.formatColor('#3F51B5', 'hsla');  // "hsla(239, 48
 
 ---
 
-## 🎨 Canvas API Integration
+## 🎨 Tích Hợp API Canvas
 
 ### Phân Tích Màu từ Image
 
@@ -216,12 +216,12 @@ function extractDominantColorFromImage(imageUrl) {
                     }
                 });
             } else {
-                reject(new Error('Could not extract dominant color'));
+                reject(new Error('Không thể trích xuất màu chủ đạo'));
             }
         };
         
         img.onerror = function() {
-            reject(new Error('Failed to load image'));
+            reject(new Error('Không thể tải hình ảnh'));
         };
         
         img.src = imageUrl;
@@ -239,7 +239,7 @@ extractDominantColorFromImage('https://example.com/image.jpg')
         GM_addStyle(theme);
     })
     .catch(error => {
-        console.error('Color extraction failed:', error);
+        console.error('Trích xuất màu thất bại:', error);
     });
 ```
 
@@ -307,13 +307,13 @@ const analysis = analyzeCanvasColors(canvas, {
     quantizeLevel: 16   // Quantization mịn hơn
 });
 
-console.log('Top colors:', analysis.dominantColors);
+console.log('Màu hàng đầu:', analysis.dominantColors);
 const palette = analysis.generatePalette();
 ```
 
 ---
 
-## 🔗 Integration v1.0 và v2.0
+## 🔗 Tích Hợp v1.0 và v2.0
 
 ### Migration Strategy
 
@@ -337,7 +337,7 @@ class HybridColorManager {
         try {
             this.v2Enhanced = MonetAPI.v2CreateEnhancedPalette(baseColor);
         } catch (error) {
-            console.warn('v2.0 not available, using v1.0 only');
+            console.warn('v2.0 không khả dụng, chỉ sử dụng v1.0');
             this.v2Enhanced = null;
         }
         
@@ -786,7 +786,7 @@ class ColorPerformanceMonitor {
 
 ---
 
-## 📊 API Reference v2.0
+## 📊 Tài Liệu API v2.0
 
 ### Core Color Extraction Methods
 ```javascript
@@ -837,16 +837,16 @@ MonetAPI.v2PreloadColors(colorArray)
 MonetAPI v2.0 cung cấp hệ thống trích xuất màu toàn diện với:
 
 ### ✨ Color Extraction Features
-- **🎨 Multiple Formats**: HEX, RGB, RGBA, HSL, HSLA extraction
-- **⚡ Canvas Integration**: Direct analysis from images and canvas
-- **🔄 v1.0 Compatibility**: Seamless integration with legacy methods
-- **🚀 Performance Optimized**: Intelligent caching and batch processing
-- **♿ Developer Friendly**: Comprehensive error handling and monitoring
+- **🎨 Nhiều Định Dạng**: Trích xuất HEX, RGB, RGBA, HSL, HSLA
+- **⚡ Tích Hợp Canvas**: Phân tích trực tiếp từ hình ảnh và canvas
+- **🔄 Tương Thích v1.0**: Tích hợp liền mạch với các phương thức cũ
+- **🚀 Tối Ưu Hiệu Suất**: Bộ nhớ đệm thông minh và xử lý hàng loạt
+- **♿ Thân Thiện Với Nhà Phát Triển**: Xử lý lỗi toàn diện và giám sát
 
 ### 🎯 Use Cases
-- **Image Processing**: Extract dominant colors from images
-- **Theme Generation**: Create cohesive color schemes
-- **Design Systems**: Consistent color management across components
-- **Performance**: Optimized for high-frequency color operations
+- **Xử Lý Hình Ảnh**: Trích xuất màu chủ đạo từ hình ảnh
+- **Tạo Chủ Đề**: Tạo các bảng màu gắn kết
+- **Hệ Thống Thiết Kế**: Quản lý màu nhất quán trên các thành phần
+- **Hiệu Suất**: Tối ưu cho các hoạt động màu có tần suất cao
 
 MonetAPI v2.0 sẵn sàng để xử lý mọi nhu cầu về màu sắc trong các ứng dụng hiện đại!
