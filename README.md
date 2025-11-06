@@ -140,10 +140,11 @@ Script cung cấp tính năng chặn quảng cáo popup thông minh:
 <div align="left">
 
 - Sử dụng Canvas API để phân tích màu sắc ảnh
-- ~~Ưu tiên màu tóc nhân vật để tạo palette~~
-Sử dụng pick màu truyền thống nhưng không pick màu quá sáng và quá tối.
-- Material You color scheme algorithm
+- **MonetAPI v2.0-Integrated**: Hệ thống quản lý màu sắc nâng cao với caching và accessibility
+- Material You color scheme algorithm với V1/V2 compatibility
 - **Ad Popup Blocker**: Chặn quảng cáo popup, bảo vệ Google/Facebook Login
+- **Color Harmony & Accessibility**: Phân tích và tạo color schemes tương hợp
+- **Theme Detection**: Tự động phát hiện dark/light mode
 - Modular architecture dễ bảo trì và mở rộng
 
 </div>
