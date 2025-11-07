@@ -57,7 +57,7 @@
                     })
                     .catch(error => {
                         debugLog('Error getting color from thumbnail:', error);
-                        applyCurrentColorScheme();
+                        applyConfigColor();
                     });
                 return;
             }
@@ -119,7 +119,7 @@
             }
 
             // Áp dụng lại màu dựa trên cài đặt mới
-            applyCurrentColorScheme();
+            applyConfigColor();
         });
 
         debugLog('Set up color change listener');
@@ -219,16 +219,8 @@
         debugLog('CORS handling ready');
     }
 
-    function applyCurrentColorScheme() {
-        const extractFromAvatar = window.HMTConfig && window.HMTConfig.getExtractColorFromAvatar ?
-            window.HMTConfig.getExtractColorFromAvatar() : false;
-
-        if (extractFromAvatar) {
-            debugLog('Trích xuất màu từ avatar được bật, áp dụng màu từ avatar');
-            applyAvatarColorScheme();
-            return;
-        }
-
+    // Hàm áp dụng màu từ config (không bao gồm avatar)
+    function applyConfigColor() {
         const defaultColor = window.HMTConfig ? window.HMTConfig.getDefaultColor() : '#FCE4EC'; // Get color from config or fallback
 
         debugLog('Applying light color scheme with config color:', defaultColor);
@@ -250,6 +242,20 @@
         debugLog('Is light color?', isLightColor);
 
         applyMonetColorScheme(monetPalette, isLightColor);
+    }
+
+    function applyCurrentColorScheme() {
+        const extractFromAvatar = window.HMTConfig && window.HMTConfig.getExtractColorFromAvatar ?
+            window.HMTConfig.getExtractColorFromAvatar() : false;
+
+        if (extractFromAvatar) {
+            debugLog('Trích xuất màu từ avatar được bật, áp dụng màu từ avatar');
+            applyAvatarColorScheme();
+            return;
+        }
+
+        // Sử dụng hàm applyConfigColor thay vì duplicate code
+        applyConfigColor();
     }
 
     // Hàm thiết lập theo dõi thay đổi avatar
@@ -282,7 +288,7 @@
                             debugLog('Tự động cập nhật màu sắc từ avatar mới');
                             // Đợi một chút để đảm bảo ảnh đã load xong
                             setTimeout(() => {
-                                applyCurrentColorScheme();
+                                applyConfigColor();
                             }, 1500);
                         }
 
@@ -309,14 +315,14 @@
         const avatarElement = document.querySelector('.nav-user_avatar img');
         if (!avatarElement) {
             debugLog('Không tìm thấy avatar element, fallback về màu config');
-            applyCurrentColorScheme();
+            applyConfigColor();
             return;
         }
 
         const avatarSrc = avatarElement.src || avatarElement.getAttribute('data-src');
         if (!avatarSrc) {
             debugLog('Avatar không có src, fallback về màu config');
-            applyCurrentColorScheme();
+            applyConfigColor();
             return;
         }
 
@@ -329,7 +335,7 @@
 
                 if (!isValidColor(dominantColor)) {
                     debugLog('Màu từ avatar không hợp lệ, fallback về màu config');
-                    applyCurrentColorScheme();
+                    applyConfigColor();
                     return;
                 }
 
@@ -343,7 +349,7 @@
             })
             .catch(error => {
                 debugLog('Lỗi khi phân tích màu từ avatar:', error);
-                applyCurrentColorScheme(); // Fallback to config color
+                applyConfigColor(); // Fallback to config color
             });
     }
 

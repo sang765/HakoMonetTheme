@@ -1342,8 +1342,17 @@ ${!isInfoPage() ? `
                  return;
              }
 
-             const defaultColor = '#206452';
-             debugLog('Reset màu về mặc định (preview):', defaultColor);
+             debugLog('Reset tất cả cài đặt về mặc định');
+
+             // Reset tất cả cài đặt về giá trị mặc định
+             const defaultColor = '#063c30'; // Sử dụng giá trị mặc định thực tế
+             const defaultSettings = {
+                 default_color: defaultColor,
+                 hide_domain_warning: false,
+                 disable_colors_on_reading_page: false,
+                 color_mode: 'default',
+                 extract_color_from_avatar: false
+             };
 
              // Cập nhật preview color
              previewColor = defaultColor;
@@ -1367,9 +1376,34 @@ ${!isInfoPage() ? `
              // Áp dụng màu preview ngay lập tức
              applyPreviewColor(defaultColor);
 
-             showNotification('Đã khôi phục màu mặc định!', 3000);
+             // Reset các toggle switches về mặc định
+             if (domainWarningToggle) {
+                 domainWarningToggle.checked = defaultSettings.hide_domain_warning;
+             }
+             if (readingPageToggle) {
+                 readingPageToggle.checked = defaultSettings.disable_colors_on_reading_page;
+             }
+             if (avatarColorToggle) {
+                 avatarColorToggle.checked = defaultSettings.extract_color_from_avatar;
+             }
 
-             debugLog('Đã cập nhật UI cho reset button:', defaultColor);
+             // Reset color mode dropdown
+             if (!isInfoPage()) {
+                 const colorModeSelect = dialog.querySelector('#hmt-color-mode-select');
+                 if (colorModeSelect) {
+                     colorModeSelect.value = defaultSettings.color_mode;
+                 }
+             }
+
+             // Hiển thị lại custom color picker nếu avatar extraction bị tắt
+             const customColorSection = dialog.querySelector('.hmt-custom-color');
+             if (customColorSection) {
+                 customColorSection.style.display = defaultSettings.extract_color_from_avatar ? 'none' : '';
+             }
+
+             showNotification('Đã khôi phục tất cả cài đặt về mặc định!', 3000);
+
+             debugLog('Đã reset tất cả cài đặt về mặc định');
          });
 
         // Domain warning toggle

@@ -70,7 +70,7 @@
                     })
                     .catch(error => {
                         debugLog('Lỗi khi lấy màu từ thumbnail:', error);
-                        applyCurrentColorScheme(); // Fallback to config color
+                        applyConfigColor(); // Fallback to config color
                     });
                 return;
             }
@@ -85,17 +85,8 @@
 
         debugLog('Khởi tạo PageGeneral cho trang không phải truyện');
 
-        // Hàm áp dụng màu sắc hiện tại
-        function applyCurrentColorScheme() {
-            const extractFromAvatar = window.HMTConfig && window.HMTConfig.getExtractColorFromAvatar ?
-                window.HMTConfig.getExtractColorFromAvatar() : false;
-
-            if (extractFromAvatar) {
-                debugLog('Trích xuất màu từ avatar được bật, áp dụng màu từ avatar');
-                applyAvatarColorScheme();
-                return;
-            }
-
+        // Hàm áp dụng màu từ config (không bao gồm avatar)
+        function applyConfigColor() {
             const defaultColor = window.HMTConfig && window.HMTConfig.getDefaultColor ?
                 window.HMTConfig.getDefaultColor() : '#063c30';
 
@@ -117,6 +108,21 @@
             applyMonetColorScheme(monetPalette, isLightColor);
         }
 
+        // Hàm áp dụng màu sắc hiện tại
+        function applyCurrentColorScheme() {
+            const extractFromAvatar = window.HMTConfig && window.HMTConfig.getExtractColorFromAvatar ?
+                window.HMTConfig.getExtractColorFromAvatar() : false;
+
+            if (extractFromAvatar) {
+                debugLog('Trích xuất màu từ avatar được bật, áp dụng màu từ avatar');
+                applyAvatarColorScheme();
+                return;
+            }
+
+            // Sử dụng hàm applyConfigColor thay vì duplicate code
+            applyConfigColor();
+        }
+
         // Hàm áp dụng màu từ avatar
         function applyAvatarColorScheme() {
             debugLog('Bắt đầu trích xuất màu từ avatar');
@@ -125,14 +131,14 @@
             const avatarElement = document.querySelector('.nav-user_avatar img');
             if (!avatarElement) {
                 debugLog('Không tìm thấy avatar element, fallback về màu config');
-                applyCurrentColorScheme();
+                applyConfigColor();
                 return;
             }
 
             const avatarSrc = avatarElement.src || avatarElement.getAttribute('data-src');
             if (!avatarSrc) {
                 debugLog('Avatar không có src, fallback về màu config');
-                applyCurrentColorScheme();
+                applyConfigColor();
                 return;
             }
 
@@ -145,7 +151,7 @@
 
                     if (!isValidColor(dominantColor)) {
                         debugLog('Màu từ avatar không hợp lệ, fallback về màu config');
-                        applyCurrentColorScheme();
+                        applyConfigColor();
                         return;
                     }
 
@@ -155,7 +161,7 @@
                 })
                 .catch(error => {
                     debugLog('Lỗi khi phân tích màu từ avatar:', error);
-                    applyCurrentColorScheme(); // Fallback to config color
+                    applyConfigColor(); // Fallback to config color
                 });
         }
 
@@ -240,7 +246,7 @@
                                 })
                                 .catch(error => {
                                     debugLog('Lỗi khi áp dụng màu thumbnail:', error);
-                                    applyCurrentColorScheme();
+                                    applyConfigColor();
                                     addOverlay();
                                 });
                         }
@@ -306,7 +312,7 @@
                         }
                     } else {
                         debugLog('Chế độ default, áp dụng lại màu từ config');
-                        applyCurrentColorScheme();
+                        applyConfigColor();
                         addOverlay();
                     }
                 }
