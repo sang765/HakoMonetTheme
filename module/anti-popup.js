@@ -139,12 +139,16 @@
 
     // Override window.open to block only advertisement popups
     function overrideWindowOpen() {
-        if (window._originalWindowOpen) return; // Already overridden
+        if (window._originalWindowOpen) {
+            debugLog('Window.open already overridden, skipping');
+            return; // Already overridden
+        }
 
+        debugLog('Overriding window.open...');
         window._originalWindowOpen = window.open;
-        
+
         window.open = function(url, name, features) {
-            debugLog('Window.open called:', url, name, features);
+            debugLog('Window.open called:', { url, name, features });
 
             // Check whitelist first
             if (url && isWhitelisted(url)) {
@@ -160,18 +164,18 @@
 
             // Block advertisement popups
             if (isAdPopup(url, name)) {
-                debugLog('Ad popup blocked:', url, name, features);
+                debugLog('Ad popup blocked:', { url, name, features });
                 incrementBlockedCount();
                 showNotification(`Đã chặn quảng cáo popup: ${url || 'Unknown'}`, 3000);
                 return null;
             }
 
             // Allow other popups by default (could be functional popups)
-            debugLog('Popup allowed (functional):', url, name);
+            debugLog('Popup allowed (functional):', { url, name });
             return window._originalWindowOpen(url, name, features);
         };
 
-        debugLog('Window.open đã bị override (ad popup only)');
+        debugLog('Window.open has been overridden (ad popup only)');
     }
 
     // Restore original window.open
@@ -209,15 +213,19 @@
     // Block advertisement popups based on selectors
     function blockPopupTriggers() {
         try {
+            debugLog('Starting to block popup triggers...');
             let blockedCount = 0;
 
             SELECTORS.forEach(selector => {
                 const elements = document.querySelectorAll(selector);
+                debugLog(`Found ${elements.length} elements for selector: ${selector}`);
+
                 elements.forEach(element => {
                     // Skip if already processed or hidden
                     if (element.getAttribute('data-anti-popup-processed') === 'true' ||
                         element.style.display === 'none' ||
                         element.offsetParent === null) {
+                        debugLog('Element already processed or hidden, skipping:', element);
                         return;
                     }
 
@@ -226,6 +234,8 @@
                         debugLog('Safe popup element skipped:', selector, element);
                         return;
                     }
+
+                    debugLog('Processing popup trigger element:', { selector, element, href: element.href, onclick: element.onclick });
 
                     // Store original attributes
                     const originalOnclick = element.getAttribute('onclick') || element.onclick;
@@ -242,6 +252,8 @@
 
                     // Add our own handler to block popup
                     element.addEventListener('click', function blockPopupHandler(e) {
+                        debugLog('Popup trigger clicked:', { href: this.href, element: this });
+
                         // Check if this should be allowed
                         const href = this.href || '';
                         if (isWhitelisted(href) || isSafeElement(this)) {
@@ -253,7 +265,7 @@
                         e.stopPropagation();
                         e.stopImmediatePropagation();
 
-                        debugLog('Ad popup trigger blocked:', selector, element);
+                        debugLog('Ad popup trigger blocked:', { selector, element, href });
                         incrementBlockedCount();
 
                         showNotification(`Đã chặn quảng cáo popup: ${href || 'unknown'}`, 3000);
@@ -265,10 +277,7 @@
                 });
             });
 
-            if (blockedCount > 0) {
-                debugLog(`Blocked ${blockedCount} advertisement popup triggers`);
-            }
-
+            debugLog(`Blocked ${blockedCount} advertisement popup triggers total`);
             return blockedCount;
         } catch (error) {
             debugLog('Error blocking popup triggers:', error);
@@ -279,10 +288,12 @@
     // Enable anti-popup functionality
     function enableAntiPopup() {
         try {
+            debugLog('Enabling Anti-Popup functionality...');
             overrideWindowOpen();
             blockPopupTriggers();
             observeDynamicElements();
             showNotification('Anti-Popup đã được bật', 3000);
+            debugLog('Anti-Popup functionality enabled successfully');
         } catch (error) {
             debugLog('Error enabling anti-popup:', error);
         }
@@ -332,11 +343,17 @@
     // Observe for dynamically added elements
     function observeDynamicElements() {
         if (typeof MutationObserver === 'undefined') {
+            debugLog('MutationObserver not supported, skipping dynamic element observation');
             return;
         }
 
+        debugLog('Setting up dynamic element observer...');
+
         const observer = new MutationObserver(function(mutations) {
-            if (!isAntiPopupEnabled()) return;
+            if (!isAntiPopupEnabled()) {
+                debugLog('Anti-popup disabled, skipping mutation processing');
+                return;
+            }
 
             let shouldCheckPopups = false;
 
@@ -345,6 +362,7 @@
                     mutation.addedNodes.forEach(node => {
                         if (node.nodeType === 1) { // Element node
                             if (SELECTORS.some(selector => node.matches?.(selector) || node.querySelector?.(selector))) {
+                                debugLog('Dynamic element matches popup selector:', { node, selector });
                                 shouldCheckPopups = true;
                             }
                         }
@@ -353,8 +371,10 @@
             });
 
             if (shouldCheckPopups) {
+                debugLog('Dynamic elements detected, checking for popups in 100ms...');
                 setTimeout(() => {
                     if (isAntiPopupEnabled()) {
+                        debugLog('Re-checking popup triggers for dynamic elements');
                         blockPopupTriggers();
                     }
                 }, 100);
@@ -1101,8 +1121,14 @@ Kiểm tra lại: Các popup bị chặn sẽ không hiển thị.
 
     // Initialize anti-popup
     function initializeAntiPopup() {
+        debugLog('Initializing Anti-Popup...');
+        debugLog('Anti-Popup enabled status:', isAntiPopupEnabled());
+
         if (isAntiPopupEnabled()) {
+            debugLog('Enabling Anti-Popup functionality');
             enableAntiPopup();
+        } else {
+            debugLog('Anti-Popup is disabled, skipping initialization');
         }
 
         debugLog('Anti-Popup initialized');
@@ -1122,6 +1148,7 @@ Kiểm tra lại: Các popup bị chặn sẽ không hiển thị.
     };
 
     // Initialize when module loads
+    debugLog('Anti-Popup module loading, initializing...');
     initializeAntiPopup();
 
     debugLog('Anti-Popup module đã được tải');
