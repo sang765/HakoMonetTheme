@@ -26,6 +26,16 @@
     // Cached CSS blob URL to avoid repeated fetches
     let cachedCssBlobUrl = null;
 
+    // Coloris library URLs (local versions for userscript compatibility)
+    const COLORIS_CSS_URL = 'https://sang765.github.io/HakoMonetTheme/api/coloris.min.css';
+    const COLORIS_JS_URL = 'https://sang765.github.io/HakoMonetTheme/api/coloris.min.js';
+    const COLORIS_COLORS_URL = 'https://sang765.github.io/HakoMonetTheme/api/coloris-colors.json';
+
+    // Cached Coloris resources
+    let cachedColorisCss = null;
+    let cachedColorisJs = null;
+    let cachedColorisColors = null;
+
     function debugLog(...args) {
         if (DEBUG && typeof window.Logger !== 'undefined') {
             window.Logger.log('config', ...args);
@@ -679,6 +689,86 @@
         });
     }
 
+    /**
+     * Loads Coloris library resources locally for userscript compatibility
+     */
+    function loadColorisLibrary() {
+        return new Promise((resolve, reject) => {
+            // Check if Coloris is already loaded
+            if (typeof Coloris !== 'undefined') {
+                debugLog('Coloris already loaded');
+                resolve();
+                return;
+            }
+
+            // Load Coloris resources simultaneously
+            Promise.all([
+                fetch(COLORIS_CSS_URL).then(r => r.text()).catch(() => {
+                    debugLog('Failed to load Coloris CSS, using fallback');
+                    return cachedColorisCss || '';
+                }),
+                fetch(COLORIS_JS_URL).then(r => r.text()).catch(() => {
+                    debugLog('Failed to load Coloris JS, using fallback');
+                    return cachedColorisJs || '';
+                }),
+                fetch(COLORIS_COLORS_URL).then(r => r.json()).catch(() => {
+                    debugLog('Failed to load Coloris colors, using fallback');
+                    return cachedColorisColors || {};
+                })
+            ])
+            .then(([css, js, colors]) => {
+                // Cache the resources
+                cachedColorisCss = css;
+                cachedColorisJs = js;
+                cachedColorisColors = colors;
+
+                // Load CSS
+                if (css) {
+                    const style = document.createElement('style');
+                    style.textContent = css;
+                    style.id = 'coloris-styles';
+                    document.head.appendChild(style);
+                    debugLog('Coloris CSS loaded');
+                }
+
+                // Load JS
+                if (js) {
+                    try {
+                        // Execute Coloris JS in global scope
+                        (0, eval)(js);
+                        debugLog('Coloris JS loaded');
+
+                        // Configure Coloris with default settings
+                        if (typeof Coloris !== 'undefined') {
+                            Coloris({
+                                theme: 'default',
+                                themeMode: 'auto',
+                                format: 'hex',
+                                alpha: false,
+                                swatches: colors.map(color => color.value).slice(0, 12) || [
+                                    '#264653', '#2a9d8f', '#e9c46a', '#f4a261', '#e76f51',
+                                    '#d62828', '#023e8a', '#0077b6', '#0096c7', '#00b4d8', '#48cae4'
+                                ]
+                            });
+                            debugLog('Coloris configured');
+                        }
+
+                        resolve();
+                    } catch (error) {
+                        debugLog('Error executing Coloris JS:', error);
+                        reject(error);
+                    }
+                } else {
+                    reject(new Error('Coloris JS not available'));
+                }
+            })
+            .catch(error => {
+                debugLog('Error loading Coloris library:', error);
+                reject(error);
+            });
+        });
+    }
+
     function createConfigDialog() {
         // Kiểm tra xem dialog đã tồn tại chưa (kiểm tra ở top window để tránh duplicate trong iframe)
         if ((window.top || window).document.querySelector('.hmt-config-dialog')) {
@@ -687,6 +777,12 @@
 
         // Load and apply CSS styles
         loadAndApplyStyles();
+
+        // Load Coloris library for color picker functionality
+        loadColorisLibrary().catch(error => {
+            debugLog('Failed to load Coloris library:', error);
+            showNotification('Cảnh báo', 'Không thể tải thư viện chọn màu. Một số tính năng có thể không hoạt động.', 5000);
+        });
 
         const dialog = document.createElement('div');
         dialog.className = 'hmt-config-dialog';
@@ -757,7 +853,7 @@ ${!isInfoPage() ? `
                                     <div class="hmt-color-picker-wrapper">
                                         <div class="hmt-custom-color-picker" id="hmt-custom-color-input">
                                             <div class="hmt-color-picker-display">
-                                                <div class="hmt-color-preview" id="hmt-color-preview"></div>
+                                                <div class="hmt-color-preview" id="hmt-color-preview" data-coloris></div>
                                                 <span class="hmt-color-value" id="hmt-color-value">${currentColor}</span>
                                                 <button class="hmt-screen-color-picker-btn" title="Chọn màu từ màn hình">
                                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -999,6 +1095,42 @@ ${!isInfoPage() ? `
         const lightSlider = dialog.querySelector('#hmt-light-slider');
         const sliderButtons = dialog.querySelectorAll('.hmt-slider-btn');
         const screenColorPickerBtn = dialog.querySelector('.hmt-screen-color-picker-btn');
+
+        // Initialize Coloris on the color preview element
+        if (colorPreview && typeof Coloris !== 'undefined') {
+            debugLog('Initializing Coloris on color preview element');
+
+            // Set initial value
+            colorPreview.value = currentColor;
+
+            // Listen for Coloris color changes
+            document.addEventListener('coloris:pick', function(event) {
+                const selectedColor = event.detail.color;
+                debugLog('Coloris color selected:', selectedColor);
+
+                if (isValidHexColor(selectedColor)) {
+                    // Update preview color
+                    previewColor = selectedColor;
+
+                    // Update all UI elements
+                    syncUIWithColor(selectedColor);
+
+                    // Convert hex to HSL and update sliders
+                    const hsl = hexToHsl(selectedColor);
+                    currentHue = hsl.h;
+                    currentSat = hsl.s;
+                    currentLight = hsl.l;
+
+                    // Update slider values
+                    if (hueSlider) hueSlider.value = currentHue;
+                    if (satSlider) satSlider.value = currentSat;
+                    if (lightSlider) lightSlider.value = currentLight;
+
+                    // Apply preview color
+                    applyPreviewColor(selectedColor);
+                }
+            });
+        }
 
         // Hàm chuyển đổi HEX sang HSL
         function hexToHsl(hex) {

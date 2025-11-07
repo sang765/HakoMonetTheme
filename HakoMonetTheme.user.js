@@ -56,6 +56,9 @@
 // @resource     deviceCSSLoaderJS ./module/device-css-loader.js
 // @resource     html2canvasJS ./api/html2canvas.min.js
 // @resource     monetTestJS ./api/monet-test.js
+// @resource     colorisJS ./api/coloris.min.js
+// @resource     colorisCSS ./api/coloris.min.css
+// @resource     colorisColors ./api/coloris-colors.json
 // @connect      html2canvas.hertzen.com
 // @connect      hertzen.com
 // ==/UserScript==

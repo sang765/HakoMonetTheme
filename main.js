@@ -53,6 +53,9 @@
             const colorinfotruyen = GM_getResourceText('colorinfotruyen');
             const imageAnalyzerJS = GM_getResourceText('imageAnalyzerJS');
             const html2canvasJS = GM_getResourceText('html2canvasJS');
+            const colorisJS = GM_getResourceText('colorisJS');
+            const colorisCSS = GM_getResourceText('colorisCSS');
+            const colorisColors = GM_getResourceText('colorisColors');
             const configJS = GM_getResourceText('configJS');
             const adBlockerJS = GM_getResourceText('adBlockerJS');
             const antiPopupJS = GM_getResourceText('antiPopupJS');
@@ -76,6 +79,14 @@
             loadScript(themeDetectorJS, 'theme-detector.js');
             loadScript(imageAnalyzerJS, 'image-analyzer.js');
             loadScript(html2canvasJS, 'html2canvas.min.js');
+            loadScript(colorisJS, 'coloris.min.js');
+
+            // Load Coloris CSS
+            if (colorisCSS) {
+                GM_addStyle(colorisCSS);
+                debugLog('Đã tải Coloris CSS');
+            }
+
             loadScript(infoTruyenJS, 'info-truyen.js');
             loadScript(tagColorJS, 'tag-color.js');
             loadScript(monetAPIJS, 'monet.js');
