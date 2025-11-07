@@ -927,6 +927,25 @@
             .rank-cirle .rank-circle-item:first-of-type .series-detail, .rank-cirle .rank-circle-item:first-of-type .series-title {
                 color: ${palette[500]} !important;
             }
+
+            .topview-item:first-child {
+                background-color: ${palette[500]} !important;
+                color: ${textColor} !important;
+            }
+            .topview-item:first-child .topview_rank {
+                background-color: ${textColor} !important;
+                color: ${palette[500]} !important;
+            }
+            .topview-item:first-child .ranked-attr, .topview-item:first-child .series-name a{
+                color: ${textColor} !important;
+            }
+            .topview-item:first-child .series-name, .topview-item:nth-child(2) .series-name, .topview-item:nth-child(3) .series-name {
+                color: ${palette[500]} !important;
+            }
+            .topview-item:first-child .topview_rank, .topview-item:nth-child(2) .topview_rank, .topview-item:nth-child(3) .topview_rank {
+                background-color: ${palette[500]} !important;
+                color: ${textColor} !important;
+            }
         `;
 
         GM_addStyle(css);
@@ -1453,6 +1472,25 @@
 
             .rank-cirle .rank-circle-item:first-of-type .series-detail, .rank-cirle .rank-circle-item:first-of-type .series-title {
                 color: ${defaultPalette[500]} !important;
+            }
+
+            .topview-item:first-child {
+                background-color: ${defaultPalette[500]} !important;
+                color: ${textColor} !important;
+            }
+            .topview-item:first-child .topview_rank {
+                background-color: ${textColor} !important;
+                color: ${defaultPalette[500]} !important;
+            }
+            .topview-item:first-child .ranked-attr, .topview-item:first-child .series-name a{
+                color: ${textColor} !important;
+            }
+            .topview-item:first-child .series-name, .topview-item:nth-child(2) .series-name, .topview-item:nth-child(3) .series-name {
+                color: ${defaultPalette[500]} !important;
+            }
+            .topview-item:first-child .topview_rank, .topview-item:nth-child(2) .topview_rank, .topview-item:nth-child(3) .topview_rank {
+                background-color: ${defaultPalette[500]} !important;
+                color: ${textColor} !important;
             }
         `;
 
