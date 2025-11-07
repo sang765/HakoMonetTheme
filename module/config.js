@@ -1338,6 +1338,10 @@ ${!isInfoPage() ? `
 
         // Khôi phục mặc định
          resetBtn.addEventListener('click', function() {
+             if (!confirm('Bạn có chắc chắn muốn khôi phục cài đặt về mặc định?')) {
+                 return;
+             }
+
              const defaultColor = '#206452';
              debugLog('Reset màu về mặc định (preview):', defaultColor);
 
