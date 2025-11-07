@@ -795,7 +795,7 @@ ${!isInfoPage() ? `
                                                    id="hmt-custom-color-text"
                                                    value="${currentColor}"
                                                    class="hmt-color-text"
-                                                   placeholder="#17deb3">
+                                                   placeholder="#206452">
                                         </div>
                                         <span class="hmt-color-picker-label">Thanh trượt HSL</span>
                                     </div>
@@ -1338,7 +1338,7 @@ ${!isInfoPage() ? `
 
         // Khôi phục mặc định
          resetBtn.addEventListener('click', function() {
-             const defaultColor = '#17deb3';
+             const defaultColor = '#206452';
              debugLog('Reset màu về mặc định (preview):', defaultColor);
 
              // Cập nhật preview color
