@@ -1344,6 +1344,19 @@ ${!isInfoPage() ? `
              // Cập nhật preview color
              previewColor = defaultColor;
 
+             // Chuyển đổi hex sang HSL và cập nhật sliders
+             const hsl = hexToHsl(defaultColor);
+             currentHue = hsl.h;
+             currentSat = hsl.s;
+             currentLight = hsl.l;
+
+             debugLog('HSL values for reset:', hsl);
+
+             // Cập nhật giá trị sliders
+             if (hueSlider) hueSlider.value = currentHue;
+             if (satSlider) satSlider.value = currentSat;
+             if (lightSlider) lightSlider.value = currentLight;
+
              // Cập nhật tất cả các elements UI
              syncUIWithColor(defaultColor);
 
