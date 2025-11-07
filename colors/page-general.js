@@ -1344,9 +1344,14 @@
             }
 
             .statistic-top,
-            .detail-list .detail-list-item,
-            .profile-showcase header, ol.list-volume li {
+            .comment-item,
+            .profile-showcase header, ol.list-volume li,
+            .detail-list .detail-list-item {
                 border-bottom-color: ${palette[800]} !important;
+            }
+
+            .see-more_text {
+                border-top-color: ${palette[800]} !important;
             }
 
             .profile-feature .profile-function.at-mobile {
@@ -1898,9 +1903,14 @@
             }
 
             .statistic-top,
+            .comment-item,
             .profile-showcase header, ol.list-volume li,
             .detail-list .detail-list-item {
                 border-bottom-color: ${defaultPalette[800]} !important;
+            }
+
+            .see-more_text {
+                border-top-color: ${defaultPalette[800]} !important;
             }
 
             .profile-feature .profile-function.at-mobile {
