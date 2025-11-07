@@ -8,11 +8,246 @@
     let domObserver = null;
     let portraitCSSApplied = false;
     let orientationListenerAdded = false;
+
+    // CORS Proxy System Constants
+    const PROXY_SERVERS = [
+        'https://images.weserv.nl/?url=',
+        'https://api.allorigins.win/raw?url=',
+        'https://cors-anywhere.herokuapp.com/',
+        'https://corsproxy.io/?key=990f3464&url='
+    ];
+
+    const FALLBACK_CACHE_KEY = 'hmt-fallback-images';
+    const DEBUG_LEVELS = {
+        CORS_CHECK: 'cors_check',
+        PROXY_ATTEMPT: 'proxy_attempt',
+        FALLBACK_USED: 'fallback_used'
+    };
     
     function debugLog(...args) {
         if (DEBUG) {
             console.log('[InfoTruyen]', ...args);
         }
+    }
+
+    function debugLogWithLevel(level, ...args) {
+        if (DEBUG) {
+            console.log(`[InfoTruyen:${level}]`, ...args);
+        }
+    }
+
+    // Smart Time-Based Detection
+    function isCorsBlockedTime() {
+        const hour = new Date().getHours();
+        return hour >= 23 || hour < 5;
+    }
+
+    // Image Access Testing Function
+    async function testImageAccess(url, timeout = 5000) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            const timer = setTimeout(() => {
+                img.src = '';
+                resolve(false);
+            }, timeout);
+
+            img.onload = () => {
+                clearTimeout(timer);
+                resolve(true);
+            };
+
+            img.onerror = () => {
+                clearTimeout(timer);
+                resolve(false);
+            };
+
+            img.src = url;
+        });
+    }
+
+    // Gradient Fallback System
+    function createGradientFallback(width = 400, height = 600) {
+        // Create a beautiful gradient based on time of day
+        const hour = new Date().getHours();
+        let gradient;
+
+        if (hour >= 6 && hour < 12) {
+            // Morning - warm sunrise colors
+            gradient = 'linear-gradient(135deg, #FFE5B4 0%, #FFA07A 50%, #FF6347 100%)';
+        } else if (hour >= 12 && hour < 18) {
+            // Afternoon - bright and vibrant
+            gradient = 'linear-gradient(135deg, #87CEEB 0%, #98FB98 50%, #FFD700 100%)';
+        } else if (hour >= 18 && hour < 22) {
+            // Evening - sunset colors
+            gradient = 'linear-gradient(135deg, #FF4500 0%, #FF6347 50%, #8B0000 100%)';
+        } else {
+            // Night - cool dark colors
+            gradient = 'linear-gradient(135deg, #191970 0%, #4169E1 50%, #000080 100%)';
+        }
+
+        // Create canvas to generate base64
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+
+        // Create gradient
+        const grad = ctx.createLinearGradient(0, 0, width, height);
+        if (hour >= 6 && hour < 12) {
+            grad.addColorStop(0, '#FFE5B4');
+            grad.addColorStop(0.5, '#FFA07A');
+            grad.addColorStop(1, '#FF6347');
+        } else if (hour >= 12 && hour < 18) {
+            grad.addColorStop(0, '#87CEEB');
+            grad.addColorStop(0.5, '#98FB98');
+            grad.addColorStop(1, '#FFD700');
+        } else if (hour >= 18 && hour < 22) {
+            grad.addColorStop(0, '#FF4500');
+            grad.addColorStop(0.5, '#FF6347');
+            grad.addColorStop(1, '#8B0000');
+        } else {
+            grad.addColorStop(0, '#191970');
+            grad.addColorStop(0.5, '#4169E1');
+            grad.addColorStop(1, '#000080');
+        }
+
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, width, height);
+
+        return canvas.toDataURL('image/jpeg', 0.8);
+    }
+
+    // Local Storage Cache for Fallback Images
+    function getCachedFallback(key) {
+        try {
+            const cached = GM_getValue(FALLBACK_CACHE_KEY, {});
+            const item = cached[key];
+            if (item && item.expires > Date.now()) {
+                return item.data;
+            }
+            // Clean expired items
+            if (item) {
+                delete cached[key];
+                GM_setValue(FALLBACK_CACHE_KEY, cached);
+            }
+        } catch (error) {
+            debugLogWithLevel(DEBUG_LEVELS.FALLBACK_USED, 'Error accessing fallback cache:', error);
+        }
+        return null;
+    }
+
+    function setCachedFallback(key, data, ttlHours = 24) {
+        try {
+            const cached = GM_getValue(FALLBACK_CACHE_KEY, {});
+            cached[key] = {
+                data: data,
+                expires: Date.now() + (ttlHours * 60 * 60 * 1000)
+            };
+            GM_setValue(FALLBACK_CACHE_KEY, cached);
+        } catch (error) {
+            debugLogWithLevel(DEBUG_LEVELS.FALLBACK_USED, 'Error setting fallback cache:', error);
+        }
+    }
+
+    // Retry Mechanism with Exponential Backoff
+    async function retryWithBackoff(operation, maxRetries = 3, baseDelay = 1000) {
+        let lastError;
+
+        for (let attempt = 0; attempt <= maxRetries; attempt++) {
+            try {
+                return await operation();
+            } catch (error) {
+                lastError = error;
+                if (attempt < maxRetries) {
+                    const delay = baseDelay * Math.pow(2, attempt);
+                    debugLogWithLevel(DEBUG_LEVELS.PROXY_ATTEMPT, `Retry attempt ${attempt + 1} after ${delay}ms`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+        }
+
+        throw lastError;
+    }
+
+    // Main CORS-Safe Thumbnail Function
+    async function getCorsSafeThumbnail(originalUrl, options = {}) {
+        const {
+            width = 400,
+            height = 600,
+            timeout = 5000,
+            useCache = true
+        } = options;
+
+        debugLogWithLevel(DEBUG_LEVELS.CORS_CHECK, 'Getting CORS-safe thumbnail for:', originalUrl);
+
+        // Step 1: Check if it's CORS blocked time
+        if (isCorsBlockedTime()) {
+            debugLogWithLevel(DEBUG_LEVELS.CORS_CHECK, 'CORS blocked time detected, using fallback immediately');
+            const cacheKey = `fallback_${width}x${height}_${new Date().getHours()}`;
+            let fallbackUrl = useCache ? getCachedFallback(cacheKey) : null;
+
+            if (!fallbackUrl) {
+                fallbackUrl = createGradientFallback(width, height);
+                if (useCache) {
+                    setCachedFallback(cacheKey, fallbackUrl, 1); // Cache for 1 hour
+                }
+            }
+
+            debugLogWithLevel(DEBUG_LEVELS.FALLBACK_USED, 'Using time-based fallback');
+            return fallbackUrl;
+        }
+
+        // Step 2: Test original URL access
+        debugLogWithLevel(DEBUG_LEVELS.CORS_CHECK, 'Testing original URL access');
+        const originalAccessible = await testImageAccess(originalUrl, timeout);
+
+        if (originalAccessible) {
+            debugLogWithLevel(DEBUG_LEVELS.CORS_CHECK, 'Original URL accessible, using directly');
+            return originalUrl;
+        }
+
+        // Step 3: Try proxy servers with retry mechanism
+        for (const proxyUrl of PROXY_SERVERS) {
+            try {
+                const proxiedUrl = proxyUrl + encodeURIComponent(originalUrl);
+                debugLogWithLevel(DEBUG_LEVELS.PROXY_ATTEMPT, 'Trying proxy:', proxyUrl);
+
+                const accessible = await retryWithBackoff(
+                    () => testImageAccess(proxiedUrl, timeout),
+                    2, // maxRetries
+                    500 // baseDelay
+                );
+
+                if (accessible) {
+                    debugLogWithLevel(DEBUG_LEVELS.PROXY_ATTEMPT, 'Proxy successful:', proxyUrl);
+
+                    // Cache successful proxy URL for 24 hours
+                    if (useCache) {
+                        const cacheKey = `proxy_${btoa(originalUrl).substring(0, 16)}`;
+                        setCachedFallback(cacheKey, proxiedUrl, 24);
+                    }
+
+                    return proxiedUrl;
+                }
+            } catch (error) {
+                debugLogWithLevel(DEBUG_LEVELS.PROXY_ATTEMPT, 'Proxy failed:', proxyUrl, error.message);
+                continue;
+            }
+        }
+
+        // Step 4: Final fallback - gradient image
+        debugLogWithLevel(DEBUG_LEVELS.FALLBACK_USED, 'All proxies failed, using gradient fallback');
+        const cacheKey = `fallback_${width}x${height}_${new Date().getHours()}`;
+        let fallbackUrl = useCache ? getCachedFallback(cacheKey) : null;
+
+        if (!fallbackUrl) {
+            fallbackUrl = createGradientFallback(width, height);
+            if (useCache) {
+                setCachedFallback(cacheKey, fallbackUrl, 1);
+            }
+        }
+
+        return fallbackUrl;
     }
     
     function initInfoTruyen() {
@@ -386,10 +621,14 @@
             }
 
             // Tất cả điều kiện đã sẵn sàng
-            applyThumbnailEffects(coverUrl);
-            cleanupObserver();
+            applyThumbnailEffects(coverUrl).then(() => {
+                cleanupObserver();
+            }).catch(error => {
+                debugLogWithLevel(DEBUG_LEVELS.FALLBACK_USED, 'Error applying thumbnail effects:', error);
+                cleanupObserver();
+            });
 
-            // Service Worker integration: Preload related thumbnails
+            // Service Worker integration: Preload related thumbnails with CORS safety
             preloadRelatedThumbnails(coverUrl);
         }
 
@@ -443,24 +682,45 @@
         }
     }
     
-    function applyThumbnailEffects(coverUrl) {
+    async function applyThumbnailEffects(coverUrl) {
         // Double check để tránh race condition
         if (thumbnailEffectApplied || document.querySelector('.betterhako-bg-overlay')) {
             debugLog('Thumbnail effect đã được áp dụng, bỏ qua');
             return;
         }
-        
-        thumbnailEffectApplied = true;
-        
-        debugLog('Áp dụng thumbnail effects cho URL:', coverUrl);
-        
-        // Thêm hiệu ứng thumbnail mờ dần
-        addThumbnailFadeEffect(coverUrl);
 
-        // Thêm CSS cho phần trên của feature-section trong suốt
-        addTransparentTopCSS();
-        
-        debugLog('Đã áp dụng thành công thumbnail effects');
+        thumbnailEffectApplied = true;
+
+        debugLog('Áp dụng thumbnail effects với CORS safety cho URL:', coverUrl);
+
+        try {
+            // Get CORS-safe thumbnail URL
+            const safeUrl = await getCorsSafeThumbnail(coverUrl, {
+                width: 400,
+                height: 600,
+                timeout: 5000,
+                useCache: true
+            });
+
+            debugLog('Using CORS-safe URL:', safeUrl);
+
+            // Thêm hiệu ứng thumbnail mờ dần với URL an toàn
+            addThumbnailFadeEffect(safeUrl);
+
+            // Thêm CSS cho phần trên của feature-section trong suốt
+            addTransparentTopCSS();
+
+            debugLog('Đã áp dụng thành công thumbnail effects với CORS safety');
+        } catch (error) {
+            debugLogWithLevel(DEBUG_LEVELS.FALLBACK_USED, 'Failed to get CORS-safe thumbnail, using fallback:', error);
+
+            // Fallback to gradient if everything fails
+            const fallbackUrl = createGradientFallback(400, 600);
+            addThumbnailFadeEffect(fallbackUrl);
+            addTransparentTopCSS();
+
+            debugLog('Applied fallback thumbnail effects');
+        }
     }
     
     // Hàm thêm hiệu ứng thumbnail mờ dần
@@ -569,9 +829,9 @@
         });
     }
 
-    // Service Worker integration: Preload related thumbnails
+    // Service Worker integration: Preload related thumbnails with CORS safety
     function preloadRelatedThumbnails(coverUrl) {
-        debugLog('Service Worker: Preloading related thumbnails');
+        debugLog('Service Worker: Preloading related thumbnails with CORS safety');
 
         // Find other thumbnail images on the page
         const thumbnailElements = document.querySelectorAll('.series-cover .img-in-ratio, .story-item img, .thumbnail img');
@@ -596,7 +856,23 @@
 
         if (urlsToPreload.length > 0 && window.HMTServiceWorker) {
             debugLog(`Service Worker: Preloading ${urlsToPreload.length} thumbnails`);
-            window.HMTServiceWorker.preloadThumbnails(urlsToPreload, 'high');
+
+            // Process each URL through CORS safety check
+            const corsSafeUrls = urlsToPreload.map(async (url) => {
+                try {
+                    return await getCorsSafeThumbnail(url, { timeout: 3000, useCache: true });
+                } catch (error) {
+                    debugLogWithLevel(DEBUG_LEVELS.PROXY_ATTEMPT, 'Failed to get CORS-safe URL for preload:', url, error);
+                    return null;
+                }
+            });
+
+            Promise.all(corsSafeUrls).then(safeUrls => {
+                const validUrls = safeUrls.filter(url => url !== null);
+                if (validUrls.length > 0) {
+                    window.HMTServiceWorker.preloadThumbnails(validUrls, 'high');
+                }
+            });
 
             // Also register background sync for additional thumbnails
             if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
