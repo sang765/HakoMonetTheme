@@ -1291,7 +1291,7 @@
                 background-color: ${palette[850]} !important;
             }
 
-            .section-content a:hover {
+            .section-content [class="filter-type_item"] a:hover {
                 background-color: ${palette[300]} !important;
                 border: 1px solid ${palette[600]} !important;
                 color: ${palette[800]} !important;
@@ -1337,11 +1337,9 @@
                 color: ${textColor} !important;
             }
 
+            .statistic-top,
+            .detail-list .detail-list-item,
             .profile-showcase header, ol.list-volume li {
-                border-bottom-color: ${palette[800]} !important;
-            }
-
-            .statistic-top {
                 border-bottom-color: ${palette[800]} !important;
             }
 
@@ -1847,7 +1845,7 @@
                 background-color: ${defaultPalette[850]} !important;
             }
 
-            .section-content a:hover {
+            .section-content [class="filter-type_item"] a:hover {
                 background-color: ${defaultPalette[300]} !important;
                 border: 1px solid ${defaultPalette[600]} !important;
                 color: ${defaultPalette[800]} !important;
@@ -1893,11 +1891,9 @@
                 color: ${textColor} !important;
             }
 
-            .profile-showcase header, ol.list-volume li {
-                border-bottom-color: ${defaultPalette[800]} !important;
-            }
-
-            .statistic-top {
+            .statistic-top,
+            .profile-showcase header, ol.list-volume li,
+            .detail-list .detail-list-item {
                 border-bottom-color: ${defaultPalette[800]} !important;
             }
 
