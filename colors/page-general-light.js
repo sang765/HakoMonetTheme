@@ -33,8 +33,9 @@
             return;
         }
 
-        // Kiểm tra chế độ màu
+        // Kiểm tra chế độ màu và cài đặt trích xuất màu từ avatar
         const colorMode = window.HMTConfig && window.HMTConfig.getColorMode ? window.HMTConfig.getColorMode() : 'default';
+        const extractFromAvatar = window.HMTConfig && window.HMTConfig.getExtractColorFromAvatar ? window.HMTConfig.getExtractColorFromAvatar() : false;
 
         // Nếu là trang đọc truyện và chế độ thumbnail, áp dụng màu từ thumbnail
         if (document.querySelector('.rd-basic_icon.row') && colorMode === 'thumbnail') {
@@ -84,6 +85,13 @@
             }
 
             const colorMode = window.HMTConfig && window.HMTConfig.getColorMode ? window.HMTConfig.getColorMode() : 'default';
+            const extractFromAvatar = window.HMTConfig && window.HMTConfig.getExtractColorFromAvatar ? window.HMTConfig.getExtractColorFromAvatar() : false;
+
+            // Nếu trích xuất từ avatar được bật, không áp dụng màu từ config
+            if (extractFromAvatar) {
+                debugLog('Trích xuất từ avatar được bật, bỏ qua sự kiện màu sắc thay đổi');
+                return;
+            }
 
             if (!event.detail.isPreview && colorMode === 'default') {
                 setTimeout(() => {
@@ -97,6 +105,21 @@
                     applyMonetColorScheme(monetPalette, isLightColor);
                 }
             }
+        });
+
+        // Lắng nghe sự kiện trích xuất màu từ avatar thay đổi
+        (window.top || window).document.addEventListener('hmtExtractAvatarColorChanged', function(event) {
+            const extract = event.detail.extract;
+            debugLog('Nhận sự kiện trích xuất màu từ avatar thay đổi:', extract);
+
+            // Check if in dark mode
+            if (window.__themeDetectorLoaded && window.ThemeDetector && window.ThemeDetector.isDark()) {
+                debugLog('In dark mode, skipping');
+                return;
+            }
+
+            // Áp dụng lại màu dựa trên cài đặt mới
+            applyCurrentColorScheme();
         });
 
         debugLog('Set up color change listener');
@@ -194,6 +217,12 @@
     }
 
     function applyCurrentColorScheme() {
+        if (extractFromAvatar) {
+            debugLog('Trích xuất màu từ avatar được bật, áp dụng màu từ avatar');
+            applyAvatarColorScheme();
+            return;
+        }
+
         const defaultColor = window.HMTConfig ? window.HMTConfig.getDefaultColor() : '#FCE4EC'; // Get color from config or fallback
 
         debugLog('Applying light color scheme with config color:', defaultColor);
@@ -215,6 +244,52 @@
         debugLog('Is light color?', isLightColor);
 
         applyMonetColorScheme(monetPalette, isLightColor);
+    }
+
+    // Hàm áp dụng màu từ avatar
+    function applyAvatarColorScheme() {
+        debugLog('Bắt đầu trích xuất màu từ avatar');
+
+        // Tìm avatar element
+        const avatarElement = document.querySelector('.nav-user_avatar img');
+        if (!avatarElement) {
+            debugLog('Không tìm thấy avatar element, fallback về màu config');
+            applyCurrentColorScheme();
+            return;
+        }
+
+        const avatarSrc = avatarElement.src || avatarElement.getAttribute('data-src');
+        if (!avatarSrc) {
+            debugLog('Avatar không có src, fallback về màu config');
+            applyCurrentColorScheme();
+            return;
+        }
+
+        debugLog('Tìm thấy avatar src:', avatarSrc);
+
+        // Phân tích màu từ avatar
+        analyzeImageColorTraditionalAccent(avatarSrc)
+            .then(dominantColor => {
+                debugLog('Màu chủ đạo từ avatar:', dominantColor);
+
+                if (!isValidColor(dominantColor)) {
+                    debugLog('Màu từ avatar không hợp lệ, fallback về màu config');
+                    applyCurrentColorScheme();
+                    return;
+                }
+
+                // Create tinted white using avatar color for light mode
+                const tintedWhite = createTintedWhite(dominantColor);
+                debugLog('Tinted white từ avatar cho light mode:', tintedWhite);
+
+                const monetPalette = MonetAPI.generateMonetPalette(tintedWhite);
+                const isLightColor = MonetAPI.isColorLight(tintedWhite);
+                applyMonetColorScheme(monetPalette, isLightColor);
+            })
+            .catch(error => {
+                debugLog('Lỗi khi phân tích màu từ avatar:', error);
+                applyCurrentColorScheme(); // Fallback to config color
+            });
     }
 
     function applyMonetColorScheme(palette, isLight) {

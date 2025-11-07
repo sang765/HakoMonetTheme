@@ -19,6 +19,12 @@
     'use strict';
 
     const DEBUG = GM_getValue('debug_mode', false);
+    const FOLDER_URL = 'https://sang765.github.io/HakoMonetTheme/styles/';
+    const CSS_FILE = 'userscript/configmenu/hmt-config-menu.css';
+    const CSS_MAP_FILE = 'userscript/configmenu/hmt-config-menu.css.map';
+
+    // Cached CSS blob URL to avoid repeated fetches
+    let cachedCssBlobUrl = null;
 
     function debugLog(...args) {
         if (DEBUG && typeof window.Logger !== 'undefined') {
@@ -113,6 +119,22 @@
         });
         (window.top || window).document.dispatchEvent(modeChangeEvent);
         debugLog('Đã phát sự kiện chế độ màu thay đổi:', mode);
+    }
+
+    function getExtractColorFromAvatar() {
+        return GM_getValue('extract_color_from_avatar', false);
+    }
+
+    function setExtractColorFromAvatar(extract) {
+        GM_setValue('extract_color_from_avatar', extract);
+        debugLog('Đã lưu cài đặt trích xuất màu từ avatar:', extract);
+
+        // Phát sự kiện để các module khác cập nhật
+        const extractChangeEvent = new CustomEvent('hmtExtractAvatarColorChanged', {
+            detail: { extract: extract }
+        });
+        (window.top || window).document.dispatchEvent(extractChangeEvent);
+        debugLog('Đã phát sự kiện trích xuất màu từ avatar thay đổi:', extract);
     }
 
     function applyDomainWarningVisibility() {
@@ -613,11 +635,58 @@
         return '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
     }
 
+    /**
+     * Loads and applies CSS styles with caching for performance
+     */
+    function loadAndApplyStyles() {
+        if (cachedCssBlobUrl) {
+            // Use cached styles
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = cachedCssBlobUrl;
+            document.head.appendChild(link);
+            debugLog('Using cached CSS styles');
+            return;
+        }
+
+        // Fetch CSS and source map simultaneously
+        Promise.all([
+            fetch(FOLDER_URL + CSS_FILE).then(r => r.text()),
+            fetch(FOLDER_URL + CSS_MAP_FILE).then(r => r.text())
+        ])
+        .then(([css, mapContent]) => {
+            // Convert source map to data URL
+            const mapDataUrl = 'data:application/json;base64,' + btoa(unescape(encodeURIComponent(mapContent)));
+
+            // Add source mapping as data URL
+            css += '\n/*# sourceMappingURL=' + mapDataUrl + ' */';
+
+            // Create Blob URL for efficient resource management
+            const blob = new Blob([css], { type: 'text/css' });
+            cachedCssBlobUrl = URL.createObjectURL(blob);
+
+            // Create link element and apply CSS
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = cachedCssBlobUrl;
+            document.head.appendChild(link);
+
+            debugLog('CSS styles loaded and cached successfully');
+        })
+        .catch(error => {
+            debugLog('Error loading CSS or source map:', error);
+            showNotification('Lỗi', 'Không thể tải giao diện cài đặt. Một số style có thể không hoạt động.', 3000);
+        });
+    }
+
     function createConfigDialog() {
         // Kiểm tra xem dialog đã tồn tại chưa (kiểm tra ở top window để tránh duplicate trong iframe)
         if ((window.top || window).document.querySelector('.hmt-config-dialog')) {
             return;
         }
+
+        // Load and apply CSS styles
+        loadAndApplyStyles();
 
         const dialog = document.createElement('div');
         dialog.className = 'hmt-config-dialog';
@@ -682,7 +751,7 @@ ${!isInfoPage() ? `
                             <h4>Màu mặc định</h4>
                             <p>Chọn màu sẽ được sử dụng khi không thể lấy màu từ ảnh bìa truyện. Sử dụng thanh trượt HSL để điều chỉnh màu sắc theo ý muốn.</p>
 
-                            <div class="hmt-custom-color">
+                            <div class="hmt-custom-color" ${getExtractColorFromAvatar() ? 'style="display: none;"' : ''}>
                                 <label for="hmt-custom-color-input">Chọn màu tùy chỉnh:</label>
                                 <div class="hmt-color-input-group">
                                     <div class="hmt-color-picker-wrapper">
@@ -762,6 +831,20 @@ ${!isInfoPage() ? `
                             </div>
                         </div>
 
+                        <div class="hmt-config-section">
+                            <h4>Lấy avatar làm màu chủ đạo</h4>
+                            <p>Lấy màu chủ đạo từ ảnh avatar của bạn để làm màu theme (chỉ áp dụng với giao diện chung, Không ảnh hưởng tới trang thông tin và trang đọc truyện). Hỗ trợ JPG, PNG và GIF. Khi bật, cài đặt chọn màu tùy chỉnh sẽ bị ẩn sau khi lưu.</p>
+                            <small class="hmt-color-help">LƯU Ý: Với ảnh GIF chỉ trích xuất với frame đầu tiên để tập trung vào tối ưu hóa.</small>
+
+                            <div class="hmt-avatar-color-toggle">
+                                <label class="hmt-toggle-label">
+                                    <input type="checkbox" ${getExtractColorFromAvatar() ? 'checked' : ''} class="hmt-avatar-color-toggle-input">
+                                    <span class="hmt-toggle-switch"></span>
+                                    Trích xuất màu từ avatar
+                                </label>
+                            </div>
+                        </div>
+
 ${!isInfoPage() ? `
                         <div class="hmt-config-section">
                             <h4>Chế độ màu</h4>
@@ -794,781 +877,7 @@ ${!isInfoPage() ? `
             </div>
         `;
 
-        // Thêm CSS
-        GM_addStyle(`
-            :root {
-                --random-bg-color: #ffffff; /* Mặc định, sẽ được ghi đè bởi JS */
-            }
-
-            .hmt-config-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(0, 0, 0, 0.5);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 10001;
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            }
-
-            .hmt-config-content {
-                background: white;
-                border-radius: 12px;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-                width: 90%;
-                max-width: 700px;
-                max-height: 90vh;
-                overflow: hidden;
-                animation: hmtConfigSlideIn 0.3s ease-out;
-            }
-
-            .hmt-config-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 20px 24px;
-                background: linear-gradient(135deg, var(--random-bg-color) 0%, var(--random-bg-color) 100%);
-                color: white;
-            }
-
-            .hmt-header-content {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                width: 100%;
-            }
-
-            .hmt-config-back {
-                background: rgba(255, 255, 255, 0.2);
-                border: none;
-                color: white;
-                padding: 8px 16px;
-                border-radius: 6px;
-                cursor: pointer;
-                font-size: 14px;
-                font-weight: 500;
-                transition: background-color 0.2s;
-                margin-right: 16px;
-            }
-
-            .hmt-config-back:hover {
-                background: rgba(255, 255, 255, 0.3);
-            }
-
-            .hmt-logo-section {
-                display: flex;
-                align-items: center;
-                gap: 16px;
-            }
-
-            .hmt-logo {
-                width: 48px;
-                height: 48px;
-                border-radius: 12px;
-                object-fit: cover;
-                border: 2px solid rgba(255, 255, 255, 0.2);
-                transition: transform 0.3s ease;
-                background: rgba(255, 255, 255, 0.1);
-            }
-
-            .hmt-logo:hover {
-                transform: scale(1.05);
-            }
-
-            .hmt-logo:not([src]),
-            .hmt-logo[src=""] {
-                background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-weight: bold;
-                font-size: 16px;
-                color: white;
-            }
-
-            .hmt-logo:not([src])::after,
-            .hmt-logo[src=""]::after {
-                content: "🎨";
-                font-size: 20px;
-            }
-
-            .hmt-title-section h3 {
-                margin: 0;
-                font-size: 20px;
-                font-weight: 700;
-                letter-spacing: -0.5px;
-            }
-
-            .hmt-subtitle {
-                font-size: 14px;
-                opacity: 0.9;
-                font-weight: 400;
-                margin-top: 2px;
-                display: block;
-            }
-
-            .hmt-config-close {
-                background: rgba(255, 255, 255, 0.2);
-                border: none;
-                color: white;
-                width: 32px;
-                height: 32px;
-                border-radius: 50%;
-                cursor: pointer;
-                font-size: 18px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: background-color 0.2s;
-            }
-
-            .hmt-config-close:hover {
-                background: rgba(255, 255, 255, 0.3);
-            }
-
-            .hmt-config-body {
-                padding: 24px;
-                max-height: 60vh;
-                overflow-y: auto;
-            }
-
-            .hmt-config-section {
-                margin-bottom: 24px;
-            }
-
-            .hmt-config-section h4 {
-                margin: 0 0 8px 0;
-                color: #333;
-                font-size: 16px;
-                font-weight: 600;
-            }
-
-            .hmt-config-section p {
-                margin: 0 0 16px 0;
-                color: #666;
-                font-size: 14px;
-                line-height: 1.5;
-            }
-
-            .hmt-custom-color {
-                margin-top: 16px;
-            }
-
-            .hmt-custom-color label {
-                display: block;
-                margin-bottom: 8px;
-                color: #333;
-                font-size: 14px;
-                font-weight: 500;
-            }
-
-            .hmt-color-input-group {
-                display: flex;
-                gap: 16px;
-                align-items: center;
-                margin-bottom: 8px;
-            }
-
-            .hmt-color-picker-wrapper {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 8px;
-                width: 360px;
-            }
-
-            .hmt-custom-color-picker {
-                width: 320px;
-                background: white;
-                border: 2px solid #e9ecef;
-                border-radius: 8px;
-                padding: 16px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                display: flex;
-                flex-direction: column;
-                gap: 12px;
-            }
-
-            .hmt-color-picker-display {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                margin-bottom: 16px;
-            }
-
-            .hmt-screen-color-picker-btn {
-                width: 32px;
-                height: 32px;
-                border: 2px solid #e9ecef;
-                border-radius: 6px;
-                background: #f8f9fa;
-                color: #495057;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: all 0.2s;
-                user-select: none;
-                margin-left: 8px;
-            }
-
-            .hmt-screen-color-picker-btn:hover {
-                background: #e9ecef;
-                border-color: #667eea;
-                color: #667eea;
-            }
-
-            .hmt-screen-color-picker-btn:active {
-                transform: scale(0.95);
-            }
-
-            .hmt-screen-color-picker-btn svg {
-                width: 16px;
-                height: 16px;
-            }
-
-            .hmt-color-picker-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(0, 0, 0, 0.8);
-                z-index: 10002;
-                cursor: crosshair;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .hmt-color-picker-canvas {
-                max-width: 100%;
-                max-height: 100%;
-                object-fit: contain;
-                pointer-events: none;
-            }
-
-            .hmt-color-picker-zoom {
-                position: absolute;
-                width: 160px;
-                height: 160px;
-                border: 3px solid white;
-                border-radius: 50%;
-                background: rgba(255, 255, 255, 0.95);
-                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-                pointer-events: none;
-                display: none;
-                overflow: hidden;
-                cursor: move;
-                z-index: 10003;
-                transition: transform 0.1s ease-out;
-            }
-
-            .hmt-color-picker-zoom::after {
-                content: '';
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                width: 4px;
-                height: 4px;
-                background: red;
-                border-radius: 50%;
-                transform: translate(-50%, -50%);
-                box-shadow: 0 0 0 2px white;
-            }
-
-            .hmt-color-picker-zoom.dragging {
-                cursor: grabbing;
-            }
-
-            .hmt-color-picker-info {
-                position: absolute;
-                top: 20px;
-                left: 20px;
-                background: rgba(0, 0, 0, 0.9);
-                color: white;
-                padding: 14px 18px;
-                border-radius: 10px;
-                font-family: monospace;
-                font-size: 15px;
-                font-weight: 600;
-                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-                pointer-events: none;
-                transition: all 0.3s ease;
-                backdrop-filter: blur(4px);
-            }
-
-            .hmt-color-picker-info.updating {
-                background: rgba(0, 0, 0, 0.95);
-                transform: scale(1.02);
-            }
-
-            .hmt-color-picker-instructions {
-                position: absolute;
-                bottom: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: rgba(0, 0, 0, 0.8);
-                color: white;
-                padding: 12px 20px;
-                border-radius: 8px;
-                font-size: 14px;
-                text-align: center;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-                pointer-events: none;
-            }
-
-            .hmt-color-picker-controls {
-                position: absolute;
-                bottom: 20px;
-                left: 20px;
-                right: 20px;
-                display: flex;
-                gap: 12px;
-                justify-content: center;
-                pointer-events: none;
-            }
-
-            .hmt-color-picker-controls > * {
-                pointer-events: auto;
-            }
-
-            .hmt-color-picker-btn {
-                padding: 12px 24px;
-                border: none;
-                border-radius: 8px;
-                font-size: 16px;
-                font-weight: 600;
-                cursor: pointer;
-                transition: all 0.2s;
-                min-width: 100px;
-            }
-
-            .hmt-color-picker-btn.select {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-            }
-
-            .hmt-color-picker-btn.select:hover {
-                transform: translateY(-1px);
-                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-            }
-
-            .hmt-color-picker-btn.cancel {
-                background: #f8f9fa;
-                color: #666;
-                border: 1px solid #ddd;
-            }
-
-            .hmt-color-picker-btn.cancel:hover {
-                background: #e9ecef;
-                color: #333;
-            }
-
-            /* Mobile responsive */
-            @media (max-width: 768px) {
-                .hmt-color-picker-info {
-                    top: 10px;
-                    left: 10px;
-                    right: 10px;
-                    font-size: 12px;
-                    padding: 8px 12px;
-                }
-
-                .hmt-color-picker-instructions {
-                    bottom: 80px;
-                    font-size: 12px;
-                    padding: 8px 16px;
-                }
-
-                .hmt-color-picker-controls {
-                    bottom: 10px;
-                    left: 10px;
-                    right: 10px;
-                }
-
-                .hmt-color-picker-btn {
-                    flex: 1;
-                    padding: 14px 20px;
-                    font-size: 14px;
-                }
-            }
-
-            .hmt-color-preview {
-                width: 40px;
-                height: 40px;
-                border-radius: 6px;
-                border: 2px solid #e9ecef;
-                background: #6c5ce7;
-            }
-
-            .hmt-color-value {
-                font-family: monospace;
-                font-size: 14px;
-                font-weight: 600;
-                color: #495057;
-                background: #f8f9fa;
-                padding: 8px 12px;
-                border-radius: 4px;
-                border: 1px solid #e9ecef;
-                min-width: 80px;
-                text-align: center;
-            }
-
-
-            .hmt-slider-label {
-                display: block;
-                font-size: 12px;
-                font-weight: 600;
-                color: #495057;
-                margin-bottom: 6px;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            }
-
-            .hmt-color-slider {
-                width: 100%;
-                height: 8px;
-                border-radius: 4px;
-                outline: none;
-                cursor: pointer;
-                background: #e9ecef;
-                border: none;
-                -webkit-appearance: none;
-            }
-
-            .hmt-color-slider::-webkit-slider-thumb {
-                -webkit-appearance: none;
-                appearance: none;
-                width: 16px;
-                height: 16px;
-                border-radius: 50%;
-                background: #667eea;
-                cursor: pointer;
-                border: 2px solid white;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            }
-
-            .hmt-color-slider::-moz-range-thumb {
-                width: 16px;
-                height: 16px;
-                border-radius: 50%;
-                background: #667eea;
-                cursor: pointer;
-                border: 2px solid white;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            }
-
-            .hmt-hsl-controls {
-                margin-bottom: 8px;
-            }
-
-            .hmt-hsl-slider-group {
-                margin-bottom: 12px;
-            }
-
-            .hmt-hsl-slider-group:last-child {
-                margin-bottom: 0;
-            }
-
-            .hmt-slider-with-buttons {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-
-            .hmt-slider-btn {
-                width: 32px;
-                height: 32px;
-                border: 2px solid #e9ecef;
-                border-radius: 6px;
-                background: #f8f9fa;
-                color: #495057;
-                font-size: 16px;
-                font-weight: 600;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: all 0.2s;
-                user-select: none;
-            }
-
-            .hmt-slider-btn:hover {
-                background: #e9ecef;
-                border-color: #667eea;
-                color: #667eea;
-            }
-
-            .hmt-slider-btn:active {
-                transform: scale(0.95);
-            }
-
-            .hmt-color-picker-label {
-                font-size: 12px;
-                color: #667eea;
-                font-weight: 600;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            }
-
-            .hmt-color-text {
-                width: 100%;
-                padding: 10px 12px;
-                border: 2px solid #e1e5e9;
-                border-radius: 6px;
-                font-size: 14px;
-                font-family: monospace;
-                background: #f8f9fa;
-                color: #495057;
-                font-weight: 500;
-                box-sizing: border-box;
-            }
-
-            .hmt-color-text:focus {
-                outline: none;
-                border-color: #667eea;
-                background: white;
-            }
-
-            .hmt-color-help {
-                color: #6c757d;
-                font-size: 12px;
-                margin-top: 4px;
-                display: block;
-                line-height: 1.4;
-            }
-
-            .hmt-config-preview {
-                margin-top: 24px;
-                padding: 16px;
-                background: #f8f9fa;
-                border-radius: 8px;
-            }
-
-            .hmt-config-preview h4 {
-                margin: 0 0 12px 0;
-                color: #333;
-                font-size: 16px;
-                font-weight: 600;
-            }
-
-            .hmt-preview-box {
-                height: 80px;
-                border-radius: 8px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: white;
-                font-weight: 600;
-                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-                transition: background-color 0.3s ease;
-            }
-
-            .hmt-config-footer {
-                padding: 20px 24px;
-                background: #f8f9fa;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                gap: 12px;
-            }
-
-            .hmt-config-reset,
-            .hmt-config-save {
-                padding: 10px 20px;
-                border: none;
-                border-radius: 6px;
-                font-size: 14px;
-                font-weight: 600;
-                cursor: pointer;
-                transition: all 0.2s;
-            }
-
-            .hmt-config-reset {
-                background: #f8f9fa;
-                color: #666;
-                border: 1px solid #ddd;
-            }
-
-            .hmt-config-reset:hover {
-                background: #e9ecef;
-                color: #333;
-            }
-
-            .hmt-config-save {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-            }
-
-            .hmt-config-save:hover {
-                transform: translateY(-1px);
-                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-            }
-
-            @keyframes hmtConfigSlideIn {
-                from {
-                    opacity: 0;
-                    transform: scale(0.9) translateY(-20px);
-                }
-                to {
-                    opacity: 1;
-                    transform: scale(1) translateY(0);
-                }
-            }
-
-            /* Dark mode support */
-            body.dark .hmt-config-content {
-                background: #2d3748;
-                color: #e2e8f0;
-            }
-
-            body.dark .hmt-config-section h4 {
-                color: #e2e8f0;
-            }
-
-            body.dark .hmt-config-section p {
-                color: #a0aec0;
-            }
-
-            body.dark .hmt-color-text {
-                background: #2d3748;
-                border-color: #4a5568;
-                color: #e2e8f0;
-            }
-
-            body.dark .hmt-color-text:focus {
-                background: #1a202c;
-                border-color: #667eea;
-            }
-
-            body.dark .hmt-color-help {
-                color: #a0aec0;
-            }
-
-            body.dark .hmt-color-picker {
-                border-color: #764ba2;
-                box-shadow: 0 2px 8px rgba(118, 75, 162, 0.2);
-            }
-
-            body.dark .hmt-color-picker:hover {
-                box-shadow: 0 4px 16px rgba(118, 75, 162, 0.3);
-            }
-
-            body.dark .hmt-color-picker-label {
-                color: #764ba2;
-            }
-
-            /* Dark mode logo styling */
-            body.dark .hmt-logo {
-                border-color: rgba(255, 255, 255, 0.3);
-            }
-
-            body.dark .hmt-logo:not([src]),
-            body.dark .hmt-logo[src=""] {
-                background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
-            }
-
-            body.dark .hmt-config-preview {
-                background: #1a202c;
-            }
-
-            body.dark .hmt-config-footer {
-                background: #1a202c;
-            }
-
-            body.dark .hmt-config-reset {
-                background: #1a202c;
-                color: #a0aec0;
-                border-color: #4a5568;
-            }
-
-            body.dark .hmt-config-reset:hover {
-                background: #2d3748;
-                color: #e2e8f0;
-            }
-
-            .hmt-domain-warning-toggle {
-                margin-top: 16px;
-            }
-
-            .hmt-reading-page-toggle {
-                margin-top: 16px;
-            }
-
-            .hmt-color-mode-dropdown {
-                margin-top: 16px;
-            }
-
-            .hmt-color-mode-select {
-                width: 100%;
-                padding: 8px 12px;
-                border: 2px solid #e9ecef;
-                border-radius: 6px;
-                background: #f8f9fa;
-                color: #495057;
-                font-size: 14px;
-                font-family: inherit;
-                box-sizing: border-box;
-            }
-
-            .hmt-color-mode-select:focus {
-                outline: none;
-                border-color: #667eea;
-                background: white;
-            }
-
-            .hmt-toggle-label {
-                display: flex;
-                align-items: center;
-                cursor: pointer;
-                font-size: 14px;
-                font-weight: 500;
-                color: #333;
-                user-select: none;
-            }
-
-            .hmt-toggle-label input[type="checkbox"] {
-                display: none;
-            }
-
-            .hmt-toggle-switch {
-                position: relative;
-                display: inline-block;
-                width: 50px;
-                height: 24px;
-                background-color: #ccc;
-                border-radius: 24px;
-                margin-right: 12px;
-                transition: background-color 0.3s;
-            }
-
-            .hmt-toggle-switch::after {
-                content: '';
-                position: absolute;
-                top: 2px;
-                left: 2px;
-                width: 20px;
-                height: 20px;
-                background-color: white;
-                border-radius: 50%;
-                transition: transform 0.3s;
-            }
-
-            .hmt-toggle-label input[type="checkbox"]:checked + .hmt-toggle-switch {
-                background-color: #667eea;
-            }
-
-            .hmt-toggle-label input[type="checkbox"]:checked + .hmt-toggle-switch::after {
-                transform: translateX(26px);
-            }
-
-            .hmt-color-mode-dropdown label {
-                color: #333;
-        `);
+        // CSS đã được load từ external file, không cần GM_addStyle nữa
 
         (window.top || window).document.body.appendChild(dialog);
 
@@ -1620,6 +929,7 @@ ${!isInfoPage() ? `
         const resetBtn = dialog.querySelector('.hmt-config-reset');
         const domainWarningToggle = dialog.querySelector('.hmt-domain-warning-toggle-input');
         const readingPageToggle = dialog.querySelector('.hmt-reading-page-toggle-input');
+        const avatarColorToggle = dialog.querySelector('.hmt-avatar-color-toggle-input');
 
         // Lưu màu hiện tại để có thể khôi phục nếu không lưu
          const currentColor = dialog._currentColor || getDefaultColor();
@@ -2061,6 +1371,24 @@ ${!isInfoPage() ? `
             });
         }
 
+        // Avatar color extraction toggle
+        if (avatarColorToggle) {
+            avatarColorToggle.addEventListener('change', function() {
+                setExtractColorFromAvatar(this.checked);
+                showNotification('Đã cập nhật cài đặt trích xuất màu từ avatar!', 3000);
+
+                // Hide/show custom color picker based on avatar extraction setting
+                const customColorSection = dialog.querySelector('.hmt-custom-color');
+                if (customColorSection) {
+                    if (this.checked) {
+                        customColorSection.style.display = 'none';
+                    } else {
+                        customColorSection.style.display = '';
+                    }
+                }
+            });
+        }
+
         // Color mode dropdown
         if (!isInfoPage()) {
             const colorModeSelect = dialog.querySelector('#hmt-color-mode-select');
@@ -2191,6 +1519,8 @@ ${!isInfoPage() ? `
         getRandomHexColor: getRandomHexColor,
         getColorMode: getColorMode,
         setColorMode: setColorMode,
+        getExtractColorFromAvatar: getExtractColorFromAvatar,
+        setExtractColorFromAvatar: setExtractColorFromAvatar,
         openConfigDialog: openConfigDialog,
         initialize: initializeConfig,
         ensureDomainWarningCookies: ensureDomainWarningCookies,

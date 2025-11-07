@@ -87,6 +87,12 @@
 
         // Hàm áp dụng màu sắc hiện tại
         function applyCurrentColorScheme() {
+            if (extractFromAvatar) {
+                debugLog('Trích xuất màu từ avatar được bật, áp dụng màu từ avatar');
+                applyAvatarColorScheme();
+                return;
+            }
+
             const defaultColor = window.HMTConfig && window.HMTConfig.getDefaultColor ?
                 window.HMTConfig.getDefaultColor() : '#063c30';
 
@@ -108,6 +114,48 @@
             applyMonetColorScheme(monetPalette, isLightColor);
         }
 
+        // Hàm áp dụng màu từ avatar
+        function applyAvatarColorScheme() {
+            debugLog('Bắt đầu trích xuất màu từ avatar');
+
+            // Tìm avatar element
+            const avatarElement = document.querySelector('.nav-user_avatar img');
+            if (!avatarElement) {
+                debugLog('Không tìm thấy avatar element, fallback về màu config');
+                applyCurrentColorScheme();
+                return;
+            }
+
+            const avatarSrc = avatarElement.src || avatarElement.getAttribute('data-src');
+            if (!avatarSrc) {
+                debugLog('Avatar không có src, fallback về màu config');
+                applyCurrentColorScheme();
+                return;
+            }
+
+            debugLog('Tìm thấy avatar src:', avatarSrc);
+
+            // Phân tích màu từ avatar
+            analyzeImageColorTraditionalAccent(avatarSrc)
+                .then(dominantColor => {
+                    debugLog('Màu chủ đạo từ avatar:', dominantColor);
+
+                    if (!isValidColor(dominantColor)) {
+                        debugLog('Màu từ avatar không hợp lệ, fallback về màu config');
+                        applyCurrentColorScheme();
+                        return;
+                    }
+
+                    const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
+                    const isLightColor = MonetAPI.isColorLight(dominantColor);
+                    applyMonetColorScheme(monetPalette, isLightColor);
+                })
+                .catch(error => {
+                    debugLog('Lỗi khi phân tích màu từ avatar:', error);
+                    applyCurrentColorScheme(); // Fallback to config color
+                });
+        }
+
         // Áp dụng màu sắc lần đầu
         applyCurrentColorScheme();
 
@@ -121,8 +169,9 @@
                 return;
             }
 
-            // Kiểm tra chế độ màu
+            // Kiểm tra chế độ màu và cài đặt trích xuất màu từ avatar
             const colorMode = window.HMTConfig && window.HMTConfig.getColorMode ? window.HMTConfig.getColorMode() : 'default';
+            const extractFromAvatar = window.HMTConfig && window.HMTConfig.getExtractColorFromAvatar ? window.HMTConfig.getExtractColorFromAvatar() : false;
 
             // Chỉ áp dụng màu thực sự nếu không phải preview mode và chế độ là default
             if (!event.detail.isPreview && colorMode === 'default') {
@@ -256,6 +305,21 @@
                     }
                 }
             }
+        });
+
+        // Lắng nghe sự kiện trích xuất màu từ avatar thay đổi
+        (window.top || window).document.addEventListener('hmtExtractAvatarColorChanged', function(event) {
+            const extract = event.detail.extract;
+            debugLog('Nhận sự kiện trích xuất màu từ avatar thay đổi:', extract);
+
+            // Check if in dark mode
+            if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
+                debugLog('Not in dark mode, skipping color application');
+                return;
+            }
+
+            // Áp dụng lại màu dựa trên cài đặt mới
+            applyCurrentColorScheme();
         });
     }
 
