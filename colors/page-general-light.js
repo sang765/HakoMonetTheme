@@ -646,6 +646,11 @@
                 border-color: ${palette[600]} !important;
                 color: ${textColor} !important;
             }
+            .button-green:hover {
+                background-color: ${textColor} !important;
+                border-color: ${palette[600]} !important;
+                color: ${palette[400]} !important;
+            }
 
             .button.to-contact.button-green:hover {
                 background-color: ${textColor} !important;
@@ -894,6 +899,7 @@
             .statistic-top,
             .comment-item,
             .profile-showcase header, ol.list-volume li,
+            .licensed-list-page #licensed-list .info-item,
             .detail-list .detail-list-item {
                 border-bottom-color: ${palette[800]} !important;
             }
@@ -945,6 +951,10 @@
             .topview-item:first-child .topview_rank, .topview-item:nth-child(2) .topview_rank, .topview-item:nth-child(3) .topview_rank {
                 background-color: ${palette[500]} !important;
                 color: ${textColor} !important;
+            }
+
+            .ln-list-default li {
+                background-color: ${palette[800]} !important;
             }
         `;
 
@@ -1215,6 +1225,11 @@
                 border-color: ${defaultPalette[600]} !important;
                 color: ${textColor} !important;
             }
+            .button-green:hover {
+                background-color: ${textColor} !important;
+                border-color: ${defaultPalette[600]} !important;
+                color: ${defaultPalette[400]} !important;
+            }
 
             .button.to-contact.button-green:hover {
                 background-color: ${textColor} !important;
@@ -1440,6 +1455,7 @@
             .statistic-top,
             .comment-item,
             .profile-showcase header, ol.list-volume li,
+            .licensed-list-page #licensed-list .info-item,
             .detail-list .detail-list-item {
                 border-bottom-color: ${defaultPalette[800]} !important;
             }
@@ -1491,6 +1507,10 @@
             .topview-item:first-child .topview_rank, .topview-item:nth-child(2) .topview_rank, .topview-item:nth-child(3) .topview_rank {
                 background-color: ${defaultPalette[500]};
                 color: ${textColor};
+            }
+
+            .ln-list-default li {
+                background-color: ${defaultPalette[800]} !important;
             }
         `;
 
