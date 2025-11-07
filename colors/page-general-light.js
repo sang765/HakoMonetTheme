@@ -1486,11 +1486,11 @@
                 color: ${textColor} !important;
             }
             .topview-item:first-child .series-name, .topview-item:nth-child(2) .series-name, .topview-item:nth-child(3) .series-name {
-                color: ${defaultPalette[500]} !important;
+                color: ${defaultPalette[500]};
             }
             .topview-item:first-child .topview_rank, .topview-item:nth-child(2) .topview_rank, .topview-item:nth-child(3) .topview_rank {
-                background-color: ${defaultPalette[500]} !important;
-                color: ${textColor} !important;
+                background-color: ${defaultPalette[500]};
+                color: ${textColor};
             }
         `;
 
