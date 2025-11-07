@@ -123,6 +123,9 @@
         });
 
         debugLog('Set up color change listener');
+
+        // Thiết lập theo dõi thay đổi avatar
+        setupAvatarChangeDetection();
     }
 
     function isValidColor(color) {
@@ -247,6 +250,55 @@
         debugLog('Is light color?', isLightColor);
 
         applyMonetColorScheme(monetPalette, isLightColor);
+    }
+
+    // Hàm thiết lập theo dõi thay đổi avatar
+    function setupAvatarChangeDetection() {
+        const avatarImg = document.querySelector('.nav-user_avatar img');
+        if (!avatarImg) {
+            debugLog('Không tìm thấy avatar element để theo dõi');
+            return;
+        }
+
+        debugLog('Thiết lập theo dõi thay đổi avatar');
+
+        // Lưu URL hiện tại để so sánh
+        let currentAvatarUrl = avatarImg.src || avatarImg.getAttribute('data-src');
+
+        // Sử dụng MutationObserver để theo dõi thay đổi src
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
+                    const newUrl = avatarImg.src || avatarImg.getAttribute('data-src');
+
+                    // Kiểm tra xem URL có thực sự thay đổi không
+                    if (newUrl && newUrl !== currentAvatarUrl) {
+                        debugLog('Phát hiện avatar thay đổi:', newUrl);
+
+                        const extractFromAvatar = window.HMTConfig && window.HMTConfig.getExtractColorFromAvatar ?
+                            window.HMTConfig.getExtractColorFromAvatar() : false;
+
+                        if (extractFromAvatar) {
+                            debugLog('Tự động cập nhật màu sắc từ avatar mới');
+                            // Đợi một chút để đảm bảo ảnh đã load xong
+                            setTimeout(() => {
+                                applyCurrentColorScheme();
+                            }, 1500);
+                        }
+
+                        // Cập nhật URL hiện tại
+                        currentAvatarUrl = newUrl;
+                    }
+                }
+            });
+        });
+
+        observer.observe(avatarImg, {
+            attributes: true,
+            attributeFilter: ['src', 'data-src']
+        });
+
+        debugLog('Đã thiết lập MutationObserver cho avatar');
     }
 
     // Hàm áp dụng màu từ avatar
