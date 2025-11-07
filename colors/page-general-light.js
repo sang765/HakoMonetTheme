@@ -217,6 +217,9 @@
     }
 
     function applyCurrentColorScheme() {
+        const extractFromAvatar = window.HMTConfig && window.HMTConfig.getExtractColorFromAvatar ?
+            window.HMTConfig.getExtractColorFromAvatar() : false;
+
         if (extractFromAvatar) {
             debugLog('Trích xuất màu từ avatar được bật, áp dụng màu từ avatar');
             applyAvatarColorScheme();
