@@ -2,32 +2,14 @@
     'use strict';
 
     const DEBUG = GM_getValue('debug_mode', false);
-    const SELECTORS = [
-        // Advertisement popup triggers
-        '[onclick*="window.open"]',
-        '[onclick*="popup"]',
-        '[onclick*="window"]',
-        '.popup-trigger',
-        '.open-popup',
-        '.popup-link',
-        'a[href*="popup"]',
-        'a[href*="javascript:window"]',
-        'button[onclick*="window"]',
-        // Ad specific selectors
-        '.ad-popup',
-        '.promo-popup',
-        '.newsletter-popup',
-        '.cookie-notice',
-        '.age-verification',
-        '.survey-popup',
-        '.advertisement-popup',
-        '.sponsored-popup',
-        '.marketing-popup'
-    ];
-
     const STORAGE_KEY = 'anti_popup_enabled';
     const BLOCKED_POPUPS_KEY = 'blocked_popups_count';
     const WHITELIST_KEY = 'popup_whitelist';
+
+    // User gesture tracking
+    let userGestureFlag = false;
+    let gestureTimeout = null;
+    const GESTURE_TIMEOUT_MS = 1000; // 1 second window for user gestures
 
     // Advertisement popup patterns to block (excluding authentication)
     const AD_PATTERNS = [
@@ -38,7 +20,7 @@
         'survey',
         'newsletter'
     ];
-    
+
     const SAFE_PATTERNS = [
         'login',
         'auth',
@@ -128,16 +110,42 @@
     // Check if URL is an advertisement popup
     function isAdPopup(url, name) {
         if (!url && !name) return false;
-        
+
         const urlString = (url || '').toLowerCase();
         const nameString = (name || '').toLowerCase();
-        
+
         return AD_PATTERNS.some(pattern =>
             urlString.includes(pattern) || nameString.includes(pattern)
         );
     }
 
-    // Override window.open to block only advertisement popups
+    // Track user gestures (mouse, touch, keyboard events)
+    function trackUserGestures() {
+        const events = ['mousedown', 'mouseup', 'click', 'touchstart', 'touchend', 'keydown', 'keyup'];
+
+        events.forEach(eventType => {
+            document.addEventListener(eventType, function() {
+                userGestureFlag = true;
+
+                // Clear existing timeout
+                if (gestureTimeout) {
+                    clearTimeout(gestureTimeout);
+                }
+
+                // Set new timeout to reset the flag
+                gestureTimeout = setTimeout(() => {
+                    userGestureFlag = false;
+                    gestureTimeout = null;
+                }, GESTURE_TIMEOUT_MS);
+
+                debugLog('User gesture detected:', eventType);
+            }, { capture: true, passive: true });
+        });
+
+        debugLog('User gesture tracking initialized');
+    }
+
+    // Override window.open to require user gestures for non-safe popups
     function overrideWindowOpen() {
         if (window._originalWindowOpen) {
             debugLog('Window.open already overridden, skipping');
@@ -156,13 +164,21 @@
                 return window._originalWindowOpen(url, name, features);
             }
 
-            // Allow safe popups (login/auth related)
+            // Allow safe popups (login/auth related) regardless of gesture
             if (isSafePopup(url, name)) {
                 debugLog('Popup allowed (safe):', url, name);
                 return window._originalWindowOpen(url, name, features);
             }
 
-            // Block advertisement popups
+            // Check if this is a user-initiated call
+            if (!userGestureFlag) {
+                debugLog('Popup blocked (no user gesture):', { url, name, features });
+                incrementBlockedCount();
+                showNotification(`Đã chặn popup không mong muốn: ${url || 'Unknown'}`, 3000);
+                return null;
+            }
+
+            // For user-initiated calls, still check for ad patterns
             if (isAdPopup(url, name)) {
                 debugLog('Ad popup blocked:', { url, name, features });
                 incrementBlockedCount();
@@ -170,12 +186,12 @@
                 return null;
             }
 
-            // Allow other popups by default (could be functional popups)
-            debugLog('Popup allowed (functional):', { url, name });
+            // Allow other user-initiated popups
+            debugLog('Popup allowed (user gesture):', { url, name });
             return window._originalWindowOpen(url, name, features);
         };
 
-        debugLog('Window.open has been overridden (ad popup only)');
+        debugLog('Window.open has been overridden (gesture-based)');
     }
 
     // Restore original window.open
@@ -187,111 +203,12 @@
         }
     }
 
-    // Check if element is safe (authentication/login related)
-    function isSafeElement(element) {
-        const text = (element.textContent || '').toLowerCase();
-        const href = (element.href || '').toLowerCase();
-        const className = (element.className || '').toLowerCase();
-        const id = (element.id || '').toLowerCase();
-        const onclick = (element.getAttribute('onclick') || '').toLowerCase();
-
-        const safeKeywords = [
-            'login', 'signin', 'auth', 'sign in', 'log in',
-            'google', 'facebook', 'twitter', 'oauth',
-            'đăng nhập', 'đăng ký', 'sign up'
-        ];
-
-        return safeKeywords.some(keyword =>
-            text.includes(keyword) ||
-            href.includes(keyword) ||
-            className.includes(keyword) ||
-            id.includes(keyword) ||
-            onclick.includes(keyword)
-        );
-    }
-
-    // Block advertisement popups based on selectors
-    function blockPopupTriggers() {
-        try {
-            debugLog('Starting to block popup triggers...');
-            let blockedCount = 0;
-
-            SELECTORS.forEach(selector => {
-                const elements = document.querySelectorAll(selector);
-                debugLog(`Found ${elements.length} elements for selector: ${selector}`);
-
-                elements.forEach(element => {
-                    // Skip if already processed or hidden
-                    if (element.getAttribute('data-anti-popup-processed') === 'true' ||
-                        element.style.display === 'none' ||
-                        element.offsetParent === null) {
-                        debugLog('Element already processed or hidden, skipping:', element);
-                        return;
-                    }
-
-                    // Skip if element is related to authentication/login
-                    if (isSafeElement(element)) {
-                        debugLog('Safe popup element skipped:', selector, element);
-                        return;
-                    }
-
-                    debugLog('Processing popup trigger element:', { selector, element, href: element.href, onclick: element.onclick });
-
-                    // Store original attributes
-                    const originalOnclick = element.getAttribute('onclick') || element.onclick;
-                    const originalHref = element.href;
-
-                    // Remove onclick handlers
-                    element.onclick = null;
-                    element.removeAttribute('onclick');
-
-                    // Store original click handler for potential restoration
-                    if (originalOnclick) {
-                        element.setAttribute('data-anti-popup-original-onclick', originalOnclick.toString());
-                    }
-
-                    // Add our own handler to block popup
-                    element.addEventListener('click', function blockPopupHandler(e) {
-                        debugLog('Popup trigger clicked:', { href: this.href, element: this });
-
-                        // Check if this should be allowed
-                        const href = this.href || '';
-                        if (isWhitelisted(href) || isSafeElement(this)) {
-                            debugLog('Popup allowed via click handler:', href);
-                            return; // Allow the click
-                        }
-
-                        e.preventDefault();
-                        e.stopPropagation();
-                        e.stopImmediatePropagation();
-
-                        debugLog('Ad popup trigger blocked:', { selector, element, href });
-                        incrementBlockedCount();
-
-                        showNotification(`Đã chặn quảng cáo popup: ${href || 'unknown'}`, 3000);
-                    }, true); // Use capture phase
-
-                    // Mark as processed
-                    element.setAttribute('data-anti-popup-processed', 'true');
-                    blockedCount++;
-                });
-            });
-
-            debugLog(`Blocked ${blockedCount} advertisement popup triggers total`);
-            return blockedCount;
-        } catch (error) {
-            debugLog('Error blocking popup triggers:', error);
-            return 0;
-        }
-    }
-
     // Enable anti-popup functionality
     function enableAntiPopup() {
         try {
             debugLog('Enabling Anti-Popup functionality...');
+            trackUserGestures();
             overrideWindowOpen();
-            blockPopupTriggers();
-            observeDynamicElements();
             showNotification('Anti-Popup đã được bật', 3000);
             debugLog('Anti-Popup functionality enabled successfully');
         } catch (error) {
@@ -299,94 +216,14 @@
         }
     }
 
-    // Restore original click handlers
-    function restorePopupTriggers() {
-        try {
-            const processedElements = document.querySelectorAll('[data-anti-popup-processed="true"]');
-            let restoredCount = 0;
-
-            processedElements.forEach(element => {
-                const originalOnclick = element.getAttribute('data-anti-popup-original-onclick');
-
-                if (originalOnclick) {
-                    try {
-                        element.setAttribute('onclick', originalOnclick);
-                    } catch (e) {
-                        debugLog('Error restoring onclick:', e);
-                    }
-                }
-
-                element.removeAttribute('data-anti-popup-processed');
-                element.removeAttribute('data-anti-popup-original-onclick');
-                restoredCount++;
-            });
-
-            if (restoredCount > 0) {
-                debugLog(`Restored ${restoredCount} popup triggers`);
-            }
-        } catch (error) {
-            debugLog('Error restoring popup triggers:', error);
-        }
-    }
-
     // Disable anti-popup functionality
     function disableAntiPopup() {
         try {
             restoreWindowOpen();
-            restorePopupTriggers();
             showNotification('Anti-Popup đã được tắt', 3000);
         } catch (error) {
             debugLog('Error disabling anti-popup:', error);
         }
-    }
-
-    // Observe for dynamically added elements
-    function observeDynamicElements() {
-        if (typeof MutationObserver === 'undefined') {
-            debugLog('MutationObserver not supported, skipping dynamic element observation');
-            return;
-        }
-
-        debugLog('Setting up dynamic element observer...');
-
-        const observer = new MutationObserver(function(mutations) {
-            if (!isAntiPopupEnabled()) {
-                debugLog('Anti-popup disabled, skipping mutation processing');
-                return;
-            }
-
-            let shouldCheckPopups = false;
-
-            mutations.forEach(function(mutation) {
-                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-                    mutation.addedNodes.forEach(node => {
-                        if (node.nodeType === 1) { // Element node
-                            if (SELECTORS.some(selector => node.matches?.(selector) || node.querySelector?.(selector))) {
-                                debugLog('Dynamic element matches popup selector:', { node, selector });
-                                shouldCheckPopups = true;
-                            }
-                        }
-                    });
-                }
-            });
-
-            if (shouldCheckPopups) {
-                debugLog('Dynamic elements detected, checking for popups in 100ms...');
-                setTimeout(() => {
-                    if (isAntiPopupEnabled()) {
-                        debugLog('Re-checking popup triggers for dynamic elements');
-                        blockPopupTriggers();
-                    }
-                }, 100);
-            }
-        });
-
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
-
-        debugLog('Dynamic element observer started');
     }
 
     // Create anti-popup dialog
@@ -421,7 +258,7 @@
                     <div class="hmt-antipopup-body">
                         <div class="hmt-antipopup-section">
                             <h4>Cài đặt Ad Popup Blocker</h4>
-                            <p>Chặn các popup quảng cáo không mong muốn. Tính năng này sẽ tự động ngăn chặn các trigger popup quảng cáo và override window.open() cho quảng cáo, nhưng cho phép popup đăng nhập như Google Login hoạt động bình thường.</p>
+                            <p>Chặn các popup quảng cáo không mong muốn bằng cách kiểm soát API window.open và yêu cầu tương tác người dùng. Tính năng này sẽ tự động ngăn chặn các popup không được kích hoạt bởi hành động của người dùng, nhưng cho phép popup đăng nhập như Google Login hoạt động bình thường.</p>
 
                             <div class="hmt-antipopup-status">
                                 <div class="hmt-status-item">
@@ -461,12 +298,12 @@
                         <div class="hmt-antipopup-whitelist">
                             <h4>Whitelist URLs</h4>
                             <p>Các URL trong danh sách này sẽ không bị chặn:</p>
-                            
+
                             <div class="hmt-whitelist-input">
                                 <input type="text" placeholder="Nhập URL để thêm vào whitelist" class="hmt-whitelist-text">
                                 <button class="hmt-whitelist-add">Thêm</button>
                             </div>
-                            
+
                             <div class="hmt-whitelist-list">
                                 ${whitelist.length > 0 ? whitelist.map(url => `
                                     <div class="hmt-whitelist-item">
@@ -480,9 +317,9 @@
                         <div class="hmt-antipopup-info">
                             <h4>Thông tin</h4>
                             <div class="hmt-info-content">
-                                <p><strong>Hoạt động:</strong> Chặn các popup quảng cáo bằng cách override window.open() và loại bỏ onclick handlers.</p>
-                                <p><strong>Đối tượng:</strong> Chỉ chặn quảng cáo popup, không ảnh hưởng đến popup đăng nhập như Google Login, Facebook Login.</p>
-                                <p><strong>An toàn:</strong> Tự động nhận diện và cho phép popup đăng nhập, xác thực hoạt động bình thường.</p>
+                                <p><strong>Cơ chế hoạt động:</strong> Override window.open() và chỉ cho phép gọi khi có tương tác người dùng trong vòng 1 giây. Các popup quảng cáo sẽ bị chặn ngay cả khi được kích hoạt bởi người dùng.</p>
+                                <p><strong>Đối tượng:</strong> Chỉ chặn popup quảng cáo và popup không mong muốn, không ảnh hưởng đến popup đăng nhập như Google Login, Facebook Login.</p>
+                                <p><strong>An toàn:</strong> Tự động nhận diện và cho phép popup đăng nhập, xác thực hoạt động bình thường. Không thể bị phát hiện bởi các script khác.</p>
                                 <p><strong>Whitelist:</strong> Các URL trong whitelist sẽ không bị chặn để đảm bảo chức năng bình thường.</p>
                                 <p><strong>Lưu ý:</strong> Thay đổi cài đặt sẽ được áp dụng ngay lập tức và được lưu lại cho các lần truy cập sau.</p>
                             </div>
@@ -1096,10 +933,10 @@
     function showStats() {
         const blockedCount = getBlockedCount();
         const whitelist = getWhitelist();
-        
+
         const stats = `
 Anti-Popup Statistics:
-─────────────────────
+────────────────────
 Tổng số popup đã chặn: ${blockedCount}
 Số URL trong whitelist: ${whitelist.length}
 
