@@ -743,19 +743,40 @@
                                 // Submit the form containing the original input
                                 const form = originalFileInput.closest('form');
                                 if (form) {
-                                    debugLog('Submitting form with cropped image');
-                                    setTimeout(() => {
-                                        try {
-                                            form.submit();
-                                            showNotification('Ảnh đã được cắt và đang upload!', 3000);
-                                        } catch (error) {
-                                            debugLog('Form submission failed:', error);
-                                            showNotification('Không thể upload ảnh.', 5000);
-                                        }
-                                    }, 100);
+                                    debugLog('Found form, attempting to submit:', form, 'action:', form.action);
+                                    // Try to find and click the submit button instead of calling form.submit()
+                                    const submitButton = form.querySelector('input[type="submit"], button[type="submit"], button:not([type]), input[type="button"][value*="upload"], button[value*="upload"]');
+                                    if (submitButton) {
+                                        debugLog('Found submit button, clicking it:', submitButton);
+                                        setTimeout(() => {
+                                            try {
+                                                submitButton.click();
+                                                showNotification('Ảnh đã được cắt và đang upload!', 3000);
+                                            } catch (error) {
+                                                debugLog('Submit button click failed:', error);
+                                                showNotification('Không thể upload ảnh.', 5000);
+                                            }
+                                        }, 100);
+                                    } else {
+                                        debugLog('No submit button found, trying form.submit()');
+                                        setTimeout(() => {
+                                            try {
+                                                form.submit();
+                                                showNotification('Ảnh đã được cắt và đang upload!', 3000);
+                                            } catch (error) {
+                                                debugLog('Form submission failed:', error);
+                                                showNotification('Không thể upload ảnh.', 5000);
+                                            }
+                                        }, 100);
+                                    }
                                 } else {
-                                    debugLog('No form found for original input');
-                                    showNotification('Không tìm thấy form để upload ảnh.', 5000);
+                                    debugLog('No form found for original input, trying to trigger change event');
+                                    // If no form, try to trigger change event to simulate upload
+                                    setTimeout(() => {
+                                        const changeEvent = new Event('change', { bubbles: true });
+                                        originalFileInput.dispatchEvent(changeEvent);
+                                        showNotification('Ảnh đã được cắt và đang upload!', 3000);
+                                    }, 100);
                                 }
                             } else {
                                 debugLog('Original file input not found');
