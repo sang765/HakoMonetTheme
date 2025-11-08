@@ -98,33 +98,121 @@
 
         const modal = document.createElement('div');
         modal.className = 'hmt-crop-modal-overlay';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        `;
         modal.innerHTML = `
-            <div class="hmt-crop-modal">
-                <div class="hmt-crop-header">
-                    <h3>Cắt ảnh profile banner</h3>
-                    <button class="hmt-crop-close">&times;</button>
+            <div class="hmt-crop-modal" style="
+                background: white;
+                border-radius: 10px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                max-width: 90vw;
+                max-height: 90vh;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            ">
+                <div class="hmt-crop-header" style="
+                    padding: 15px 20px;
+                    border-bottom: 1px solid #ddd;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                ">
+                    <h3 style="margin: 0; font-size: 18px; font-weight: 600;">Cắt ảnh profile banner</h3>
+                    <button class="hmt-crop-close" style="
+                        background: none;
+                        border: none;
+                        font-size: 24px;
+                        cursor: pointer;
+                        color: #666;
+                        padding: 0;
+                        width: 30px;
+                        height: 30px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    ">&times;</button>
                 </div>
-                <div class="hmt-crop-body">
-                    <div class="hmt-crop-container">
-                        <img id="hmt-crop-image" alt="Profile banner preview">
+                <div class="hmt-crop-body" style="
+                    padding: 20px;
+                    display: flex;
+                    gap: 20px;
+                    flex: 1;
+                    overflow: hidden;
+                ">
+                    <div class="hmt-crop-container" style="
+                        flex: 1;
+                        min-height: 300px;
+                        border: 1px solid #ddd;
+                        border-radius: 5px;
+                        overflow: hidden;
+                    ">
+                        <img id="hmt-crop-image" alt="Profile banner preview" style="max-width: 100%; display: block;">
                     </div>
-                    <div class="hmt-crop-info">
-                        <p>Kích thước tối thiểu: ${MIN_WIDTH}x${MIN_HEIGHT}px</p>
-                        <p>Tỷ lệ: ${ASPECT_RATIO}:1</p>
+                    <div class="hmt-crop-info" style="
+                        width: 200px;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 15px;
+                    ">
+                        <div>
+                            <p style="margin: 0; font-size: 14px;">Kích thước tối thiểu: ${MIN_WIDTH}x${MIN_HEIGHT}px</p>
+                            <p style="margin: 0; font-size: 14px;">Tỷ lệ: ${ASPECT_RATIO}:1</p>
+                        </div>
                         <div class="hmt-crop-preview">
-                            <h4>Xem trước:</h4>
-                            <div class="hmt-crop-preview-box"></div>
+                            <h4 style="margin: 0 0 10px 0; font-size: 16px;">Xem trước:</h4>
+                            <div class="hmt-crop-preview-box" style="
+                                width: 200px;
+                                height: 50px;
+                                border: 1px solid #ddd;
+                                border-radius: 3px;
+                                background: #f5f5f5;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                overflow: hidden;
+                            "></div>
                         </div>
                     </div>
                 </div>
-                <div class="hmt-crop-footer">
-                    <button class="hmt-crop-cancel">Hủy</button>
-                    <button class="hmt-crop-upload">Cắt & Upload</button>
+                <div class="hmt-crop-footer" style="
+                    padding: 15px 20px;
+                    border-top: 1px solid #ddd;
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: 10px;
+                ">
+                    <button class="hmt-crop-cancel" style="
+                        padding: 8px 16px;
+                        border: 1px solid #ddd;
+                        background: white;
+                        border-radius: 5px;
+                        cursor: pointer;
+                    ">Hủy</button>
+                    <button class="hmt-crop-upload" style="
+                        padding: 8px 16px;
+                        border: none;
+                        background: #007bff;
+                        color: white;
+                        border-radius: 5px;
+                        cursor: pointer;
+                    ">Cắt & Upload</button>
                 </div>
             </div>
         `;
 
         document.body.appendChild(modal);
+        debugLog('Modal appended to body');
 
         const img = modal.querySelector('#hmt-crop-image');
         const closeBtn = modal.querySelector('.hmt-crop-close');
@@ -132,14 +220,18 @@
         const uploadBtn = modal.querySelector('.hmt-crop-upload');
         const previewBox = modal.querySelector('.hmt-crop-preview-box');
 
+        debugLog('Modal elements found:', !!img, !!closeBtn, !!cancelBtn, !!uploadBtn, !!previewBox);
+
         let cropper = null;
 
         // Load image
         const reader = new FileReader();
         reader.onload = function(e) {
+            debugLog('Image loaded from FileReader');
             img.src = e.target.result;
 
             img.onload = function() {
+                debugLog('Image element loaded, dimensions:', img.naturalWidth, 'x', img.naturalHeight);
                 // Validate image dimensions
                 if (img.naturalWidth < MIN_WIDTH || img.naturalHeight < MIN_HEIGHT) {
                     showNotification(`Ảnh quá nhỏ! Yêu cầu tối thiểu ${MIN_WIDTH}x${MIN_HEIGHT}px. Ảnh hiện tại: ${img.naturalWidth}x${img.naturalHeight}px`, 5000);
@@ -148,26 +240,35 @@
                 }
 
                 // Initialize Cropper
-                cropper = new Cropper(img, {
-                    aspectRatio: ASPECT_RATIO,
-                    viewMode: 1,
-                    autoCropArea: 1.0,
-                    responsive: true,
-                    restore: false,
-                    guides: true,
-                    center: true,
-                    highlight: false,
-                    cropBoxMovable: true,
-                    cropBoxResizable: true,
-                    toggleDragModeOnDblclick: false,
-                    ready: function() {
-                        debugLog('Cropper ready');
-                        updatePreview();
-                    },
-                    crop: function(event) {
-                        updatePreview();
-                    }
-                });
+                debugLog('Initializing Cropper.js');
+                try {
+                    cropper = new Cropper(img, {
+                        aspectRatio: ASPECT_RATIO,
+                        viewMode: 1,
+                        autoCropArea: 1.0,
+                        responsive: true,
+                        restore: false,
+                        guides: true,
+                        center: true,
+                        highlight: false,
+                        cropBoxMovable: true,
+                        cropBoxResizable: true,
+                        toggleDragModeOnDblclick: false,
+                        ready: function() {
+                            debugLog('Cropper ready');
+                            updatePreview();
+                        },
+                        crop: function(event) {
+                            updatePreview();
+                        }
+                    });
+                    debugLog('Cropper initialized successfully');
+                } catch (error) {
+                    debugLog('Error initializing Cropper:', error);
+                    showNotification('Không thể khởi tạo công cụ cắt ảnh.', 5000);
+                    modal.remove();
+                    return;
+                }
 
                 function updatePreview() {
                     if (!cropper) return;
