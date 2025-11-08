@@ -25,6 +25,8 @@
         } else if (DEBUG) {
             console.log('[ProfileBannerCropper]', ...args);
         }
+        // Always log for debugging
+        console.log('[ProfileBannerCropper]', ...args);
     }
 
     // Cached Cropper.js library
@@ -501,8 +503,11 @@
 
         // Check if we're on a profile page
         const isProfilePage = window.location.href.includes('/user/') ||
-                             window.location.href.includes('/profile') ||
-                             document.querySelector('[class*="profile"], [id*="profile"]');
+                              window.location.href.includes('/profile') ||
+                              document.querySelector('[class*="profile"], [id*="profile"]');
+
+        debugLog('Current URL:', window.location.href);
+        debugLog('Is profile page:', isProfilePage);
 
         if (!isProfilePage) {
             debugLog('Not on profile page, skipping initialization');
@@ -511,9 +516,12 @@
     
         // Handle profile changer element
         const profileChanger = document.querySelector('.profile-changer');
+        debugLog('Profile changer element found:', !!profileChanger);
         if (profileChanger) {
+            debugLog('Showing profile changer element');
             profileChanger.classList.remove('none'); // Show the profile changer element
             profileChanger.addEventListener('click', () => {
+                debugLog('Profile changer clicked');
                 const fileInput = document.createElement('input');
                 fileInput.type = 'file';
                 fileInput.accept = 'image/*';
