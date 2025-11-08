@@ -1031,7 +1031,32 @@ ${!isInfoPage() ? `
 
         // CSS đã được load từ external file, không cần GM_addStyle nữa
 
-        (window.top || window).document.body.appendChild(dialog);
+        // Find the first html element within the first 5 lines of the document
+        const htmlContent = document.documentElement.outerHTML;
+        const lines = htmlContent.split('\n').slice(0, 5).join('\n');
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = lines;
+        const firstHtml = tempDiv.querySelector('html');
+
+        let targetElement = document.documentElement; // Default to root html
+
+        if (firstHtml) {
+            // Use the html element found in first 5 lines
+            targetElement = firstHtml;
+        }
+
+        // Remove any existing dialogs from the target element to prevent accumulation
+        const existingDialog = targetElement.querySelector('.hmt-config-dialog');
+        if (existingDialog) {
+            existingDialog.remove();
+        }
+
+        // Remove any existing styles to prevent accumulation
+        const existingLinks = document.head.querySelectorAll(`link[href*="${CSS_FILE}"]`);
+        existingLinks.forEach(link => link.remove());
+
+        // Append dialog to the target html element (right after opening tag)
+        targetElement.insertBefore(dialog, targetElement.firstChild);
 
         // Đồng bộ màu hiện tại với tất cả các elements
          debugLog('Đồng bộ màu hiện tại với dialog:', currentColor);

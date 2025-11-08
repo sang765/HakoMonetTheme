@@ -33,24 +33,22 @@
       */
      function openMainMenu() {
          try {
-             // Find the main body element (first html > body, or document.body as fallback)
-             // In case of multiple html elements (rare), prioritize the first one
-             const htmlElements = document.querySelectorAll('html');
-             let targetBody = document.body; // Default fallback
+             // Find the first html element within the first 5 lines of the document
+             const htmlContent = document.documentElement.outerHTML;
+             const lines = htmlContent.split('\n').slice(0, 5).join('\n');
+             const tempDiv = document.createElement('div');
+             tempDiv.innerHTML = lines;
+             const firstHtml = tempDiv.querySelector('html');
 
-             if (htmlElements.length > 0) {
-                 // Find the first html that has a body child
-                 for (const html of htmlElements) {
-                     const body = html.querySelector('body');
-                     if (body) {
-                         targetBody = body;
-                         break;
-                     }
-                 }
+             let targetElement = document.documentElement; // Default to root html
+
+             if (firstHtml) {
+                 // Use the html element found in first 5 lines
+                 targetElement = firstHtml;
              }
 
-             // Remove any existing dialogs from the target body to prevent accumulation
-             const existingDialog = targetBody.querySelector(`.${DIALOG_CLASS}`);
+             // Remove any existing dialogs from the target element to prevent accumulation
+             const existingDialog = targetElement.querySelector(`.${DIALOG_CLASS}`);
              if (existingDialog) {
                  existingDialog.remove();
                  debugLog('Removed existing dialog');
@@ -72,8 +70,8 @@
             // Load and apply CSS styles
             loadAndApplyStyles();
 
-            // Append dialog to the target body element
-            targetBody.appendChild(dialog);
+            // Append dialog to the target html element (right after opening tag)
+            targetElement.insertBefore(dialog, targetElement.firstChild);
 
             // Setup event listeners
             setupEventListeners(dialog);
