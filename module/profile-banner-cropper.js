@@ -434,76 +434,79 @@
             return;
         }
 
-        debugLog('Found profile banner input:', fileInput);
+        debugLog('Found profile banner input:', fileInput, fileInput.id, fileInput.name);
 
         // Intercept change event
         fileInput.addEventListener('change', function(e) {
-        const files = e.target.files;
-        if (files.length === 0) return;
+            debugLog('File input change event triggered');
+            const files = e.target.files;
+            if (files.length === 0) return;
 
-        const file = files[0];
+            const file = files[0];
 
-        // Check if it's an image
-        if (!file.type.startsWith('image/')) {
-            debugLog('Selected file is not an image');
-            return;
-        }
+            // Check if it's an image
+            if (!file.type.startsWith('image/')) {
+                debugLog('Selected file is not an image');
+                return;
+            }
 
-        debugLog('Image selected:', file.name, file.size, 'bytes');
+            debugLog('Image selected:', file.name, file.size, 'bytes');
 
-        // Prevent default upload
-        e.preventDefault();
-        e.stopPropagation();
+            // Prevent default upload
+            e.preventDefault();
+            e.stopPropagation();
 
-        // Clear the input
-        e.target.value = '';
+            // Clear the input
+            e.target.value = '';
 
-        // Load Cropper.js and show modal
-        loadCropperLibrary().then(() => {
-            createCropModal(file, function(croppedFile) {
-                debugLog('Uploading cropped image...');
+            // Load Cropper.js and show modal
+            loadCropperLibrary().then(() => {
+                createCropModal(file, function(croppedFile) {
+                    debugLog('Uploading cropped image...');
 
-                // Create new FileList with cropped file
-                const dt = new DataTransfer();
-                dt.items.add(croppedFile);
-                fileInput.files = dt.files;
+                    // Create new FileList with cropped file
+                    const dt = new DataTransfer();
+                    dt.items.add(croppedFile);
+                    fileInput.files = dt.files;
 
-                // Trigger upload
-                const form = fileInput.closest('form');
-                if (form) {
-                    // Try to submit the form
-                    const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
-                    if (!form.dispatchEvent(submitEvent)) {
-                        debugLog('Form submission was cancelled');
-                        return;
-                    }
+                    // Trigger upload
+                    const form = fileInput.closest('form');
+                    if (form) {
+                        debugLog('Found form, submitting:', form);
+                        // Try to submit the form
+                        const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+                        if (!form.dispatchEvent(submitEvent)) {
+                            debugLog('Form submission was cancelled');
+                            return;
+                        }
 
-                    // If form has onsubmit handler, it might handle the submission
-                    if (form.onsubmit) {
-                        form.onsubmit();
+                        // If form has onsubmit handler, it might handle the submission
+                        if (form.onsubmit) {
+                            form.onsubmit();
+                        } else {
+                            form.submit();
+                        }
                     } else {
-                        form.submit();
+                        debugLog('No form found, triggering change event');
+                        // If no form, try to trigger change event to simulate upload
+                        const changeEvent = new Event('change', { bubbles: true });
+                        fileInput.dispatchEvent(changeEvent);
                     }
-                } else {
-                    // If no form, try to trigger change event to simulate upload
-                    const changeEvent = new Event('change', { bubbles: true });
-                    fileInput.dispatchEvent(changeEvent);
-                }
 
-                showNotification('Ảnh đã được cắt và đang upload!', 3000);
+                    showNotification('Ảnh đã được cắt và đang upload!', 3000);
+                });
+            }).catch(error => {
+                debugLog('Failed to load Cropper.js:', error);
+                showNotification('Không thể tải thư viện cắt ảnh. Upload ảnh gốc.', 5000);
+
+                // Fallback: upload original file
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                fileInput.files = dt.files;
+                const changeEvent = new Event('change', { bubbles: true });
+                fileInput.dispatchEvent(changeEvent);
             });
-        }).catch(error => {
-            debugLog('Failed to load Cropper.js:', error);
-            showNotification('Không thể tải thư viện cắt ảnh. Upload ảnh gốc.', 5000);
-
-            // Fallback: upload original file
-            const dt = new DataTransfer();
-            dt.items.add(file);
-            fileInput.files = dt.files;
-            const changeEvent = new Event('change', { bubbles: true });
-            fileInput.dispatchEvent(changeEvent);
-        });
-    }, true); // Use capture phase to intercept before other handlers
+        }, true); // Use capture phase to intercept before other handlers
     }
 
     /**
@@ -518,7 +521,7 @@
                               document.querySelector('[class*="profile"], [id*="profile"]');
 
         debugLog('Current URL:', window.location.href);
-        debugLog('Is profile page:', isProfilePage);
+        debugLog('Is profile page:', isProfilePage, document.querySelector('[class*="profile"], [id*="profile"]'));
 
         if (!isProfilePage) {
             debugLog('Not on profile page, skipping initialization');
@@ -527,7 +530,7 @@
     
         // Handle profile changer element
         const profileChanger = document.querySelector('.profile-changer');
-        debugLog('Profile changer element found:', !!profileChanger);
+        debugLog('Profile changer element found:', !!profileChanger, profileChanger);
         if (profileChanger) {
             debugLog('Showing profile changer element');
             profileChanger.classList.remove('none'); // Show the profile changer element
@@ -632,6 +635,12 @@
             debugLog('Delayed interception after 2 seconds');
             interceptFileInput();
         }, 2000);
+
+        // Also try after a longer delay for dynamic content
+        setTimeout(function() {
+            debugLog('Delayed interception after 5 seconds');
+            interceptFileInput();
+        }, 5000);
 
         debugLog('Profile Banner Cropper module initialized');
     }
