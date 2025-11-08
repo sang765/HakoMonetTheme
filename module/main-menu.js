@@ -30,14 +30,35 @@
 
     /**
      * Opens the main menu dialog with optimized performance and error handling
-     */
-    function openMainMenu() {
-        try {
-            // Prevent multiple dialogs
-            if (document.querySelector(`.${DIALOG_CLASS}`)) {
-                debugLog('Dialog already exists, skipping creation');
-                return;
-            }
+      */
+     function openMainMenu() {
+         try {
+             // Find the main body element (first html > body, or document.body as fallback)
+             // In case of multiple html elements (rare), prioritize the first one
+             const htmlElements = document.querySelectorAll('html');
+             let targetBody = document.body; // Default fallback
+
+             if (htmlElements.length > 0) {
+                 // Find the first html that has a body child
+                 for (const html of htmlElements) {
+                     const body = html.querySelector('body');
+                     if (body) {
+                         targetBody = body;
+                         break;
+                     }
+                 }
+             }
+
+             // Remove any existing dialogs from the target body to prevent accumulation
+             const existingDialog = targetBody.querySelector(`.${DIALOG_CLASS}`);
+             if (existingDialog) {
+                 existingDialog.remove();
+                 debugLog('Removed existing dialog');
+             }
+
+             // Remove any existing styles to prevent accumulation
+             const existingLinks = document.head.querySelectorAll(`link[href*="${CSS_FILE}"]`);
+             existingLinks.forEach(link => link.remove());
 
             // Check for updates on menu open
             checkForUpdatesOnMenuOpen();
@@ -51,8 +72,8 @@
             // Load and apply CSS styles
             loadAndApplyStyles();
 
-            // Append dialog to body
-            document.body.appendChild(dialog);
+            // Append dialog to the target body element
+            targetBody.appendChild(dialog);
 
             // Setup event listeners
             setupEventListeners(dialog);
@@ -157,11 +178,13 @@
      */
     function loadAndApplyStyles() {
         if (cachedCssBlobUrl) {
-            // Use cached styles
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = cachedCssBlobUrl;
-            document.head.appendChild(link);
+            // Check if styles are already applied to avoid duplicates
+            if (!document.head.querySelector(`link[href="${cachedCssBlobUrl}"]`)) {
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = cachedCssBlobUrl;
+                document.head.appendChild(link);
+            }
             debugLog('Using cached CSS styles');
             return;
         }
@@ -182,11 +205,13 @@
             const blob = new Blob([css], { type: 'text/css' });
             cachedCssBlobUrl = URL.createObjectURL(blob);
 
-            // Create link element and apply CSS
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = cachedCssBlobUrl;
-            document.head.appendChild(link);
+            // Create link element and apply CSS, check for duplicates
+            if (!document.head.querySelector(`link[href="${cachedCssBlobUrl}"]`)) {
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = cachedCssBlobUrl;
+                document.head.appendChild(link);
+            }
 
             debugLog('CSS styles loaded and cached successfully');
         })
@@ -211,7 +236,10 @@
             // Close dialog function
             const closeDialog = () => {
                 dialog.remove();
-                debugLog('Dialog closed');
+                // Clean up styles when dialog closes to prevent accumulation
+                const existingLinks = document.head.querySelectorAll(`link[href*="${CSS_FILE}"]`);
+                existingLinks.forEach(link => link.remove());
+                debugLog('Dialog closed and styles cleaned up');
             };
 
             // Close button events
