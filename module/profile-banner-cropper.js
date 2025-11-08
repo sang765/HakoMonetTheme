@@ -602,8 +602,16 @@
         debugLog('Found profile banner input:', fileInput, fileInput.id, fileInput.name);
 
         // Intercept change event
+        let isProcessing = false;
         fileInput.addEventListener('change', function(e) {
             debugLog('File input change event triggered');
+
+            // Prevent infinite loop
+            if (isProcessing) {
+                debugLog('Already processing, skipping');
+                return;
+            }
+
             const files = e.target.files;
             if (files.length === 0) return;
 
@@ -624,6 +632,8 @@
             // Clear the input
             e.target.value = '';
 
+            isProcessing = true;
+
             // Load Cropper.js and show modal
             loadCropperLibrary().then(() => {
                 createCropModal(file, function(croppedFile) {
@@ -642,6 +652,7 @@
                         const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
                         if (!form.dispatchEvent(submitEvent)) {
                             debugLog('Form submission was cancelled');
+                            isProcessing = false;
                             return;
                         }
 
@@ -659,6 +670,7 @@
                     }
 
                     showNotification('Ảnh đã được cắt và đang upload!', 3000);
+                    isProcessing = false;
                 });
             }).catch(error => {
                 debugLog('Failed to load Cropper.js:', error);
@@ -670,6 +682,7 @@
                 fileInput.files = dt.files;
                 const changeEvent = new Event('change', { bubbles: true });
                 fileInput.dispatchEvent(changeEvent);
+                isProcessing = false;
             });
         }, true); // Use capture phase to intercept before other handlers
     }
@@ -736,23 +749,25 @@
                             debugLog('Uploading cropped image...');
 
                             // Find the actual file input on the page to upload the cropped image
-                            const actualFileInput = document.querySelector('input[type="file"]');
+                            const actualFileInput = document.querySelector('input[type="file"][id="user_cover_file"]') || document.querySelector('input[type="file"]');
                             if (actualFileInput) {
+                                debugLog('Found actual file input:', actualFileInput.id, actualFileInput.name);
                                 // Create new FileList with cropped file
                                 const dt = new DataTransfer();
                                 dt.items.add(croppedFile);
                                 actualFileInput.files = dt.files;
-
+        
                                 // Trigger upload
                                 const form = actualFileInput.closest('form');
                                 if (form) {
+                                    debugLog('Found form, submitting:', form);
                                     // Try to submit the form
                                     const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
                                     if (!form.dispatchEvent(submitEvent)) {
                                         debugLog('Form submission was cancelled');
                                         return;
                                     }
-
+        
                                     // If form has onsubmit handler, it might handle the submission
                                     if (form.onsubmit) {
                                         form.onsubmit();
@@ -760,18 +775,24 @@
                                         form.submit();
                                     }
                                 } else {
+                                    debugLog('No form found, triggering change event');
                                     // If no form, try to trigger change event to simulate upload
                                     const changeEvent = new Event('change', { bubbles: true });
                                     actualFileInput.dispatchEvent(changeEvent);
                                 }
-
+        
                                 showNotification('Ảnh đã được cắt và đang upload!', 3000);
                             } else {
+                                debugLog('No file input found for upload');
                                 showNotification('Không tìm thấy input để upload ảnh.', 5000);
                             }
 
-                            // Remove the temporary input
-                            fileInput.remove();
+                            // Remove the temporary input after a delay to allow processing
+                            setTimeout(() => {
+                                if (fileInput && fileInput.parentElement) {
+                                    fileInput.remove();
+                                }
+                            }, 1000);
                         });
                     }).catch(error => {
                         debugLog('Failed to load Cropper.js:', error);
