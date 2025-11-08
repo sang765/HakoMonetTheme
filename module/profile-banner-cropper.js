@@ -151,7 +151,7 @@
                 cropper = new Cropper(img, {
                     aspectRatio: ASPECT_RATIO,
                     viewMode: 1,
-                    autoCropArea: 1,
+                    autoCropArea: 1.0,
                     responsive: true,
                     restore: false,
                     guides: true,
@@ -175,7 +175,9 @@
                     const canvas = cropper.getCroppedCanvas({
                         width: MIN_WIDTH,
                         height: MIN_HEIGHT,
-                        fillColor: '#fff'
+                        fillColor: '#fff',
+                        imageSmoothingEnabled: true,
+                        imageSmoothingQuality: 'high'
                     });
 
                     if (canvas) {
@@ -183,6 +185,7 @@
                         canvas.style.maxWidth = '200px';
                         canvas.style.maxHeight = '50px';
                         canvas.style.border = '1px solid #ddd';
+                        canvas.style.objectFit = 'contain';
                         previewBox.appendChild(canvas);
                     }
                 }
@@ -213,11 +216,19 @@
             const canvas = cropper.getCroppedCanvas({
                 width: MIN_WIDTH,
                 height: MIN_HEIGHT,
-                fillColor: '#fff'
+                fillColor: '#fff',
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high'
             });
 
             if (canvas) {
                 canvas.toBlob(function(blob) {
+                    if (!blob) {
+                        debugLog('Failed to create blob from canvas');
+                        showNotification('Không thể tạo ảnh đã cắt.', 5000);
+                        return;
+                    }
+
                     const croppedFile = new File([blob], imageFile.name, {
                         type: 'image/jpeg',
                         lastModified: Date.now()
@@ -607,13 +618,20 @@
     
         // Wait for DOM to be ready
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', interceptFileInput);
+            document.addEventListener('DOMContentLoaded', function() {
+                debugLog('DOMContentLoaded fired, intercepting file inputs');
+                interceptFileInput();
+            });
         } else {
+            debugLog('DOM already loaded, intercepting file inputs');
             interceptFileInput();
         }
 
         // Also try after a short delay in case elements are loaded dynamically
-        setTimeout(interceptFileInput, 2000);
+        setTimeout(function() {
+            debugLog('Delayed interception after 2 seconds');
+            interceptFileInput();
+        }, 2000);
 
         debugLog('Profile Banner Cropper module initialized');
     }
