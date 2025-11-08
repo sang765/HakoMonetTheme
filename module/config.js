@@ -961,8 +961,8 @@ ${!isInfoPage() ? `
 
                         <div class="hmt-config-section">
                             <h4>Lấy avatar làm màu chủ đạo</h4>
-                            <p>Lấy màu chủ đạo từ ảnh avatar của bạn để làm màu theme (chỉ áp dụng với giao diện chung, Không ảnh hưởng tới trang thông tin và trang đọc truyện). Hỗ trợ JPG, PNG và GIF. Khi bật, cài đặt chọn màu tùy chỉnh sẽ bị ẩn sau khi lưu.</p>
-                            <small class="hmt-color-help">LƯU Ý: Với ảnh GIF chỉ trích xuất với frame đầu tiên để tập trung vào tối ưu hóa.</small>
+                            <p>Lấy màu chủ đạo từ ảnh avatar của bạn để làm màu theme <span style="color: #ffee00ff;">(chỉ áp dụng với giao diện chung, Không ảnh hưởng tới trang thông tin và trang đọc truyện)</span>. Hỗ trợ JPG, PNG và GIF. Khi bật, cài đặt chọn màu tùy chỉnh sẽ bị ẩn sau khi lưu.</p>
+                            <small class="hmt-color-help" style="color: #fd7e14;">LƯU Ý: Với ảnh GIF chỉ trích xuất với frame đầu tiên để tập trung vào tối ưu hóa.</small>
 
                             <div class="hmt-avatar-color-toggle">
                                 <label class="hmt-toggle-label">

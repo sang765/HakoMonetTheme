@@ -54,6 +54,7 @@
 // @resource     darkModePrompterJS ./module/dark-mode-prompter.js
 // @resource     fullscreenJS ./module/fullscreen.js
 // @resource     deviceCSSLoaderJS ./module/device-css-loader.js
+// @resource     profileBannerCropperJS ./module/profile-banner-cropper.js
 // @resource     html2canvasJS ./api/html2canvas.min.js
 // @resource     monetTestJS ./api/monet-test.js
 // @resource     colorisJS ./api/coloris.min.js
@@ -333,7 +334,7 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
             'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyenlight', 'themeDetectorJS',
             'deviceDetectorJS', 'configJS', 'adBlockerJS', 'autoReloadJS', 'antiPopupJS',
             'mainMenuJS', 'navbarLogoJS', 'updateManagerJS', 'darkModePrompterJS', 'fullscreenJS',
-            'readingPageJS', 'deviceCSSLoaderJS'
+            'readingPageJS', 'deviceCSSLoaderJS', 'profileBannerCropperJS'
         ];
 
         let loadedCount = 0;
