@@ -675,6 +675,10 @@
     function init() {
         debugLog('Initializing Profile Banner Cropper module');
 
+        // TEMPORARILY DISABLED - Module is having upload issues
+        debugLog('Profile Banner Cropper module is temporarily disabled');
+        return;
+
         // Check if we're on a profile page
         const isProfilePage = window.location.href.includes('/user/') ||
                               window.location.href.includes('/profile') ||
