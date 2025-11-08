@@ -98,7 +98,7 @@ Nếu bạn gặp vấn đề hoặc có đề xuất cải tiến, vui lòng:
 ### Với người dùng phổ thông:
 - Chỉ cần vào trang web và tận hưởng thành quả. Nếu cần update màu theme chỉ cần mở script manager extension của bạn lên rồi click "Menu chính > Cài đặt".
 
-### Với devenloper và phát triển repository:
+### Với developer và phát triển repository:
 - Vui lòng đọc:
   - [Hướng dẫn API chung](./docs/monet-api-guide.md)
   - [Hướng dẫn sử dụng MonetAPI v1](./docs/monet-api-v1-guide.md)
