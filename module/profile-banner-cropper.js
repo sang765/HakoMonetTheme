@@ -291,11 +291,25 @@
                     }
                 }
             };
+
+            img.onerror = function() {
+                debugLog('Error loading image');
+                showNotification('Không thể tải ảnh.', 5000);
+                modal.remove();
+            };
         };
+
+        reader.onerror = function() {
+            debugLog('Error reading file');
+            showNotification('Không thể đọc file ảnh.', 5000);
+            modal.remove();
+        };
+
         reader.readAsDataURL(imageFile);
 
         // Event handlers
         function closeModal() {
+            debugLog('Closing modal');
             if (cropper) {
                 cropper.destroy();
             }
@@ -307,12 +321,17 @@
 
         modal.addEventListener('click', function(e) {
             if (e.target === modal) {
+                debugLog('Clicked outside modal, closing');
                 closeModal();
             }
         });
 
         uploadBtn.addEventListener('click', function() {
-            if (!cropper) return;
+            debugLog('Upload button clicked');
+            if (!cropper) {
+                debugLog('No cropper instance');
+                return;
+            }
 
             const canvas = cropper.getCroppedCanvas({
                 width: MIN_WIDTH,
@@ -323,6 +342,7 @@
             });
 
             if (canvas) {
+                debugLog('Canvas created, converting to blob');
                 canvas.toBlob(function(blob) {
                     if (!blob) {
                         debugLog('Failed to create blob from canvas');
@@ -344,16 +364,24 @@
 
                     closeModal();
                 }, 'image/jpeg', 0.9);
+            } else {
+                debugLog('Failed to get cropped canvas');
+                showNotification('Không thể tạo canvas đã cắt.', 5000);
             }
         });
 
         // ESC key handler
         document.addEventListener('keydown', function escHandler(e) {
             if (e.key === 'Escape') {
+                debugLog('ESC key pressed, closing modal');
                 closeModal();
                 document.removeEventListener('keydown', escHandler);
             }
         });
+
+        // Prevent modal from disappearing immediately
+        modal.style.display = 'flex';
+        debugLog('Modal should now be visible');
     }
 
     /**
