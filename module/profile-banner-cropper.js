@@ -18,6 +18,7 @@
     const MIN_WIDTH = 1200;
     const MIN_HEIGHT = 300;
     const ASPECT_RATIO = 4; // 1200/300 = 4:1
+    const ALLOW_SMALL_IMAGES = true; // Allow images smaller than minimum size, will resize them
 
     function debugLog(...args) {
         if (DEBUG && typeof window.Logger !== 'undefined') {
@@ -232,11 +233,18 @@
 
             img.onload = function() {
                 debugLog('Image element loaded, dimensions:', img.naturalWidth, 'x', img.naturalHeight);
-                // Validate image dimensions
+
+                // Check if image needs resizing
+                let needsResize = false;
                 if (img.naturalWidth < MIN_WIDTH || img.naturalHeight < MIN_HEIGHT) {
-                    showNotification(`Ảnh quá nhỏ! Yêu cầu tối thiểu ${MIN_WIDTH}x${MIN_HEIGHT}px. Ảnh hiện tại: ${img.naturalWidth}x${img.naturalHeight}px`, 5000);
-                    modal.remove();
-                    return;
+                    if (ALLOW_SMALL_IMAGES) {
+                        debugLog('Image is smaller than minimum size, will resize after cropping');
+                        needsResize = true;
+                    } else {
+                        showNotification(`Ảnh quá nhỏ! Yêu cầu tối thiểu ${MIN_WIDTH}x${MIN_HEIGHT}px. Ảnh hiện tại: ${img.naturalWidth}x${img.naturalHeight}px`, 5000);
+                        modal.remove();
+                        return;
+                    }
                 }
 
                 // Initialize Cropper
@@ -268,6 +276,14 @@
                     showNotification('Không thể khởi tạo công cụ cắt ảnh.', 5000);
                     modal.remove();
                     return;
+                }
+
+                // Update info text if image needs resizing
+                if (needsResize) {
+                    const infoText = modal.querySelector('.hmt-crop-info p:first-child');
+                    if (infoText) {
+                        infoText.textContent = `Ảnh sẽ được resize thành ${MIN_WIDTH}x${MIN_HEIGHT}px sau khi cắt. Kích thước hiện tại: ${img.naturalWidth}x${img.naturalHeight}px`;
+                    }
                 }
 
                 function updatePreview() {
@@ -333,16 +349,36 @@
                 return;
             }
 
-            const canvas = cropper.getCroppedCanvas({
-                width: MIN_WIDTH,
-                height: MIN_HEIGHT,
+            let canvas = cropper.getCroppedCanvas({
                 fillColor: '#fff',
                 imageSmoothingEnabled: true,
                 imageSmoothingQuality: 'high'
             });
 
             if (canvas) {
-                debugLog('Canvas created, converting to blob');
+                debugLog('Canvas created, dimensions:', canvas.width, 'x', canvas.height);
+
+                // If canvas is smaller than required dimensions, resize it
+                if (canvas.width < MIN_WIDTH || canvas.height < MIN_HEIGHT) {
+                    debugLog('Canvas smaller than required, resizing to', MIN_WIDTH, 'x', MIN_HEIGHT);
+                    const resizedCanvas = document.createElement('canvas');
+                    const ctx = resizedCanvas.getContext('2d');
+
+                    resizedCanvas.width = MIN_WIDTH;
+                    resizedCanvas.height = MIN_HEIGHT;
+
+                    // Enable high-quality image scaling
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+
+                    // Draw the original canvas onto the resized canvas
+                    ctx.drawImage(canvas, 0, 0, MIN_WIDTH, MIN_HEIGHT);
+
+                    canvas = resizedCanvas;
+                    debugLog('Canvas resized successfully');
+                }
+
+                debugLog('Converting canvas to blob');
                 canvas.toBlob(function(blob) {
                     if (!blob) {
                         debugLog('Failed to create blob from canvas');

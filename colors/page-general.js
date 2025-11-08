@@ -1408,6 +1408,19 @@
             .ln-list-default li {
                 background-color: ${palette[800]} !important;
             }
+
+            .hmt-crop-modal {
+                background-color: ${palette[900]} !important;
+            }
+            [class="hmt-crop-modal"] :is(h3, h4, p, .hmt-crop-cancel, .hmt-crop-upload) {
+                color: ${textColor} !important;
+            }
+            .hmt-crop-cancel {
+                background-color: ${palette[700]} !important;
+            }
+            .hmt-crop-upload {
+                background-color: ${palette[500]} !important;
+            }
         `;
 
         GM_addStyle(css);
@@ -1994,6 +2007,20 @@
 
             .ln-list-default li {
                 background-color: ${defaultPalette[800]} !important;
+            }
+
+            
+            .hmt-crop-modal {
+                background-color: ${defaultPalette[900]} !important;
+            }
+            [class="hmt-crop-modal"] :is(h3, h4, p, .hmt-crop-cancel, .hmt-crop-upload) {
+                color: ${textColor} !important;
+            }
+            .hmt-crop-cancel {
+                background-color: ${defaultPalette[700]} !important;
+            }
+            .hmt-crop-upload {
+                background-color: ${defaultPalette[500]} !important;
             }
         `;
 
