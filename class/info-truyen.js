@@ -52,6 +52,13 @@
         return useProxy && (hour >= 22 || hour < 5);
     }
 
+    // Check if it's time to use proxy for background loading
+    function isProxyBackgroundTime() {
+        const hour = new Date().getHours();
+        // Use proxy for background loading from 10 PM to 5 AM
+        return hour >= 22 || hour < 5;
+    }
+
     // Image Access Testing Function
     async function testImageAccess(url, timeout = 5000) {
         return new Promise((resolve) => {
@@ -147,33 +154,22 @@
             return originalUrl;
         }
 
-        // Step 1: Check if it's CORS blocked time
-        if (isCorsBlockedTime()) {
-            debugLogWithLevel(DEBUG_LEVELS.CORS_CHECK, 'CORS blocked time detected, using fallback immediately');
-            const cacheKey = `fallback_${width}x${height}_${new Date().getHours()}`;
-            let fallbackUrl = useCache ? getCachedFallback(cacheKey) : null;
+        // Step 1: Check if it's time to use proxy for background loading
+        if (isProxyBackgroundTime()) {
+            debugLogWithLevel(DEBUG_LEVELS.CORS_CHECK, 'Proxy background time detected, forcing proxy usage');
+            // Skip direct access test and go straight to proxy
+        } else {
+            // Step 2: Test original URL access (only outside proxy time)
+            debugLogWithLevel(DEBUG_LEVELS.CORS_CHECK, 'Testing original URL access');
+            const originalAccessible = await testImageAccess(originalUrl, timeout);
 
-            if (!fallbackUrl) {
-                fallbackUrl = createGradientFallback(width, height);
-                if (useCache) {
-                    setCachedFallback(cacheKey, fallbackUrl, 1); // Cache for 1 hour
-                }
+            if (originalAccessible) {
+                debugLogWithLevel(DEBUG_LEVELS.CORS_CHECK, 'Original URL accessible, using directly');
+                return originalUrl;
             }
-
-            debugLogWithLevel(DEBUG_LEVELS.FALLBACK_USED, 'Using time-based fallback');
-            return fallbackUrl;
         }
 
-        // Step 2: Test original URL access
-        debugLogWithLevel(DEBUG_LEVELS.CORS_CHECK, 'Testing original URL access');
-        const originalAccessible = await testImageAccess(originalUrl, timeout);
-
-        if (originalAccessible) {
-            debugLogWithLevel(DEBUG_LEVELS.CORS_CHECK, 'Original URL accessible, using directly');
-            return originalUrl;
-        }
-
-        // Step 3: Try preferred proxy first, then others
+        // Step 3: Try preferred proxy first, then others (always during proxy time, fallback during normal time)
         const preferredProxyUrl = PROXY_MAPPING[preferredProxy];
         const proxyOrder = [preferredProxyUrl, ...PROXY_SERVERS.filter(url => url !== preferredProxyUrl)];
 
@@ -205,19 +201,25 @@
             }
         }
 
-        // Step 4: Final fallback - gradient image
-        debugLogWithLevel(DEBUG_LEVELS.FALLBACK_USED, 'All proxies failed, using gradient fallback');
-        const cacheKey = `fallback_${width}x${height}_${new Date().getHours()}`;
-        let fallbackUrl = useCache ? getCachedFallback(cacheKey) : null;
+        // Step 4: Final fallback - gradient image (only if not proxy time)
+        if (!isProxyBackgroundTime()) {
+            debugLogWithLevel(DEBUG_LEVELS.FALLBACK_USED, 'All proxies failed, using gradient fallback');
+            const cacheKey = `fallback_${width}x${height}_${new Date().getHours()}`;
+            let fallbackUrl = useCache ? getCachedFallback(cacheKey) : null;
 
-        if (!fallbackUrl) {
-            fallbackUrl = createGradientFallback(width, height);
-            if (useCache) {
-                setCachedFallback(cacheKey, fallbackUrl, 1);
+            if (!fallbackUrl) {
+                fallbackUrl = createGradientFallback(width, height);
+                if (useCache) {
+                    setCachedFallback(cacheKey, fallbackUrl, 1);
+                }
             }
-        }
 
-        return fallbackUrl;
+            return fallbackUrl;
+        } else {
+            // During proxy time, if all proxies fail, still try to use original URL as last resort
+            debugLogWithLevel(DEBUG_LEVELS.FALLBACK_USED, 'All proxies failed during proxy time, using original URL as fallback');
+            return originalUrl;
+        }
     }
     
     function initInfoTruyen() {
@@ -700,13 +702,21 @@
             debugLog('Overlay đã tồn tại, bỏ qua thêm mới');
             return;
         }
-        
+
         // Tạo phần tử cho hiệu ứng nền
         const bgOverlay = document.createElement('div');
         bgOverlay.className = 'betterhako-bg-overlay';
-        
+
         // Kiểm tra xem có phải dark mode không với fallback
         let brightness = '0.6'; // Default brightness
+        let blurLevel = '12px'; // Default blur level
+
+        // Tăng độ mờ trong khung giờ proxy (10h đêm đến 5h sáng)
+        if (isProxyBackgroundTime()) {
+            blurLevel = '20px'; // Tăng blur level để làm mờ hơn
+            debugLog('Proxy background time detected, increasing blur level to 20px');
+        }
+
         try {
             if (window.__themeDetectorLoaded && window.ThemeDetector && window.ThemeDetector.isDark()) {
                 brightness = '0.5';
@@ -736,7 +746,7 @@
             const blob = new Blob([css + `
                 .betterhako-bg-overlay {
                     background-image: url('${coverUrl}');
-                    filter: blur(12px) brightness(${brightness});
+                    filter: blur(${blurLevel}) brightness(${brightness});
                 }
             `], { type: 'text/css' });
             const blobUrl = URL.createObjectURL(blob);
@@ -759,7 +769,7 @@
             // Kiểm tra lại xem overlay đã tồn tại chưa
             if (!document.querySelector('.betterhako-bg-overlay')) {
                 mainPart.prepend(bgOverlay);
-                debugLog(`Đã thêm hiệu ứng thumbnail mờ dần với brightness: ${brightness}`);
+                debugLog(`Đã thêm hiệu ứng thumbnail mờ dần với brightness: ${brightness} và blur: ${blurLevel}`);
             } else {
                 debugLog('Overlay đã tồn tại khi thêm vào DOM');
             }
