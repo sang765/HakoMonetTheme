@@ -17,6 +17,14 @@
         'https://corsproxy.io/?key=990f3464&url='
     ];
 
+    // Proxy mapping for config compatibility
+    const PROXY_MAPPING = {
+        'images.weserv.nl': 'https://images.weserv.nl/?url=',
+        'allOrigins.nl': 'https://api.allorigins.win/raw?url=',
+        'cors-anywhere.herokuapp.com': 'https://cors-anywhere.herokuapp.com/',
+        'corsproxy.io': 'https://corsproxy.io/?key=990f3464&url='
+    };
+
     const FALLBACK_CACHE_KEY = 'hmt-fallback-images';
     const DEBUG_LEVELS = {
         CORS_CHECK: 'cors_check',
@@ -39,7 +47,9 @@
     // Smart Time-Based Detection
     function isCorsBlockedTime() {
         const hour = new Date().getHours();
-        return hour >= 23 || hour < 5;
+        // Only use time-based blocking if proxy is enabled
+        const useProxy = window.HMTConfig ? window.HMTConfig.getUseProxy() : true;
+        return useProxy && (hour >= 22 || hour < 5);
     }
 
     // Image Access Testing Function
@@ -63,58 +73,6 @@
 
             img.src = url;
         });
-    }
-
-    // Gradient Fallback System
-    function createGradientFallback(width = 400, height = 600) {
-        // Create a beautiful gradient based on time of day
-        const hour = new Date().getHours();
-        let gradient;
-
-        if (hour >= 6 && hour < 12) {
-            // Morning - warm sunrise colors
-            gradient = 'linear-gradient(135deg, #FFE5B4 0%, #FFA07A 50%, #FF6347 100%)';
-        } else if (hour >= 12 && hour < 18) {
-            // Afternoon - bright and vibrant
-            gradient = 'linear-gradient(135deg, #87CEEB 0%, #98FB98 50%, #FFD700 100%)';
-        } else if (hour >= 18 && hour < 22) {
-            // Evening - sunset colors
-            gradient = 'linear-gradient(135deg, #FF4500 0%, #FF6347 50%, #8B0000 100%)';
-        } else {
-            // Night - cool dark colors
-            gradient = 'linear-gradient(135deg, #191970 0%, #4169E1 50%, #000080 100%)';
-        }
-
-        // Create canvas to generate base64
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-
-        // Create gradient
-        const grad = ctx.createLinearGradient(0, 0, width, height);
-        if (hour >= 6 && hour < 12) {
-            grad.addColorStop(0, '#FFE5B4');
-            grad.addColorStop(0.5, '#FFA07A');
-            grad.addColorStop(1, '#FF6347');
-        } else if (hour >= 12 && hour < 18) {
-            grad.addColorStop(0, '#87CEEB');
-            grad.addColorStop(0.5, '#98FB98');
-            grad.addColorStop(1, '#FFD700');
-        } else if (hour >= 18 && hour < 22) {
-            grad.addColorStop(0, '#FF4500');
-            grad.addColorStop(0.5, '#FF6347');
-            grad.addColorStop(1, '#8B0000');
-        } else {
-            grad.addColorStop(0, '#191970');
-            grad.addColorStop(0.5, '#4169E1');
-            grad.addColorStop(1, '#000080');
-        }
-
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, width, height);
-
-        return canvas.toDataURL('image/jpeg', 0.8);
     }
 
     // Local Storage Cache for Fallback Images
@@ -180,6 +138,15 @@
 
         debugLogWithLevel(DEBUG_LEVELS.CORS_CHECK, 'Getting CORS-safe thumbnail for:', originalUrl);
 
+        // Check if proxy is enabled in config
+        const useProxy = window.HMTConfig ? window.HMTConfig.getUseProxy() : true;
+        const preferredProxy = window.HMTConfig ? window.HMTConfig.getPreferredProxy() : 'images.weserv.nl';
+
+        if (!useProxy) {
+            debugLogWithLevel(DEBUG_LEVELS.CORS_CHECK, 'Proxy disabled in config, using original URL');
+            return originalUrl;
+        }
+
         // Step 1: Check if it's CORS blocked time
         if (isCorsBlockedTime()) {
             debugLogWithLevel(DEBUG_LEVELS.CORS_CHECK, 'CORS blocked time detected, using fallback immediately');
@@ -206,8 +173,11 @@
             return originalUrl;
         }
 
-        // Step 3: Try proxy servers with retry mechanism
-        for (const proxyUrl of PROXY_SERVERS) {
+        // Step 3: Try preferred proxy first, then others
+        const preferredProxyUrl = PROXY_MAPPING[preferredProxy];
+        const proxyOrder = [preferredProxyUrl, ...PROXY_SERVERS.filter(url => url !== preferredProxyUrl)];
+
+        for (const proxyUrl of proxyOrder) {
             try {
                 const proxiedUrl = proxyUrl + encodeURIComponent(originalUrl);
                 debugLogWithLevel(DEBUG_LEVELS.PROXY_ATTEMPT, 'Trying proxy:', proxyUrl);

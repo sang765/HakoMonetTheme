@@ -147,6 +147,38 @@
         debugLog('Đã phát sự kiện trích xuất màu từ avatar thay đổi:', extract);
     }
 
+    function getUseProxy() {
+        return GM_getValue('use_proxy', true);
+    }
+
+    function setUseProxy(use) {
+        GM_setValue('use_proxy', use);
+        debugLog('Đã lưu cài đặt sử dụng proxy:', use);
+
+        // Phát sự kiện để các module khác cập nhật
+        const proxyChangeEvent = new CustomEvent('hmtUseProxyChanged', {
+            detail: { use: use }
+        });
+        (window.top || window).document.dispatchEvent(proxyChangeEvent);
+        debugLog('Đã phát sự kiện sử dụng proxy thay đổi:', use);
+    }
+
+    function getPreferredProxy() {
+        return GM_getValue('preferred_proxy', 'images.weserv.nl');
+    }
+
+    function setPreferredProxy(proxy) {
+        GM_setValue('preferred_proxy', proxy);
+        debugLog('Đã lưu cài đặt proxy ưu tiên:', proxy);
+
+        // Phát sự kiện để các module khác cập nhật
+        const proxyChangeEvent = new CustomEvent('hmtPreferredProxyChanged', {
+            detail: { proxy: proxy }
+        });
+        (window.top || window).document.dispatchEvent(proxyChangeEvent);
+        debugLog('Đã phát sự kiện proxy ưu tiên thay đổi:', proxy);
+    }
+
     function applyDomainWarningVisibility() {
         const shouldHide = getHideDomainWarning();
         const warningElements = document.querySelectorAll('.border-l-4.border-yellow-400.bg-yellow-50.p-4');
@@ -941,6 +973,29 @@ ${!isInfoPage() ? `
                             </div>
                         </div>
 
+                        <div class="hmt-config-section">
+                            <h4>Sử dụng proxy</h4>
+                            <p>Sử dụng proxy để tránh bị lỗi CORS khiến không thể hiển thị thumbnail và load màu chủ đề.</p>
+
+                            <div class="hmt-proxy-toggle">
+                                <label class="hmt-toggle-label">
+                                    <input type="checkbox" ${getUseProxy() ? 'checked' : ''} class="hmt-proxy-toggle-input">
+                                    <span class="hmt-toggle-switch"></span>
+                                    Sử dụng proxy
+                                </label>
+                            </div>
+
+                            <div class="hmt-proxy-dropdown">
+                                <label for="hmt-proxy-select">Proxy sử dụng:</label>
+                                <select id="hmt-proxy-select" class="hmt-proxy-select">
+                                    <option value="images.weserv.nl" ${getPreferredProxy() === 'images.weserv.nl' ? 'selected' : ''}>images.weserv.nl</option>
+                                    <option value="allOrigins.nl" ${getPreferredProxy() === 'allOrigins.nl' ? 'selected' : ''}>allOrigins.nl</option>
+                                    <option value="cors-anywhere.herokuapp.com" ${getPreferredProxy() === 'cors-anywhere.herokuapp.com' ? 'selected' : ''}>cors-anywhere.herokuapp.com</option>
+                                    <option value="corsproxy.io" ${getPreferredProxy() === 'corsproxy.io' ? 'selected' : ''}>corsproxy.io (giới hạn request)</option>
+                                </select>
+                            </div>
+                        </div>
+
 ${!isInfoPage() ? `
                         <div class="hmt-config-section">
                             <h4>Chế độ màu</h4>
@@ -1026,6 +1081,8 @@ ${!isInfoPage() ? `
         const domainWarningToggle = dialog.querySelector('.hmt-domain-warning-toggle-input');
         const readingPageToggle = dialog.querySelector('.hmt-reading-page-toggle-input');
         const avatarColorToggle = dialog.querySelector('.hmt-avatar-color-toggle-input');
+        const proxyToggle = dialog.querySelector('.hmt-proxy-toggle-input');
+        const proxySelect = dialog.querySelector('#hmt-proxy-select');
 
         // Lưu màu hiện tại để có thể khôi phục nếu không lưu
          const currentColor = dialog._currentColor || getDefaultColor();
@@ -1572,6 +1629,22 @@ ${!isInfoPage() ? `
             });
         }
 
+        // Proxy toggle
+        if (proxyToggle) {
+            proxyToggle.addEventListener('change', function() {
+                setUseProxy(this.checked);
+                showNotification('Đã cập nhật cài đặt sử dụng proxy!', 3000);
+            });
+        }
+
+        // Proxy dropdown
+        if (proxySelect) {
+            proxySelect.addEventListener('change', function() {
+                setPreferredProxy(this.value);
+                showNotification('Đã cập nhật proxy ưu tiên!', 3000);
+            });
+        }
+
         // Color mode dropdown
         if (!isInfoPage()) {
             const colorModeSelect = dialog.querySelector('#hmt-color-mode-select');
@@ -1704,6 +1777,10 @@ ${!isInfoPage() ? `
         setColorMode: setColorMode,
         getExtractColorFromAvatar: getExtractColorFromAvatar,
         setExtractColorFromAvatar: setExtractColorFromAvatar,
+        getUseProxy: getUseProxy,
+        setUseProxy: setUseProxy,
+        getPreferredProxy: getPreferredProxy,
+        setPreferredProxy: setPreferredProxy,
         openConfigDialog: openConfigDialog,
         initialize: initializeConfig,
         ensureDomainWarningCookies: ensureDomainWarningCookies,
