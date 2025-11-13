@@ -887,6 +887,10 @@
             .statistic-list .block-wide.at-mobile {
                 border-bottom-color: ${palette[200]} !important;
             }
+
+            .user-private-tabs li a {
+                border-bottom-color: ${palette[800]} !important;
+            }
         `;
 
         GM_addStyle(css);
@@ -1160,6 +1164,10 @@
 
             .statistic-list .block-wide.at-mobile {
                 border-bottom-color: ${defaultPalette[200]} !important;
+            }
+
+            .user-private-tabs li a {
+                border-bottom-color: ${defaultPalette[800]} !important;
             }
         `;
 
