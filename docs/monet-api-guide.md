@@ -1,4 +1,4 @@
-# Hướng Dẫn Sử Dụng MonetAPI v2.0-Integrated - Hệ Thống Màu Sắc HakoMonetTheme
+# Hướng Dẫn Sử Dụng MonetAPI - Hệ Thống Màu Sắc HakoMonetTheme
 
 ## Mục Lục
 1. [Tổng Quan](#tổng-quan)
@@ -13,7 +13,7 @@
 
 ## Tổng Quan
 
-MonetAPI v2.0-Integrated là hệ thống quản lý màu sắc được phát triển cho HakoMonetTheme, hỗ trợ tạo palette màu từ một màu cơ sở và chuyển đổi giữa các định dạng màu khác nhau.
+MonetAPI là hệ thống quản lý màu sắc được phát triển cho HakoMonetTheme, hỗ trợ tạo palette màu từ một màu cơ sở và chuyển đổi giữa các định dạng màu khác nhau.
 
 ### Tính năng chính:
 - **V1 (Legacy)**: Tạo Material You color palette cơ bản từ màu cơ sở
@@ -27,7 +27,6 @@ MonetAPI v2.0-Integrated là hệ thống quản lý màu sắc được phát t
 ### Phiên bản:
 - **V1**: Legacy methods với basic palette generation
 - **V2**: Advanced methods với enhanced features
-- **Integrated**: Kết hợp cả hai phiên bản trong một file
 
 ---
 
@@ -236,5 +235,3 @@ if (typeof window.testMonetAPI === 'function') {
 ```
 
 ---
-
-MonetAPI v2.0-Integrated đã được thiết kế để hoàn toàn backward compatible trong khi cung cấp các tính năng nâng cao mạnh mẽ.
