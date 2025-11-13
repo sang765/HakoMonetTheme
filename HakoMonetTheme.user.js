@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Hako: Monet Theme
 // @namespace    https://github.com/sang765
-// @version      5.1.6
+// @version      5.1.7
 // @description  Material You theme for Hako/DocLN.
 // @description:vi Material You theme dành cho Hako/DocLN.
 // @icon         https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/.github/assets/logo.png
@@ -74,102 +74,84 @@
 
     let isCheckingForUpdate = false;
 
-    // Enhanced console logging with colors
+    // Simple console logging without colors
     const Logger = {
-        // Color schemes for different log levels
-        styles: {
-            log: 'color: #6c757d; background: #f8f9fa; padding: 2px 4px; border-radius: 3px;',
-            info: 'color: #0d6efd; background: #e7f3ff; padding: 2px 4px; border-radius: 3px; font-weight: bold;',
-            warn: 'color: #fd7e14; background: #fff3cd; padding: 2px 4px; border-radius: 3px; font-weight: bold;',
-            error: 'color: #dc3545; background: #f8d7da; padding: 2px 4px; border-radius: 3px; font-weight: bold;',
-            success: 'color: #198754; background: #d1edff; padding: 2px 4px; border-radius: 3px; font-weight: bold;',
-            debug: 'color: #6f42c1; background: #f3f0ff; padding: 2px 4px; border-radius: 3px; font-style: italic;'
-        },
-
-        // Module-specific prefixes with colors
+        // Module-specific prefixes
         prefixes: {
-            main: '%c[HakoMonetTheme]',
-            config: '%c[Config]',
-            colorPicker: '%c[ColorPicker]',
-            updateChecker: '%c[UpdateChecker]',
-            themeDetector: '%c[ThemeDetector]',
-            deviceDetector: '%c[DeviceDetector]',
-            adBlocker: '%c[AdBlocker]',
-            antiPopup: '%c[AntiPopup]',
-            fullscreen: '%c[Fullscreen]',
-            mainMenu: '%c[MainMenu]',
-            navbarLogo: '%c[NavbarLogo]',
-            updateManager: '%c[UpdateManager]',
-            darkModePrompter: '%c[DarkModePrompter]',
-            readingPage: '%c[ReadingPage]',
-            infoTruyen: '%c[InfoTruyen]',
-            tagColor: '%c[TagColor]',
-            animation: '%c[Animation]',
-            fontImport: '%c[FontImport]',
-            pageGeneral: '%c[PageGeneral]',
-            pageGeneralLight: '%c[PageGeneralLight]',
-            pageInfoTruyen: '%c[PageInfoTruyen]',
-            pageInfoTruyenLight: '%c[PageInfoTruyenLight]',
-            corsMaster: '%c[CORSMaster]'
+            main: '[HakoMonetTheme]',
+            config: '[Config]',
+            colorPicker: '[ColorPicker]',
+            updateChecker: '[UpdateChecker]',
+            themeDetector: '[ThemeDetector]',
+            deviceDetector: '[DeviceDetector]',
+            adBlocker: '[AdBlocker]',
+            antiPopup: '[AntiPopup]',
+            fullscreen: '[Fullscreen]',
+            mainMenu: '[MainMenu]',
+            navbarLogo: '[NavbarLogo]',
+            updateManager: '[UpdateManager]',
+            darkModePrompter: '[DarkModePrompter]',
+            readingPage: '[ReadingPage]',
+            infoTruyen: '[InfoTruyen]',
+            tagColor: '[TagColor]',
+            animation: '[Animation]',
+            fontImport: '[FontImport]',
+            pageGeneral: '[PageGeneral]',
+            pageGeneralLight: '[PageGeneralLight]',
+            pageInfoTruyen: '[PageInfoTruyen]',
+            pageInfoTruyenLight: '[PageInfoTruyenLight]',
+            corsMaster: '[CORSMaster]'
         },
 
-        // Enhanced logging functions
+        // Simple logging functions
         log: function(module, ...args) {
             if (!DEBUG) return;
-            const prefix = this.prefixes[module] || `%c[${module.toUpperCase()}]`;
-            const style = this.styles.log;
-            console.log(`${prefix} %c${args.shift() || ''}`, style, this.styles.log, ...args);
+            const prefix = this.prefixes[module] || `[${module.toUpperCase()}]`;
+            console.log(`${prefix} ${args.shift() || ''}`, ...args);
         },
 
         info: function(module, ...args) {
             if (!DEBUG) return;
-            const prefix = this.prefixes[module] || `%c[${module.toUpperCase()}]`;
-            const style = this.styles.info;
-            console.info(`${prefix} %c${args.shift() || ''}`, style, this.styles.info, ...args);
+            const prefix = this.prefixes[module] || `[${module.toUpperCase()}]`;
+            console.info(`${prefix} ${args.shift() || ''}`, ...args);
         },
 
         warn: function(module, ...args) {
             if (!DEBUG) return;
-            const prefix = this.prefixes[module] || `%c[${module.toUpperCase()}]`;
-            const style = this.styles.warn;
-            console.warn(`${prefix} %c${args.shift() || ''}`, style, this.styles.warn, ...args);
+            const prefix = this.prefixes[module] || `[${module.toUpperCase()}]`;
+            console.warn(`${prefix} ${args.shift() || ''}`, ...args);
         },
 
         error: function(module, ...args) {
-            const prefix = this.prefixes[module] || `%c[${module.toUpperCase()}]`;
-            const style = this.styles.error;
-            console.error(`${prefix} %c${args.shift() || ''}`, style, this.styles.error, ...args);
+            const prefix = this.prefixes[module] || `[${module.toUpperCase()}]`;
+            console.error(`${prefix} ${args.shift() || ''}`, ...args);
         },
 
         success: function(module, ...args) {
             if (!DEBUG) return;
-            const prefix = this.prefixes[module] || `%c[${module.toUpperCase()}]`;
-            const style = this.styles.success;
-            console.log(`${prefix} %c${args.shift() || ''}`, style, this.styles.success, ...args);
+            const prefix = this.prefixes[module] || `[${module.toUpperCase()}]`;
+            console.log(`${prefix} ${args.shift() || ''}`, ...args);
         },
 
         debug: function(module, ...args) {
             if (!DEBUG) return;
-            const prefix = this.prefixes[module] || `%c[${module.toUpperCase()}]`;
-            const style = this.styles.debug;
-            console.debug(`${prefix} %c${args.shift() || ''}`, style, this.styles.debug, ...args);
+            const prefix = this.prefixes[module] || `[${module.toUpperCase()}]`;
+            console.debug(`${prefix} ${args.shift() || ''}`, ...args);
         },
 
         // Performance logging
         performance: function(module, operation, startTime, endTime) {
             if (!DEBUG) return;
             const duration = endTime - startTime;
-            const durationStyle = duration > 100 ? this.styles.warn : duration > 50 ? this.styles.info : this.styles.success;
-            console.log(`${this.prefixes[module]} %c${operation} completed in ${duration.toFixed(2)}ms`, this.styles.log, durationStyle);
+            console.log(`${this.prefixes[module]} ${operation} completed in ${duration.toFixed(2)}ms`);
         },
 
         // Color picker specific logging
         colorPicker: function(level, ...args) {
             if (!DEBUG) return;
             const prefix = this.prefixes.colorPicker;
-            const style = this.styles[level] || this.styles.log;
             const method = level === 'error' ? 'error' : level === 'warn' ? 'warn' : level === 'info' ? 'info' : 'log';
-            console[method](`${prefix} %c${args.shift() || ''}`, style, this.styles[level] || this.styles.log, ...args);
+            console[method](`${prefix} ${args.shift() || ''}`, ...args);
         }
     };
 
@@ -181,8 +163,6 @@
     // Expose Logger globally for modules
     window.Logger = Logger;
     
-
-
     function registerMenuCommands() {
         if (typeof GM_registerMenuCommand === 'function') {
             GM_registerMenuCommand('📋 Menu chính', function() {
