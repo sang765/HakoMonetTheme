@@ -902,7 +902,8 @@
             .licensed-list-page #licensed-list .info-item,
             .detail-list .detail-list-item,
             .user-private-tabs li a,
-            .account-sidebar li {
+            .account-sidebar li,
+            .comment-item-at-index {
                 border-bottom-color: ${palette[800]} !important;
             }
 
@@ -1474,7 +1475,8 @@
             .licensed-list-page #licensed-list .info-item,
             .detail-list .detail-list-item,
             .user-private-tabs li a,
-            .account-sidebar li {
+            .account-sidebar li,
+            .comment-item-at-index {
                 border-bottom-color: ${defaultPalette[800]} !important;
             }
 

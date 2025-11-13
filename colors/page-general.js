@@ -1353,7 +1353,9 @@
             .profile-showcase header, ol.list-volume li,
             .licensed-list-page #licensed-list .info-item,
             .detail-list .detail-list-item,
-            .user-private-tabs li a {
+            .user-private-tabs li a,
+            .account-sidebar li,
+            .comment-item-at-index {
                 border-bottom-color: ${palette[800]} !important;
             }
 
@@ -1955,7 +1957,9 @@
             .profile-showcase header, ol.list-volume li,
             .licensed-list-page #licensed-list .info-item,
             .detail-list .detail-list-item,
-            .user-private-tabs li a {
+            .user-private-tabs li a,
+            .account-sidebar li,
+            .comment-item-at-index {
                 border-bottom-color: ${defaultPalette[800]} !important;
             }
 
