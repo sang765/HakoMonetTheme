@@ -35,7 +35,7 @@
             console.log('[Main] Calling setupAutoUpdate');
             window.HMTUpdateChecker.setupAutoUpdate();
         } else {
-            console.log('[Main] Update Checker API not loaded');
+            console.error('[Main] Update Checker API not loaded');
             debugLog('Update Checker API chưa được tải');
         }
         

@@ -853,7 +853,7 @@
         formatColor: (color, format) => monetAPIv2.formatColor(color, format),
         
         // ===== API VERSION INFO =====
-        version: '2.0-integrated',
+        version: '2.0',
         v1Methods: ['generateMonetPalette', 'isValidColor', 'isColorLight', 'rgbToHex', 'hexToRgb', 'generateMonetPaletteWithRGBA', 'paletteToRgba'],
         v2Methods: [
             'v2CreateEnhancedPalette', 'v2PaletteToRgba', 'v2GetColorHarmonies', 'v2CheckAccessibility',
@@ -864,7 +864,7 @@
     
     // Auto-debug if enabled (only log once for combined version)
     if (GM_getValue('debug_mode', false)) {
-        console.log('🎨 MonetAPI v2.0-integrated initialized');
+        console.log('🎨 MonetAPI V2 initialized');
         console.log('V1 Methods:', window.MonetAPI.v1Methods.length);
         console.log('V2 Methods:', window.MonetAPI.v2Methods.length);
         console.log('Total API Methods:', Object.keys(window.MonetAPI).length);
