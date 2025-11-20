@@ -855,11 +855,11 @@
 
             .statistic-list, .feature-section .summary-wrapper,
             .statistic-list .block-wide.at-mobile {
-                border-top-color: ${palette[200]} !important;
+                border-top-color: ${palette[500]} !important;
             }
 
             .statistic-list .block-wide.at-mobile {
-                border-bottom-color: ${palette[200]} !important;
+                border-bottom-color: ${palette[500]} !important;
             }
 
             .user-private-tabs li a {
@@ -1146,11 +1146,11 @@
 
             .statistic-list, .feature-section .summary-wrapper,
             .statistic-list .block-wide.at-mobile {
-                border-top-color: ${defaultPalette[200]} !important;
+                border-top-color: ${defaultPalette[500]} !important;
             }
 
             .statistic-list .block-wide.at-mobile {
-                border-bottom-color: ${defaultPalette[200]} !important;
+                border-bottom-color: ${defaultPalette[500]} !important;
             }
 
             .user-private-tabs li a {
