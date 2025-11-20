@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "coloris": "^0.1.0",
+    "cropperjs": "^2.1.0"
+  }
+}

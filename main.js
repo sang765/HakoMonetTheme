@@ -1,17 +1,16 @@
 (function() {
     'use strict';
-    
-    const DEBUG = true;
-    const CHECK_UPDATE_INTERVAL = 30 * 60 * 1000; // 30 phút
-    const VERSION = '3.2.5';
-    const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/HakoMonetTheme.user.js';
-    
+
+    const DEBUG = GM_getValue('debug_mode', false);
+
     function debugLog(...args) {
-        if (DEBUG) {
+        if (DEBUG && typeof window.Logger !== 'undefined') {
+            window.Logger.log('main', ...args);
+        } else if (DEBUG) {
             console.log('[HakoMonetTheme]', ...args);
         }
     }
-    
+
     function loadScript(scriptContent, scriptName) {
         try {
             eval(scriptContent);
@@ -23,128 +22,89 @@
         }
     }
     
-    function checkForUpdates() {
-        debugLog('Đang kiểm tra cập nhật...');
-        
-        GM_xmlhttpRequest({
-            method: 'GET',
-            url: GITHUB_RAW_URL + '?t=' + new Date().getTime(),
-            timeout: 10000,
-            onload: function(response) {
-                if (response.status === 200) {
-                    const scriptContent = response.responseText;
-                    const versionMatch = scriptContent.match(/@version\s+([\d.]+)/);
-                    
-                    if (versionMatch && versionMatch[1]) {
-                        const latestVersion = versionMatch[1];
-                        debugLog(`Phiên bản hiện tại: ${VERSION}, Phiên bản mới nhất: ${latestVersion}`);
-                        
-                        if (isNewerVersion(latestVersion, VERSION)) {
-                            debugLog('Đã tìm thấy phiên bản mới!');
-                            showUpdateNotification(latestVersion);
-                        } else {
-                            debugLog('Đang sử dụng phiên bản mới nhất.');
-                        }
-                        
-                        // Lưu thời gian kiểm tra cuối cùng
-                        GM_setValue('lastUpdateCheck', Date.now());
-                    }
-                }
-            },
-            onerror: function(error) {
-                debugLog('Lỗi khi kiểm tra cập nhật:', error);
-            },
-            ontimeout: function() {
-                debugLog('Hết thời gian kiểm tra cập nhật');
-            }
-        });
-    }
-    
-    function isNewerVersion(newVersion, currentVersion) {
-        const newParts = newVersion.split('.').map(Number);
-        const currentParts = currentVersion.split('.').map(Number);
-        
-        for (let i = 0; i < Math.max(newParts.length, currentParts.length); i++) {
-            const newPart = newParts[i] || 0;
-            const currentPart = currentParts[i] || 0;
-            
-            if (newPart > currentPart) return true;
-            if (newPart < currentPart) return false;
-        }
-        
-        return false;
-    }
-    
-    function showUpdateNotification(latestVersion) {
-        if (typeof GM_notification !== 'undefined') {
-            GM_notification({
-                title: 'HakoMonetTheme - Có bản cập nhật mới',
-                text: `Phiên bản ${latestVersion} đã có sẵn. Nhấn để cập nhật.`,
-                timeout: 10000,
-                onclick: function() {
-                    window.open('https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js', '_blank');
-                }
-            });
-        } else {
-            // Fallback cho các userscript manager không hỗ trợ GM_notification
-            if (confirm(`HakoMonetTheme phiên bản ${latestVersion} đã có sẵn. Bạn có muốn cập nhật ngay bây giờ không?`)) {
-                window.open('https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js', '_blank');
-            }
-        }
-    }
-    
-    function setupAutoUpdate() {
-        // Kiểm tra lần cuối cập nhật
-        const lastUpdateCheck = GM_getValue('lastUpdateCheck', 0);
-        const now = Date.now();
-        
-        // Nếu chưa từng kiểm tra hoặc đã qua 30 phút kể từ lần kiểm tra cuối
-        if (now - lastUpdateCheck > CHECK_UPDATE_INTERVAL) {
-            checkForUpdates();
-        }
-        
-        // Thiết lập interval để kiểm tra định kỳ
-        setInterval(checkForUpdates, CHECK_UPDATE_INTERVAL);
-        
-        debugLog('Đã thiết lập tự động kiểm tra cập nhật mỗi 30 phút');
-    }
-    
     function init() {
         debugLog('Đang khởi tạo HakoMonetTheme...');
-        debugLog(`Phiên bản: ${VERSION}`);
-        
+        debugLog(`Phiên bản: ${GM_info.script.version}`);
+
+        // Đăng ký Service Worker trước khi tải các module khác
+        registerServiceWorker();
+
         // Thiết lập auto update
-        setupAutoUpdate();
+        console.log('[Main] Checking for HMTUpdateChecker');
+        if (typeof window.HMTUpdateChecker !== 'undefined' && typeof window.HMTUpdateChecker.setupAutoUpdate === 'function') {
+            console.log('[Main] Calling setupAutoUpdate');
+            window.HMTUpdateChecker.setupAutoUpdate();
+        } else {
+            console.error('[Main] Update Checker API not loaded');
+            debugLog('Update Checker API chưa được tải');
+        }
         
         // Load các module
         try {
             const monetJS = GM_getResourceText('monetJS');
+            const updateCheckerJS = GM_getResourceText('updateCheckerJS');
             const simpleCORSJS = GM_getResourceText('simpleCORSJS');
             const themeDetectorJS = GM_getResourceText('themeDetectorJS');
             const infoTruyenJS = GM_getResourceText('infoTruyenJS');
             const animationJS = GM_getResourceText('animationJS');
             const monetAPIJS = GM_getResourceText('monetAPIJS');
+            const monetTestJS = GM_getResourceText('monetTestJS');
             const tagColorJS = GM_getResourceText('tagColorJS');
             const colorinfotruyen = GM_getResourceText('colorinfotruyen');
             const imageAnalyzerJS = GM_getResourceText('imageAnalyzerJS');
+            const html2canvasJS = GM_getResourceText('html2canvasJS');
+            const colorisJS = GM_getResourceText('colorisJS');
+            const colorisCSS = GM_getResourceText('colorisCSS');
+            const colorisColors = GM_getResourceText('colorisColors');
             const configJS = GM_getResourceText('configJS');
             const adBlockerJS = GM_getResourceText('adBlockerJS');
-            
+            const antiPopupJS = GM_getResourceText('antiPopupJS');
+            const blacklistJS = GM_getResourceText('blacklistJS');
+            const fullscreenJS = GM_getResourceText('fullscreenJS');
+            const deviceCSSLoaderJS = GM_getResourceText('deviceCSSLoaderJS');
+
+            // Load module blacklist trước tiên (ưu tiên cao nhất)
+            loadScript(blacklistJS, 'blacklist.js');
+
+            // Kiểm tra xem có bị blacklist không
+            if (typeof window.HMTBlacklist !== 'undefined' && !window.HMTBlacklist.init()) {
+                debugLog('Trang bị blacklist, dừng tải các module khác');
+                return; // Dừng việc tải các module khác
+            }
+
             // Load các module theo thứ tự
+            console.log('[Main] Loading update-checker.js');
+            loadScript(updateCheckerJS, 'update-checker.js');
             loadScript(simpleCORSJS, 'simple-cors.js');
             loadScript(themeDetectorJS, 'theme-detector.js');
             loadScript(imageAnalyzerJS, 'image-analyzer.js');
+            loadScript(html2canvasJS, 'html2canvas.min.js');
+            loadScript(colorisJS, 'coloris.min.js');
+
+            // Load Coloris CSS
+            if (colorisCSS) {
+                GM_addStyle(colorisCSS);
+                debugLog('Đã tải Coloris CSS');
+            }
+
             loadScript(infoTruyenJS, 'info-truyen.js');
             loadScript(tagColorJS, 'tag-color.js');
             loadScript(monetAPIJS, 'monet.js');
+            loadScript(monetTestJS, 'monet-test.js');
             loadScript(animationJS, 'animation.js');
             loadScript(monetJS, 'monet.js');
             loadScript(configJS, 'config.js');
             loadScript(adBlockerJS, 'ad-blocker.js');
+            loadScript(antiPopupJS, 'anti-popup.js');
+            loadScript(fullscreenJS, 'fullscreen.js');
             loadScript(colorinfotruyen, 'page-info-truyen.js');
+            loadScript(deviceCSSLoaderJS, 'device-css-loader.js');
             
             debugLog('Tất cả module đã được tải');
-            
+
+            // Kiểm tra cập nhật tự động được xử lý bởi update-checker API
+            // để tránh duplicate notifications
+
             // Thêm CSS cho update notification
             GM_addStyle(`
                 .hmt-update-notification {
@@ -236,18 +196,18 @@
         const notification = document.createElement('div');
         notification.className = 'hmt-update-notification';
         notification.onclick = function() {
-            window.open('https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js', '_blank');
+            window.open('https://sang765.github.io/HakoMonetTheme/HakoMonetTheme.user.js', '_blank');
             this.remove();
         };
-        
+
         notification.innerHTML = `
             <h4>Có bản cập nhật mới!</h4>
             <p>Phiên bản ${latestVersion} đã có sẵn. Nhấn để cập nhật.</p>
             <button class="close-btn" onclick="event.stopPropagation(); this.parentElement.remove()">×</button>
         `;
-        
+
         document.body.appendChild(notification);
-        
+
         // Tự động ẩn sau 15 giây
         setTimeout(() => {
             if (notification.parentElement) {
@@ -255,6 +215,159 @@
             }
         }, 15000);
     }
+
+    // Service Worker registration and management
+    function registerServiceWorker() {
+        if ('serviceWorker' in navigator) {
+            const swPath = '/api/service-worker.js';
+
+            navigator.serviceWorker.register(swPath)
+                .then(registration => {
+                    debugLog('Service Worker registered successfully');
+
+                    // Setup push notifications for story updates
+                    setupPushNotifications(registration);
+
+                    // Monitor service worker updates
+                    registration.addEventListener('updatefound', () => {
+                        debugLog('Service Worker update found');
+                        const newWorker = registration.installing;
+                        if (newWorker) {
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    debugLog('Service Worker updated, will activate on next page load');
+                                    showServiceWorkerUpdateNotification();
+                                }
+                            });
+                        }
+                    });
+
+                    // Listen for messages from service worker
+                    navigator.serviceWorker.addEventListener('message', handleServiceWorkerMessage);
+                })
+                .catch(error => {
+                    debugLog('Service Worker registration failed:', error);
+                });
+        } else {
+            debugLog('Service Worker not supported');
+        }
+    }
+
+    function setupPushNotifications(registration) {
+        // Request notification permission for story updates
+        if ('Notification' in window && Notification.permission === 'default') {
+            setTimeout(() => {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        debugLog('Push notifications enabled for story updates');
+                        GM_setValue('push_notifications_enabled', true);
+                    }
+                });
+            }, 5000); // Delay to avoid being intrusive
+        }
+    }
+
+    function showServiceWorkerUpdateNotification() {
+        const notification = document.createElement('div');
+        notification.className = 'hmt-update-notification';
+        notification.style.background = 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)';
+
+        notification.innerHTML = `
+            <h4>Service Worker đã cập nhật</h4>
+            <p>Cải thiện hiệu suất offline và caching. Thay đổi sẽ có hiệu lực khi làm mới trang.</p>
+            <button class="close-btn" onclick="this.parentElement.remove()">×</button>
+        `;
+
+        document.body.appendChild(notification);
+
+        // Tự động ẩn sau 10 giây
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 10000);
+    }
+
+    function handleServiceWorkerMessage(event) {
+        const { type, data } = event.data;
+
+        switch (type) {
+            case 'CACHE_STATUS':
+                debugLog('Cache status update:', data);
+                break;
+            case 'OFFLINE_READY':
+                showOfflineReadyNotification();
+                break;
+            case 'SYNC_COMPLETE':
+                debugLog('Background sync completed:', data);
+                break;
+        }
+    }
+
+    function showOfflineReadyNotification() {
+        const notification = document.createElement('div');
+        notification.className = 'hmt-update-notification';
+        notification.style.background = 'linear-gradient(135deg, #2196F3 0%, #1976D2 100%)';
+
+        notification.innerHTML = `
+            <h4>Sẵn sàng hoạt động offline</h4>
+            <p>HakoMonetTheme đã cache nội dung cần thiết để hoạt động offline.</p>
+            <button class="close-btn" onclick="this.parentElement.remove()">×</button>
+        `;
+
+        document.body.appendChild(notification);
+
+        // Tự động ẩn sau 8 giây
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 8000);
+    }
+
+    // Service Worker communication helpers
+    window.HMTServiceWorker = {
+        preloadThumbnails: function(urls, priority = 'normal') {
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({
+                    type: 'PRELOAD_THUMBNAILS',
+                    data: { urls, priority }
+                });
+            }
+        },
+
+        cacheStoryData: function(storyId, data) {
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({
+                    type: 'CACHE_STORY_DATA',
+                    data: { storyId, data }
+                });
+            }
+        },
+
+        clearCache: function(cacheType = null) {
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({
+                    type: 'CLEAR_CACHE',
+                    data: { cacheType }
+                });
+            }
+        },
+
+        getCacheStatus: function() {
+            return new Promise((resolve) => {
+                if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                    const channel = new MessageChannel();
+                    channel.port1.onmessage = (event) => resolve(event.data);
+                    navigator.serviceWorker.controller.postMessage({
+                        type: 'GET_CACHE_STATUS'
+                    }, [channel.port2]);
+                } else {
+                    resolve(null);
+                }
+            });
+        }
+    };
     
     // Khởi chạy
     if (document.readyState === 'loading') {

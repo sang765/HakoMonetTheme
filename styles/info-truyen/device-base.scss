@@ -1,0 +1,13 @@
+/* Base responsive styles - Mobile first approach */
+.text-right.pad-bottom-20 {
+    text-align: center !important;
+}
+
+/* Desktop override */
+@media (min-width: 768px) {
+    .text-right.pad-bottom-20 {
+        text-align: left !important;
+    }
+}
+
+/*# sourceMappingURL=https://sang765.github.io/HakoMonetTheme/styles/info-truyen/device-base.css.map */

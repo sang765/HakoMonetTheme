@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Hako: Monet Theme
 // @namespace    https://github.com/sang765
-// @version      3.2.5
+// @version      5.1.7
 // @description  Material You theme for Hako/DocLN.
 // @description:vi Material You theme dành cho Hako/DocLN.
-// @icon         https://docln.sbs/img/logo-9.png
-// @author       SangsDayy
+// @icon         https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/.github/assets/logo.png
+// @author       sang765
 // @match        https://docln.sbs/*
 // @match        https://docln.net/*
 // @match        https://ln.hako.vn/*
@@ -20,162 +20,165 @@
 // @grant        GM_deleteValue
 // @grant        GM_listValues
 // @grant        GM_openInTab
+// @grant        unsafeWindow
 // @connect      *
-// @run-at       document-end
-// @require      https://greasyfork.org/scripts/447115-gm-config/code/GM_config.js?version=1060849
-// @resource     mainJS ./main.js
-// @resource     monetAPIJS ./api/monet.js
-// @resource     simpleCORSJS ./module/simple-cors.js
-// @resource     infoTruyenJS ./class/info-truyen.js
-// @resource     animationJS ./class/animation.js
-// @resource     tagColorJS ./class/tag-color.js
-// @resource     colorinfotruyen ./colors/page-info-truyen.js
-// @resource     pagegeneralJS ./colors/page-general.js
-// @resource     themeDetectorJS ./module/theme-detector.js
-// @resource     configJS ./module/config.js
-// @resource     adBlockerJS ./module/ad-blocker.js
+// @run-at       document-start
 // @supportURL   https://github.com/sang765/HakoMonetTheme/issues
-// @updateURL    https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js
-// @downloadURL  https://github.com/sang765/HakoMonetTheme/raw/main/HakoMonetTheme.user.js
+// @updateURL    https://sang765.github.io/HakoMonetTheme/HakoMonetTheme.user.js
+// @downloadURL  https://sang765.github.io/HakoMonetTheme/HakoMonetTheme.user.js
 // @homepageURL  https://github.com/sang765/HakoMonetTheme
 // @license      MIT
+// @discord      https://discord.gg/uvQ6A3CDPq
+// @resource     mainJS ./main.js
+// @resource     monetAPIJS ./api/monet.js
+// @resource     updateCheckerJS ./api/update-checker.js
+// @resource     CORSJS ./module/cors.js
+// @resource     infoTruyenJS ./class/info-truyen.js
+// @resource     readingPageJS ./class/reading-page.js
+// @resource     animationJS ./class/animation.js
+// @resource     tagColorJS ./class/tag-color.js
+// @resource     fontImportJS ./class/font-import.js
+// @resource     colorinfotruyen ./colors/page-info-truyen.js
+// @resource     pagegeneralJS ./colors/page-general.js
+// @resource     pagegenerallightJS ./colors/page-general-light.js
+// @resource     colorinfotruyenlight ./colors/page-info-truyen-light.js
+// @resource     themeDetectorJS ./module/theme-detector.js
+// @resource     deviceDetectorJS ./module/device-detector.js
+// @resource     configJS ./module/config.js
+// @resource     adBlockerJS ./module/ad-blocker.js
+// @resource     autoReloadJS ./module/auto-reload.js
+// @resource     antiPopupJS ./module/anti-popup.js
+// @resource     mainMenuJS ./module/main-menu.js
+// @resource     navbarLogoJS ./module/navbar-logo.js
+// @resource     updateManagerJS ./module/update-manager.js
+// @resource     darkModePrompterJS ./module/dark-mode-prompter.js
+// @resource     fullscreenJS ./module/fullscreen.js
+// @resource     deviceCSSLoaderJS ./module/device-css-loader.js
+// @resource     profileBannerCropperJS ./module/profile-banner-cropper.js
+// @resource     html2canvasJS ./api/html2canvas.min.js
+// @resource     monetTestJS ./api/monet-test.js
+// @resource     colorisJS ./api/coloris.min.js
+// @resource     colorisCSS ./api/coloris.min.css
+// @resource     colorisColors ./api/coloris-colors.json
+// @connect      html2canvas.hertzen.com
+// @connect      hertzen.com
 // ==/UserScript==
 
 (function() {
     'use strict';
-    
-    const DEBUG = true;
+
+    const DEBUG = GM_getValue('debug_mode', false);
     const SCRIPT_NAME = 'Hako: Monet Theme';
     const GITHUB_REPO = 'https://github.com/sang765/HakoMonetTheme';
-    const RAW_GITHUB_URL = 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/';
-    
+    const RAW_GITHUB_URL = 'https://sang765.github.io/HakoMonetTheme';
+
     let isCheckingForUpdate = false;
-    
+
+    // Simple console logging without colors
+    const Logger = {
+        // Module-specific prefixes
+        prefixes: {
+            main: '[HakoMonetTheme]',
+            config: '[Config]',
+            colorPicker: '[ColorPicker]',
+            updateChecker: '[UpdateChecker]',
+            themeDetector: '[ThemeDetector]',
+            deviceDetector: '[DeviceDetector]',
+            adBlocker: '[AdBlocker]',
+            antiPopup: '[AntiPopup]',
+            fullscreen: '[Fullscreen]',
+            mainMenu: '[MainMenu]',
+            navbarLogo: '[NavbarLogo]',
+            updateManager: '[UpdateManager]',
+            darkModePrompter: '[DarkModePrompter]',
+            readingPage: '[ReadingPage]',
+            infoTruyen: '[InfoTruyen]',
+            tagColor: '[TagColor]',
+            animation: '[Animation]',
+            fontImport: '[FontImport]',
+            pageGeneral: '[PageGeneral]',
+            pageGeneralLight: '[PageGeneralLight]',
+            pageInfoTruyen: '[PageInfoTruyen]',
+            pageInfoTruyenLight: '[PageInfoTruyenLight]',
+            corsMaster: '[CORSMaster]'
+        },
+
+        // Simple logging functions
+        log: function(module, ...args) {
+            if (!DEBUG) return;
+            const prefix = this.prefixes[module] || `[${module.toUpperCase()}]`;
+            console.log(`${prefix} ${args.shift() || ''}`, ...args);
+        },
+
+        info: function(module, ...args) {
+            if (!DEBUG) return;
+            const prefix = this.prefixes[module] || `[${module.toUpperCase()}]`;
+            console.info(`${prefix} ${args.shift() || ''}`, ...args);
+        },
+
+        warn: function(module, ...args) {
+            if (!DEBUG) return;
+            const prefix = this.prefixes[module] || `[${module.toUpperCase()}]`;
+            console.warn(`${prefix} ${args.shift() || ''}`, ...args);
+        },
+
+        error: function(module, ...args) {
+            const prefix = this.prefixes[module] || `[${module.toUpperCase()}]`;
+            console.error(`${prefix} ${args.shift() || ''}`, ...args);
+        },
+
+        success: function(module, ...args) {
+            if (!DEBUG) return;
+            const prefix = this.prefixes[module] || `[${module.toUpperCase()}]`;
+            console.log(`${prefix} ${args.shift() || ''}`, ...args);
+        },
+
+        debug: function(module, ...args) {
+            if (!DEBUG) return;
+            const prefix = this.prefixes[module] || `[${module.toUpperCase()}]`;
+            console.debug(`${prefix} ${args.shift() || ''}`, ...args);
+        },
+
+        // Performance logging
+        performance: function(module, operation, startTime, endTime) {
+            if (!DEBUG) return;
+            const duration = endTime - startTime;
+            console.log(`${this.prefixes[module]} ${operation} completed in ${duration.toFixed(2)}ms`);
+        },
+
+        // Color picker specific logging
+        colorPicker: function(level, ...args) {
+            if (!DEBUG) return;
+            const prefix = this.prefixes.colorPicker;
+            const method = level === 'error' ? 'error' : level === 'warn' ? 'warn' : level === 'info' ? 'info' : 'log';
+            console[method](`${prefix} ${args.shift() || ''}`, ...args);
+        }
+    };
+
+    // Legacy debugLog function for backward compatibility
     function debugLog(...args) {
-        if (DEBUG) {
-            console.log(`[${SCRIPT_NAME}]`, ...args);
-        }
+        Logger.log('main', ...args);
     }
-    
-    function showNotification(title, message, timeout = 5000) {
-        if (typeof GM_notification === 'function') {
-            GM_notification({
-                title: title,
-                text: message,
-                timeout: timeout,
-                silent: false
-            });
-        } else {
-            // Fallback notification
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                padding: 15px 20px;
-                border-radius: 10px;
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-                z-index: 10000;
-                max-width: 300px;
-                animation: slideIn 0.5s ease-out;
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            `;
-            
-            notification.innerHTML = `
-                <h4 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 600;">${title}</h4>
-                <p style="margin: 0; font-size: 14px; opacity: 0.9;">${message}</p>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                if (notification.parentElement) {
-                    notification.remove();
-                }
-            }, timeout);
-        }
-    }
+
+    // Expose Logger globally for modules
+    window.Logger = Logger;
     
     function registerMenuCommands() {
-        // Command để kiểm tra cập nhật
         if (typeof GM_registerMenuCommand === 'function') {
-            GM_registerMenuCommand('🔄 Kiểm tra cập nhật', checkForUpdatesManual, 'u');
+            GM_registerMenuCommand('📋 Menu chính', function() {
+                if (typeof window.HMTMainMenu !== 'undefined' && typeof window.HMTMainMenu.openMainMenu === 'function') {
+                    window.HMTMainMenu.openMainMenu();
+                } else {
+                    showNotification('Lỗi', 'Module Main Menu chưa được tải. Vui lòng làm mới trang.', 5000);
+                    debugLog('Main Menu module chưa được tải');
+                }
+            }, 'm');
             GM_registerMenuCommand('📊 Thông tin script', showScriptInfo, 'i');
-            GM_registerMenuCommand('🎨 Cài đặt màu sắc', openColorConfig, 'c');
-            GM_registerMenuCommand('🚫 Ad Blocker', openAdBlockerConfig, 'a');
             GM_registerMenuCommand('🐛 Báo cáo lỗi', reportBug, 'b');
             GM_registerMenuCommand('💡 Đề xuất tính năng', suggestFeature, 'f');
-            GM_registerMenuCommand('🔧 Debug Mode', toggleDebugMode, 'd');
 
             debugLog('Đã đăng ký menu commands');
         }
-    }
-    
-    function checkForUpdatesManual() {
-        if (isCheckingForUpdate) {
-            showNotification('Thông tin', 'Đang kiểm tra cập nhật...', 3000);
-            return;
-        }
-        isCheckingForUpdate = true;
-        showNotification('Kiểm tra cập nhật', 'Đang kiểm tra phiên bản mới...', 3000);
-        
-        GM_xmlhttpRequest({
-            method: 'GET',
-            url: RAW_GITHUB_URL + 'HakoMonetTheme.user.js?t=' + new Date().getTime(),
-            timeout: 10000,
-            onload: function(response) {
-                if (response.status === 200) {
-                    const scriptContent = response.responseText;
-                    const versionMatch = scriptContent.match(/@version\s+([\d.]+)/);
-                    
-                    if (versionMatch && versionMatch[1]) {
-                        const latestVersion = versionMatch[1];
-                        const currentVersion = GM_info.script.version;
-                        
-                        if (isNewerVersion(latestVersion, currentVersion)) {
-                            showNotification(
-                                'Có bản cập nhật mới!',
-                                `Phiên bản ${latestVersion} đã có sẵn. Nhấp để cập nhật.`,
-                                8000
-                            );
-                            
-                            if (confirm(`Phiên bản mới ${latestVersion} đã có sẵn! Bạn có muốn cập nhật ngay bây giờ không?`)) {
-                                GM_openInTab(RAW_GITHUB_URL + 'HakoMonetTheme.user.js');
-                            }
-                        } else {
-                            showNotification('Thông tin', 'Bạn đang sử dụng phiên bản mới nhất!', 3000);
-                        }
-                    }
-                }
-                isCheckingForUpdate = false;
-            },
-            onerror: function(error) {
-                showNotification('Lỗi', 'Không thể kiểm tra cập nhật. Vui lòng thử lại sau.', 5000);
-                debugLog('Lỗi khi kiểm tra cập nhật:', error);
-                isCheckingForUpdate = false;
-            },
-            ontimeout: function() {
-                showNotification('Lỗi', 'Hết thời gian kiểm tra cập nhật.', 5000);
-                isCheckingForUpdate = false;
-            }
-        });
-    }
-    
-    function isNewerVersion(newVersion, currentVersion) {
-        const newParts = newVersion.split('.').map(Number);
-        const currentParts = currentVersion.split('.').map(Number);
-        
-        for (let i = 0; i < Math.max(newParts.length, currentParts.length); i++) {
-            const newPart = newParts[i] || 0;
-            const currentPart = currentParts[i] || 0;
-            
-            if (newPart > currentPart) return true;
-            if (newPart < currentPart) return false;
-        }
-        
-        return false;
     }
     
     function openSettings() {
@@ -214,21 +217,50 @@
             debugLog('Ad Blocker module chưa được tải');
         }
     }
+
+    function openAntiPopupConfig() {
+        // Đảm bảo anti-popup module đã được tải
+        if (typeof window.HMTAntiPopup !== 'undefined' && typeof window.HMTAntiPopup.openDialog === 'function') {
+            window.HMTAntiPopup.openDialog();
+            showNotification('Anti-Popup', 'Mở bảng cài đặt Anti-Popup...', 3000);
+        } else {
+            showNotification('Lỗi', 'Module Anti-Popup chưa được tải. Vui lòng làm mới trang.', 5000);
+            debugLog('Anti-Popup module chưa được tải');
+        }
+    }
     
+
+    function getCurrentVersion() {
+        try {
+            // Extract version from script header comment
+            const scriptContent = GM_info.scriptMetaStr || '';
+            const versionMatch = scriptContent.match(/\/\/\s*@version\s+([^\s]+)/);
+            if (versionMatch && versionMatch[1]) {
+                return versionMatch[1];
+            }
+            // Fallback to GM_info.script.version
+            return GM_info.script.version;
+        } catch (error) {
+            debugLog('Error extracting version:', error);
+            return GM_info.script.version;
+        }
+    }
+
     function showScriptInfo() {
+        const currentVersion = getCurrentVersion();
         const info = `
 Tên: ${GM_info.script.name}
-Phiên bản: ${GM_info.script.version}
+Phiên bản: ${currentVersion}
 Tác giả: ${GM_info.script.author}
 Mô tả: ${GM_info.script.description}
 
-Handler: ${GM_info.scriptHandler || 'Unknown'}
-Engine: ${GM_info.scriptEngine || 'Unknown'}
+Handler: ${GM_info.scriptHandler || 'Không rõ'}
+Engine: ${GM_info.scriptEngine || 'Không rõ'}
 
 GitHub: ${GITHUB_REPO}
 Báo cáo lỗi: ${GITHUB_REPO}/issues
         `.trim();
-        
+
         alert(info);
         debugLog('Hiển thị thông tin script');
     }
@@ -243,6 +275,18 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
         showNotification('Đề xuất tính năng', 'Mở trang đề xuất tính năng trên GitHub...', 3000);
     }
     
+    function joinDiscord() {
+        const discordURL = 'https://discord.gg/uvQ6A3CDPq';
+        try {
+            GM_openInTab(discordURL);
+            showNotification('Discord', 'Mở liên kết Discord...', 3000);
+        } catch (e) {
+            window.open(discordURL, '_blank');
+            showNotification('Discord', 'Mở Discord trong tab mới (fallback)...', 3000);
+            debugLog('GM_openInTab không khả dụng, dùng fallback window.open', e);
+        }
+    }
+
     function toggleDebugMode() {
         const currentDebug = GM_getValue('debug_mode', false);
         const newDebug = !currentDebug;
@@ -265,36 +309,47 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
     
     function loadAllResources() {
         const resources = [
-            'mainJS', 'monetJS', 'simpleCORSJS', 'infoTruyenJS',
-            'animationJS', 'tagColorJS', 'colorinfotruyen', 'pagegeneralJS', 'imageAnalyzerJS', 'themeDetectorJS', 'configJS', 'adBlockerJS'
+            'mainJS', 'monetAPIJS', 'monetTestJS', 'updateCheckerJS', 'CORSJS', 'infoTruyenJS',
+            'animationJS', 'tagColorJS', 'fontImportJS', 'colorinfotruyen',
+            'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyenlight', 'themeDetectorJS',
+            'deviceDetectorJS', 'configJS', 'adBlockerJS', 'autoReloadJS', 'antiPopupJS',
+            'mainMenuJS', 'navbarLogoJS', 'updateManagerJS', 'darkModePrompterJS', 'fullscreenJS',
+            'readingPageJS', 'deviceCSSLoaderJS', 'profileBannerCropperJS'
         ];
-        
+
         let loadedCount = 0;
         let failedCount = 0;
-        
+        const loadedResources = [];
+        const failedResources = [];
+
         resources.forEach(resourceName => {
             try {
                 const resourceContent = GM_getResourceText(resourceName);
                 if (resourceContent) {
                     eval(resourceContent);
                     loadedCount++;
+                    loadedResources.push(resourceName);
                     debugLog(`Đã tải ${resourceName}`);
                 } else {
                     debugLog(`Không tìm thấy resource: ${resourceName}`);
                     failedCount++;
+                    failedResources.push(resourceName);
                 }
             } catch (error) {
                 debugLog(`Lỗi khi tải ${resourceName}:`, error);
                 failedCount++;
+                failedResources.push(resourceName);
             }
         });
-        
+
         if (failedCount > 0) {
             debugLog(`Tải resources: ${loadedCount} thành công, ${failedCount} thất bại`);
-            
+            debugLog(`Loaded: ${loadedResources.join(', ')}`);
+            debugLog(`Failed: ${failedResources.join(', ')}`);
+
             if (failedCount === resources.length) {
                 showNotification(
-                    'Lỗi nghiêm trọng', 
+                    'Lỗi nghiêm trọng',
                     'Không thể tải bất kỳ resource nào. Vui lòng cài đặt lại script.',
                     10000
                 );
@@ -302,34 +357,89 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
         } else {
             debugLog('Đã tải tất cả resources thành công');
         }
-        
-        return loadedCount;
+
+        return { loadedCount, loadedResources, failedCount, failedResources };
     }
-    
+
+    function updateAllResources() {
+        debugLog('Bắt đầu cập nhật tất cả resources...');
+        const { loadedCount, loadedResources, failedCount, failedResources } = loadAllResources();
+        if (loadedCount > 0) {
+            const resourceList = loadedResources.join(', ');
+            showNotification(
+                'Cập nhật Resources',
+                `Đã cập nhật ${loadedCount} resources: ${resourceList}`,
+                5000
+            );
+        }
+        if (failedCount > 0) {
+            const failedList = failedResources.join(', ');
+            showNotification(
+                'Cảnh báo',
+                `Không thể cập nhật ${failedCount} resources: ${failedList}`,
+                5000
+            );
+        }
+        if (loadedCount === 0) {
+            showNotification(
+                'Lỗi',
+                'Không thể cập nhật resources. Vui lòng thử lại.',
+                5000
+            );
+        }
+        debugLog('Cập nhật resources hoàn tất');
+    }
+
     function initializeScript() {
         debugLog(`Bắt đầu khởi tạo ${SCRIPT_NAME} v${GM_info.script.version}`);
-        
+
+        // Check if we need to auto-reload after update
+        const pendingReload = GM_getValue('pending_update_reload', false);
+        const pendingTime = GM_getValue('pending_update_time', 0);
+        const updatedFromVersion = GM_getValue('updated_from_version', null);
+        const updatedToVersion = GM_getValue('updated_to_version', null);
+        const now = Date.now();
+
+        if (pendingReload && (now - pendingTime) < 30000) { // Within 30 seconds
+            debugLog('Auto-reload sau khi cập nhật');
+            GM_deleteValue('pending_update_reload');
+            GM_deleteValue('pending_update_time');
+
+            let updateMessage = 'Script đã được cập nhật thành công!';
+            if (updatedFromVersion && updatedToVersion) {
+                updateMessage = `Script đã được cập nhật từ ${updatedFromVersion} lên ${updatedToVersion}!`;
+                GM_deleteValue('updated_from_version');
+                GM_deleteValue('updated_to_version');
+            }
+
+            showNotification('Cập nhật hoàn tất', updateMessage, 5000);
+
+            // Force update version display after successful update
+            if (typeof window.HMTMainMenu !== 'undefined' &&
+                typeof window.HMTMainMenu.updateVersionDisplay === 'function') {
+                setTimeout(() => window.HMTMainMenu.updateVersionDisplay(), 500);
+            }
+        }
+
         // Đăng ký menu commands
         registerMenuCommands();
-        
+
         // Tải tất cả resources
-        const loadedCount = loadAllResources();
-        
-        if (loadedCount > 0) {
+        const { loadedCount } = loadAllResources();
+
+        // Only show initialization notification if user has enabled it or if there are errors
+        const showInitNotification = GM_getValue('show_init_notification', false);
+        if (showInitNotification && loadedCount > 0) {
             showNotification(
-                `${SCRIPT_NAME}`, 
+                `${SCRIPT_NAME}`,
                 `Đã tải ${loadedCount} modules thành công!`,
                 3000
             );
         }
-        
-        // Kiểm tra cập nhật tự động (sau 5 giây)
-        setTimeout(() => {
-            if (GM_getValue('auto_update_check', true)) {
-                checkForUpdatesManual();
-            }
-        }, 5000);
-        
+
+        // Kiểm tra cập nhật tự động được xử lý bởi main.js
+        // để tránh duplicate notifications
+
         debugLog('Khởi tạo script hoàn tất');
     }
     

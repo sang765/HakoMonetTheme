@@ -1,11 +1,13 @@
 (function() {
     'use strict';
     
-    const DEBUG = true;
+    const DEBUG = GM_getValue('debug_mode', false);
     const TARGET_DOMAINS = ['docln', 'hako', 'i2.hako.vip', 'docln.sbs', 'docln.net', 'ln.hako.vn'];
 
     function debugLog(...args) {
-        if (DEBUG) {
+        if (DEBUG && typeof window.Logger !== 'undefined') {
+            window.Logger.log('pageInfoTruyen', ...args);
+        } else if (DEBUG) {
             console.log('[PageInfoTruyen]', ...args);
         }
     }
@@ -72,6 +74,18 @@
     }
     
     function initPageInfoTruyen() {
+        // Check if in dark mode
+        if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
+            debugLog('Not in dark mode, skipping color application');
+            return;
+        }
+
+        // Kiểm tra xem có phải trang đọc truyện không và có tắt màu không
+        if (document.querySelector('.rd-basic_icon.row') && window.HMTConfig && window.HMTConfig.getDisableColorsOnReadingPage && window.HMTConfig.getDisableColorsOnReadingPage()) {
+            debugLog('Phát hiện trang đọc truyện và tính năng tắt màu được bật, bỏ qua áp dụng màu.');
+            return;
+        }
+
         // Kiểm tra xem có phải trang chi tiết truyện không bằng cách tìm element đặc trưng
         const sideFeaturesElement = document.querySelector('div.col-4.col-md.feature-item.width-auto-xl');
         if (!sideFeaturesElement) {
@@ -98,7 +112,7 @@
         // Hàm áp dụng màu sắc hiện tại
         function applyCurrentColorScheme() {
             const defaultColor = window.HMTConfig && window.HMTConfig.getDefaultColor ?
-                window.HMTConfig.getDefaultColor() : '#6c5ce7';
+                window.HMTConfig.getDefaultColor() : '#063c30';
 
             debugLog('Áp dụng màu mặc định từ config:', defaultColor);
 
@@ -108,9 +122,6 @@
                 return;
             }
 
-            // Thêm class để kích hoạt animation
-            document.body.classList.add('hmt-color-changing');
-
             // Tạo Monet palette từ màu config
             const monetPalette = MonetAPI.generateMonetPalette(defaultColor);
             debugLog('Monet Palette từ config:', monetPalette);
@@ -119,21 +130,10 @@
             debugLog('Màu sáng?', isLightColor);
 
             applyMonetColorScheme(monetPalette, isLightColor);
-
-            // Loại bỏ class sau khi animation hoàn thành
-            setTimeout(() => {
-                document.body.classList.remove('hmt-color-changing');
-            }, 600);
         }
 
         // Hàm phân tích màu từ ảnh bìa và áp dụng
         function analyzeAndApplyImageColor() {
-            // Thêm hiệu ứng thumbnail mờ dần
-            addThumbnailFadeEffect(coverUrl);
-
-            // Thêm CSS cho phần trên của feature-section trong suốt
-            addTransparentTopCSS();
-
             // Phân tích màu từ ảnh bìa
             analyzeImageColorTraditionalAccent(coverUrl)
                 .then(dominantColor => {
@@ -164,16 +164,25 @@
         analyzeAndApplyImageColor();
 
         // Lắng nghe sự kiện màu sắc thay đổi để cập nhật real-time
-        document.addEventListener('hmtColorChanged', function(event) {
+        (window.top || window).document.addEventListener('hmtColorChanged', function(event) {
             debugLog('Nhận sự kiện màu sắc thay đổi:', event.detail);
 
-            // Chỉ áp dụng màu thực sự nếu không phải preview mode
-            if (!event.detail.isPreview) {
+            // Check if in dark mode
+            if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
+                debugLog('Not in dark mode, skipping color application');
+                return;
+            }
+
+            // Kiểm tra chế độ màu
+            const colorMode = window.HMTConfig && window.HMTConfig.getColorMode ? window.HMTConfig.getColorMode() : 'default';
+
+            // Chỉ áp dụng màu thực sự nếu không phải preview mode và chế độ là default
+            if (!event.detail.isPreview && colorMode === 'default') {
                 // Đợi một chút để đảm bảo màu đã được lưu vào storage
                 setTimeout(() => {
                     applyCurrentColorScheme();
                 }, 100);
-            } else {
+            } else if (event.detail.isPreview) {
                 // Nếu là preview mode, áp dụng màu ngay lập tức
                 const previewColor = event.detail.color;
                 if (previewColor && isValidColor(previewColor)) {
@@ -191,106 +200,7 @@
         return MonetAPI.isValidColor(color);
     }
     
-    // Hàm thêm CSS cho phần trên của feature-section trong suốt
-    function addTransparentTopCSS() {
-        GM_addStyle(`
-            .feature-section.at-series {
-                background: transparent !important;
-                border: none !important;
-            }
-            
-            /* Xóa gradient mặc định của dark mode */
-            .feature-section.at-series.clear {
-                background: transparent !important;
-                background-image: none !important;
-            }
-            
-            /* Đảm bảo nội dung vẫn hiển thị bình thường */
-            .feature-section > * {
-                position: relative;
-                z-index: 2;
-            }
-            
-            /* Tạo lớp phủ gradient để phần trên trong suốt */
-            .feature-section::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 200px;
-                background: linear-gradient(to bottom, 
-                    rgba(0, 0, 0, 0.3) 0%, 
-                    rgba(0, 0, 0, 0.7) 50%,
-                    rgba(0, 0, 0, 0.9) 100%);
-                pointer-events: none;
-                z-index: 1;
-            }
-            
-            /* Light mode support */
-            body:not(.dark) .feature-section::before {
-                background: linear-gradient(to bottom, 
-                    rgba(255, 255, 255, 0.3) 0%, 
-                    rgba(255, 255, 255, 0.7) 50%,
-                    rgba(255, 255, 255, 0.9) 100%);
-            }
-        `);
-        
-        debugLog('Đã thêm CSS phần trên trong suốt');
-    }
     
-    // Hàm thêm hiệu ứng thumbnail mờ dần
-    function addThumbnailFadeEffect(coverUrl) {
-        // Tạo phần tử cho hiệu ứng nền
-        const bgOverlay = document.createElement('div');
-        bgOverlay.className = 'betterhako-bg-overlay';
-        
-        // Thêm styles
-        GM_addStyle(`
-            .betterhako-bg-overlay {
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 350px;
-                z-index: -1;
-                background-image: url('${coverUrl}');
-                background-size: cover;
-                background-position: center;
-                filter: blur(12px) brightness(0.5);
-                mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
-                -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
-                pointer-events: none;
-            }
-            
-            #mainpart {
-                position: relative;
-                isolation: isolate;
-            }
-            
-            #mainpart > .container {
-                position: relative;
-                z-index: 1;
-            }
-            
-            /* Điều chỉnh cho light mode */
-            body:not(.dark) .betterhako-bg-overlay {
-                filter: blur(12px) brightness(0.7);
-            }
-        `);
-        
-        // Thêm phần tử vào DOM
-        const mainPart = document.getElementById('mainpart');
-        if (mainPart) {
-            // Kiểm tra xem overlay đã tồn tại chưa để tránh thêm nhiều lần
-            if (!document.querySelector('.betterhako-bg-overlay')) {
-                mainPart.prepend(bgOverlay);
-                debugLog('Đã thêm hiệu ứng thumbnail mờ dần');
-            }
-        } else {
-            debugLog('Không tìm thấy #mainpart');
-        }
-    }
     
     // Hàm phân tích ảnh với focus vào accent color truyền thống
     function analyzeImageColorTraditionalAccent(imageUrl) {
@@ -322,21 +232,21 @@
             img.onerror = function(error) {
                 debugLog('Lỗi tải ảnh với Image API:', imageUrl, error);
 
-                // Fallback: try using XMLHttpRequest with CORS headers
+                // Fallback: try using GM_xmlhttpRequest (CORS bypass)
                 if (isTargetDomain(imageUrl)) {
-                    debugLog('Thử tải ảnh bằng XMLHttpRequest với CORS headers');
+                    debugLog('Thử tải ảnh bằng GM_xmlhttpRequest (CORS bypass)');
                     loadImageWithXHR(imageUrl)
                         .then(img => {
                             try {
                                 const dominantColor = getTraditionalAccentColorFromImage(img);
                                 resolve(dominantColor);
                             } catch (error) {
-                                reject('Lỗi khi phân tích ảnh từ XHR: ' + error);
+                                reject('Lỗi khi phân tích ảnh từ GM_xmlhttpRequest: ' + error);
                             }
                         })
                         .catch(xhrError => {
-                            debugLog('XMLHttpRequest cũng thất bại:', xhrError);
-                            reject('Không thể tải ảnh bằng cả Image API và XMLHttpRequest');
+                            debugLog('GM_xmlhttpRequest cũng thất bại:', xhrError);
+                            reject('Không thể tải ảnh bằng cả Image API và GM_xmlhttpRequest');
                         });
                 } else {
                     reject('Không thể tải ảnh');
@@ -347,37 +257,29 @@
         });
     }
 
-    // Fallback function to load image using XMLHttpRequest with CORS headers
+    // Fallback function to load image using GM_xmlhttpRequest (bypasses CORS)
     function loadImageWithXHR(imageUrl) {
         return new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', imageUrl, true);
-            xhr.responseType = 'blob';
-
-            // Add CORS headers for target domains
-            if (isTargetDomain(imageUrl)) {
-                xhr.setRequestHeader('Origin', window.location.origin);
-                xhr.setRequestHeader('Referer', window.location.href);
-                xhr.setRequestHeader('Access-Control-Request-Method', 'GET');
-            }
-
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    const blob = xhr.response;
-                    const img = new Image();
-                    img.onload = () => resolve(img);
-                    img.onerror = () => reject('Không thể tạo ảnh từ blob');
-                    img.src = URL.createObjectURL(blob);
-                } else {
-                    reject('XHR failed with status: ' + xhr.status);
+            debugLog('Sending GM_xmlhttpRequest to:', imageUrl);
+            GM_xmlhttpRequest({
+                method: 'GET',
+                url: imageUrl,
+                responseType: 'blob',
+                onload: function(response) {
+                    if (response.status === 200) {
+                        const blob = response.response;
+                        const img = new Image();
+                        img.onload = () => resolve(img);
+                        img.onerror = () => reject('Không thể tạo ảnh từ blob');
+                        img.src = URL.createObjectURL(blob);
+                    } else {
+                        reject('GM_xmlhttpRequest failed with status: ' + response.status);
+                    }
+                },
+                onerror: function(error) {
+                    reject('GM_xmlhttpRequest network error: ' + error);
                 }
-            };
-
-            xhr.onerror = function() {
-                reject('XHR network error');
-            };
-
-            xhr.send();
+            });
         });
     }
     
@@ -405,7 +307,7 @@
         // Đếm màu với trọng số ưu tiên màu accent truyền thống
         const colorCount = {};
         let maxCount = 0;
-        let dominantColor = '#6c5ce7'; // Màu mặc định
+        let dominantColor = '#063c30'; // Màu mặc định
         
         // Phạm vi màu accent truyền thống (loại bỏ màu quá sáng và quá tối)
         const traditionalAccentRanges = [
@@ -510,7 +412,7 @@
         const data = imageData.data;
         
         let maxSaturation = 0;
-        let mostSaturatedColor = '#6c5ce7';
+        let mostSaturatedColor = '#063c30';
         
         for (let i = 0; i < data.length; i += 4) {
             const r = data[i];
@@ -559,35 +461,13 @@
                 --monet-elevated-dark: ${palette[100]};
             }
 
-            /* Smooth color transitions for real-time updates */
-            * {
-                transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease !important;
-            }
-
             /* Faster transitions for interactive elements */
             a, button, .navbar-menu, .nav-submenu, .noti-sidebar, .account-sidebar {
-                transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
+                transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease !important;
             }
 
-            /* Special animation for color changes */
-            @keyframes hmtColorChangePulse {
-                0% {
-                    filter: brightness(1) saturate(1);
-                }
-                50% {
-                    filter: brightness(1.05) saturate(1.1);
-                }
-                100% {
-                    filter: brightness(1) saturate(1);
-                }
-            }
 
-            /* Apply subtle pulse animation when colors change */
-            body.hmt-color-changing * {
-                animation: hmtColorChangePulse 0.6s ease-in-out;
-            }
-            
-            a:hover,
+            a:hover:not([href*="/the-loai/"]),
             .long-text a:hover {
                 color: ${palette[500]} !important;
             }
@@ -611,6 +491,8 @@
             
             .series-type,
             .series-owner.group-mem,
+            .series-users .series-owner.group-admin,
+            .series-users .series-owner.group-mod,
             .ln-comment-form input.button {
                 background-color: ${palette[500]} !important;
             }
@@ -644,7 +526,7 @@
             .noti-sidebar,
             #sidenav-icon.active,
             .navbar-menu {
-                background-color: ${palette[700]} !important;
+                background-color: ${palette[800]} !important;
             }
             
             #navbar-user#guest-menu ul.nav-submenu,
@@ -663,7 +545,8 @@
             }
             
             #mainpart,
-            #mainpart.at-index {
+            #mainpart.at-index,
+            body:not(.mce-content-body) {
                 background-color: ${palette[1000]} !important;
             }
             
@@ -759,12 +642,10 @@
             
             .expand, .mobile-more, .summary-more.more-state {
                 background: linear-gradient(180deg, rgba(31,31,31,0) 1%, ${palette[900]} 75%, ${palette[900]}) !important;
-                filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#001f1f1f",endColorstr="${palette[900]}",GradientType=0) !important;
             }
             
             .ln-comment-group:nth-child(odd) .expand {
                 background: linear-gradient(180deg, rgba(42,42,42,0) 1%, ${palette[800]} 75%, ${palette[800]}) !important;
-                filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#002a2a2a",endColorstr="${palette[800]}",GradientType=0) !important;
             }
             
             .visible-toolkit .visible-toolkit-item.do-like.liked {
@@ -784,11 +665,208 @@
                 color: ${textColor} !important;
             }
 
-            :is(.dark .dark\:ring-cyan-900) {
+            :is(.dark .dark\\:ring-cyan-900) {
                 --tw-ring-color: ${palette[800]} !important;
             }
+
+            #mainpart.reading-page.style-6 #rd-side_icon {
+                background-color: ${palette[800]} !important;
+            }
+
+            #rd-side_icon {
+                border: 1px solid ${palette[700]} !important;
+            }
+
+            .rd_sidebar-header {
+                background-color: ${palette[900]} !important;
+            }
+
+            .rd_sidebar main {
+                background-color: ${palette[50]} !important;
+            }
+
+            .black-click {
+                background-color: ${palette[900]} !important;
+            }
+
+            [href*="/the-loai/"]:hover {
+                background-color: ${palette[300]} !important;
+                border: 1px solid ${palette[600]} !important;
+                color: ${palette[800]} !important;
+            }
+
+            .button.button-green:hover,
+            .button.button-red:hover {
+                background-color: ${palette[900]} !important;
+            }
+
+            [data-theme="dark"] .navbar {
+                background-color: ${palette[800]} !important;
+            }
+
+            .navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:hover, .navbar-default .navbar-nav > .open > a:focus {
+                background-color: ${palette[100]} !important;
+                color: ${palette[900]} !important;
+            }
+
+            [data-theme="dark"] .panel-default {
+                border-color: ${palette[700]} !important;
+            }
+
+            [data-theme="dark"] .panel {
+                background-color: ${palette[800]} !important;
+            }
+
+            .panel-default {
+                border-color: ${palette[200]} !important;
+            }
+
+            [data-theme="dark"] .panel-default > .panel-heading {
+                color: ${palette[100]} !important;
+                background-color: ${palette[800]} !important;
+                border-color: ${palette[700]} !important;
+            }
+
+            [data-theme="dark"] .panel-body {
+                background-color: ${palette[800]} !important;
+            }
+
+            #drop a {
+                background-color: ${palette[600]} !important;
+                color: ${palette[100]} !important;
+            }
+
+            [data-theme="dark"] .btn-warning {
+                color: ${palette[100]} !important;
+                background-color: ${palette[600]} !important;
+                border-color: ${palette[600]} !important;
+            }
+
+            .btn-warning {
+                color: ${palette[100]} !important;
+                background-color: ${palette[500]} !important;
+                border-color: ${palette[400]} !important;
+            }
+
+            [data-theme="dark"] .btn-warning:hover {
+                color: ${palette[100]} !important;
+                background-color: ${palette[700]} !important;
+                border-color: ${palette[700]} !important;
+            }
+
+            .btn-warning:hover, .btn-warning:focus, .btn-warning.focus, .btn-warning:active, .btn-warning.active, .open > .dropdown-toggle.btn-warning {
+                color: ${palette[100]} !important;
+                background-color: ${palette[600]} !important;
+                border-color: ${palette[500]} !important;
+            }
+
+            [data-theme="dark"] .btn-primary {
+                color: ${palette[100]} !important;
+                background-color: ${palette[700]} !important;
+                border-color: ${palette[700]} !important;
+            }
+
+            .btn-primary {
+                color: ${palette[100]} !important;
+                background-color: ${palette[500]} !important;
+                border-color: ${palette[400]} !important;
+            }
+
+            [data-theme="dark"] .btn-primary:hover {
+                color: ${palette[100]} !important;
+                background-color: ${palette[800]} !important;
+                border-color: ${palette[800]} !important;
+            }
+
+            .btn-primary:hover, .btn-primary:focus, .btn-primary.focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
+                color: ${palette[100]} !important;
+                background-color: ${palette[600]} !important;
+                border-color: ${palette[500]} !important;
+            }
+
+            #drop a:hover {
+                background-color: ${palette[700]} !important;
+            }
+
+            [data-theme="dark"] .alert-info {
+                color: ${palette[100]} !important;
+                background-color: ${palette[500]} !important;
+                border-color: ${palette[500]} !important;
+            }
+
+            .alert-info {
+                background-color: ${palette[100]} !important;
+                border-color: ${palette[200]} !important;
+                color: ${palette[800]} !important;
+            }
+
+            #rd-side_icon {
+                border: 1px solid ${palette[700]} !important;
+            }
+
+            .rd_sidebar-header {
+                background-color: ${palette[900]} !important;
+            }
+
+            .rd_sidebar main {
+                background-color: ${palette[50]} !important;
+            }
+
+            .black-click {
+                background-color: ${palette[900]} !important;
+            }
+
+            [href*="/the-loai/"]:hover {
+                background-color: ${palette[300]} !important;
+                border: 1px solid ${palette[600]} !important;
+                color: ${palette[800]} !important;
+            }
+
+            .button.button-green:hover,
+            .button.button-red:hover {
+                background-color: ${palette[900]} !important;
+            }
+
+            .ln-comment-toolkit-item:hover {
+                background-color: ${palette[700]} !important;
+                color: ${textColor} !important;
+            }
+
+            :is(.dark .dark\:ring-cyan-900) {
+                --tw-ring-color: ${palette[900]} !important;
+            }
+
+            .button-blue {
+                background-color: ${palette[500]};
+                border-color: ${palette[700]};
+                color: ${textColor};
+            }
+
+            .button-blue:hover {
+                background-color: ${textColor};
+                color: ${palette[500]};
+            }
+
+            .noti-unread {
+              background-color: ${palette[500]};
+              border-bottom: 1px solid ${palette[700]};
+              color: ${textColor};
+            }
+
+            .statistic-list, .feature-section .summary-wrapper,
+            .statistic-list .block-wide.at-mobile {
+                border-top-color: ${palette[200]} !important;
+            }
+
+            .statistic-list .block-wide.at-mobile {
+                border-bottom-color: ${palette[200]} !important;
+            }
+
+            .user-private-tabs li a {
+                border-bottom-color: ${palette[800]} !important;
+            }
         `;
-        
+
         GM_addStyle(css);
         debugLog('Đã áp dụng Monet theme với màu chủ đạo:', palette[500]);
     }
@@ -796,7 +874,7 @@
     function applyDefaultColorScheme() {
         // Lấy màu mặc định từ config, fallback về màu cũ nếu không có
         const defaultColor = (window.HMTConfig && window.HMTConfig.getDefaultColor) ?
-            window.HMTConfig.getDefaultColor() : '#6c5ce7';
+            window.HMTConfig.getDefaultColor() : '#063c30';
         const defaultPalette = MonetAPI.generateMonetPalette(defaultColor);
         
         if (!defaultPalette) {
@@ -805,17 +883,12 @@
         }
         
         const css = `
-            /* Smooth color transitions for real-time updates */
-            * {
-                transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease !important;
-            }
-
             /* Faster transitions for interactive elements */
             a, button, .navbar-menu, .nav-submenu, .noti-sidebar, .account-sidebar {
-                transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
+                transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease !important;
             }
 
-            a:hover,
+            a:hover:not([href*="/the-loai/"]),
             .text-slate-500,
             .long-text a:hover,
             .long-text a {
@@ -831,11 +904,13 @@
             .paging_item.paging_prevnext.next:hover,
             .paging_item.paging_prevnext.prev:hover {
                 background-color: ${defaultColor} !important;
-                color: #fff !important;
+                color: ${textColor} !important;
             }
             
             .series-type,
             .series-owner.group-mem,
+            .series-users .series-owner.group-mod,
+            .series-users .series-owner.group-admin,
             .ln-comment-form input.button {
                 background-color: ${defaultColor} !important;
             }
@@ -843,7 +918,7 @@
             .series-type,
             .ln-comment-form input.button,
             .series-users .series-owner_name a {
-                color: #fff !important;
+                color: ${textColor} !important;
             }
             
             .feature-section .series-type:before {
@@ -869,7 +944,7 @@
             .noti-sidebar,
             #sidenav-icon.active,
             .navbar-menu {
-                background-color: ${defaultPalette[700]} !important;
+                background-color: ${defaultPalette[800]} !important;
             }
             
             #navbar-user#guest-menu ul.nav-submenu,
@@ -888,7 +963,8 @@
             }
             
             #mainpart,
-            #mainpart.at-index {
+            #mainpart.at-index,
+            body:not(.mce-content-body) {
                 background-color: ${defaultPalette[1000]} !important;
             }
             
@@ -984,12 +1060,10 @@
             
             .expand, .mobile-more, .summary-more.more-state {
                 background: linear-gradient(180deg, rgba(31,31,31,0) 1%, ${defaultPalette[900]} 75%, ${defaultPalette[900]}) !important;
-                filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#001f1f1f",endColorstr="${defaultPalette[900]}",GradientType=0) !important;
             }
             
             .ln-comment-group:nth-child(odd) .expand {
                 background: linear-gradient(180deg, rgba(42,42,42,0) 1%, ${defaultPalette[800]} 75%, ${defaultPalette[800]}) !important;
-                filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#002a2a2a",endColorstr="${defaultPalette[800]}",GradientType=0) !important;
             }
             
             .visible-toolkit .visible-toolkit-item.do-like.liked {
@@ -1006,14 +1080,84 @@
             .button-green {
                 background-color: ${defaultPalette[400]} !important;
                 border-color: ${defaultPalette[600]} !important;
-                color: #fff !important;
+                color: ${textColor} !important;
             }
 
             :is(.dark .dark\:ring-cyan-900) {
                 --tw-ring-color: ${defaultPalette[800]} !important;
             }
+
+            #mainpart.reading-page.style-6 #rd-side_icon {
+                background-color: ${defaultPalette[800]} !important;
+            }
+
+            #rd-side_icon {
+                border: 1px solid ${defaultPalette[700]} !important;
+            }
+
+            .rd_sidebar-header {
+                background-color: ${defaultPalette[900]} !important;
+            }
+
+            .rd_sidebar main {
+                background-color: ${defaultPalette[50]} !important;
+            }
+
+            .black-click {
+                background-color: ${defaultPalette[900]} !important;
+            }
+
+            [href*="/the-loai/"]:hover {
+                background-color: ${defaultPalette[300]} !important;
+                border: 1px solid ${defaultPalette[600]} !important;
+                color: ${defaultPalette[800]} !important;
+            }
+
+            .button.button-green:hover,
+            .button.button-red:hover {
+                background-color: ${defaultPalette[900]} !important;
+            }
+
+            .ln-comment-toolkit-item:hover {
+                background-color: ${palette[700]} !important;
+                color: ${textColor} !important;
+            }
+
+            :is(.dark .dark\\:ring-cyan-900) {
+                --tw-ring-color: ${defaultPalette[900]} !important;
+            }
+
+            .button-blue {
+                background-color: ${defaultPalette[500]};
+                border-color: ${defaultPalette[700]};
+                color: ${textColor};
+            }
+
+            .button-blue:hover {
+                background-color: ${textColor};
+                color: ${defaultPalette[500]};
+            }
+
+            .noti-unread {
+              background-color: ${defaultPalette[500]};
+              border-bottom: 1px solid ${defaultPalette[700]};
+              color: ${textColor};
+            }
+
+            .statistic-list, .feature-section .summary-wrapper,
+            .statistic-list .block-wide.at-mobile {
+                border-top-color: ${defaultPalette[200]} !important;
+            }
+
+            .statistic-list .block-wide.at-mobile {
+                border-bottom-color: ${defaultPalette[200]} !important;
+            }
+
+            .user-private-tabs li a {
+                border-bottom-color: ${defaultPalette[800]} !important;
+            }
         `;
-        
+
         GM_addStyle(css);
         debugLog('Đã áp dụng màu mặc định từ config:', defaultColor);
     }

@@ -1,7 +1,8 @@
 (function() {
     'use strict';
     
-    const DEBUG = true;
+    const DEBUG = GM_getValue('debug_mode', false);
+    const FOLDER_URL = 'https://sang765.github.io/HakoMonetTheme/styles/';
     
     function debugLog(...args) {
         if (DEBUG) {
@@ -17,70 +18,33 @@
     }
     
     function addAnimations() {
-        GM_addStyle(`
-            /* Fade in animation */
-            @keyframes fadeIn {
-                from { opacity: 0; }
-                to { opacity: 1; }
-            }
-            
-            /* Slide in from top animation */
-            @keyframes slideInFromTop {
-                from { transform: translateY(-20px); opacity: 0; }
-                to { transform: translateY(0); opacity: 1; }
-            }
-            
-            /* Slide in from bottom animation */
-            @keyframes slideInFromBottom {
-                from { transform: translateY(20px); opacity: 0; }
-                to { transform: translateY(0); opacity: 1; }
-            }
-            
-            /* Pulse animation */
-            @keyframes pulse {
-                0% { transform: scale(1); }
-                50% { transform: scale(1.05); }
-                100% { transform: scale(1); }
-            }
-            
-            /* Hover animations */
-            .series-cover {
-                transition: transform 0.3s ease, box-shadow 0.3s ease;
-            }
-            
-            .series-cover:hover {
-                transform: translateY(-4px);
-                box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-            }
-            
-            .tag-item {
-                transition: all 0.2s ease;
-            }
-            
-            .tag-item:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            }
-            
-            /* Page load animations */
-            .series-cover {
-                animation: fadeIn 0.6s ease-out;
-            }
-            
-            .feature-section {
-                animation: slideInFromTop 0.5s ease-out;
-            }
-            
-            .basic-section {
-                animation: slideInFromBottom 0.5s ease-out 0.2s both;
-            }
-            
-            .list-chapters {
-                animation: slideInFromBottom 0.5s ease-out 0.4s both;
-            }
-        `);
-        
-        debugLog('Đã thêm animations');
+        // Fetch CSS and source map simultaneously
+        Promise.all([
+            fetch(FOLDER_URL + 'animation/animation.css').then(r => r.text()),
+            fetch(FOLDER_URL + 'animation/animation.css.map').then(r => r.text())
+        ])
+        .then(([css, mapContent]) => {
+            // Convert source map to data URL
+            const mapDataUrl = 'data:application/json;base64,' + btoa(unescape(encodeURIComponent(mapContent)));
+
+            // Add source mapping as data URL
+            css += '\n/*# sourceMappingURL=' + mapDataUrl + ' */';
+
+            // Tạo Blob URL cho quản lý tài nguyên hiệu quả
+            const blob = new Blob([css], { type: 'text/css' });
+            const blobUrl = URL.createObjectURL(blob);
+
+            // Tạo link element và áp dụng CSS
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = blobUrl;
+            document.head.appendChild(link);
+
+            debugLog('Đã thêm animations với Blob URL và inline source mapping');
+        })
+        .catch(error => {
+            debugLog('Lỗi khi tải animation/animation.css hoặc source map:', error);
+        });
     }
     
     // Khởi chạy class
