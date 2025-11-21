@@ -28,8 +28,9 @@
         }
 
         // Check if in dark mode
-        if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
-            debugLog('Not in dark mode or theme detector not ready, skipping dark theme application');
+        const isDarkMode = document.cookie.includes('night_mode=true');
+        if (!isDarkMode) {
+            debugLog('Not in dark mode, skipping dark theme application');
             return;
         }
 
@@ -184,7 +185,8 @@
             debugLog('Nhận sự kiện màu sắc thay đổi:', event.detail);
 
             // Check if in dark mode
-            if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
+            const isDarkMode = document.cookie.includes('night_mode=true');
+            if (!isDarkMode) {
                 debugLog('Not in dark mode, skipping color application');
                 return;
             }
@@ -221,7 +223,8 @@
             debugLog('Nhận sự kiện tắt màu thay đổi:', isDisabled);
 
             // Check if in dark mode
-            if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
+            const isDarkMode = document.cookie.includes('night_mode=true');
+            if (!isDarkMode) {
                 debugLog('Not in dark mode, skipping color application');
                 return;
             }
@@ -276,7 +279,8 @@
             debugLog('Nhận sự kiện chế độ màu thay đổi:', newMode);
 
             // Check if in dark mode
-            if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
+            const isDarkMode = document.cookie.includes('night_mode=true');
+            if (!isDarkMode) {
                 debugLog('Not in dark mode, skipping color application');
                 return;
             }
@@ -336,7 +340,8 @@
             debugLog('Nhận sự kiện trích xuất màu từ avatar thay đổi:', extract);
 
             // Check if in dark mode
-            if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
+            const isDarkMode = document.cookie.includes('night_mode=true');
+            if (!isDarkMode) {
                 debugLog('Not in dark mode, skipping color application');
                 return;
             }

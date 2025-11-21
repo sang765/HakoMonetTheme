@@ -75,10 +75,11 @@
     
     function initPageInfoTruyen() {
         // Check if in dark mode
-        if (!window.__themeDetectorLoaded || !window.ThemeDetector || window.ThemeDetector.isDark()) {
-            debugLog('In dark mode, skipping light theme application');
-            return;
-        }
+        const isDarkMode = document.cookie.includes('night_mode=true');
+        if (isDarkMode) {
+        debugLog('In dark mode, skipping light theme application');
+        return;
+    }
 
         // Kiểm tra xem có phải trang đọc truyện không và có tắt màu không
         if (document.querySelector('.rd-basic_icon.row') && window.HMTConfig && window.HMTConfig.getDisableColorsOnReadingPage && window.HMTConfig.getDisableColorsOnReadingPage()) {
@@ -168,10 +169,11 @@
             debugLog('Nhận sự kiện màu sắc thay đổi:', event.detail);
 
             // Check if in dark mode
-            if (!window.__themeDetectorLoaded || !window.ThemeDetector || window.ThemeDetector.isDark()) {
-            debugLog('In dark mode, skipping light theme application');
-            return;
-        }
+            const isDarkMode = document.cookie.includes('night_mode=true');
+            if (isDarkMode) {
+                debugLog('In dark mode, skipping light theme application');
+                return;
+            }
 
             // Kiểm tra chế độ màu
             const colorMode = window.HMTConfig && window.HMTConfig.getColorMode ? window.HMTConfig.getColorMode() : 'default';

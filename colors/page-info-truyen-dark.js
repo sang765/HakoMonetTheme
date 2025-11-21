@@ -75,7 +75,8 @@
     
     function initPageInfoTruyen() {
         // Check if in dark mode
-        if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
+        const isDarkMode = document.cookie.includes('night_mode=true');
+        if (!isDarkMode) {
             debugLog('Not in dark mode, skipping color application');
             return;
         }
@@ -168,7 +169,8 @@
             debugLog('Nhận sự kiện màu sắc thay đổi:', event.detail);
 
             // Check if in dark mode
-            if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
+            const isDarkMode = document.cookie.includes('night_mode=true');
+            if (!isDarkMode) {
                 debugLog('Not in dark mode, skipping color application');
                 return;
             }
