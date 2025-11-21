@@ -51,6 +51,9 @@
             const monetTestJS = GM_getResourceText('monetTestJS');
             const tagColorJS = GM_getResourceText('tagColorJS');
             const colorinfotruyen = GM_getResourceText('colorinfotruyen');
+            const colorinfotruyenlight = GM_getResourceText('colorinfotruyenlight');
+            const pagegenerallightJS = GM_getResourceText('pagegenerallightJS');
+            const pagegeneralJS = GM_getResourceText('pagegeneralJS');
             const imageAnalyzerJS = GM_getResourceText('imageAnalyzerJS');
             const html2canvasJS = GM_getResourceText('html2canvasJS');
             const colorisJS = GM_getResourceText('colorisJS');
@@ -100,6 +103,9 @@
 
             // Load color scripts - let them determine theme internally
             debugLog('Loading color scripts (they will check theme internally)');
+            debugLog('colorinfotruyenlight defined:', typeof colorinfotruyenlight, colorinfotruyenlight ? 'content length: ' + colorinfotruyenlight.length : 'null/undefined');
+            debugLog('pagegenerallightJS defined:', typeof pagegenerallightJS, pagegenerallightJS ? 'content length: ' + pagegenerallightJS.length : 'null/undefined');
+            debugLog('pagegeneralJS defined:', typeof pagegeneralJS, pagegeneralJS ? 'content length: ' + pagegeneralJS.length : 'null/undefined');
             loadScript(colorinfotruyenlight, 'page-info-truyen-light.js');
             loadScript(pagegenerallightJS, 'page-general-light.js');
             loadScript(colorinfotruyen, 'page-info-truyen-dark.js');
