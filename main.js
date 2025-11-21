@@ -97,7 +97,31 @@
             loadScript(adBlockerJS, 'ad-blocker.js');
             loadScript(antiPopupJS, 'anti-popup.js');
             loadScript(fullscreenJS, 'fullscreen.js');
-            loadScript(colorinfotruyen, 'page-info-truyen-dark.js');
+
+            // Load color scripts based on theme detection
+            // Wait a bit for theme detector to initialize
+            setTimeout(() => {
+                if (window.__themeDetectorLoaded && window.ThemeDetector) {
+                    const isDark = window.ThemeDetector.isDark();
+                    debugLog('Detected theme:', isDark ? 'dark' : 'light');
+
+                    if (isDark) {
+                        // Load dark mode scripts
+                        loadScript(colorinfotruyen, 'page-info-truyen-dark.js');
+                        loadScript(pagegeneralJS, 'page-general-dark.js');
+                    } else {
+                        // Load light mode scripts
+                        loadScript(colorinfotruyenlight, 'page-info-truyen-light.js');
+                        loadScript(pagegenerallightJS, 'page-general-light.js');
+                    }
+                } else {
+                    debugLog('Theme detector not ready, loading dark mode as fallback');
+                    // Fallback to dark mode if theme detector failed
+                    loadScript(colorinfotruyen, 'page-info-truyen-dark.js');
+                    loadScript(pagegeneralJS, 'page-general-dark.js');
+                }
+            }, 100);
+
             loadScript(deviceCSSLoaderJS, 'device-css-loader.js');
             
             debugLog('Tất cả module đã được tải');
