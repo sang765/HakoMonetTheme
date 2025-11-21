@@ -926,8 +926,8 @@
             .series-users,
             .showcase-item,
             .sub-index-style {
-                background-color: ${palette[100]} !important;
-                border-color: ${palette[100]} ${palette[0]} ${palette[0]} !important;
+                background-color: ${palette[200]} !important;
+                border-color: ${palette[200]} ${palette[0]} ${palette[0]} !important;
             }
 
             #licensed-list header.section-title,
@@ -1573,8 +1573,8 @@
             .series-users,
             .showcase-item,
             .sub-index-style {
-                background-color: ${defaultPalette[100]} !important;
-                border-color: ${defaultPalette[100]} ${defaultPalette[0]} ${defaultPalette[0]} !important;
+                background-color: ${defaultPalette[200]} !important;
+                border-color: ${defaultPalette[200]} ${defaultPalette[0]} ${defaultPalette[0]} !important;
             }
 
             #licensed-list header.section-title,
