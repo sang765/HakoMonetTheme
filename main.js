@@ -97,7 +97,7 @@
             loadScript(adBlockerJS, 'ad-blocker.js');
             loadScript(antiPopupJS, 'anti-popup.js');
             loadScript(fullscreenJS, 'fullscreen.js');
-            loadScript(colorinfotruyen, 'page-info-truyen.js');
+            loadScript(colorinfotruyen, 'page-info-truyen-dark.js');
             loadScript(deviceCSSLoaderJS, 'device-css-loader.js');
             
             debugLog('Tất cả module đã được tải');
