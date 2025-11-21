@@ -546,6 +546,11 @@ function rgbToHex(r, g, b) {
 
         debugLog('Thiết lập theo dõi thay đổi avatar');
 
+        // Ngắt kết nối observer cũ nếu có
+        if (window.__avatarObserver) {
+            window.__avatarObserver.disconnect();
+        }
+
         // Lưu URL hiện tại để so sánh
         let currentAvatarUrl = avatarImg.src || avatarImg.getAttribute('data-src');
 
@@ -566,7 +571,13 @@ function rgbToHex(r, g, b) {
                             debugLog('Tự động cập nhật màu sắc từ avatar mới');
                             // Đợi một chút để đảm bảo ảnh đã load xong
                             setTimeout(() => {
-                                applyCurrentColorScheme();
+                                try {
+                                    applyCurrentColorScheme();
+                                } catch (e) {
+                                    debugLog('Lỗi khi áp dụng màu từ avatar thay đổi:', e);
+                                    // Fallback to config color
+                                    applyConfigColor();
+                                }
                             }, 1500);
                         }
 
@@ -581,6 +592,9 @@ function rgbToHex(r, g, b) {
             attributes: true,
             attributeFilter: ['src', 'data-src']
         });
+
+        // Lưu observer để có thể ngắt kết nối sau
+        window.__avatarObserver = observer;
 
         debugLog('Đã thiết lập MutationObserver cho avatar');
     }
