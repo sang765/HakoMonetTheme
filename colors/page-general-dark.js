@@ -18,11 +18,22 @@
     }
 
     function initPageGeneral() {
+        debugLog('initPageGeneral called for DARK mode');
+        debugLog('Theme detector loaded:', !!window.__themeDetectorLoaded);
+        debugLog('ThemeDetector available:', !!window.ThemeDetector);
+        if (window.ThemeDetector) {
+            debugLog('Current theme:', window.ThemeDetector.getCurrentTheme());
+            debugLog('isDark():', window.ThemeDetector.isDark());
+            debugLog('isLight():', window.ThemeDetector.isLight());
+        }
+
         // Check if in dark mode
         if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
-            debugLog('Not in dark mode, skipping color application');
+            debugLog('Not in dark mode or theme detector not ready, skipping dark theme application');
             return;
         }
+
+        debugLog('Proceeding with DARK theme application');
 
         // Setup CORS handling for images
         setupImageCorsHandling();

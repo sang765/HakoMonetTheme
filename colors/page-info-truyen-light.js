@@ -74,7 +74,7 @@
     }
     
     function initPageInfoTruyen() {
-        // Check if in light mode
+        // Check if in dark mode
         if (!window.__themeDetectorLoaded || !window.ThemeDetector || window.ThemeDetector.isDark()) {
             debugLog('In dark mode, skipping light theme application');
             return;
@@ -167,11 +167,11 @@
         (window.top || window).document.addEventListener('hmtColorChanged', function(event) {
             debugLog('Nhận sự kiện màu sắc thay đổi:', event.detail);
 
-            // Check if in light mode
+            // Check if in dark mode
             if (!window.__themeDetectorLoaded || !window.ThemeDetector || window.ThemeDetector.isDark()) {
-                debugLog('In dark mode, skipping light theme application');
-                return;
-            }
+            debugLog('In dark mode, skipping light theme application');
+            return;
+        }
 
             // Kiểm tra chế độ màu
             const colorMode = window.HMTConfig && window.HMTConfig.getColorMode ? window.HMTConfig.getColorMode() : 'default';

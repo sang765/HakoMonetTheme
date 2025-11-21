@@ -1,5 +1,7 @@
 // USAGE: node converter.js colors/page-general-dark.js colors/page-general-light.js && node converter.js colors/page-general-dark.js colors/page-general-light.js
 // node converter.js <input-dark-file> <input-light-file>
+// Work in progress: BROKEN THEME DETECTED, DO NOT USE YET
+
 
 const fs = require('fs');
 const path = require('path');
