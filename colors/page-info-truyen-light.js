@@ -201,28 +201,7 @@
     function isValidColor(color) {
         return MonetAPI.isValidColor(color);
     }
-// Function to create tinted white using config color for light mode
-function createTintedWhite(tintColor) {
-    const BASE_WHITE = '#ffffff';    // Base white color
-    const TINT_STRENGTH = 0.1;       // 10% tint strength for subtle effect
 
-    // Convert hex to RGB
-    const white = hexToRgb(BASE_WHITE);
-    const tint = hexToRgb(tintColor);
-
-    // Mix: 90% white + 10% tint color
-    const result = {
-        r: Math.round(white.r * (1 - TINT_STRENGTH) + tint.r * TINT_STRENGTH),
-        g: Math.round(white.g * (1 - TINT_STRENGTH) + tint.g * TINT_STRENGTH),
-        b: Math.round(white.b * (1 - TINT_STRENGTH) + tint.b * TINT_STRENGTH)
-    };
-
-    return rgbToHex(result.r, result.g, result.b);
-}
-
-    
-    
-    
     // Hàm phân tích ảnh với focus vào accent color truyền thống
     function analyzeImageColorTraditionalAccent(imageUrl) {
         return new Promise((resolve, reject) => {
@@ -853,7 +832,7 @@ function createTintedWhite(tintColor) {
                 color: ${textColor} !important;
             }
 
-            :is(.dark .dark\:ring-cyan-900) {
+            :is(.dark .dark\\:\\ring-cyan-900) {
                 --tw-ring-color: ${palette[100]} !important;
             }
 
