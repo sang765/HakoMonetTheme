@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name         Hako: Monet Theme
 // @namespace    https://github.com/sang765
-// @version      5.1.9
+// @version      5.2.6
 // @description  Material You theme for Hako/DocLN.
 // @description:vi Material You theme dành cho Hako/DocLN.
 // @icon         https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/.github/assets/logo.png
 // @author       sang765
-// @match        https://docln.sbs/*
-// @match        https://docln.net/*
-// @match        https://ln.hako.vn/*
+// @match        *://docln.sbs/*
+// @match        *://docln.net/*
+// @match        *://ln.hako.vn/*
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
 // @grant        GM_xmlhttpRequest
@@ -324,7 +324,9 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
 
         resources.forEach(resourceName => {
             try {
+                debugLog(`Attempting to load resource: ${resourceName}`);
                 const resourceContent = GM_getResourceText(resourceName);
+                debugLog(`GM_getResourceText for ${resourceName} returned: ${resourceContent ? 'content (length: ' + resourceContent.length + ')' : 'null/undefined'}`);
                 if (resourceContent) {
                     eval(resourceContent);
                     loadedCount++;
@@ -337,6 +339,7 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
                 }
             } catch (error) {
                 debugLog(`Lỗi khi tải ${resourceName}:`, error);
+                debugLog(`Full error details for ${resourceName}:`, error.stack || error.message);
                 failedCount++;
                 failedResources.push(resourceName);
             }

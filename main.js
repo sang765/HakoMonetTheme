@@ -97,7 +97,14 @@
             loadScript(adBlockerJS, 'ad-blocker.js');
             loadScript(antiPopupJS, 'anti-popup.js');
             loadScript(fullscreenJS, 'fullscreen.js');
+
+            // Load color scripts - let them determine theme internally
+            debugLog('Loading color scripts (they will check theme internally)');
+            loadScript(colorinfotruyenlight, 'page-info-truyen-light.js');
+            loadScript(pagegenerallightJS, 'page-general-light.js');
             loadScript(colorinfotruyen, 'page-info-truyen-dark.js');
+            loadScript(pagegeneralJS, 'page-general-dark.js');
+
             loadScript(deviceCSSLoaderJS, 'device-css-loader.js');
             
             debugLog('Tất cả module đã được tải');
