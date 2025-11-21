@@ -222,7 +222,10 @@ function createTintedWhite(tintColor) {
 
 // Helper functions for color conversion
 function hexToRgb(hex) {
-    const result = /^#?([a-fd]{2})([a-fd]{2})([a-fd]{2})$/i.exec(hex);
+    const result = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex);
+    if (!result) {
+        throw new Error('Invalid hex color format: ' + hex);
+    }
     return {
         r: parseInt(result[1], 16),
         g: parseInt(result[2], 16),
