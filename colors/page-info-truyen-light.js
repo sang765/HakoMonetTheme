@@ -220,24 +220,6 @@ function createTintedWhite(tintColor) {
     return rgbToHex(result.r, result.g, result.b);
 }
 
-// Helper functions for color conversion
-function hexToRgb(hex) {
-    const result = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex);
-    if (!result) {
-        throw new Error('Invalid hex color format: ' + hex);
-    }
-    return {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-    };
-}
-
-function rgbToHex(r, g, b) {
-    return '#' + [r, g, b].map(x =>
-        x.toString(16).padStart(2, '0')
-    ).join('');
-}
     
     
     

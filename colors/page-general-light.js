@@ -74,21 +74,11 @@
                     })
                     .then(dominantColor => {
                         debugLog('Màu chủ đạo từ thumbnail:', dominantColor);
-                        try {
-                            // Create tinted white using color for light mode
-                        const tintedWhite = createTintedWhite(dominantColor);
-                        debugLog('Tinted white cho light mode:', tintedWhite);
-
-                        const monetPalette = MonetAPI.generateMonetPalette(tintedWhite);
-                        const isLightColor = MonetAPI.isColorLight(tintedWhite);
+                        const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
+                        const isLightColor = MonetAPI.isColorLight(dominantColor);
                         applyMonetColorScheme(monetPalette, isLightColor);
-                            // Thêm overlay sau khi áp dụng màu
-                            addOverlay();
-                        } catch (error) {
-                            debugLog('Lỗi khi tạo tinted white từ thumbnail:', error);
-                            applyConfigColor();
-                            addOverlay();
-                        }
+                        // Thêm overlay sau khi áp dụng màu
+                        addOverlay();
                     })
                     .catch(error => {
                         debugLog('Lỗi khi lấy màu từ thumbnail:', error);
@@ -177,18 +167,9 @@
                         return;
                     }
     
-                    try {
-                        // Create tinted white using color for light mode
-                        const tintedWhite = createTintedWhite(dominantColor);
-                        debugLog('Tinted white cho light mode:', tintedWhite);
-    
-                        const monetPalette = MonetAPI.generateMonetPalette(tintedWhite);
-                        const isLightColor = MonetAPI.isColorLight(tintedWhite);
-                        applyMonetColorScheme(monetPalette, isLightColor);
-                    } catch (error) {
-                        debugLog('Lỗi khi tạo tinted white từ avatar:', error);
-                        applyConfigColor(); // Fallback to config color
-                    }
+                    const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
+                    const isLightColor = MonetAPI.isColorLight(dominantColor);
+                    applyMonetColorScheme(monetPalette, isLightColor);
                 })
                 .catch(error => {
                     debugLog('Lỗi khi phân tích màu từ avatar:', error);
@@ -272,20 +253,10 @@
                             getCoverUrlFromInfoPage(storyId)
                                 .then(coverUrl => analyzeImageColorTraditionalAccent(coverUrl))
                                 .then(dominantColor => {
-                                    try {
-                                        // Create tinted white using color for light mode
-                        const tintedWhite = createTintedWhite(dominantColor);
-                        debugLog('Tinted white cho light mode:', tintedWhite);
-
-                        const monetPalette = MonetAPI.generateMonetPalette(tintedWhite);
-                        const isLightColor = MonetAPI.isColorLight(tintedWhite);
-                        applyMonetColorScheme(monetPalette, isLightColor);
-                                        addOverlay();
-                                    } catch (error) {
-                                        debugLog('Lỗi khi tạo tinted white từ thumbnail trong disable colors:', error);
-                                        applyConfigColor();
-                                        addOverlay();
-                                    }
+                                    const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
+                                    const isLightColor = MonetAPI.isColorLight(dominantColor);
+                                    applyMonetColorScheme(monetPalette, isLightColor);
+                                    addOverlay();
                                 })
                                 .catch(error => {
                                     debugLog('Lỗi khi áp dụng màu thumbnail:', error);
@@ -343,20 +314,10 @@
                                 })
                                 .then(dominantColor => {
                                     debugLog('Màu chủ đạo từ thumbnail:', dominantColor);
-                                    try {
-                                        // Create tinted white using color for light mode
-                        const tintedWhite = createTintedWhite(dominantColor);
-                        debugLog('Tinted white cho light mode:', tintedWhite);
-
-                        const monetPalette = MonetAPI.generateMonetPalette(tintedWhite);
-                        const isLightColor = MonetAPI.isColorLight(tintedWhite);
-                        applyMonetColorScheme(monetPalette, isLightColor);
-                                        addOverlay();
-                                    } catch (error) {
-                                        debugLog('Lỗi khi tạo tinted white từ thumbnail trong mode changed:', error);
-                                        applyCurrentColorScheme();
-                                        addOverlay();
-                                    }
+                                    const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
+                                    const isLightColor = MonetAPI.isColorLight(dominantColor);
+                                    applyMonetColorScheme(monetPalette, isLightColor);
+                                    addOverlay();
                                 })
                                 .catch(error => {
                                     debugLog('Lỗi khi áp dụng lại màu thumbnail:', error);
@@ -393,43 +354,6 @@
     function isValidColor(color) {
         return MonetAPI.isValidColor(color);
     }
-// Function to create tinted white using config color for light mode
-function createTintedWhite(tintColor) {
-    const BASE_WHITE = '#ffffff';    // Base white color
-    const TINT_STRENGTH = 0.1;       // 10% tint strength for subtle effect
-
-    // Convert hex to RGB
-    const white = hexToRgb(BASE_WHITE);
-    const tint = hexToRgb(tintColor);
-
-    // Mix: 90% white + 10% tint color
-    const result = {
-        r: Math.round(white.r * (1 - TINT_STRENGTH) + tint.r * TINT_STRENGTH),
-        g: Math.round(white.g * (1 - TINT_STRENGTH) + tint.g * TINT_STRENGTH),
-        b: Math.round(white.b * (1 - TINT_STRENGTH) + tint.b * TINT_STRENGTH)
-    };
-
-    return rgbToHex(result.r, result.g, result.b);
-}
-
-// Helper functions for color conversion
-function hexToRgb(hex) {
-    const result = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex);
-    if (!result) {
-        throw new Error('Invalid hex color format: ' + hex);
-    }
-    return {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-    };
-}
-
-function rgbToHex(r, g, b) {
-    return '#' + [r, g, b].map(x =>
-        x.toString(16).padStart(2, '0')
-    ).join('');
-}
 
     // Integrated CORS handling for images
     function setupImageCorsHandling() {
