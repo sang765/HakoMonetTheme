@@ -76,9 +76,9 @@
             }
         }
 
-        // Kiểm tra xem có phải trang truyện không bằng cách tìm element đặc trưng
-        const sideFeaturesElement = document.querySelector('div.col-4.col-md.feature-item.width-auto-xl');
-        if (sideFeaturesElement) {
+        // Kiểm tra xem có phải trang truyện không bằng cách kiểm tra URL hoặc element đặc trưng
+        const isStoryPage = window.location.pathname.includes('/truyen/') || document.querySelector('.series-cover');
+        if (isStoryPage) {
             debugLog('Phát hiện trang truyện, bỏ qua tính năng này.');
             return;
         }
