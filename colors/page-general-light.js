@@ -909,7 +909,7 @@
             #mainpart,
             #mainpart.at-index,
             .a6-ratio {
-                background-color: ${palette[0]} !important;
+                background-color: ${palette[50]} !important;
             }
 
             .basic-section,
@@ -1552,7 +1552,7 @@
             #mainpart,
             #mainpart.at-index,
             .a6-ratio {
-                background-color: ${defaultPalette[0]} !important;
+                background-color: ${defaultPalette[50]} !important;
             }
 
             .basic-section,
