@@ -324,7 +324,9 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
 
         resources.forEach(resourceName => {
             try {
+                debugLog(`Attempting to load resource: ${resourceName}`);
                 const resourceContent = GM_getResourceText(resourceName);
+                debugLog(`GM_getResourceText for ${resourceName} returned: ${resourceContent ? 'content (length: ' + resourceContent.length + ')' : 'null/undefined'}`);
                 if (resourceContent) {
                     eval(resourceContent);
                     loadedCount++;
@@ -337,6 +339,7 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
                 }
             } catch (error) {
                 debugLog(`Lỗi khi tải ${resourceName}:`, error);
+                debugLog(`Full error details for ${resourceName}:`, error.stack || error.message);
                 failedCount++;
                 failedResources.push(resourceName);
             }

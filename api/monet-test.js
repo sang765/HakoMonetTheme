@@ -367,7 +367,12 @@
         
         // Test invalid color validation
         TestFramework.assert(!MonetAPI.isValidColor('not-a-color'), 'V1 color validation rejects invalid colors');
-        TestFramework.assert(!MonetAPI.v2CreateEnhancedPalette('xyz'), 'V2 handles invalid colors gracefully');
+        try {
+            MonetAPI.v2CreateEnhancedPalette('xyz');
+            TestFramework.assert(false, 'V2 should throw error for invalid color in validation test');
+        } catch (error) {
+            TestFramework.assert(true, 'V2 handles invalid colors gracefully');
+        }
     }
     
     // ===== RUN ALL TESTS =====
