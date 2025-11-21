@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name         Hako: Monet Theme
 // @namespace    https://github.com/sang765
-// @version      5.1.8
+// @version      5.1.9
 // @description  Material You theme for Hako/DocLN.
 // @description:vi Material You theme dành cho Hako/DocLN.
 // @icon         https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/.github/assets/logo.png
 // @author       sang765
-// @match        *://docln.sbs/*
-// @match        *://docln.net/*
-// @match        *://ln.hako.vn/*
+// @match        https://docln.sbs/*
+// @match        https://docln.net/*
+// @match        https://ln.hako.vn/*
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
 // @grant        GM_xmlhttpRequest
@@ -38,10 +38,10 @@
 // @resource     animationJS ./class/animation.js
 // @resource     tagColorJS ./class/tag-color.js
 // @resource     fontImportJS ./class/font-import.js
-// @resource     colorinfotruyen ./colors/info-truyen-dark.js
-// @resource     pagegeneralJS ./colors/general-dark.js
-// @resource     pagegenerallightJS ./colors/general-light.js
-// @resource     colorinfotruyenlight ./colors/info-truyen-light.js
+// @resource     colorinfotruyen ./colors/page-info-truyen-dark.js
+// @resource     pagegeneralJS ./colors/page-general-dark.js
+// @resource     pagegenerallightJS ./colors/page-general-light.js
+// @resource     colorinfotruyenlight ./colors/page-info-truyen-light.js
 // @resource     themeDetectorJS ./module/theme-detector.js
 // @resource     deviceDetectorJS ./module/device-detector.js
 // @resource     configJS ./module/config.js

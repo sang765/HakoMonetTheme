@@ -6,9 +6,9 @@
 
     function debugLog(...args) {
         if (DEBUG && typeof window.Logger !== 'undefined') {
-            window.Logger.log('pageGeneral', ...args);
+            window.Logger.log('pageGeneralLight', ...args);
         } else if (DEBUG) {
-            console.log('[PageGeneral]', ...args);
+            console.log('[PageGeneralLight]', ...args);
         }
     }
 
@@ -17,10 +17,10 @@
         return TARGET_DOMAINS.some(domain => url.includes(domain));
     }
 
-    function initPageGeneral() {
-        // Check if in dark mode
-        if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
-            debugLog('Not in dark mode, skipping color application');
+    function initPageGeneralLight() {
+        // Check if in dark mode, if yes, skip
+        if (window.__themeDetectorLoaded && window.ThemeDetector && window.ThemeDetector.isDark()) {
+            debugLog('In dark mode, skipping light theme application');
             return;
         }
 
@@ -29,292 +29,80 @@
 
         // Kiểm tra xem có phải trang đọc truyện không và có tắt màu không
         if (document.querySelector('.rd-basic_icon.row') && window.HMTConfig && window.HMTConfig.getDisableColorsOnReadingPage && window.HMTConfig.getDisableColorsOnReadingPage()) {
-            // Xóa overlay nếu có
-            const targetElement = document.querySelector('.set-input.clear.justify-center');
-            if (targetElement) {
-                const overlay = targetElement.querySelector('.hmt-block-overlay');
-                if (overlay) {
-                    overlay.remove();
-                    // Khôi phục pointer events
-                    targetElement.style.pointerEvents = 'auto';
-                    debugLog('Đã xóa overlay trên trang đọc truyện vì tính năng tắt màu được bật');
-                }
-            }
-            debugLog('Phát hiện trang đọc truyện và tính năng tắt màu được bật, bỏ qua áp dụng màu.');
+            debugLog('Reading page with colors disabled, skipping');
             return;
         }
 
-        // Kiểm tra chế độ màu
+        // Kiểm tra chế độ màu và cài đặt trích xuất màu từ avatar
         const colorMode = window.HMTConfig && window.HMTConfig.getColorMode ? window.HMTConfig.getColorMode() : 'default';
+        const extractFromAvatar = window.HMTConfig && window.HMTConfig.getExtractColorFromAvatar ? window.HMTConfig.getExtractColorFromAvatar() : false;
 
         // Nếu là trang đọc truyện và chế độ thumbnail, áp dụng màu từ thumbnail
         if (document.querySelector('.rd-basic_icon.row') && colorMode === 'thumbnail') {
-            debugLog('Trang đọc truyện với chế độ thumbnail, áp dụng màu từ thumbnail.');
+            debugLog('Reading page with thumbnail mode, applying from thumbnail');
 
-            // Lấy story ID từ URL
             const pathParts = window.location.pathname.split('/');
             const storyId = pathParts[2];
             if (storyId) {
                 getCoverUrlFromInfoPage(storyId)
                     .then(coverUrl => {
-                        debugLog('Đã lấy URL ảnh bìa:', coverUrl);
+                        debugLog('Got cover URL:', coverUrl);
                         return analyzeImageColorTraditionalAccent(coverUrl);
                     })
                     .then(dominantColor => {
-                        debugLog('Màu chủ đạo từ thumbnail:', dominantColor);
+                        debugLog('Dominant color from thumbnail:', dominantColor);
                         const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
                         const isLightColor = MonetAPI.isColorLight(dominantColor);
                         applyMonetColorScheme(monetPalette, isLightColor);
-                        // Thêm overlay sau khi áp dụng màu
-                        addOverlay();
                     })
                     .catch(error => {
-                        debugLog('Lỗi khi lấy màu từ thumbnail:', error);
-                        applyConfigColor(); // Fallback to config color
+                        debugLog('Error getting color from thumbnail:', error);
+                        applyConfigColor();
                     });
                 return;
             }
         }
 
-        // Kiểm tra xem có phải trang truyện không bằng cách kiểm tra URL hoặc element đặc trưng
-        const isStoryPage = window.location.pathname.includes('/truyen/') || document.querySelector('.series-cover');
-        if (isStoryPage) {
-            debugLog('Phát hiện trang truyện, bỏ qua tính năng này.');
+        // Kiểm tra xem có phải trang truyện không
+        const sideFeaturesElement = document.querySelector('div.col-4.col-md.feature-item.width-auto-xl');
+        if (sideFeaturesElement) {
+            debugLog('Story page detected, skipping');
             return;
         }
 
-        debugLog('Khởi tạo PageGeneral cho trang không phải truyện');
+        debugLog('Initializing light theme for general page');
 
-        // Hàm áp dụng màu từ config (không bao gồm avatar)
-        function applyConfigColor() {
-            const defaultColor = window.HMTConfig && window.HMTConfig.getDefaultColor ?
-                window.HMTConfig.getDefaultColor() : '#063c30';
-
-            debugLog('Áp dụng màu từ config:', defaultColor);
-
-            if (!isValidColor(defaultColor)) {
-                debugLog('Màu không hợp lệ, sử dụng màu mặc định');
-                applyDefaultColorScheme();
-                return;
-            }
-
-            // Tạo Monet palette từ màu config
-            const monetPalette = MonetAPI.generateMonetPalette(defaultColor);
-            debugLog('Monet Palette từ config:', monetPalette);
-
-            const isLightColor = MonetAPI.isColorLight(defaultColor);
-            debugLog('Màu sáng?', isLightColor);
-
-            applyMonetColorScheme(monetPalette, isLightColor);
-        }
-
-        // Hàm áp dụng màu sắc hiện tại
-        function applyCurrentColorScheme() {
-            const extractFromAvatar = window.HMTConfig && window.HMTConfig.getExtractColorFromAvatar ?
-                window.HMTConfig.getExtractColorFromAvatar() : false;
-
-            if (extractFromAvatar) {
-                debugLog('Trích xuất màu từ avatar được bật, áp dụng màu từ avatar');
-                applyAvatarColorScheme();
-                return;
-            }
-
-            // Sử dụng hàm applyConfigColor thay vì duplicate code
-            applyConfigColor();
-        }
-
-        // Hàm áp dụng màu từ avatar
-        function applyAvatarColorScheme() {
-            debugLog('Bắt đầu trích xuất màu từ avatar');
-
-            // Tìm avatar element
-            const avatarElement = document.querySelector('.nav-user_avatar img');
-            if (!avatarElement) {
-                debugLog('Không tìm thấy avatar element, fallback về màu config');
-                applyConfigColor();
-                return;
-            }
-
-            const avatarSrc = avatarElement.src || avatarElement.getAttribute('data-src');
-            if (!avatarSrc) {
-                debugLog('Avatar không có src, fallback về màu config');
-                applyConfigColor();
-                return;
-            }
-
-            debugLog('Tìm thấy avatar src:', avatarSrc);
-
-            // Phân tích màu từ avatar
-            analyzeImageColorTraditionalAccent(avatarSrc)
-                .then(dominantColor => {
-                    debugLog('Màu chủ đạo từ avatar:', dominantColor);
-
-                    if (!isValidColor(dominantColor)) {
-                        debugLog('Màu từ avatar không hợp lệ, fallback về màu config');
-                        applyConfigColor();
-                        return;
-                    }
-
-                    const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
-                    const isLightColor = MonetAPI.isColorLight(dominantColor);
-                    applyMonetColorScheme(monetPalette, isLightColor);
-                })
-                .catch(error => {
-                    debugLog('Lỗi khi phân tích màu từ avatar:', error);
-                    applyConfigColor(); // Fallback to config color
-                });
-        }
-
-        // Áp dụng màu sắc lần đầu
         applyCurrentColorScheme();
 
-        // Lắng nghe sự kiện màu sắc thay đổi để cập nhật real-time
+        // Listen for color change events
         (window.top || window).document.addEventListener('hmtColorChanged', function(event) {
-            debugLog('Nhận sự kiện màu sắc thay đổi:', event.detail);
+            debugLog('Color change event received:', event.detail);
 
             // Check if in dark mode
-            if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
-                debugLog('Not in dark mode, skipping color application');
+            if (window.__themeDetectorLoaded && window.ThemeDetector && window.ThemeDetector.isDark()) {
+                debugLog('In dark mode, skipping');
                 return;
             }
 
-            // Kiểm tra chế độ màu và cài đặt trích xuất màu từ avatar
             const colorMode = window.HMTConfig && window.HMTConfig.getColorMode ? window.HMTConfig.getColorMode() : 'default';
             const extractFromAvatar = window.HMTConfig && window.HMTConfig.getExtractColorFromAvatar ? window.HMTConfig.getExtractColorFromAvatar() : false;
 
-            // Chỉ áp dụng màu thực sự nếu không phải preview mode và chế độ là default
+            // Nếu trích xuất từ avatar được bật, không áp dụng màu từ config
+            if (extractFromAvatar) {
+                debugLog('Trích xuất từ avatar được bật, bỏ qua sự kiện màu sắc thay đổi');
+                return;
+            }
+
             if (!event.detail.isPreview && colorMode === 'default') {
-                // Đợi một chút để đảm bảo màu đã được lưu vào storage
                 setTimeout(() => {
                     applyCurrentColorScheme();
                 }, 100);
             } else if (event.detail.isPreview) {
-                // Nếu là preview mode, áp dụng màu ngay lập tức
                 const previewColor = event.detail.color;
                 if (previewColor && isValidColor(previewColor)) {
                     const monetPalette = MonetAPI.generateMonetPalette(previewColor);
                     const isLightColor = MonetAPI.isColorLight(previewColor);
                     applyMonetColorScheme(monetPalette, isLightColor);
-                }
-            }
-        });
-
-        debugLog('Đã thiết lập lắng nghe sự kiện màu sắc thay đổi');
-
-        // Thiết lập theo dõi thay đổi avatar
-        setupAvatarChangeDetection();
-
-        // Lắng nghe sự kiện tắt màu thay đổi
-        (window.top || window).document.addEventListener('hmtDisableColorsChanged', function(event) {
-            const isDisabled = event.detail.disabled;
-            debugLog('Nhận sự kiện tắt màu thay đổi:', isDisabled);
-
-            // Check if in dark mode
-            if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
-                debugLog('Not in dark mode, skipping color application');
-                return;
-            }
-
-            if (document.querySelector('.rd-basic_icon.row')) {
-                if (isDisabled) {
-                    // Xóa overlay
-                    const targetElement = document.querySelector('.set-input.clear.justify-center');
-                    if (targetElement) {
-                        const overlay = targetElement.querySelector('.hmt-block-overlay');
-                        if (overlay) {
-                            overlay.remove();
-                            // Khôi phục pointer events
-                            targetElement.style.pointerEvents = 'auto';
-                            debugLog('Đã xóa overlay do tắt màu');
-                        }
-                    }
-                } else {
-                    // Áp dụng lại màu và thêm overlay
-                    const colorMode = window.HMTConfig.getColorMode();
-                    if (colorMode === 'thumbnail') {
-                        debugLog('Áp dụng lại màu thumbnail');
-                        const pathParts = window.location.pathname.split('/');
-                        const storyId = pathParts[2];
-                        if (storyId) {
-                            getCoverUrlFromInfoPage(storyId)
-                                .then(coverUrl => analyzeImageColorTraditionalAccent(coverUrl))
-                                .then(dominantColor => {
-                                    const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
-                                    const isLightColor = MonetAPI.isColorLight(dominantColor);
-                                    applyMonetColorScheme(monetPalette, isLightColor);
-                                    addOverlay();
-                                })
-                                .catch(error => {
-                                    debugLog('Lỗi khi áp dụng màu thumbnail:', error);
-                                    applyConfigColor();
-                                    addOverlay();
-                                });
-                        }
-                    } else {
-                        debugLog('Áp dụng lại màu config');
-                        applyCurrentColorScheme();
-                        addOverlay();
-                    }
-                }
-            }
-        });
-
-        // Lắng nghe sự kiện chế độ màu thay đổi
-        (window.top || window).document.addEventListener('hmtModeChanged', function(event) {
-            const newMode = event.detail.mode;
-            debugLog('Nhận sự kiện chế độ màu thay đổi:', newMode);
-
-            // Check if in dark mode
-            if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
-                debugLog('Not in dark mode, skipping color application');
-                return;
-            }
-
-            if (document.querySelector('.rd-basic_icon.row')) {
-                const isDisabled = window.HMTConfig.getDisableColorsOnReadingPage();
-
-                if (isDisabled) {
-                    // Xóa overlay
-                    const targetElement = document.querySelector('.set-input.clear.justify-center');
-                    if (targetElement) {
-                        const overlay = targetElement.querySelector('.hmt-block-overlay');
-                        if (overlay) {
-                            overlay.remove();
-                            // Khôi phục pointer events
-                            targetElement.style.pointerEvents = 'auto';
-                            debugLog('Đã xóa overlay do chế độ màu thay đổi và tắt màu');
-                        }
-                    }
-                } else {
-                    // Áp dụng lại màu dựa trên chế độ mới
-                    if (newMode === 'thumbnail') {
-                        debugLog('Chế độ thumbnail, áp dụng lại màu từ thumbnail');
-                        const pathParts = window.location.pathname.split('/');
-                        const storyId = pathParts[2];
-                        if (storyId) {
-                            getCoverUrlFromInfoPage(storyId)
-                                .then(coverUrl => {
-                                    debugLog('Đã lấy URL ảnh bìa:', coverUrl);
-                                    return analyzeImageColorTraditionalAccent(coverUrl);
-                                })
-                                .then(dominantColor => {
-                                    debugLog('Màu chủ đạo từ thumbnail:', dominantColor);
-                                    const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
-                                    const isLightColor = MonetAPI.isColorLight(dominantColor);
-                                    applyMonetColorScheme(monetPalette, isLightColor);
-                                    addOverlay();
-                                })
-                                .catch(error => {
-                                    debugLog('Lỗi khi áp dụng lại màu thumbnail:', error);
-                                    applyCurrentColorScheme();
-                                    addOverlay();
-                                });
-                        }
-                    } else {
-                        debugLog('Chế độ default, áp dụng lại màu từ config');
-                        applyConfigColor();
-                        addOverlay();
-                    }
                 }
             }
         });
@@ -325,31 +113,69 @@
             debugLog('Nhận sự kiện trích xuất màu từ avatar thay đổi:', extract);
 
             // Check if in dark mode
-            if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
-                debugLog('Not in dark mode, skipping color application');
+            if (window.__themeDetectorLoaded && window.ThemeDetector && window.ThemeDetector.isDark()) {
+                debugLog('In dark mode, skipping');
                 return;
             }
 
             // Áp dụng lại màu dựa trên cài đặt mới
-            applyCurrentColorScheme();
+            applyConfigColor();
         });
+
+        debugLog('Set up color change listener');
+
+        // Thiết lập theo dõi thay đổi avatar
+        setupAvatarChangeDetection();
     }
 
     function isValidColor(color) {
         return MonetAPI.isValidColor(color);
     }
 
+    // Function to create tinted white using config color for light mode
+    function createTintedWhite(tintColor) {
+        const BASE_WHITE = '#ffffff';    // Base white color
+        const TINT_STRENGTH = 0.1;       // 10% tint strength for subtle effect
+
+        // Convert hex to RGB
+        const white = hexToRgb(BASE_WHITE);
+        const tint = hexToRgb(tintColor);
+
+        // Mix: 90% white + 10% tint color
+        const result = {
+            r: Math.round(white.r * (1 - TINT_STRENGTH) + tint.r * TINT_STRENGTH),
+            g: Math.round(white.g * (1 - TINT_STRENGTH) + tint.g * TINT_STRENGTH),
+            b: Math.round(white.b * (1 - TINT_STRENGTH) + tint.b * TINT_STRENGTH)
+        };
+
+        return rgbToHex(result.r, result.g, result.b);
+    }
+
+    // Helper functions for color conversion
+    function hexToRgb(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        };
+    }
+
+    function rgbToHex(r, g, b) {
+        return '#' + [r, g, b].map(x =>
+            x.toString(16).padStart(2, '0')
+        ).join('');
+    }
+
     // Integrated CORS handling for images
     function setupImageCorsHandling() {
         if (window.__imageCorsSetup) return;
 
-        debugLog('Setting up integrated CORS handling for images');
+        debugLog('Setting up CORS handling for images');
 
-        // Patch Image constructor
         const originalImage = window.Image;
         window.Image = function(width, height) {
             const img = new originalImage(width, height);
-            // Patch the src setter
             const originalSrcDescriptor = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
             if (originalSrcDescriptor && originalSrcDescriptor.set) {
                 Object.defineProperty(img, 'src', {
@@ -368,12 +194,10 @@
             return img;
         };
 
-        // Copy static properties
         Object.keys(originalImage).forEach(key => {
             window.Image[key] = originalImage[key];
         });
 
-        // Also patch existing Image prototype for direct property access
         const protoDescriptor = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
         if (protoDescriptor && protoDescriptor.set) {
             const originalSet = protoDescriptor.set;
@@ -392,56 +216,46 @@
         }
 
         window.__imageCorsSetup = true;
-        debugLog('Integrated CORS handling for images is ready');
+        debugLog('CORS handling ready');
     }
 
-    // Hàm thêm overlay block trên element
-    function addOverlay() {
-        const targetElement = document.querySelector('.set-input.clear.justify-center');
-        if (targetElement) {
-            // Xóa overlay cũ nếu có
-            const existingOverlay = targetElement.querySelector('.hmt-block-overlay');
-            if (existingOverlay) {
-                existingOverlay.remove();
-            }
+    // Hàm áp dụng màu từ config (không bao gồm avatar)
+    function applyConfigColor() {
+        const defaultColor = window.HMTConfig ? window.HMTConfig.getDefaultColor() : '#FCE4EC'; // Get color from config or fallback
 
-            // Tạo overlay mới
-            const overlay = document.createElement('div');
-            overlay.className = 'hmt-block-overlay';
-            overlay.style.cssText = `
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.5);
-                pointer-events: auto;
-                z-index: 1000;
-            `;
+        debugLog('Applying light color scheme with config color:', defaultColor);
 
-            // Thêm text note vào overlay
-            overlay.innerHTML = '<div style="color: white; font-size: 14px; text-align: center; padding: 20px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">Tắt màu trên trang đọc truyện</div>';
-
-            // Thêm event listener để chặn click
-            overlay.addEventListener('click', function(e) {
-                e.stopPropagation();
-                e.preventDefault();
-                return false;
-            }, true);
-
-            // Chặn pointer events trên element gốc
-            targetElement.style.pointerEvents = 'none';
-
-            // Đảm bảo element có position relative
-            if (getComputedStyle(targetElement).position === 'static') {
-                targetElement.style.position = 'relative';
-            }
-
-            targetElement.appendChild(overlay);
-            debugLog('Đã thêm overlay block trên trang đọc truyện');
-        } else {
-            debugLog('Không tìm thấy element .set-input.clear.justify-center để thêm overlay');
+        if (!isValidColor(defaultColor)) {
+            debugLog('Invalid color, using default');
+            applyDefaultColorScheme();
+            return;
         }
+
+        // Create tinted white using config color for light mode
+        const tintedWhite = createTintedWhite(defaultColor);
+        debugLog('Tinted white for light mode:', tintedWhite);
+
+        const monetPalette = MonetAPI.generateMonetPalette(tintedWhite);
+        debugLog('Monet Palette:', monetPalette);
+
+        const isLightColor = MonetAPI.isColorLight(tintedWhite);
+        debugLog('Is light color?', isLightColor);
+
+        applyMonetColorScheme(monetPalette, isLightColor);
+    }
+
+    function applyCurrentColorScheme() {
+        const extractFromAvatar = window.HMTConfig && window.HMTConfig.getExtractColorFromAvatar ?
+            window.HMTConfig.getExtractColorFromAvatar() : false;
+
+        if (extractFromAvatar) {
+            debugLog('Trích xuất màu từ avatar được bật, áp dụng màu từ avatar');
+            applyAvatarColorScheme();
+            return;
+        }
+
+        // Sử dụng hàm applyConfigColor thay vì duplicate code
+        applyConfigColor();
     }
 
     // Hàm thiết lập theo dõi thay đổi avatar
@@ -474,7 +288,7 @@
                             debugLog('Tự động cập nhật màu sắc từ avatar mới');
                             // Đợi một chút để đảm bảo ảnh đã load xong
                             setTimeout(() => {
-                                applyCurrentColorScheme();
+                                applyConfigColor();
                             }, 1500);
                         }
 
@@ -493,301 +307,59 @@
         debugLog('Đã thiết lập MutationObserver cho avatar');
     }
 
-    // Hàm phân tích ảnh với focus vào accent color truyền thống
-    function analyzeImageColorTraditionalAccent(imageUrl) {
-        return new Promise((resolve, reject) => {
-            // Setup CORS handling for images if needed
-            if (isTargetDomain(imageUrl)) {
-                debugLog('Ảnh từ domain target, thiết lập CORS handling');
-                setupImageCorsHandling();
-            }
+    // Hàm áp dụng màu từ avatar
+    function applyAvatarColorScheme() {
+        debugLog('Bắt đầu trích xuất màu từ avatar');
 
-            const img = new Image();
+        // Tìm avatar element
+        const avatarElement = document.querySelector('.nav-user_avatar img');
+        if (!avatarElement) {
+            debugLog('Không tìm thấy avatar element, fallback về màu config');
+            applyConfigColor();
+            return;
+        }
 
-            // Always set crossOrigin for safety
-            if (isTargetDomain(imageUrl)) {
-                img.crossOrigin = 'anonymous';
-                debugLog('Đã set crossOrigin cho ảnh từ domain target');
-            }
+        const avatarSrc = avatarElement.src || avatarElement.getAttribute('data-src');
+        if (!avatarSrc) {
+            debugLog('Avatar không có src, fallback về màu config');
+            applyConfigColor();
+            return;
+        }
 
-            img.onload = function() {
-                debugLog('Ảnh đã tải xong, kích thước:', img.width, 'x', img.height);
-                try {
-                    const dominantColor = getTraditionalAccentColorFromImage(img);
-                    resolve(dominantColor);
-                } catch (error) {
-                    reject('Lỗi khi phân tích ảnh: ' + error);
+        debugLog('Tìm thấy avatar src:', avatarSrc);
+
+        // Phân tích màu từ avatar
+        analyzeImageColorTraditionalAccent(avatarSrc)
+            .then(dominantColor => {
+                debugLog('Màu chủ đạo từ avatar:', dominantColor);
+
+                if (!isValidColor(dominantColor)) {
+                    debugLog('Màu từ avatar không hợp lệ, fallback về màu config');
+                    applyConfigColor();
+                    return;
                 }
-            };
 
-            img.onerror = function(error) {
-                debugLog('Lỗi tải ảnh với Image API:', imageUrl, error);
+                // Create tinted white using avatar color for light mode
+                const tintedWhite = createTintedWhite(dominantColor);
+                debugLog('Tinted white từ avatar cho light mode:', tintedWhite);
 
-                // Fallback: try using GM_xmlhttpRequest (CORS bypass)
-                if (isTargetDomain(imageUrl)) {
-                    debugLog('Thử tải ảnh bằng GM_xmlhttpRequest (CORS bypass)');
-                    loadImageWithXHR(imageUrl)
-                        .then(img => {
-                            try {
-                                const dominantColor = getTraditionalAccentColorFromImage(img);
-                                resolve(dominantColor);
-                            } catch (error) {
-                                reject('Lỗi khi phân tích ảnh từ GM_xmlhttpRequest: ' + error);
-                            }
-                        })
-                        .catch(xhrError => {
-                            debugLog('GM_xmlhttpRequest cũng thất bại:', xhrError);
-                            reject('Không thể tải ảnh bằng cả Image API và GM_xmlhttpRequest');
-                        });
-                } else {
-                    reject('Không thể tải ảnh');
-                }
-            };
-
-            img.src = imageUrl;
-        });
-    }
-
-    // Fallback function to load image using GM_xmlhttpRequest (bypasses CORS)
-    function loadImageWithXHR(imageUrl) {
-        return new Promise((resolve, reject) => {
-            debugLog('Sending GM_xmlhttpRequest to:', imageUrl);
-            GM_xmlhttpRequest({
-                method: 'GET',
-                url: imageUrl,
-                responseType: 'blob',
-                onload: function(response) {
-                    if (response.status === 200) {
-                        const blob = response.response;
-                        const img = new Image();
-                        img.onload = () => resolve(img);
-                        img.onerror = () => reject('Không thể tạo ảnh từ blob');
-                        img.src = URL.createObjectURL(blob);
-                    } else {
-                        reject('GM_xmlhttpRequest failed with status: ' + response.status);
-                    }
-                },
-                onerror: function(error) {
-                    reject('GM_xmlhttpRequest network error: ' + error);
-                }
+                const monetPalette = MonetAPI.generateMonetPalette(tintedWhite);
+                const isLightColor = MonetAPI.isColorLight(tintedWhite);
+                applyMonetColorScheme(monetPalette, isLightColor);
+            })
+            .catch(error => {
+                debugLog('Lỗi khi phân tích màu từ avatar:', error);
+                applyConfigColor(); // Fallback to config color
             });
-        });
     }
 
-    // Hàm lấy màu accent truyền thống từ ảnh
-    function getTraditionalAccentColorFromImage(img) {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        
-        // Thiết lập kích thước canvas
-        const width = 200;
-        const height = 200;
-        canvas.width = width;
-        canvas.height = height;
-        
-        // Vẽ ảnh với kích thước nhỏ
-        ctx.drawImage(img, 0, 0, width, height);
-        
-        // Lấy dữ liệu pixel từ toàn bộ ảnh
-        const imageData = ctx.getImageData(0, 0, width, height);
-        const data = imageData.data;
-        
-        debugLog('Phân tích toàn bộ ảnh để tìm accent color truyền thống');
-        debugLog('Tổng pixel trong ảnh:', data.length / 4);
-        
-        // Đếm màu với trọng số ưu tiên màu accent truyền thống
-        const colorCount = {};
-        let maxCount = 0;
-        let dominantColor = '#063c30'; // Màu mặc định
-        
-        // Phạm vi màu accent truyền thống (loại bỏ màu quá sáng và quá tối)
-        const traditionalAccentRanges = [
-            // Màu đỏ
-            {min: [120, 0, 0], max: [255, 100, 100], weight: 1.8},
-            // Màu cam
-            {min: [200, 80, 0], max: [255, 165, 50], weight: 1.7},
-            // Màu vàng (không quá sáng)
-            {min: [180, 150, 0], max: [240, 220, 100], weight: 1.5},
-            // Màu xanh lá
-            {min: [0, 100, 0], max: [100, 255, 100], weight: 1.6},
-            // Màu xanh dương
-            {min: [0, 0, 120], max: [100, 100, 255], weight: 1.8},
-            // Màu tím
-            {min: [100, 0, 100], max: [200, 100, 200], weight: 1.7},
-            // Màu hồng
-            {min: [200, 100, 150], max: [255, 180, 200], weight: 1.6}
-        ];
-        
-        for (let i = 0; i < data.length; i += 4) {
-            const r = data[i];
-            const g = data[i + 1];
-            const b = data[i + 2];
-            const a = data[i + 3];
-            
-            // Bỏ qua pixel trong suốt
-            if (a < 128) continue;
-            
-            // LOẠI BỎ màu quá sáng (gần trắng) và quá tối (gần đen)
-            const brightness = (r + g + b) / 3;
-            if (brightness > 240 || brightness < 15) {
-                continue;
-            }
-            
-            // LOẠI BỎ màu xám (khi các kênh màu gần bằng nhau)
-            const maxChannel = Math.max(r, g, b);
-            const minChannel = Math.min(r, g, b);
-            const saturation = maxChannel - minChannel;
-            
-            // Bỏ qua màu có độ bão hòa thấp (màu xám)
-            if (saturation < 30) {
-                continue;
-            }
-            
-            // Nhóm màu
-            const roundedR = Math.round(r / 8) * 8;
-            const roundedG = Math.round(g / 8) * 8;
-            const roundedB = Math.round(b / 8) * 8;
-            
-            const colorGroup = `${roundedR},${roundedG},${roundedB}`;
-            
-            // Tính trọng số dựa trên màu accent truyền thống
-            let weight = 1.0;
-            for (const accentRange of traditionalAccentRanges) {
-                if (roundedR >= accentRange.min[0] && roundedR <= accentRange.max[0] &&
-                    roundedG >= accentRange.min[1] && roundedG <= accentRange.max[1] &&
-                    roundedB >= accentRange.min[2] && roundedB <= accentRange.max[2]) {
-                    weight = accentRange.weight;
-                    break;
-                }
-            }
-            
-            // Giảm trọng số cho màu có độ bão hòa thấp
-            const normalizedSaturation = saturation / 255;
-            weight *= (0.5 + normalizedSaturation * 0.5);
-            
-            const weightedCount = Math.round(weight);
-            
-            if (colorCount[colorGroup]) {
-                colorCount[colorGroup] += weightedCount;
-            } else {
-                colorCount[colorGroup] = weightedCount;
-            }
-            
-            if (colorCount[colorGroup] > maxCount) {
-                maxCount = colorCount[colorGroup];
-                dominantColor = MonetAPI.rgbToHex(roundedR, roundedG, roundedB);
-            }
-        }
-        
-        // Nếu không tìm thấy màu accent phù hợp, sử dụng màu có độ bão hòa cao nhất
-        if (maxCount === 0) {
-            debugLog('Không tìm thấy màu accent truyền thống, sử dụng màu bão hòa cao nhất');
-            dominantColor = getMostSaturatedColor(img);
-        }
-        
-        debugLog('Màu accent được chọn:', dominantColor);
-        return dominantColor;
-    }
-
-    // Hàm lấy màu có độ bão hòa cao nhất (fallback)
-    function getMostSaturatedColor(img) {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        const width = 100;
-        const height = 100;
-        canvas.width = width;
-        canvas.height = height;
-        
-        ctx.drawImage(img, 0, 0, width, height);
-        const imageData = ctx.getImageData(0, 0, width, height);
-        const data = imageData.data;
-        
-        let maxSaturation = 0;
-        let mostSaturatedColor = '#063c30';
-        
-        for (let i = 0; i < data.length; i += 4) {
-            const r = data[i];
-            const g = data[i + 1];
-            const b = data[i + 2];
-            const a = data[i + 3];
-            
-            if (a < 128) continue;
-            
-            const maxChannel = Math.max(r, g, b);
-            const minChannel = Math.min(r, g, b);
-            const saturation = maxChannel - minChannel;
-            
-            // Bỏ qua màu quá sáng/quá tối
-            const brightness = (r + g + b) / 3;
-            if (brightness > 240 || brightness < 15) continue;
-            
-            if (saturation > maxSaturation) {
-                maxSaturation = saturation;
-                mostSaturatedColor = MonetAPI.rgbToHex(r, g, b);
-            }
-        }
-        
-        return mostSaturatedColor;
-    }
-
-    // Hàm lấy URL ảnh bìa từ trang thông tin truyện
-    function getCoverUrlFromInfoPage(storyId) {
-        const infoUrl = window.location.origin + '/truyen/' + storyId;
-        debugLog('Đang lấy ảnh bìa từ:', infoUrl);
-
-        return new Promise((resolve, reject) => {
-            GM_xmlhttpRequest({
-                method: 'GET',
-                url: infoUrl,
-                onload: function(response) {
-                    if (response.status === 200) {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(response.responseText, 'text/html');
-                        const coverElement = doc.querySelector('.series-cover .img-in-ratio');
-                        if (coverElement) {
-                            // Thử lấy từ style.backgroundImage trước
-                            let coverUrl = coverElement.style.backgroundImage;
-                            if (coverUrl) {
-                                coverUrl = coverUrl.replace(/url\(['"]?(.*?)['"]?\)/i, '$1');
-                                if (coverUrl) {
-                                    resolve(coverUrl);
-                                    return;
-                                }
-                            }
-
-                            // Nếu không có, thử tìm img tag bên trong
-                            const imgElement = coverElement.querySelector('img');
-                            if (imgElement) {
-                                coverUrl = imgElement.src || imgElement.getAttribute('data-src');
-                                if (coverUrl) {
-                                    resolve(coverUrl);
-                                    return;
-                                }
-                            }
-
-                            reject('No cover URL found in style or img tag');
-                        } else {
-                            reject('No cover element found');
-                        }
-                    } else {
-                        reject('Failed to fetch info page');
-                    }
-                },
-                onerror: function(error) {
-                    reject('Network error: ' + error);
-                }
-            });
-        });
-    }
-
-    // Hàm áp dụng Monet color scheme
     function applyMonetColorScheme(palette, isLight) {
         if (!palette) {
             applyDefaultColorScheme();
             return;
         }
 
-        const textColor = isLight ? '#000' : '#fff';
+        const textColor = isLight ? '#000000' : '#ffffff';
 
         const css = `
             :root {
@@ -802,7 +374,6 @@
                 --monet-elevated-dark: ${palette[100]};
             }
 
-            /* Faster transitions for interactive elements */
             a, button, .navbar-menu, .nav-submenu, .noti-sidebar, .account-sidebar {
                 transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease !important;
             }
@@ -826,7 +397,7 @@
             .paging_item.paging_prevnext.next:hover,
             .paging_item.paging_prevnext.prev:hover {
                 background-color: ${palette[500]} !important;
-                color: ${isLight ? '#000' : '#fff'} !important;
+                color: ${textColor} !important;
             }
 
             .series-owner.group-mem,
@@ -917,10 +488,6 @@
                 background-color: ${palette[800]} !important;
             }
 
-            :is(.dark .dark\\:\\!bg-zinc-800) {
-                background-color: ${palette[800]} !important;
-            }
-
             .noti-item.untouch {
                 background-color: ${palette[700]} !important;
             }
@@ -935,10 +502,6 @@
 
             #noti-icon.active .icon-wrapper {
                 background-color: ${palette[900]} !important;
-            }
-
-            :is(.dark .dark\\:hover\\:\\!bg-zinc-700:hover) {
-                background-color: ${palette[700]} !important;
             }
 
             ul.list-chapters li:hover {
@@ -973,13 +536,11 @@
             }
 
             .expand, .mobile-more, .summary-more.more-state {
-                background: linear-gradient(180deg, rgba(31,31,31,0) 1%, ${palette[900]} 75%, ${palette[900]}) !important;
-                filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#001f1f1f",endColorstr="${palette[900]}",GradientType=0) !important;
+                background: linear-gradient(180deg, rgba(${textColor},0) 1%, ${palette[100]} 75%, ${palette[100]}) !important;
             }
 
             .ln-comment-group:nth-child(odd) .expand {
-                background: linear-gradient(180deg, rgba(42,42,42,0) 1%, ${palette[800]} 75%, ${palette[800]}) !important;
-                filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#002a2a2a",endColorstr="${palette[800]}",GradientType=0) !important;
+                background: linear-gradient(180deg, rgba(248,249,250,0) 1%, ${palette[50]} 75%, ${palette[50]}) !important;
             }
 
             .visible-toolkit .visible-toolkit-item.do-like.liked {
@@ -988,7 +549,6 @@
                 font-weight: 700 !important;
             }
 
-            /* Additional styles for general pages */
             .bottom-part.at-index {
                 background-color: ${palette[1000]} !important;
                 border-bottom: 1px solid ${palette[800]} !important;
@@ -1068,10 +628,6 @@
                 color: ${textColor} !important;
             }
 
-            .hover\:bg-green-700:hover {
-                background-color: ${palette[600]} !important;
-            }
-
             .pagination_wrap .current {
                 background-color: ${palette[600]} !important;
                 color: ${textColor} !important;
@@ -1079,10 +635,6 @@
 
             .paging_item {
                 color: ${palette[400]} !important;
-            }
-
-            :is(.dark .dark\\:ring-cyan-900) {
-                --tw-ring-color: ${palette[800]} !important;
             }
 
             #mainpart.custome-page, #mainpart.page-board {
@@ -1114,10 +666,6 @@
                 background-color: ${palette[500]} !important;
             }
 
-            :is(.dark .dark\\:bg-gray-700) {
-                background-color: ${palette[700]} !important;
-            }
-
             ul.bookmarks_list li:nth-of-type(2n+1) {
                 background-color: ${palette[700]} !important;
             }
@@ -1131,8 +679,8 @@
             }
 
             body:not(.mce-content-body) {
-                background-color: ${palette[900]} !important;
-                color: ${palette[100]} !important;
+                background-color: ${palette[50]} !important;
+                color: ${textColor} !important;
             }
 
             table.listext-table tr th {
@@ -1317,14 +865,14 @@
                 border-right-color: ${palette[900]} !important;
             }
 
-            :is(.dark .dark\\:ring-cyan-900) {
-                --tw-ring-color: ${palette[900]} !important;
+            .ring-cyan-500 {
+                --tw-ring-color: ${palette[500]} !important;
             }
 
             .button-blue {
-              background-color: ${palette[500]};
-              border-color: ${palette[700]};
-              color: ${textColor};
+                background-color: ${palette[500]};
+                border-color: ${palette[700]};
+                color: ${textColor};
             }
 
             .button-blue:hover {
@@ -1338,12 +886,12 @@
               color: ${textColor};
             }
 
-            :is(.dark .dark\\:bg-gray-700) {
-                background-color: ${palette[1000]} !important;
-                border: 1px solid ${palette[800]} !important;
+            .bg-gray-200 {
+                background-color: ${palette[200]} !important;
+                border: 1px solid ${palette[300]} !important;
             }
 
-            .profile-showcase header span.number {
+            .profile-showcase header span.number, {
                 background-color: ${palette[800]} !important;
                 color: ${textColor} !important;
             }
@@ -1362,7 +910,7 @@
             .see-more_text {
                 border-top-color: ${palette[800]} !important;
             }
-
+                
             .profile-feature .profile-function.at-mobile {
                 border-top-color: ${palette[1000]} !important;
             }
@@ -1376,7 +924,7 @@
             }
 
             .popular-thumb-item .thumb-detail,
-            .thumb-item-flow .thumb-detail {
+            .feature-item .thumb-detail {
                 background: linear-gradient(180deg,transparent 0,${MonetAPI.paletteToRgba(palette, 500, .8)} 67%,${MonetAPI.paletteToRgba(palette, 800, .8)});
             }
 
@@ -1401,17 +949,18 @@
                 color: ${textColor} !important;
             }
             .topview-item:first-child .series-name, .topview-item:nth-child(2) .series-name, .topview-item:nth-child(3) .series-name {
-                color: ${palette[500]};
+                color: ${palette[500]} !important;
             }
             .topview-item:first-child .topview_rank, .topview-item:nth-child(2) .topview_rank, .topview-item:nth-child(3) .topview_rank {
-                background-color: ${palette[500]};
-                color: ${textColor};
+                background-color: ${palette[500]} !important;
+                color: ${textColor} !important;
             }
 
             .ln-list-default li {
                 background-color: ${palette[800]} !important;
             }
 
+            
             .hmt-crop-modal {
                 background-color: ${palette[900]} !important;
             }
@@ -1427,31 +976,22 @@
         `;
 
         GM_addStyle(css);
-        debugLog('Đã áp dụng Monet theme với màu từ config:', palette[500]);
-
-        // Thêm overlay nếu đang ở trang đọc truyện
-        if (document.querySelector('.rd-basic_icon.row')) {
-            addOverlay();
-        }
+        debugLog('Applied light Monet theme with color:', palette[500]);
     }
 
     function applyDefaultColorScheme() {
-        // Lấy màu mặc định từ config, fallback về màu cũ nếu không có
-        const defaultColor = (window.HMTConfig && window.HMTConfig.getDefaultColor) ?
-            window.HMTConfig.getDefaultColor() : '#063c30';
+        const defaultColor = '#E3F2FD';
         const defaultPalette = MonetAPI.generateMonetPalette(defaultColor);
 
         if (!defaultPalette) {
-            debugLog('Không thể tạo palette mặc định');
+            debugLog('Cannot generate default palette');
             return;
         }
 
         const css = `
-            /* Faster transitions for interactive elements */
             a, button, .navbar-menu, .nav-submenu, .noti-sidebar, .account-sidebar {
                 transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease !important;
             }
-
 
             a:hover,
             .text-slate-500,
@@ -1469,7 +1009,7 @@
             .paging_item.paging_prevnext.next:hover,
             .paging_item.paging_prevnext.prev:hover {
                 background-color: ${defaultColor} !important;
-                color: ${textColor} !important;
+                color: #000 !important;
             }
 
             .series-owner.group-mem,
@@ -1479,7 +1019,7 @@
 
             .ln-comment-form input.button,
             .series-users .series-owner_name a {
-                color: ${textColor} !important;
+                color: #000 !important;
             }
 
             .navbar-logo-wrapper .navbar-logo {
@@ -1560,10 +1100,6 @@
                 background-color: ${defaultPalette[800]} !important;
             }
 
-            :is(.dark .dark\\:\\!bg-zinc-800) {
-                background-color: ${defaultPalette[800]} !important;
-            }
-
             .noti-item.untouch {
                 background-color: ${defaultPalette[700]} !important;
             }
@@ -1578,10 +1114,6 @@
 
             #noti-icon.active .icon-wrapper {
                 background-color: ${defaultPalette[900]} !important;
-            }
-
-            :is(.dark .dark\\:hover\\:\\!bg-zinc-700:hover) {
-                background-color: ${defaultPalette[700]} !important;
             }
 
             ul.list-chapters li:hover {
@@ -1616,13 +1148,11 @@
             }
 
             .expand, .mobile-more, .summary-more.more-state {
-                background: linear-gradient(180deg, rgba(31,31,31,0) 1%, ${defaultPalette[900]} 75%, ${defaultPalette[900]}) !important;
-                filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#001f1f1f",endColorstr="${defaultPalette[900]}",GradientType=0) !important;
+                background: linear-gradient(180deg, rgba(${textColor},0) 1%, ${defaultPalette[100]} 75%, ${defaultPalette[100]}) !important;
             }
 
             .ln-comment-group:nth-child(odd) .expand {
-                background: linear-gradient(180deg, rgba(42,42,42,0) 1%, ${defaultPalette[800]} 75%, ${defaultPalette[800]}) !important;
-                filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#002a2a2a",endColorstr="${defaultPalette[800]}",GradientType=0) !important;
+                background: linear-gradient(180deg, rgba(248,249,250,0) 1%, ${defaultPalette[50]} 75%, ${defaultPalette[50]}) !important;
             }
 
             .visible-toolkit .visible-toolkit-item.do-like.liked {
@@ -1631,7 +1161,6 @@
                 font-weight: 700 !important;
             }
 
-            /* Additional styles for general pages */
             .bottom-part.at-index {
                 background-color: ${defaultPalette[1000]} !important;
                 border-bottom: 1px solid ${defaultPalette[800]} !important;
@@ -1685,35 +1214,27 @@
             [type="date"], [type="email"], [type="number"], [type="password"], [type="tel"], [type="text"], select, select.form-control {
                 background-color: ${defaultPalette[700]} !important;
                 border-color: ${defaultPalette[600]} !important;
-                color: ${textColor} !important;
+                color: #000 !important;
             }
 
             .sub-index-style .section-title {
                 background-color: ${defaultPalette[700]} !important;
                 border: none !important;
-                color: ${textColor} !important;
+                color: #000 !important;
             }
 
             .browse-alphabet .current {
                 background-color: ${defaultPalette[400]} !important;
-                color: ${textColor} !important;
-            }
-
-            .hover\:bg-green-700:hover {
-                background-color: ${defaultPalette[600]} !important;
+                color: #000 !important;
             }
 
             .pagination_wrap .current {
                 background-color: ${defaultPalette[600]} !important;
-                color: ${textColor} !important;
+                color: #000 !important;
             }
 
             .paging_item {
                 color: ${defaultPalette[400]} !important;
-            }
-
-            :is(.dark .dark\\:ring-cyan-900) {
-                --tw-ring-color: ${defaultPalette[800]} !important;
             }
 
             .button-green {
@@ -1741,10 +1262,6 @@
                 background-color: ${defaultColor} !important;
             }
 
-            :is(.dark .dark\\:bg-gray-700) {
-                background-color: ${defaultPalette[700]} !important;
-            }
-
             ul.bookmarks_list li:nth-of-type(2n+1) {
                 background-color: ${defaultPalette[700]} !important;
             }
@@ -1758,8 +1275,8 @@
             }
 
             body:not(.mce-content-body) {
-                background-color: ${defaultPalette[900]} !important;
-                color: ${defaultPalette[100]} !important;
+                background-color: ${defaultPalette[50]} !important;
+                color: #000 !important;
             }
 
             table.listext-table tr th {
@@ -1921,14 +1438,14 @@
                 border-right-color: ${defaultPalette[900]} !important;
             }
 
-            :is(.dark .dark\\:ring-cyan-900) {
-                --tw-ring-color: ${defaultPalette[900]} !important;
+            .ring-cyan-500 {
+                --tw-ring-color: ${defaultColor} !important;
             }
 
             .button-blue {
-              background-color: ${defaultPalette[500]};
-              border-color: ${defaultPalette[700]};
-              color: ${textColor};
+                background-color: ${defaultPalette[500]};
+                border-color: ${defaultPalette[700]};
+                color: ${textColor};
             }
 
             .button-blue:hover {
@@ -1942,12 +1459,12 @@
               color: ${textColor};
             }
 
-            :is(.dark .dark\\:bg-gray-700) {
-                background-color: ${defaultPalette[900]} !important;
-                border: 1px solid ${defaultPalette[800]} !important;
+            .bg-gray-200 {
+                background-color: ${defaultPalette[200]} !important;
+                border: 1px solid ${defaultPalette[300]} !important;
             }
 
-            .profile-showcase header span.number {
+            .profile-showcase header span.number, {
                 background-color: ${defaultPalette[800]} !important;
                 color: ${textColor} !important;
             }
@@ -1974,12 +1491,13 @@
             .tns-nav .tns-nav-active {
                 background-color: ${defaultPalette[500]} !important;
             }
+
             .tns-nav button {
                 background-color: ${defaultPalette[800]} !important;
             }
 
             .popular-thumb-item .thumb-detail,
-            .thumb-item-flow .thumb-detail {
+            .feature-item .thumb-detail {
                 background: linear-gradient(180deg,transparent 0,${MonetAPI.paletteToRgba(defaultPalette, 500, .8)} 67%,${MonetAPI.paletteToRgba(defaultPalette, 800, .8)});
             }
 
@@ -2031,18 +1549,13 @@
         `;
 
         GM_addStyle(css);
-        debugLog('Đã áp dụng màu mặc định từ config:', defaultColor);
-
-        // Thêm overlay nếu đang ở trang đọc truyện
-        if (document.querySelector('.rd-basic_icon.row')) {
-            addOverlay();
-        }
+        debugLog('Applied default light color scheme:', defaultColor);
     }
 
-    // Khởi chạy module
+    // Initialize
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initPageGeneral);
+        document.addEventListener('DOMContentLoaded', initPageGeneralLight);
     } else {
-        initPageGeneral();
+        initPageGeneralLight();
     }
 })();

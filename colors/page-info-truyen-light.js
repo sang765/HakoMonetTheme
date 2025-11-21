@@ -6,9 +6,9 @@
 
     function debugLog(...args) {
         if (DEBUG && typeof window.Logger !== 'undefined') {
-            window.Logger.log('pageInfoTruyen', ...args);
+            window.Logger.log('pageInfoTruyenLight', ...args);
         } else if (DEBUG) {
-            console.log('[PageInfoTruyen]', ...args);
+            console.log('[PageInfoTruyenLight]', ...args);
         }
     }
 
@@ -73,29 +73,29 @@
         debugLog('Integrated CORS handling for images is ready');
     }
     
-    function initPageInfoTruyen() {
-        // Check if in dark mode
-        if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
-            debugLog('Not in dark mode, skipping color application');
+    function initPageInfoTruyenLight() {
+        // Check if in dark mode, if yes, skip
+        if (window.__themeDetectorLoaded && window.ThemeDetector && window.ThemeDetector.isDark()) {
+            debugLog('In dark mode, skipping light theme application');
             return;
         }
 
         // Kiểm tra xem có phải trang đọc truyện không và có tắt màu không
         if (document.querySelector('.rd-basic_icon.row') && window.HMTConfig && window.HMTConfig.getDisableColorsOnReadingPage && window.HMTConfig.getDisableColorsOnReadingPage()) {
-            debugLog('Phát hiện trang đọc truyện và tính năng tắt màu được bật, bỏ qua áp dụng màu.');
+            debugLog('Reading page with colors disabled, skipping');
             return;
         }
 
         // Kiểm tra xem có phải trang chi tiết truyện không bằng cách tìm element đặc trưng
         const sideFeaturesElement = document.querySelector('div.col-4.col-md.feature-item.width-auto-xl');
         if (!sideFeaturesElement) {
-            debugLog('Không tìm thấy element, bỏ qua tính năng đổi màu.');
+            debugLog('Not a story info page, skipping');
             return;
         }
 
         const coverElement = document.querySelector('.series-cover .img-in-ratio');
         if (!coverElement) {
-            debugLog('Không tìm thấy ảnh bìa.');
+            debugLog('No cover image found');
             return;
         }
 
@@ -103,31 +103,34 @@
         const coverUrl = coverStyle.replace(/url\(['"]?(.*?)['"]?\)/i, '$1');
 
         if (!coverUrl) {
-            debugLog('Không thể lấy URL ảnh bìa.');
+            debugLog('Cannot get cover URL');
             return;
         }
 
-        debugLog('Đang phân tích màu từ ảnh bìa:', coverUrl);
+        debugLog('Analyzing color from cover:', coverUrl);
 
         // Hàm áp dụng màu sắc hiện tại
         function applyCurrentColorScheme() {
-            const defaultColor = window.HMTConfig && window.HMTConfig.getDefaultColor ?
-                window.HMTConfig.getDefaultColor() : '#063c30';
+            const defaultColor = window.HMTConfig ? window.HMTConfig.getDefaultColor() : '#FCE4EC'; // Get color from config or fallback
 
-            debugLog('Áp dụng màu mặc định từ config:', defaultColor);
+            debugLog('Applying light color scheme with config color:', defaultColor);
 
             if (!isValidColor(defaultColor)) {
-                debugLog('Màu không hợp lệ, sử dụng màu mặc định');
+                debugLog('Invalid color, using default');
                 applyDefaultColorScheme();
                 return;
             }
 
-            // Tạo Monet palette từ màu config
-            const monetPalette = MonetAPI.generateMonetPalette(defaultColor);
-            debugLog('Monet Palette từ config:', monetPalette);
+            // Create tinted white using config color for light mode
+            const tintedWhite = createTintedWhite(defaultColor);
+            debugLog('Tinted white for light mode:', tintedWhite);
 
-            const isLightColor = MonetAPI.isColorLight(defaultColor);
-            debugLog('Màu sáng?', isLightColor);
+            // Tạo Monet palette từ màu config
+            const monetPalette = MonetAPI.generateMonetPalette(tintedWhite);
+            debugLog('Monet Palette:', monetPalette);
+
+            const isLightColor = MonetAPI.isColorLight(tintedWhite);
+            debugLog('Is light color?', isLightColor);
 
             applyMonetColorScheme(monetPalette, isLightColor);
         }
@@ -137,10 +140,10 @@
             // Phân tích màu từ ảnh bìa
             analyzeImageColorTraditionalAccent(coverUrl)
                 .then(dominantColor => {
-                    debugLog('Màu chủ đạo (accent truyền thống):', dominantColor);
+                    debugLog('Dominant color (traditional accent):', dominantColor);
 
                     if (!isValidColor(dominantColor)) {
-                        debugLog('Màu không hợp lệ, sử dụng màu mặc định');
+                        debugLog('Invalid color, using default');
                         applyCurrentColorScheme();
                         return;
                     }
@@ -150,12 +153,12 @@
                     debugLog('Monet Palette:', monetPalette);
 
                     const isLightColor = MonetAPI.isColorLight(dominantColor);
-                    debugLog('Màu sáng?', isLightColor);
+                    debugLog('Is light color?', isLightColor);
 
                     applyMonetColorScheme(monetPalette, isLightColor);
                 })
                 .catch(error => {
-                    debugLog('Lỗi khi phân tích ảnh:', error);
+                    debugLog('Error analyzing image:', error);
                     applyCurrentColorScheme();
                 });
         }
@@ -165,11 +168,11 @@
 
         // Lắng nghe sự kiện màu sắc thay đổi để cập nhật real-time
         (window.top || window).document.addEventListener('hmtColorChanged', function(event) {
-            debugLog('Nhận sự kiện màu sắc thay đổi:', event.detail);
+            debugLog('Color change event received:', event.detail);
 
             // Check if in dark mode
-            if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
-                debugLog('Not in dark mode, skipping color application');
+            if (window.__themeDetectorLoaded && window.ThemeDetector && window.ThemeDetector.isDark()) {
+                debugLog('In dark mode, skipping');
                 return;
             }
 
@@ -193,11 +196,46 @@
             }
         });
 
-        debugLog('Đã thiết lập lắng nghe sự kiện màu sắc thay đổi');
+        debugLog('Set up color change listener');
     }
     
     function isValidColor(color) {
         return MonetAPI.isValidColor(color);
+    }
+
+    // Function to create tinted white using config color for light mode
+    function createTintedWhite(tintColor) {
+        const BASE_WHITE = '#ffffff';    // Base white color
+        const TINT_STRENGTH = 0.1;       // 10% tint strength for subtle effect
+
+        // Convert hex to RGB
+        const white = hexToRgb(BASE_WHITE);
+        const tint = hexToRgb(tintColor);
+
+        // Mix: 90% white + 10% tint color
+        const result = {
+            r: Math.round(white.r * (1 - TINT_STRENGTH) + tint.r * TINT_STRENGTH),
+            g: Math.round(white.g * (1 - TINT_STRENGTH) + tint.g * TINT_STRENGTH),
+            b: Math.round(white.b * (1 - TINT_STRENGTH) + tint.b * TINT_STRENGTH)
+        };
+
+        return rgbToHex(result.r, result.g, result.b);
+    }
+
+    // Helper functions for color conversion
+    function hexToRgb(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        };
+    }
+
+    function rgbToHex(r, g, b) {
+        return '#' + [r, g, b].map(x =>
+            x.toString(16).padStart(2, '0')
+        ).join('');
     }
     
     
@@ -207,7 +245,7 @@
         return new Promise((resolve, reject) => {
             // Setup CORS handling for images if needed
             if (isTargetDomain(imageUrl)) {
-                debugLog('Ảnh từ domain target, thiết lập CORS handling');
+                debugLog('Image from target domain, setting up CORS handling');
                 setupImageCorsHandling();
             }
 
@@ -216,40 +254,40 @@
             // Always set crossOrigin for safety
             if (isTargetDomain(imageUrl)) {
                 img.crossOrigin = 'anonymous';
-                debugLog('Đã set crossOrigin cho ảnh từ domain target');
+                debugLog('Set crossOrigin for image from target domain');
             }
 
             img.onload = function() {
-                debugLog('Ảnh đã tải xong, kích thước:', img.width, 'x', img.height);
+                debugLog('Image loaded, size:', img.width, 'x', img.height);
                 try {
                     const dominantColor = getTraditionalAccentColorFromImage(img);
                     resolve(dominantColor);
                 } catch (error) {
-                    reject('Lỗi khi phân tích ảnh: ' + error);
+                    reject('Error analyzing image: ' + error);
                 }
             };
 
             img.onerror = function(error) {
-                debugLog('Lỗi tải ảnh với Image API:', imageUrl, error);
+                debugLog('Error loading image with Image API:', imageUrl, error);
 
                 // Fallback: try using GM_xmlhttpRequest (CORS bypass)
                 if (isTargetDomain(imageUrl)) {
-                    debugLog('Thử tải ảnh bằng GM_xmlhttpRequest (CORS bypass)');
+                    debugLog('Trying to load image with GM_xmlhttpRequest (CORS bypass)');
                     loadImageWithXHR(imageUrl)
                         .then(img => {
                             try {
                                 const dominantColor = getTraditionalAccentColorFromImage(img);
                                 resolve(dominantColor);
                             } catch (error) {
-                                reject('Lỗi khi phân tích ảnh từ GM_xmlhttpRequest: ' + error);
+                                reject('Error analyzing image from GM_xmlhttpRequest: ' + error);
                             }
                         })
                         .catch(xhrError => {
-                            debugLog('GM_xmlhttpRequest cũng thất bại:', xhrError);
-                            reject('Không thể tải ảnh bằng cả Image API và GM_xmlhttpRequest');
+                            debugLog('GM_xmlhttpRequest also failed:', xhrError);
+                            reject('Cannot load image with both Image API and GM_xmlhttpRequest');
                         });
                 } else {
-                    reject('Không thể tải ảnh');
+                    reject('Cannot load image');
                 }
             };
 
@@ -270,7 +308,7 @@
                         const blob = response.response;
                         const img = new Image();
                         img.onload = () => resolve(img);
-                        img.onerror = () => reject('Không thể tạo ảnh từ blob');
+                        img.onerror = () => reject('Cannot create image from blob');
                         img.src = URL.createObjectURL(blob);
                     } else {
                         reject('GM_xmlhttpRequest failed with status: ' + response.status);
@@ -301,13 +339,13 @@
         const imageData = ctx.getImageData(0, 0, width, height);
         const data = imageData.data;
         
-        debugLog('Phân tích toàn bộ ảnh để tìm accent color truyền thống');
-        debugLog('Tổng pixel trong ảnh:', data.length / 4);
+        debugLog('Analyzing entire image for traditional accent color');
+        debugLog('Total pixels in image:', data.length / 4);
         
         // Đếm màu với trọng số ưu tiên màu accent truyền thống
         const colorCount = {};
         let maxCount = 0;
-        let dominantColor = '#063c30'; // Màu mặc định
+        let dominantColor = '#FCE4EC'; // Default light color
         
         // Phạm vi màu accent truyền thống (loại bỏ màu quá sáng và quá tối)
         const traditionalAccentRanges = [
@@ -390,11 +428,11 @@
         
         // Nếu không tìm thấy màu accent phù hợp, sử dụng màu có độ bão hòa cao nhất
         if (maxCount === 0) {
-            debugLog('Không tìm thấy màu accent truyền thống, sử dụng màu bão hòa cao nhất');
+            debugLog('No traditional accent color found, using most saturated color');
             dominantColor = getMostSaturatedColor(img);
         }
         
-        debugLog('Màu accent được chọn:', dominantColor);
+        debugLog('Selected accent color:', dominantColor);
         return dominantColor;
     }
     
@@ -412,7 +450,7 @@
         const data = imageData.data;
         
         let maxSaturation = 0;
-        let mostSaturatedColor = '#063c30';
+        let mostSaturatedColor = '#FCE4EC';
         
         for (let i = 0; i < data.length; i += 4) {
             const r = data[i];
@@ -466,7 +504,7 @@
                 transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease !important;
             }
 
-
+            
             a:hover:not([href*="/the-loai/"]),
             .long-text a:hover {
                 color: ${palette[500]} !important;
@@ -585,10 +623,6 @@
                 background-color: ${palette[800]} !important;
             }
 
-            :is(.dark .dark\\:\\!bg-zinc-800) {
-                background-color: ${palette[800]} !important;
-            }
-            
             .noti-item.untouch {
                 background-color: ${palette[700]} !important;
             }
@@ -603,10 +637,6 @@
             
             #noti-icon.active .icon-wrapper {
                 background-color: ${palette[900]} !important;
-            }
-            
-            :is(.dark .dark\\:hover\\:\\!bg-zinc-700:hover) {
-                background-color: ${palette[700]} !important;
             }
             
             ul.list-chapters li:hover {
@@ -641,11 +671,11 @@
             }
             
             .expand, .mobile-more, .summary-more.more-state {
-                background: linear-gradient(180deg, rgba(31,31,31,0) 1%, ${palette[900]} 75%, ${palette[900]}) !important;
+                background: linear-gradient(180deg, rgba(255,255,255,0) 1%, ${palette[100]} 75%, ${palette[100]}) !important;
             }
             
             .ln-comment-group:nth-child(odd) .expand {
-                background: linear-gradient(180deg, rgba(42,42,42,0) 1%, ${palette[800]} 75%, ${palette[800]}) !important;
+                background: linear-gradient(180deg, rgba(248,249,250,0) 1%, ${palette[50]} 75%, ${palette[50]}) !important;
             }
             
             .visible-toolkit .visible-toolkit-item.do-like.liked {
@@ -663,10 +693,6 @@
                 background-color: ${palette[400]} !important;
                 border-color: ${palette[600]} !important;
                 color: ${textColor} !important;
-            }
-
-            :is(.dark .dark\\:ring-cyan-900) {
-                --tw-ring-color: ${palette[800]} !important;
             }
 
             #mainpart.reading-page.style-6 #rd-side_icon {
@@ -832,8 +858,8 @@
                 color: ${textColor} !important;
             }
 
-            :is(.dark .dark\:ring-cyan-900) {
-                --tw-ring-color: ${palette[900]} !important;
+            .ring-cyan-500 {
+              --tw-ring-color: ${palette[500]} !important;
             }
 
             .button-blue {
@@ -855,11 +881,11 @@
 
             .statistic-list, .feature-section .summary-wrapper,
             .statistic-list .block-wide.at-mobile {
-                border-top-color: ${palette[500]} !important;
+                border-top-color: ${palette[200]} !important;
             }
 
             .statistic-list .block-wide.at-mobile {
-                border-bottom-color: ${palette[500]} !important;
+                border-bottom-color: ${palette[200]} !important;
             }
 
             .user-private-tabs li a {
@@ -868,17 +894,16 @@
         `;
 
         GM_addStyle(css);
-        debugLog('Đã áp dụng Monet theme với màu chủ đạo:', palette[500]);
+        debugLog('Applied light Monet theme with dominant color:', palette[500]);
     }
     
     function applyDefaultColorScheme() {
         // Lấy màu mặc định từ config, fallback về màu cũ nếu không có
-        const defaultColor = (window.HMTConfig && window.HMTConfig.getDefaultColor) ?
-            window.HMTConfig.getDefaultColor() : '#063c30';
+        const defaultColor = '#FCE4EC';
         const defaultPalette = MonetAPI.generateMonetPalette(defaultColor);
         
         if (!defaultPalette) {
-            debugLog('Không thể tạo palette mặc định');
+            debugLog('Cannot generate default palette');
             return;
         }
         
@@ -904,13 +929,13 @@
             .paging_item.paging_prevnext.next:hover,
             .paging_item.paging_prevnext.prev:hover {
                 background-color: ${defaultColor} !important;
-                color: ${textColor} !important;
+                color: #000 !important;
             }
             
             .series-type,
             .series-owner.group-mem,
-            .series-users .series-owner.group-mod,
             .series-users .series-owner.group-admin,
+            .series-users .series-owner.group-mod,
             .ln-comment-form input.button {
                 background-color: ${defaultColor} !important;
             }
@@ -918,7 +943,7 @@
             .series-type,
             .ln-comment-form input.button,
             .series-users .series-owner_name a {
-                color: ${textColor} !important;
+                color: #000 !important;
             }
             
             .feature-section .series-type:before {
@@ -1003,10 +1028,6 @@
                 background-color: ${defaultPalette[800]} !important;
             }
 
-            :is(.dark .dark\\:\\!bg-zinc-800) {
-                background-color: ${defaultPalette[800]} !important;
-            }
-            
             .noti-item.untouch {
                 background-color: ${defaultPalette[700]} !important;
             }
@@ -1021,10 +1042,6 @@
             
             #noti-icon.active .icon-wrapper {
                 background-color: ${defaultPalette[900]} !important;
-            }
-            
-            :is(.dark .dark\\:hover\\:\\!bg-zinc-700:hover) {
-                background-color: ${defaultPalette[700]} !important;
             }
             
             ul.list-chapters li:hover {
@@ -1059,11 +1076,11 @@
             }
             
             .expand, .mobile-more, .summary-more.more-state {
-                background: linear-gradient(180deg, rgba(31,31,31,0) 1%, ${defaultPalette[900]} 75%, ${defaultPalette[900]}) !important;
+                background: linear-gradient(180deg, rgba(255,255,255,0) 1%, ${defaultPalette[100]} 75%, ${defaultPalette[100]}) !important;
             }
             
             .ln-comment-group:nth-child(odd) .expand {
-                background: linear-gradient(180deg, rgba(42,42,42,0) 1%, ${defaultPalette[800]} 75%, ${defaultPalette[800]}) !important;
+                background: linear-gradient(180deg, rgba(248,249,250,0) 1%, ${defaultPalette[50]} 75%, ${defaultPalette[50]}) !important;
             }
             
             .visible-toolkit .visible-toolkit-item.do-like.liked {
@@ -1080,11 +1097,7 @@
             .button-green {
                 background-color: ${defaultPalette[400]} !important;
                 border-color: ${defaultPalette[600]} !important;
-                color: ${textColor} !important;
-            }
-
-            :is(.dark .dark\:ring-cyan-900) {
-                --tw-ring-color: ${defaultPalette[800]} !important;
+                color: #000 !important;
             }
 
             #mainpart.reading-page.style-6 #rd-side_icon {
@@ -1119,12 +1132,12 @@
             }
 
             .ln-comment-toolkit-item:hover {
-                background-color: ${palette[700]} !important;
+                background-color: ${defaultPalette[700]} !important;
                 color: ${textColor} !important;
             }
 
-            :is(.dark .dark\\:ring-cyan-900) {
-                --tw-ring-color: ${defaultPalette[900]} !important;
+            .ring-cyan-500 {
+              --tw-ring-color: ${defaultPalette[500]} !important;
             }
 
             .button-blue {
@@ -1146,11 +1159,11 @@
 
             .statistic-list, .feature-section .summary-wrapper,
             .statistic-list .block-wide.at-mobile {
-                border-top-color: ${defaultPalette[500]} !important;
+                border-top-color: ${defaultPalette[200]} !important;
             }
 
             .statistic-list .block-wide.at-mobile {
-                border-bottom-color: ${defaultPalette[500]} !important;
+                border-bottom-color: ${defaultPalette[200]} !important;
             }
 
             .user-private-tabs li a {
@@ -1159,13 +1172,13 @@
         `;
 
         GM_addStyle(css);
-        debugLog('Đã áp dụng màu mặc định từ config:', defaultColor);
+        debugLog('Applied default light color scheme:', defaultColor);
     }
     
     // Khởi chạy module
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initPageInfoTruyen);
+        document.addEventListener('DOMContentLoaded', initPageInfoTruyenLight);
     } else {
-        initPageInfoTruyen();
+        initPageInfoTruyenLight();
     }
 })();

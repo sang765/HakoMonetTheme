@@ -75,7 +75,7 @@
     
     function initPageInfoTruyen() {
         // Check if in dark mode
-        if (window.__themeDetectorLoaded && window.ThemeDetector && window.ThemeDetector.isDark()) {
+        if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
             debugLog('Not in dark mode, skipping color application');
             return;
         }
@@ -168,7 +168,7 @@
             debugLog('Nhận sự kiện màu sắc thay đổi:', event.detail);
 
             // Check if in dark mode
-            if (window.__themeDetectorLoaded && window.ThemeDetector && window.ThemeDetector.isDark()) {
+            if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
                 debugLog('Not in dark mode, skipping color application');
                 return;
             }
@@ -199,41 +199,6 @@
     function isValidColor(color) {
         return MonetAPI.isValidColor(color);
     }
-    // Function to create tinted white using config color for light mode
-    function createTintedWhite(tintColor) {
-        const BASE_WHITE = '#ffffff';    // Base white color
-        const TINT_STRENGTH = 0.1;       // 10% tint strength for subtle effect
-
-        // Convert hex to RGB
-        const white = hexToRgb(BASE_WHITE);
-        const tint = hexToRgb(tintColor);
-
-        // Mix: 90% white + 10% tint color
-        const result = {
-            r: Math.round(white.r * (1 - TINT_STRENGTH) + tint.r * TINT_STRENGTH),
-            g: Math.round(white.g * (1 - TINT_STRENGTH) + tint.g * TINT_STRENGTH),
-            b: Math.round(white.b * (1 - TINT_STRENGTH) + tint.b * TINT_STRENGTH)
-        };
-
-        return rgbToHex(result.r, result.g, result.b);
-    }
-
-    // Helper functions for color conversion
-    function hexToRgb(hex) {
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16)
-        };
-    }
-
-    function rgbToHex(r, g, b) {
-        return '#' + [r, g, b].map(x =>
-            x.toString(16).padStart(2, '0')
-        ).join('');
-    }
-
     
     
     
@@ -486,14 +451,14 @@
         const css = `
             :root {
                 --monet-primary: ${palette[500]};
-                --monet-primary-light: ${palette[700]};
-                --monet-primary-dark: ${palette[300]};
-                --monet-surface: ${palette[900]};
-                --monet-surface-dark: ${palette[800]};
-                --monet-background: ${palette[950]};
-                --monet-background-dark: ${palette[900]};
-                --monet-elevated: ${palette[1000]};
-                --monet-elevated-dark: ${palette[900]};
+                --monet-primary-light: ${palette[300]};
+                --monet-primary-dark: ${palette[700]};
+                --monet-surface: ${palette[100]};
+                --monet-surface-dark: ${palette[200]};
+                --monet-background: ${palette[50]};
+                --monet-background-dark: ${palette[100]};
+                --monet-elevated: ${palette[0]};
+                --monet-elevated-dark: ${palette[100]};
             }
 
             /* Faster transitions for interactive elements */
@@ -509,7 +474,7 @@
             
             .text-slate-500,
             .long-text a {
-            	color: ${palette[700]} !important;
+            	color: ${palette[300]} !important;
             }
             
             .paging_item.paging_prevnext.next,
@@ -548,7 +513,7 @@
             
             #navbar,
             .noti-sidebar .noti-more {
-                background-color: ${palette[200]} !important;
+                background-color: ${palette[800]} !important;
             }
             
             .navbar-menu.at-mobile,
@@ -561,7 +526,7 @@
             .noti-sidebar,
             #sidenav-icon.active,
             .navbar-menu {
-                background-color: ${palette[200]} !important;
+                background-color: ${palette[800]} !important;
             }
             
             #navbar-user#guest-menu ul.nav-submenu,
@@ -572,17 +537,17 @@
             .navbar-menu.at-mobile,
             .navbar-menu.at-navbar .nav-submenu,
             .noti-sidebar {
-                box-shadow: 0 0 14px ${palette[100]} !important;
+                box-shadow: 0 0 14px ${palette[900]} !important;
             }
             
             .navbar-menu {
-                border-bottom-color: ${palette[100]} !important;
+                border-bottom-color: ${palette[900]} !important;
             }
             
             #mainpart,
             #mainpart.at-index,
             body:not(.mce-content-body) {
-                background-color: ${palette[0]} !important;
+                background-color: ${palette[1000]} !important;
             }
             
             .basic-section,
@@ -599,8 +564,8 @@
             .series-users,
             .showcase-item,
             .sub-index-style {
-                background-color: ${palette[100]} !important;
-                border-color: ${palette[100]} ${palette[0]} ${palette[0]} !important;
+                background-color: ${palette[900]} !important;
+                border-color: ${palette[900]} ${palette[1000]} ${palette[1000]} !important;
             }
             
             #licensed-list header.section-title,
@@ -609,61 +574,61 @@
             .detail-list header.section-title,
             .modal-header,
             .private-tabs header {
-                background-color: ${palette[200]} !important;
+                background-color: ${palette[800]} !important;
             }
             
             .bg-gray-100 {
-                background-color: ${palette[900]} !important;
-            }
-            
-            #footer {
-                background-color: ${palette[200]} !important;
-            }
-
-            :is(.dark .dark\\:\\!bg-zinc-800) {
-                background-color: ${palette[200]} !important;
-            }
-            
-            .noti-item.untouch {
-                background-color: ${palette[300]} !important;
-            }
-            
-            .noti-item {
-                border-color: ${palette[300]} !important;
-            }
-            
-            .noti-item:hover {
-                background-color: ${palette[200]} !important;
-            }
-            
-            #noti-icon.active .icon-wrapper {
                 background-color: ${palette[100]} !important;
             }
             
+            #footer {
+                background-color: ${palette[800]} !important;
+            }
+
+            :is(.dark .dark\\:\\!bg-zinc-800) {
+                background-color: ${palette[800]} !important;
+            }
+            
+            .noti-item.untouch {
+                background-color: ${palette[700]} !important;
+            }
+            
+            .noti-item {
+                border-color: ${palette[700]} !important;
+            }
+            
+            .noti-item:hover {
+                background-color: ${palette[800]} !important;
+            }
+            
+            #noti-icon.active .icon-wrapper {
+                background-color: ${palette[900]} !important;
+            }
+            
             :is(.dark .dark\\:hover\\:\\!bg-zinc-700:hover) {
-                background-color: ${palette[300]} !important;
+                background-color: ${palette[700]} !important;
             }
             
             ul.list-chapters li:hover {
-                background-color: ${palette[300]} !important;
+                background-color: ${palette[700]} !important;
             }
             
             ul.list-chapters li:nth-child(2n) {
-                background-color: ${palette[200]} !important;
+                background-color: ${palette[800]} !important;
             }
 
             .navbar-menu.at-mobile li {
-                border-bottom-color: ${palette[300]} !important;
+                border-bottom-color: ${palette[700]} !important;
             }
             
             .nav-submenu {
-                background-color: ${palette[200]} !important;
-                border-bottom-color: ${palette[300]} !important;
+                background-color: ${palette[800]} !important;
+                border-bottom-color: ${palette[700]} !important;
             }
             
             #noti-icon.active,
             .nav-user_icon.active {
-                background-color: ${palette[200]} !important;
+                background-color: ${palette[800]} !important;
             }
 
             .summary-more.more-state:hover,
@@ -676,11 +641,11 @@
             }
             
             .expand, .mobile-more, .summary-more.more-state {
-                background: linear-gradient(180deg, rgba(31,31,31,0) 1%, ${palette[100]} 75%, ${palette[100]}) !important;
+                background: linear-gradient(180deg, rgba(31,31,31,0) 1%, ${palette[900]} 75%, ${palette[900]}) !important;
             }
             
             .ln-comment-group:nth-child(odd) .expand {
-                background: linear-gradient(180deg, rgba(42,42,42,0) 1%, ${palette[200]} 75%, ${palette[200]}) !important;
+                background: linear-gradient(180deg, rgba(42,42,42,0) 1%, ${palette[800]} 75%, ${palette[800]}) !important;
             }
             
             .visible-toolkit .visible-toolkit-item.do-like.liked {
@@ -691,189 +656,189 @@
 
             /* Additional styles for TinyMCE editor and search */
             .navbar-search .search-input {
-                background-color: ${palette[100]} !important;
+                background-color: ${palette[900]} !important;
             }
 
             .button-green {
-                background-color: ${palette[600]} !important;
-                border-color: ${palette[400]} !important;
+                background-color: ${palette[400]} !important;
+                border-color: ${palette[600]} !important;
                 color: ${textColor} !important;
             }
 
             :is(.dark .dark\\:ring-cyan-900) {
-                --tw-ring-color: ${palette[200]} !important;
+                --tw-ring-color: ${palette[800]} !important;
             }
 
             #mainpart.reading-page.style-6 #rd-side_icon {
-                background-color: ${palette[200]} !important;
+                background-color: ${palette[800]} !important;
             }
 
             #rd-side_icon {
-                border: 1px solid ${palette[300]} !important;
+                border: 1px solid ${palette[700]} !important;
             }
 
             .rd_sidebar-header {
-                background-color: ${palette[100]} !important;
+                background-color: ${palette[900]} !important;
             }
 
             .rd_sidebar main {
-                background-color: ${palette[950]} !important;
+                background-color: ${palette[50]} !important;
             }
 
             .black-click {
-                background-color: ${palette[100]} !important;
+                background-color: ${palette[900]} !important;
             }
 
             [href*="/the-loai/"]:hover {
-                background-color: ${palette[700]} !important;
-                border: 1px solid ${palette[400]} !important;
-                color: ${palette[200]} !important;
+                background-color: ${palette[300]} !important;
+                border: 1px solid ${palette[600]} !important;
+                color: ${palette[800]} !important;
             }
 
             .button.button-green:hover,
             .button.button-red:hover {
-                background-color: ${palette[100]} !important;
+                background-color: ${palette[900]} !important;
             }
 
             [data-theme="dark"] .navbar {
-                background-color: ${palette[200]} !important;
+                background-color: ${palette[800]} !important;
             }
 
             .navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:hover, .navbar-default .navbar-nav > .open > a:focus {
-                background-color: ${palette[900]} !important;
-                color: ${palette[100]} !important;
+                background-color: ${palette[100]} !important;
+                color: ${palette[900]} !important;
             }
 
             [data-theme="dark"] .panel-default {
-                border-color: ${palette[300]} !important;
+                border-color: ${palette[700]} !important;
             }
 
             [data-theme="dark"] .panel {
-                background-color: ${palette[200]} !important;
+                background-color: ${palette[800]} !important;
             }
 
             .panel-default {
-                border-color: ${palette[800]} !important;
+                border-color: ${palette[200]} !important;
             }
 
             [data-theme="dark"] .panel-default > .panel-heading {
-                color: ${palette[900]} !important;
-                background-color: ${palette[200]} !important;
-                border-color: ${palette[300]} !important;
+                color: ${palette[100]} !important;
+                background-color: ${palette[800]} !important;
+                border-color: ${palette[700]} !important;
             }
 
             [data-theme="dark"] .panel-body {
-                background-color: ${palette[200]} !important;
+                background-color: ${palette[800]} !important;
             }
 
             #drop a {
-                background-color: ${palette[400]} !important;
-                color: ${palette[900]} !important;
+                background-color: ${palette[600]} !important;
+                color: ${palette[100]} !important;
             }
 
             [data-theme="dark"] .btn-warning {
-                color: ${palette[900]} !important;
-                background-color: ${palette[400]} !important;
-                border-color: ${palette[400]} !important;
-            }
-
-            .btn-warning {
-                color: ${palette[900]} !important;
-                background-color: ${palette[500]} !important;
+                color: ${palette[100]} !important;
+                background-color: ${palette[600]} !important;
                 border-color: ${palette[600]} !important;
             }
 
+            .btn-warning {
+                color: ${palette[100]} !important;
+                background-color: ${palette[500]} !important;
+                border-color: ${palette[400]} !important;
+            }
+
             [data-theme="dark"] .btn-warning:hover {
-                color: ${palette[900]} !important;
-                background-color: ${palette[300]} !important;
-                border-color: ${palette[300]} !important;
+                color: ${palette[100]} !important;
+                background-color: ${palette[700]} !important;
+                border-color: ${palette[700]} !important;
             }
 
             .btn-warning:hover, .btn-warning:focus, .btn-warning.focus, .btn-warning:active, .btn-warning.active, .open > .dropdown-toggle.btn-warning {
-                color: ${palette[900]} !important;
-                background-color: ${palette[400]} !important;
+                color: ${palette[100]} !important;
+                background-color: ${palette[600]} !important;
                 border-color: ${palette[500]} !important;
             }
 
             [data-theme="dark"] .btn-primary {
-                color: ${palette[900]} !important;
-                background-color: ${palette[300]} !important;
-                border-color: ${palette[300]} !important;
+                color: ${palette[100]} !important;
+                background-color: ${palette[700]} !important;
+                border-color: ${palette[700]} !important;
             }
 
             .btn-primary {
-                color: ${palette[900]} !important;
+                color: ${palette[100]} !important;
                 background-color: ${palette[500]} !important;
-                border-color: ${palette[600]} !important;
+                border-color: ${palette[400]} !important;
             }
 
             [data-theme="dark"] .btn-primary:hover {
-                color: ${palette[900]} !important;
-                background-color: ${palette[200]} !important;
-                border-color: ${palette[200]} !important;
+                color: ${palette[100]} !important;
+                background-color: ${palette[800]} !important;
+                border-color: ${palette[800]} !important;
             }
 
             .btn-primary:hover, .btn-primary:focus, .btn-primary.focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
-                color: ${palette[900]} !important;
-                background-color: ${palette[400]} !important;
+                color: ${palette[100]} !important;
+                background-color: ${palette[600]} !important;
                 border-color: ${palette[500]} !important;
             }
 
             #drop a:hover {
-                background-color: ${palette[300]} !important;
+                background-color: ${palette[700]} !important;
             }
 
             [data-theme="dark"] .alert-info {
-                color: ${palette[900]} !important;
+                color: ${palette[100]} !important;
                 background-color: ${palette[500]} !important;
                 border-color: ${palette[500]} !important;
             }
 
             .alert-info {
-                background-color: ${palette[900]} !important;
-                border-color: ${palette[800]} !important;
-                color: ${palette[200]} !important;
+                background-color: ${palette[100]} !important;
+                border-color: ${palette[200]} !important;
+                color: ${palette[800]} !important;
             }
 
             #rd-side_icon {
-                border: 1px solid ${palette[300]} !important;
+                border: 1px solid ${palette[700]} !important;
             }
 
             .rd_sidebar-header {
-                background-color: ${palette[100]} !important;
+                background-color: ${palette[900]} !important;
             }
 
             .rd_sidebar main {
-                background-color: ${palette[950]} !important;
+                background-color: ${palette[50]} !important;
             }
 
             .black-click {
-                background-color: ${palette[100]} !important;
+                background-color: ${palette[900]} !important;
             }
 
             [href*="/the-loai/"]:hover {
-                background-color: ${palette[700]} !important;
-                border: 1px solid ${palette[400]} !important;
-                color: ${palette[200]} !important;
+                background-color: ${palette[300]} !important;
+                border: 1px solid ${palette[600]} !important;
+                color: ${palette[800]} !important;
             }
 
             .button.button-green:hover,
             .button.button-red:hover {
-                background-color: ${palette[100]} !important;
+                background-color: ${palette[900]} !important;
             }
 
             .ln-comment-toolkit-item:hover {
-                background-color: ${palette[300]} !important;
+                background-color: ${palette[700]} !important;
                 color: ${textColor} !important;
             }
 
             :is(.dark .dark\:ring-cyan-900) {
-                --tw-ring-color: ${palette[100]} !important;
+                --tw-ring-color: ${palette[900]} !important;
             }
 
             .button-blue {
                 background-color: ${palette[500]};
-                border-color: ${palette[300]};
+                border-color: ${palette[700]};
                 color: ${textColor};
             }
 
@@ -884,21 +849,21 @@
 
             .noti-unread {
               background-color: ${palette[500]};
-              border-bottom: 1px solid ${palette[300]};
+              border-bottom: 1px solid ${palette[700]};
               color: ${textColor};
             }
 
             .statistic-list, .feature-section .summary-wrapper,
             .statistic-list .block-wide.at-mobile {
-                border-top-color: ${palette[500]} !important;
+                border-top-color: ${palette[200]} !important;
             }
 
             .statistic-list .block-wide.at-mobile {
-                border-bottom-color: ${palette[500]} !important;
+                border-bottom-color: ${palette[200]} !important;
             }
 
             .user-private-tabs li a {
-                border-bottom-color: ${palette[200]} !important;
+                border-bottom-color: ${palette[800]} !important;
             }
         `;
 
@@ -966,7 +931,7 @@
             
             #navbar,
             .noti-sidebar .noti-more {
-                background-color: ${defaultPalette[200]} !important;
+                background-color: ${defaultPalette[800]} !important;
             }
             
             .navbar-menu.at-mobile,
@@ -979,7 +944,7 @@
             .noti-sidebar,
             #sidenav-icon.active,
             .navbar-menu {
-                background-color: ${defaultPalette[200]} !important;
+                background-color: ${defaultPalette[800]} !important;
             }
             
             #navbar-user#guest-menu ul.nav-submenu,
@@ -990,17 +955,17 @@
             .navbar-menu.at-mobile,
             .navbar-menu.at-navbar .nav-submenu,
             .noti-sidebar {
-                box-shadow: 0 0 14px ${defaultPalette[100]} !important;
+                box-shadow: 0 0 14px ${defaultPalette[900]} !important;
             }
             
             .navbar-menu {
-                border-bottom-color: ${defaultPalette[100]} !important;
+                border-bottom-color: ${defaultPalette[900]} !important;
             }
             
             #mainpart,
             #mainpart.at-index,
             body:not(.mce-content-body) {
-                background-color: ${defaultPalette[0]} !important;
+                background-color: ${defaultPalette[1000]} !important;
             }
             
             .basic-section,
@@ -1017,8 +982,8 @@
             .series-users,
             .showcase-item,
             .sub-index-style {
-                background-color: ${defaultPalette[100]} !important;
-                border-color: ${defaultPalette[100]} ${defaultPalette[0]} ${defaultPalette[0]} !important;
+                background-color: ${defaultPalette[900]} !important;
+                border-color: ${defaultPalette[900]} ${defaultPalette[1000]} ${defaultPalette[1000]} !important;
             }
             
             #licensed-list header.section-title,
@@ -1027,61 +992,61 @@
             .detail-list header.section-title,
             .modal-header,
             .private-tabs header {
-                background-color: ${defaultPalette[200]} !important;
+                background-color: ${defaultPalette[800]} !important;
             }
             
             .bg-gray-100 {
-                background-color: ${defaultPalette[900]} !important;
-            }
-            
-            #footer {
-                background-color: ${defaultPalette[200]} !important;
-            }
-
-            :is(.dark .dark\\:\\!bg-zinc-800) {
-                background-color: ${defaultPalette[200]} !important;
-            }
-            
-            .noti-item.untouch {
-                background-color: ${defaultPalette[300]} !important;
-            }
-            
-            .noti-item {
-                border-color: ${defaultPalette[300]} !important;
-            }
-            
-            .noti-item:hover {
-                background-color: ${defaultPalette[200]} !important;
-            }
-            
-            #noti-icon.active .icon-wrapper {
                 background-color: ${defaultPalette[100]} !important;
             }
             
+            #footer {
+                background-color: ${defaultPalette[800]} !important;
+            }
+
+            :is(.dark .dark\\:\\!bg-zinc-800) {
+                background-color: ${defaultPalette[800]} !important;
+            }
+            
+            .noti-item.untouch {
+                background-color: ${defaultPalette[700]} !important;
+            }
+            
+            .noti-item {
+                border-color: ${defaultPalette[700]} !important;
+            }
+            
+            .noti-item:hover {
+                background-color: ${defaultPalette[800]} !important;
+            }
+            
+            #noti-icon.active .icon-wrapper {
+                background-color: ${defaultPalette[900]} !important;
+            }
+            
             :is(.dark .dark\\:hover\\:\\!bg-zinc-700:hover) {
-                background-color: ${defaultPalette[300]} !important;
+                background-color: ${defaultPalette[700]} !important;
             }
             
             ul.list-chapters li:hover {
-                background-color: ${defaultPalette[300]} !important;
+                background-color: ${defaultPalette[700]} !important;
             }
             
             ul.list-chapters li:nth-child(2n) {
-                background-color: ${defaultPalette[200]} !important;
+                background-color: ${defaultPalette[800]} !important;
             }
 
             .navbar-menu.at-mobile li {
-                border-bottom-color: ${defaultPalette[300]} !important;
+                border-bottom-color: ${defaultPalette[700]} !important;
             }
             
             .nav-submenu {
-                background-color: ${defaultPalette[200]} !important;
-                border-bottom-color: ${defaultPalette[300]} !important;
+                background-color: ${defaultPalette[800]} !important;
+                border-bottom-color: ${defaultPalette[700]} !important;
             }
             
             #noti-icon.active,
             .nav-user_icon.active {
-                background-color: ${defaultPalette[200]} !important;
+                background-color: ${defaultPalette[800]} !important;
             }
 
             .summary-more.more-state:hover,
@@ -1094,11 +1059,11 @@
             }
             
             .expand, .mobile-more, .summary-more.more-state {
-                background: linear-gradient(180deg, rgba(31,31,31,0) 1%, ${defaultPalette[100]} 75%, ${defaultPalette[100]}) !important;
+                background: linear-gradient(180deg, rgba(31,31,31,0) 1%, ${defaultPalette[900]} 75%, ${defaultPalette[900]}) !important;
             }
             
             .ln-comment-group:nth-child(odd) .expand {
-                background: linear-gradient(180deg, rgba(42,42,42,0) 1%, ${defaultPalette[200]} 75%, ${defaultPalette[200]}) !important;
+                background: linear-gradient(180deg, rgba(42,42,42,0) 1%, ${defaultPalette[800]} 75%, ${defaultPalette[800]}) !important;
             }
             
             .visible-toolkit .visible-toolkit-item.do-like.liked {
@@ -1109,62 +1074,62 @@
 
             /* Additional styles for TinyMCE editor and search */
             .navbar-search .search-input {
-                background-color: ${defaultPalette[100]} !important;
+                background-color: ${defaultPalette[900]} !important;
             }
 
             .button-green {
-                background-color: ${defaultPalette[600]} !important;
-                border-color: ${defaultPalette[400]} !important;
+                background-color: ${defaultPalette[400]} !important;
+                border-color: ${defaultPalette[600]} !important;
                 color: ${textColor} !important;
             }
 
             :is(.dark .dark\:ring-cyan-900) {
-                --tw-ring-color: ${defaultPalette[200]} !important;
+                --tw-ring-color: ${defaultPalette[800]} !important;
             }
 
             #mainpart.reading-page.style-6 #rd-side_icon {
-                background-color: ${defaultPalette[200]} !important;
+                background-color: ${defaultPalette[800]} !important;
             }
 
             #rd-side_icon {
-                border: 1px solid ${defaultPalette[300]} !important;
+                border: 1px solid ${defaultPalette[700]} !important;
             }
 
             .rd_sidebar-header {
-                background-color: ${defaultPalette[100]} !important;
+                background-color: ${defaultPalette[900]} !important;
             }
 
             .rd_sidebar main {
-                background-color: ${defaultPalette[950]} !important;
+                background-color: ${defaultPalette[50]} !important;
             }
 
             .black-click {
-                background-color: ${defaultPalette[100]} !important;
+                background-color: ${defaultPalette[900]} !important;
             }
 
             [href*="/the-loai/"]:hover {
-                background-color: ${defaultPalette[700]} !important;
-                border: 1px solid ${defaultPalette[400]} !important;
-                color: ${defaultPalette[200]} !important;
+                background-color: ${defaultPalette[300]} !important;
+                border: 1px solid ${defaultPalette[600]} !important;
+                color: ${defaultPalette[800]} !important;
             }
 
             .button.button-green:hover,
             .button.button-red:hover {
-                background-color: ${defaultPalette[100]} !important;
+                background-color: ${defaultPalette[900]} !important;
             }
 
             .ln-comment-toolkit-item:hover {
-                background-color: ${palette[300]} !important;
+                background-color: ${palette[700]} !important;
                 color: ${textColor} !important;
             }
 
             :is(.dark .dark\\:ring-cyan-900) {
-                --tw-ring-color: ${defaultPalette[100]} !important;
+                --tw-ring-color: ${defaultPalette[900]} !important;
             }
 
             .button-blue {
                 background-color: ${defaultPalette[500]};
-                border-color: ${defaultPalette[300]};
+                border-color: ${defaultPalette[700]};
                 color: ${textColor};
             }
 
@@ -1175,21 +1140,21 @@
 
             .noti-unread {
               background-color: ${defaultPalette[500]};
-              border-bottom: 1px solid ${defaultPalette[300]};
+              border-bottom: 1px solid ${defaultPalette[700]};
               color: ${textColor};
             }
 
             .statistic-list, .feature-section .summary-wrapper,
             .statistic-list .block-wide.at-mobile {
-                border-top-color: ${defaultPalette[500]} !important;
+                border-top-color: ${defaultPalette[200]} !important;
             }
 
             .statistic-list .block-wide.at-mobile {
-                border-bottom-color: ${defaultPalette[500]} !important;
+                border-bottom-color: ${defaultPalette[200]} !important;
             }
 
             .user-private-tabs li a {
-                border-bottom-color: ${defaultPalette[200]} !important;
+                border-bottom-color: ${defaultPalette[800]} !important;
             }
         `;
 
