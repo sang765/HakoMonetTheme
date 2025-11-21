@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Hako: Monet Theme
 // @namespace    https://github.com/sang765
-// @version      5.1.7
+// @version      5.1.9
 // @description  Material You theme for Hako/DocLN.
 // @description:vi Material You theme dành cho Hako/DocLN.
 // @icon         https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/.github/assets/logo.png
@@ -38,8 +38,8 @@
 // @resource     animationJS ./class/animation.js
 // @resource     tagColorJS ./class/tag-color.js
 // @resource     fontImportJS ./class/font-import.js
-// @resource     colorinfotruyen ./colors/page-info-truyen.js
-// @resource     pagegeneralJS ./colors/page-general.js
+// @resource     colorinfotruyen ./colors/page-info-truyen-dark.js
+// @resource     pagegeneralJS ./colors/page-general-dark.js
 // @resource     pagegenerallightJS ./colors/page-general-light.js
 // @resource     colorinfotruyenlight ./colors/page-info-truyen-light.js
 // @resource     themeDetectorJS ./module/theme-detector.js
