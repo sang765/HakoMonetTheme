@@ -1,1 +1,27 @@
+// Animation cho collapsible sections
+.series-note {
+  .sect-header {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  main {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+  }
+
+  &.open main {
+    max-height: 1000px; // Điều chỉnh dựa trên nội dung, hoặc sử dụng auto nếu có thể
+  }
+
+  .mobile-icon i {
+    transition: transform 0.3s ease-in-out;
+  }
+
+  &.open .mobile-icon i {
+    transform: rotate(180deg);
+  }
+}
+
 /*# sourceMappingURL=https://sang765.github.io/HakoMonetTheme/styles/animation/animation.css.map */

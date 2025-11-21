@@ -1,1 +1,46 @@
+.series-note .sect-header {
+  cursor: pointer;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
+.series-note main {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out;
+}
+.series-note.open main {
+  max-height: 1000px;
+}
+.series-note .mobile-icon i {
+  transition: transform 0.3s ease-in-out;
+}
+.series-note.open .mobile-icon i {
+  transform: rotate(180deg);
+}
+
 /*# sourceMappingURL=animation.css.map */
+
+/* Animation cho collapsible sections */
+.series-note .sect-header {
+  cursor: pointer;
+  user-select: none;
+}
+
+.series-note main {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out;
+}
+
+.series-note.open main {
+  max-height: 1000px;
+}
+
+.series-note .mobile-icon i {
+  transition: transform 0.3s ease-in-out;
+}
+
+.series-note.open .mobile-icon i {
+  transform: rotate(180deg);
+}

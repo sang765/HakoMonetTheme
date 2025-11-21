@@ -12,9 +12,12 @@
     
     function initAnimation() {
         debugLog('Animation class đã được tải');
-        
+
         // Thêm các animation CSS
         addAnimations();
+
+        // Thêm toggle cho collapsible sections
+        initCollapsibleSections();
     }
     
     function addAnimations() {
@@ -44,6 +47,57 @@
         })
         .catch(error => {
             debugLog('Lỗi khi tải animation/animation.css hoặc source map:', error);
+        });
+    }
+
+    function initCollapsibleSections() {
+        debugLog('Khởi tạo collapsible sections');
+
+        // Tìm tất cả các section series-note
+        const sections = document.querySelectorAll('section.series-note');
+
+        sections.forEach(section => {
+            const header = section.querySelector('.sect-header');
+            const main = section.querySelector('main');
+            const icon = section.querySelector('.mobile-icon i');
+
+            if (!header || !main || !icon) return;
+
+            // Kiểm tra trạng thái ban đầu dựa trên display
+            const isOpen = main.style.display !== 'none';
+            if (isOpen) {
+                section.classList.add('open');
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            } else {
+                section.classList.remove('open');
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            }
+
+            // Thêm event listener
+            header.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                const isCurrentlyOpen = section.classList.contains('open');
+
+                if (isCurrentlyOpen) {
+                    // Đóng
+                    section.classList.remove('open');
+                    icon.classList.remove('fa-chevron-up');
+                    icon.classList.add('fa-chevron-down');
+                    // Để transition hoàn thành trước khi set display none
+                    setTimeout(() => {
+                        main.style.display = 'none';
+                    }, 300);
+                } else {
+                    // Mở
+                    main.style.display = ''; // Xóa display none
+                    section.classList.add('open');
+                    icon.classList.remove('fa-chevron-down');
+                    icon.classList.add('fa-chevron-up');
+                }
+            });
         });
     }
     
