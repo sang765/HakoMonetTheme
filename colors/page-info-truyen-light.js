@@ -99,10 +99,15 @@
             debugLog('Không tìm thấy ảnh bìa.');
             return;
         }
-
-        const coverStyle = coverElement.style.backgroundImage;
-        const coverUrl = coverStyle.replace(/url\(['"]?(.*?)['"]?\)/i, '$1');
-
+        
+        let coverUrl;
+        if (coverElement.tagName.toLowerCase() === 'img') {
+            coverUrl = coverElement.src;
+        } else {
+            const coverStyle = coverElement.style.backgroundImage;
+            coverUrl = coverStyle.replace(/url\(['"]?(.*?)['"]?\)/i, '$1');
+        }
+        
         if (!coverUrl) {
             debugLog('Không thể lấy URL ảnh bìa.');
             return;
