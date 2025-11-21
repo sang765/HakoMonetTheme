@@ -568,7 +568,7 @@ function createTintedWhite(tintColor) {
             #mainpart,
             #mainpart.at-index,
             body:not(.mce-content-body) {
-                background-color: ${palette[50]} !important;
+                background-color: ${palette[100]} !important;
             }
             
             .basic-section,
@@ -986,7 +986,7 @@ function createTintedWhite(tintColor) {
             #mainpart,
             #mainpart.at-index,
             body:not(.mce-content-body) {
-                background-color: ${defaultPalette[50]} !important;
+                background-color: ${defaultPalette[100]} !important;
             }
             
             .basic-section,
