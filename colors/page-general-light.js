@@ -1454,6 +1454,10 @@
             .hmt-crop-upload {
                 background-color: ${palette[500]} !important;
             }
+
+            #footer span {
+                color: ${palette[700]} !important;
+            }
         `;
 
         GM_addStyle(css);
@@ -2045,7 +2049,6 @@
                 background-color: ${defaultPalette[200]} !important;
             }
 
-            
             .hmt-crop-modal {
                 background-color: ${defaultPalette[100]} !important;
             }
@@ -2057,6 +2060,10 @@
             }
             .hmt-crop-upload {
                 background-color: ${defaultPalette[500]} !important;
+            }
+
+            #footer span {
+                color: ${defaultPalette[700]} !important;
             }
         `;
 

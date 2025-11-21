@@ -865,6 +865,10 @@
             .user-private-tabs li a {
                 border-bottom-color: ${palette[200]} !important;
             }
+
+            #footer span {
+                color: ${palette[700]} !important;
+            }
         `;
 
         GM_addStyle(css);
@@ -1155,6 +1159,10 @@
 
             .user-private-tabs li a {
                 border-bottom-color: ${defaultPalette[200]} !important;
+            }
+
+            #footer span {
+                color: ${defaultPalette[700]} !important;
             }
         `;
 
