@@ -55,22 +55,11 @@
             const html2canvasJS = GM_getResourceText('html2canvasJS');
             const colorisJS = GM_getResourceText('colorisJS');
             const colorisCSS = GM_getResourceText('colorisCSS');
-            const colorisColors = GM_getResourceText('colorisColors');
             const configJS = GM_getResourceText('configJS');
             const adBlockerJS = GM_getResourceText('adBlockerJS');
             const antiPopupJS = GM_getResourceText('antiPopupJS');
-            const blacklistJS = GM_getResourceText('blacklistJS');
             const fullscreenJS = GM_getResourceText('fullscreenJS');
             const deviceCSSLoaderJS = GM_getResourceText('deviceCSSLoaderJS');
-
-            // Load module blacklist trước tiên (ưu tiên cao nhất)
-            loadScript(blacklistJS, 'blacklist.js');
-
-            // Kiểm tra xem có bị blacklist không
-            if (typeof window.HMTBlacklist !== 'undefined' && !window.HMTBlacklist.init()) {
-                debugLog('Trang bị blacklist, dừng tải các module khác');
-                return; // Dừng việc tải các module khác
-            }
 
             // Load các module theo thứ tự
             console.log('[Main] Loading update-checker.js');
@@ -97,7 +86,7 @@
             loadScript(adBlockerJS, 'ad-blocker.js');
             loadScript(antiPopupJS, 'anti-popup.js');
             loadScript(fullscreenJS, 'fullscreen.js');
-            loadScript(colorinfotruyen, 'page-info-truyen.js');
+            loadScript(colorinfotruyen, 'info-truyen-dark.js');
             loadScript(deviceCSSLoaderJS, 'device-css-loader.js');
             
             debugLog('Tất cả module đã được tải');
