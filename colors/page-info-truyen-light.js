@@ -6,9 +6,9 @@
 
     function debugLog(...args) {
         if (DEBUG && typeof window.Logger !== 'undefined') {
-            window.Logger.log('pageInfoTruyenLight', ...args);
+            window.Logger.log('pageInfoTruyen', ...args);
         } else if (DEBUG) {
-            console.log('[PageInfoTruyenLight]', ...args);
+            console.log('[PageInfoTruyen]', ...args);
         }
     }
 
@@ -73,29 +73,29 @@
         debugLog('Integrated CORS handling for images is ready');
     }
     
-    function initPageInfoTruyenLight() {
-        // Check if in dark mode, if yes, skip
-        if (window.__themeDetectorLoaded && window.ThemeDetector && window.ThemeDetector.isDark()) {
-            debugLog('In dark mode, skipping light theme application');
+    function initPageInfoTruyen() {
+        // Check if in dark mode
+        if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
+            debugLog('Not in light mode, skipping light theme application');
             return;
         }
 
         // Kiểm tra xem có phải trang đọc truyện không và có tắt màu không
         if (document.querySelector('.rd-basic_icon.row') && window.HMTConfig && window.HMTConfig.getDisableColorsOnReadingPage && window.HMTConfig.getDisableColorsOnReadingPage()) {
-            debugLog('Reading page with colors disabled, skipping');
+            debugLog('Phát hiện trang đọc truyện và tính năng tắt màu được bật, bỏ qua áp dụng màu.');
             return;
         }
 
         // Kiểm tra xem có phải trang chi tiết truyện không bằng cách tìm element đặc trưng
         const sideFeaturesElement = document.querySelector('div.col-4.col-md.feature-item.width-auto-xl');
         if (!sideFeaturesElement) {
-            debugLog('Not a story info page, skipping');
+            debugLog('Không tìm thấy element, bỏ qua tính năng đổi màu.');
             return;
         }
 
         const coverElement = document.querySelector('.series-cover .img-in-ratio');
         if (!coverElement) {
-            debugLog('No cover image found');
+            debugLog('Không tìm thấy ảnh bìa.');
             return;
         }
 
@@ -103,34 +103,31 @@
         const coverUrl = coverStyle.replace(/url\(['"]?(.*?)['"]?\)/i, '$1');
 
         if (!coverUrl) {
-            debugLog('Cannot get cover URL');
+            debugLog('Không thể lấy URL ảnh bìa.');
             return;
         }
 
-        debugLog('Analyzing color from cover:', coverUrl);
+        debugLog('Đang phân tích màu từ ảnh bìa:', coverUrl);
 
         // Hàm áp dụng màu sắc hiện tại
         function applyCurrentColorScheme() {
-            const defaultColor = window.HMTConfig ? window.HMTConfig.getDefaultColor() : '#FCE4EC'; // Get color from config or fallback
+            const defaultColor = window.HMTConfig && window.HMTConfig.getDefaultColor ?
+                window.HMTConfig.getDefaultColor() : '#FCE4EC';
 
-            debugLog('Applying light color scheme with config color:', defaultColor);
+            debugLog('Áp dụng màu mặc định từ config:', defaultColor);
 
             if (!isValidColor(defaultColor)) {
-                debugLog('Invalid color, using default');
+                debugLog('Màu không hợp lệ, sử dụng màu mặc định');
                 applyDefaultColorScheme();
                 return;
             }
 
-            // Create tinted white using config color for light mode
-            const tintedWhite = createTintedWhite(defaultColor);
-            debugLog('Tinted white for light mode:', tintedWhite);
-
             // Tạo Monet palette từ màu config
-            const monetPalette = MonetAPI.generateMonetPalette(tintedWhite);
-            debugLog('Monet Palette:', monetPalette);
+            const monetPalette = MonetAPI.generateMonetPalette(defaultColor);
+            debugLog('Monet Palette từ config:', monetPalette);
 
-            const isLightColor = MonetAPI.isColorLight(tintedWhite);
-            debugLog('Is light color?', isLightColor);
+            const isLightColor = MonetAPI.isColorLight(defaultColor);
+            debugLog('Màu sáng?', isLightColor);
 
             applyMonetColorScheme(monetPalette, isLightColor);
         }
@@ -140,10 +137,10 @@
             // Phân tích màu từ ảnh bìa
             analyzeImageColorTraditionalAccent(coverUrl)
                 .then(dominantColor => {
-                    debugLog('Dominant color (traditional accent):', dominantColor);
+                    debugLog('Màu chủ đạo (accent truyền thống):', dominantColor);
 
                     if (!isValidColor(dominantColor)) {
-                        debugLog('Invalid color, using default');
+                        debugLog('Màu không hợp lệ, sử dụng màu mặc định');
                         applyCurrentColorScheme();
                         return;
                     }
@@ -153,12 +150,12 @@
                     debugLog('Monet Palette:', monetPalette);
 
                     const isLightColor = MonetAPI.isColorLight(dominantColor);
-                    debugLog('Is light color?', isLightColor);
+                    debugLog('Màu sáng?', isLightColor);
 
                     applyMonetColorScheme(monetPalette, isLightColor);
                 })
                 .catch(error => {
-                    debugLog('Error analyzing image:', error);
+                    debugLog('Lỗi khi phân tích ảnh:', error);
                     applyCurrentColorScheme();
                 });
         }
@@ -168,13 +165,13 @@
 
         // Lắng nghe sự kiện màu sắc thay đổi để cập nhật real-time
         (window.top || window).document.addEventListener('hmtColorChanged', function(event) {
-            debugLog('Color change event received:', event.detail);
+            debugLog('Nhận sự kiện màu sắc thay đổi:', event.detail);
 
             // Check if in dark mode
-            if (window.__themeDetectorLoaded && window.ThemeDetector && window.ThemeDetector.isDark()) {
-                debugLog('In dark mode, skipping');
-                return;
-            }
+            if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
+            debugLog('Not in light mode, skipping light theme application');
+            return;
+        }
 
             // Kiểm tra chế độ màu
             const colorMode = window.HMTConfig && window.HMTConfig.getColorMode ? window.HMTConfig.getColorMode() : 'default';
@@ -196,47 +193,46 @@
             }
         });
 
-        debugLog('Set up color change listener');
+        debugLog('Đã thiết lập lắng nghe sự kiện màu sắc thay đổi');
     }
     
     function isValidColor(color) {
         return MonetAPI.isValidColor(color);
     }
+// Function to create tinted white using config color for light mode
+function createTintedWhite(tintColor) {
+    const BASE_WHITE = '#ffffff';    // Base white color
+    const TINT_STRENGTH = 0.1;       // 10% tint strength for subtle effect
 
-    // Function to create tinted white using config color for light mode
-    function createTintedWhite(tintColor) {
-        const BASE_WHITE = '#ffffff';    // Base white color
-        const TINT_STRENGTH = 0.1;       // 10% tint strength for subtle effect
+    // Convert hex to RGB
+    const white = hexToRgb(BASE_WHITE);
+    const tint = hexToRgb(tintColor);
 
-        // Convert hex to RGB
-        const white = hexToRgb(BASE_WHITE);
-        const tint = hexToRgb(tintColor);
+    // Mix: 90% white + 10% tint color
+    const result = {
+        r: Math.round(white.r * (1 - TINT_STRENGTH) + tint.r * TINT_STRENGTH),
+        g: Math.round(white.g * (1 - TINT_STRENGTH) + tint.g * TINT_STRENGTH),
+        b: Math.round(white.b * (1 - TINT_STRENGTH) + tint.b * TINT_STRENGTH)
+    };
 
-        // Mix: 90% white + 10% tint color
-        const result = {
-            r: Math.round(white.r * (1 - TINT_STRENGTH) + tint.r * TINT_STRENGTH),
-            g: Math.round(white.g * (1 - TINT_STRENGTH) + tint.g * TINT_STRENGTH),
-            b: Math.round(white.b * (1 - TINT_STRENGTH) + tint.b * TINT_STRENGTH)
-        };
+    return rgbToHex(result.r, result.g, result.b);
+}
 
-        return rgbToHex(result.r, result.g, result.b);
-    }
+// Helper functions for color conversion
+function hexToRgb(hex) {
+    const result = /^#?([a-fd]{2})([a-fd]{2})([a-fd]{2})$/i.exec(hex);
+    return {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    };
+}
 
-    // Helper functions for color conversion
-    function hexToRgb(hex) {
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16)
-        };
-    }
-
-    function rgbToHex(r, g, b) {
-        return '#' + [r, g, b].map(x =>
-            x.toString(16).padStart(2, '0')
-        ).join('');
-    }
+function rgbToHex(r, g, b) {
+    return '#' + [r, g, b].map(x =>
+        x.toString(16).padStart(2, '0')
+    ).join('');
+}
     
     
     
@@ -245,7 +241,7 @@
         return new Promise((resolve, reject) => {
             // Setup CORS handling for images if needed
             if (isTargetDomain(imageUrl)) {
-                debugLog('Image from target domain, setting up CORS handling');
+                debugLog('Ảnh từ domain target, thiết lập CORS handling');
                 setupImageCorsHandling();
             }
 
@@ -254,40 +250,40 @@
             // Always set crossOrigin for safety
             if (isTargetDomain(imageUrl)) {
                 img.crossOrigin = 'anonymous';
-                debugLog('Set crossOrigin for image from target domain');
+                debugLog('Đã set crossOrigin cho ảnh từ domain target');
             }
 
             img.onload = function() {
-                debugLog('Image loaded, size:', img.width, 'x', img.height);
+                debugLog('Ảnh đã tải xong, kích thước:', img.width, 'x', img.height);
                 try {
                     const dominantColor = getTraditionalAccentColorFromImage(img);
                     resolve(dominantColor);
                 } catch (error) {
-                    reject('Error analyzing image: ' + error);
+                    reject('Lỗi khi phân tích ảnh: ' + error);
                 }
             };
 
             img.onerror = function(error) {
-                debugLog('Error loading image with Image API:', imageUrl, error);
+                debugLog('Lỗi tải ảnh với Image API:', imageUrl, error);
 
                 // Fallback: try using GM_xmlhttpRequest (CORS bypass)
                 if (isTargetDomain(imageUrl)) {
-                    debugLog('Trying to load image with GM_xmlhttpRequest (CORS bypass)');
+                    debugLog('Thử tải ảnh bằng GM_xmlhttpRequest (CORS bypass)');
                     loadImageWithXHR(imageUrl)
                         .then(img => {
                             try {
                                 const dominantColor = getTraditionalAccentColorFromImage(img);
                                 resolve(dominantColor);
                             } catch (error) {
-                                reject('Error analyzing image from GM_xmlhttpRequest: ' + error);
+                                reject('Lỗi khi phân tích ảnh từ GM_xmlhttpRequest: ' + error);
                             }
                         })
                         .catch(xhrError => {
-                            debugLog('GM_xmlhttpRequest also failed:', xhrError);
-                            reject('Cannot load image with both Image API and GM_xmlhttpRequest');
+                            debugLog('GM_xmlhttpRequest cũng thất bại:', xhrError);
+                            reject('Không thể tải ảnh bằng cả Image API và GM_xmlhttpRequest');
                         });
                 } else {
-                    reject('Cannot load image');
+                    reject('Không thể tải ảnh');
                 }
             };
 
@@ -308,7 +304,7 @@
                         const blob = response.response;
                         const img = new Image();
                         img.onload = () => resolve(img);
-                        img.onerror = () => reject('Cannot create image from blob');
+                        img.onerror = () => reject('Không thể tạo ảnh từ blob');
                         img.src = URL.createObjectURL(blob);
                     } else {
                         reject('GM_xmlhttpRequest failed with status: ' + response.status);
@@ -339,13 +335,13 @@
         const imageData = ctx.getImageData(0, 0, width, height);
         const data = imageData.data;
         
-        debugLog('Analyzing entire image for traditional accent color');
-        debugLog('Total pixels in image:', data.length / 4);
+        debugLog('Phân tích toàn bộ ảnh để tìm accent color truyền thống');
+        debugLog('Tổng pixel trong ảnh:', data.length / 4);
         
         // Đếm màu với trọng số ưu tiên màu accent truyền thống
         const colorCount = {};
         let maxCount = 0;
-        let dominantColor = '#FCE4EC'; // Default light color
+        let dominantColor = '#FCE4EC'; // Màu mặc định
         
         // Phạm vi màu accent truyền thống (loại bỏ màu quá sáng và quá tối)
         const traditionalAccentRanges = [
@@ -428,11 +424,11 @@
         
         // Nếu không tìm thấy màu accent phù hợp, sử dụng màu có độ bão hòa cao nhất
         if (maxCount === 0) {
-            debugLog('No traditional accent color found, using most saturated color');
+            debugLog('Không tìm thấy màu accent truyền thống, sử dụng màu bão hòa cao nhất');
             dominantColor = getMostSaturatedColor(img);
         }
         
-        debugLog('Selected accent color:', dominantColor);
+        debugLog('Màu accent được chọn:', dominantColor);
         return dominantColor;
     }
     
@@ -484,19 +480,19 @@
             return;
         }
         
-        const textColor = isLight ? '#000' : '#fff';
+        const textColor = '#000000';
         
         const css = `
             :root {
                 --monet-primary: ${palette[500]};
-                --monet-primary-light: ${palette[300]};
-                --monet-primary-dark: ${palette[700]};
-                --monet-surface: ${palette[100]};
-                --monet-surface-dark: ${palette[200]};
-                --monet-background: ${palette[50]};
-                --monet-background-dark: ${palette[100]};
-                --monet-elevated: ${palette[0]};
-                --monet-elevated-dark: ${palette[100]};
+                --monet-primary-light: ${palette[700]};
+                --monet-primary-dark: ${palette[300]};
+                --monet-surface: ${palette[900]};
+                --monet-surface-dark: ${palette[800]};
+                --monet-background: ${palette[950]};
+                --monet-background-dark: ${palette[900]};
+                --monet-elevated: ${palette[1000]};
+                --monet-elevated-dark: ${palette[900]};
             }
 
             /* Faster transitions for interactive elements */
@@ -504,7 +500,7 @@
                 transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease !important;
             }
 
-            
+
             a:hover:not([href*="/the-loai/"]),
             .long-text a:hover {
                 color: ${palette[500]} !important;
@@ -512,7 +508,7 @@
             
             .text-slate-500,
             .long-text a {
-            	color: ${palette[300]} !important;
+            	color: ${palette[700]} !important;
             }
             
             .paging_item.paging_prevnext.next,
@@ -551,7 +547,7 @@
             
             #navbar,
             .noti-sidebar .noti-more {
-                background-color: ${palette[800]} !important;
+                background-color: ${palette[200]} !important;
             }
             
             .navbar-menu.at-mobile,
@@ -564,7 +560,7 @@
             .noti-sidebar,
             #sidenav-icon.active,
             .navbar-menu {
-                background-color: ${palette[800]} !important;
+                background-color: ${palette[200]} !important;
             }
             
             #navbar-user#guest-menu ul.nav-submenu,
@@ -575,17 +571,17 @@
             .navbar-menu.at-mobile,
             .navbar-menu.at-navbar .nav-submenu,
             .noti-sidebar {
-                box-shadow: 0 0 14px ${palette[900]} !important;
+                box-shadow: 0 0 14px ${palette[100]} !important;
             }
             
             .navbar-menu {
-                border-bottom-color: ${palette[900]} !important;
+                border-bottom-color: ${palette[100]} !important;
             }
             
             #mainpart,
             #mainpart.at-index,
             body:not(.mce-content-body) {
-                background-color: ${palette[1000]} !important;
+                background-color: ${palette[0]} !important;
             }
             
             .basic-section,
@@ -602,8 +598,8 @@
             .series-users,
             .showcase-item,
             .sub-index-style {
-                background-color: ${palette[900]} !important;
-                border-color: ${palette[900]} ${palette[1000]} ${palette[1000]} !important;
+                background-color: ${palette[100]} !important;
+                border-color: ${palette[100]} ${palette[0]} ${palette[0]} !important;
             }
             
             #licensed-list header.section-title,
@@ -612,53 +608,61 @@
             .detail-list header.section-title,
             .modal-header,
             .private-tabs header {
-                background-color: ${palette[800]} !important;
+                background-color: ${palette[200]} !important;
             }
             
             .bg-gray-100 {
-                background-color: ${palette[100]} !important;
-            }
-            
-            #footer {
-                background-color: ${palette[800]} !important;
-            }
-
-            .noti-item.untouch {
-                background-color: ${palette[700]} !important;
-            }
-            
-            .noti-item {
-                border-color: ${palette[700]} !important;
-            }
-            
-            .noti-item:hover {
-                background-color: ${palette[800]} !important;
-            }
-            
-            #noti-icon.active .icon-wrapper {
                 background-color: ${palette[900]} !important;
             }
             
+            #footer {
+                background-color: ${palette[200]} !important;
+            }
+
+            :is(.dark .dark\\:\\!bg-zinc-800) {
+                background-color: ${palette[200]} !important;
+            }
+            
+            .noti-item.untouch {
+                background-color: ${palette[300]} !important;
+            }
+            
+            .noti-item {
+                border-color: ${palette[300]} !important;
+            }
+            
+            .noti-item:hover {
+                background-color: ${palette[200]} !important;
+            }
+            
+            #noti-icon.active .icon-wrapper {
+                background-color: ${palette[100]} !important;
+            }
+            
+            :is(.dark .dark\\:hover\\:\\!bg-zinc-700:hover) {
+                background-color: ${palette[300]} !important;
+            }
+            
             ul.list-chapters li:hover {
-                background-color: ${palette[700]} !important;
+                background-color: ${palette[300]} !important;
             }
             
             ul.list-chapters li:nth-child(2n) {
-                background-color: ${palette[800]} !important;
+                background-color: ${palette[200]} !important;
             }
 
             .navbar-menu.at-mobile li {
-                border-bottom-color: ${palette[700]} !important;
+                border-bottom-color: ${palette[300]} !important;
             }
             
             .nav-submenu {
-                background-color: ${palette[800]} !important;
-                border-bottom-color: ${palette[700]} !important;
+                background-color: ${palette[200]} !important;
+                border-bottom-color: ${palette[300]} !important;
             }
             
             #noti-icon.active,
             .nav-user_icon.active {
-                background-color: ${palette[800]} !important;
+                background-color: ${palette[200]} !important;
             }
 
             .summary-more.more-state:hover,
@@ -675,7 +679,7 @@
             }
             
             .ln-comment-group:nth-child(odd) .expand {
-                background: linear-gradient(180deg, rgba(248,249,250,0) 1%, ${palette[50]} 75%, ${palette[50]}) !important;
+                background: linear-gradient(180deg, rgba(248,249,250,0) 1%, ${palette[200]} 75%, ${palette[200]}) !important;
             }
             
             .visible-toolkit .visible-toolkit-item.do-like.liked {
@@ -686,185 +690,189 @@
 
             /* Additional styles for TinyMCE editor and search */
             .navbar-search .search-input {
-                background-color: ${palette[900]} !important;
+                background-color: ${palette[100]} !important;
             }
 
             .button-green {
-                background-color: ${palette[400]} !important;
-                border-color: ${palette[600]} !important;
+                background-color: ${palette[600]} !important;
+                border-color: ${palette[400]} !important;
                 color: ${textColor} !important;
             }
 
+            :is(.dark .dark\\:ring-cyan-900) {
+                --tw-ring-color: ${palette[200]} !important;
+            }
+
             #mainpart.reading-page.style-6 #rd-side_icon {
-                background-color: ${palette[800]} !important;
+                background-color: ${palette[200]} !important;
             }
 
             #rd-side_icon {
-                border: 1px solid ${palette[700]} !important;
+                border: 1px solid ${palette[300]} !important;
             }
 
             .rd_sidebar-header {
-                background-color: ${palette[900]} !important;
+                background-color: ${palette[100]} !important;
             }
 
             .rd_sidebar main {
-                background-color: ${palette[50]} !important;
+                background-color: ${palette[950]} !important;
             }
 
             .black-click {
-                background-color: ${palette[900]} !important;
+                background-color: ${palette[100]} !important;
             }
 
             [href*="/the-loai/"]:hover {
-                background-color: ${palette[300]} !important;
-                border: 1px solid ${palette[600]} !important;
-                color: ${palette[800]} !important;
+                background-color: ${palette[700]} !important;
+                border: 1px solid ${palette[400]} !important;
+                color: ${palette[200]} !important;
             }
 
             .button.button-green:hover,
             .button.button-red:hover {
-                background-color: ${palette[900]} !important;
+                background-color: ${palette[100]} !important;
             }
 
             [data-theme="dark"] .navbar {
-                background-color: ${palette[800]} !important;
+                background-color: ${palette[200]} !important;
             }
 
             .navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:hover, .navbar-default .navbar-nav > .open > a:focus {
-                background-color: ${palette[100]} !important;
-                color: ${palette[900]} !important;
+                background-color: ${palette[900]} !important;
+                color: ${palette[100]} !important;
             }
 
             [data-theme="dark"] .panel-default {
-                border-color: ${palette[700]} !important;
+                border-color: ${palette[300]} !important;
             }
 
             [data-theme="dark"] .panel {
-                background-color: ${palette[800]} !important;
+                background-color: ${palette[200]} !important;
             }
 
             .panel-default {
-                border-color: ${palette[200]} !important;
+                border-color: ${palette[800]} !important;
             }
 
             [data-theme="dark"] .panel-default > .panel-heading {
-                color: ${palette[100]} !important;
-                background-color: ${palette[800]} !important;
-                border-color: ${palette[700]} !important;
+                color: ${palette[900]} !important;
+                background-color: ${palette[200]} !important;
+                border-color: ${palette[300]} !important;
             }
 
             [data-theme="dark"] .panel-body {
-                background-color: ${palette[800]} !important;
+                background-color: ${palette[200]} !important;
             }
 
             #drop a {
-                background-color: ${palette[600]} !important;
-                color: ${palette[100]} !important;
+                background-color: ${palette[400]} !important;
+                color: ${palette[900]} !important;
             }
 
             [data-theme="dark"] .btn-warning {
-                color: ${palette[100]} !important;
-                background-color: ${palette[600]} !important;
-                border-color: ${palette[600]} !important;
-            }
-
-            .btn-warning {
-                color: ${palette[100]} !important;
-                background-color: ${palette[500]} !important;
+                color: ${palette[900]} !important;
+                background-color: ${palette[400]} !important;
                 border-color: ${palette[400]} !important;
             }
 
+            .btn-warning {
+                color: ${palette[900]} !important;
+                background-color: ${palette[500]} !important;
+                border-color: ${palette[600]} !important;
+            }
+
             [data-theme="dark"] .btn-warning:hover {
-                color: ${palette[100]} !important;
-                background-color: ${palette[700]} !important;
-                border-color: ${palette[700]} !important;
+                color: ${palette[900]} !important;
+                background-color: ${palette[300]} !important;
+                border-color: ${palette[300]} !important;
             }
 
             .btn-warning:hover, .btn-warning:focus, .btn-warning.focus, .btn-warning:active, .btn-warning.active, .open > .dropdown-toggle.btn-warning {
-                color: ${palette[100]} !important;
-                background-color: ${palette[600]} !important;
+                color: ${palette[900]} !important;
+                background-color: ${palette[400]} !important;
                 border-color: ${palette[500]} !important;
             }
 
             [data-theme="dark"] .btn-primary {
-                color: ${palette[100]} !important;
-                background-color: ${palette[700]} !important;
-                border-color: ${palette[700]} !important;
+                color: ${palette[900]} !important;
+                background-color: ${palette[300]} !important;
+                border-color: ${palette[300]} !important;
             }
 
             .btn-primary {
-                color: ${palette[100]} !important;
+                color: ${palette[900]} !important;
                 background-color: ${palette[500]} !important;
-                border-color: ${palette[400]} !important;
+                border-color: ${palette[600]} !important;
             }
 
             [data-theme="dark"] .btn-primary:hover {
-                color: ${palette[100]} !important;
-                background-color: ${palette[800]} !important;
-                border-color: ${palette[800]} !important;
+                color: ${palette[900]} !important;
+                background-color: ${palette[200]} !important;
+                border-color: ${palette[200]} !important;
             }
 
             .btn-primary:hover, .btn-primary:focus, .btn-primary.focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
-                color: ${palette[100]} !important;
-                background-color: ${palette[600]} !important;
+                color: ${palette[900]} !important;
+                background-color: ${palette[400]} !important;
                 border-color: ${palette[500]} !important;
             }
 
             #drop a:hover {
-                background-color: ${palette[700]} !important;
+                background-color: ${palette[300]} !important;
             }
 
             [data-theme="dark"] .alert-info {
-                color: ${palette[100]} !important;
+                color: ${palette[900]} !important;
                 background-color: ${palette[500]} !important;
                 border-color: ${palette[500]} !important;
             }
 
             .alert-info {
-                background-color: ${palette[100]} !important;
-                border-color: ${palette[200]} !important;
-                color: ${palette[800]} !important;
+                background-color: ${palette[900]} !important;
+                border-color: ${palette[800]} !important;
+                color: ${palette[200]} !important;
             }
 
             #rd-side_icon {
-                border: 1px solid ${palette[700]} !important;
+                border: 1px solid ${palette[300]} !important;
             }
 
             .rd_sidebar-header {
-                background-color: ${palette[900]} !important;
+                background-color: ${palette[100]} !important;
             }
 
             .rd_sidebar main {
-                background-color: ${palette[50]} !important;
+                background-color: ${palette[950]} !important;
             }
 
             .black-click {
-                background-color: ${palette[900]} !important;
+                background-color: ${palette[100]} !important;
             }
 
             [href*="/the-loai/"]:hover {
-                background-color: ${palette[300]} !important;
-                border: 1px solid ${palette[600]} !important;
-                color: ${palette[800]} !important;
+                background-color: ${palette[700]} !important;
+                border: 1px solid ${palette[400]} !important;
+                color: ${palette[200]} !important;
             }
 
             .button.button-green:hover,
             .button.button-red:hover {
-                background-color: ${palette[900]} !important;
+                background-color: ${palette[100]} !important;
             }
 
             .ln-comment-toolkit-item:hover {
-                background-color: ${palette[700]} !important;
+                background-color: ${palette[300]} !important;
                 color: ${textColor} !important;
             }
 
-            .ring-cyan-500 {
-              --tw-ring-color: ${palette[500]} !important;
+            :is(.dark .dark\:ring-cyan-900) {
+                --tw-ring-color: ${palette[100]} !important;
             }
 
             .button-blue {
                 background-color: ${palette[500]};
-                border-color: ${palette[700]};
+                border-color: ${palette[300]};
                 color: ${textColor};
             }
 
@@ -875,35 +883,36 @@
 
             .noti-unread {
               background-color: ${palette[500]};
-              border-bottom: 1px solid ${palette[700]};
+              border-bottom: 1px solid ${palette[300]};
               color: ${textColor};
             }
 
             .statistic-list, .feature-section .summary-wrapper,
             .statistic-list .block-wide.at-mobile {
-                border-top-color: ${palette[200]} !important;
+                border-top-color: ${palette[800]} !important;
             }
 
             .statistic-list .block-wide.at-mobile {
-                border-bottom-color: ${palette[200]} !important;
+                border-bottom-color: ${palette[800]} !important;
             }
 
             .user-private-tabs li a {
-                border-bottom-color: ${palette[800]} !important;
+                border-bottom-color: ${palette[200]} !important;
             }
         `;
 
         GM_addStyle(css);
-        debugLog('Applied light Monet theme with dominant color:', palette[500]);
+        debugLog('Đã áp dụng Monet theme với màu chủ đạo:', palette[500]);
     }
     
     function applyDefaultColorScheme() {
         // Lấy màu mặc định từ config, fallback về màu cũ nếu không có
-        const defaultColor = '#FCE4EC';
+        const defaultColor = (window.HMTConfig && window.HMTConfig.getDefaultColor) ?
+            window.HMTConfig.getDefaultColor() : '#FCE4EC';
         const defaultPalette = MonetAPI.generateMonetPalette(defaultColor);
         
         if (!defaultPalette) {
-            debugLog('Cannot generate default palette');
+            debugLog('Không thể tạo palette mặc định');
             return;
         }
         
@@ -929,13 +938,13 @@
             .paging_item.paging_prevnext.next:hover,
             .paging_item.paging_prevnext.prev:hover {
                 background-color: ${defaultColor} !important;
-                color: #000 !important;
+                color: ${textColor} !important;
             }
             
             .series-type,
             .series-owner.group-mem,
-            .series-users .series-owner.group-admin,
             .series-users .series-owner.group-mod,
+            .series-users .series-owner.group-admin,
             .ln-comment-form input.button {
                 background-color: ${defaultColor} !important;
             }
@@ -943,7 +952,7 @@
             .series-type,
             .ln-comment-form input.button,
             .series-users .series-owner_name a {
-                color: #000 !important;
+                color: ${textColor} !important;
             }
             
             .feature-section .series-type:before {
@@ -956,7 +965,7 @@
             
             #navbar,
             .noti-sidebar .noti-more {
-                background-color: ${defaultPalette[800]} !important;
+                background-color: ${defaultPalette[200]} !important;
             }
             
             .navbar-menu.at-mobile,
@@ -969,7 +978,7 @@
             .noti-sidebar,
             #sidenav-icon.active,
             .navbar-menu {
-                background-color: ${defaultPalette[800]} !important;
+                background-color: ${defaultPalette[200]} !important;
             }
             
             #navbar-user#guest-menu ul.nav-submenu,
@@ -980,17 +989,17 @@
             .navbar-menu.at-mobile,
             .navbar-menu.at-navbar .nav-submenu,
             .noti-sidebar {
-                box-shadow: 0 0 14px ${defaultPalette[900]} !important;
+                box-shadow: 0 0 14px ${defaultPalette[100]} !important;
             }
             
             .navbar-menu {
-                border-bottom-color: ${defaultPalette[900]} !important;
+                border-bottom-color: ${defaultPalette[100]} !important;
             }
             
             #mainpart,
             #mainpart.at-index,
             body:not(.mce-content-body) {
-                background-color: ${defaultPalette[1000]} !important;
+                background-color: ${defaultPalette[0]} !important;
             }
             
             .basic-section,
@@ -1007,8 +1016,8 @@
             .series-users,
             .showcase-item,
             .sub-index-style {
-                background-color: ${defaultPalette[900]} !important;
-                border-color: ${defaultPalette[900]} ${defaultPalette[1000]} ${defaultPalette[1000]} !important;
+                background-color: ${defaultPalette[100]} !important;
+                border-color: ${defaultPalette[100]} ${defaultPalette[0]} ${defaultPalette[0]} !important;
             }
             
             #licensed-list header.section-title,
@@ -1017,53 +1026,61 @@
             .detail-list header.section-title,
             .modal-header,
             .private-tabs header {
-                background-color: ${defaultPalette[800]} !important;
+                background-color: ${defaultPalette[200]} !important;
             }
             
             .bg-gray-100 {
-                background-color: ${defaultPalette[100]} !important;
-            }
-            
-            #footer {
-                background-color: ${defaultPalette[800]} !important;
-            }
-
-            .noti-item.untouch {
-                background-color: ${defaultPalette[700]} !important;
-            }
-            
-            .noti-item {
-                border-color: ${defaultPalette[700]} !important;
-            }
-            
-            .noti-item:hover {
-                background-color: ${defaultPalette[800]} !important;
-            }
-            
-            #noti-icon.active .icon-wrapper {
                 background-color: ${defaultPalette[900]} !important;
             }
             
+            #footer {
+                background-color: ${defaultPalette[200]} !important;
+            }
+
+            :is(.dark .dark\\:\\!bg-zinc-800) {
+                background-color: ${defaultPalette[200]} !important;
+            }
+            
+            .noti-item.untouch {
+                background-color: ${defaultPalette[300]} !important;
+            }
+            
+            .noti-item {
+                border-color: ${defaultPalette[300]} !important;
+            }
+            
+            .noti-item:hover {
+                background-color: ${defaultPalette[200]} !important;
+            }
+            
+            #noti-icon.active .icon-wrapper {
+                background-color: ${defaultPalette[100]} !important;
+            }
+            
+            :is(.dark .dark\\:hover\\:\\!bg-zinc-700:hover) {
+                background-color: ${defaultPalette[300]} !important;
+            }
+            
             ul.list-chapters li:hover {
-                background-color: ${defaultPalette[700]} !important;
+                background-color: ${defaultPalette[300]} !important;
             }
             
             ul.list-chapters li:nth-child(2n) {
-                background-color: ${defaultPalette[800]} !important;
+                background-color: ${defaultPalette[200]} !important;
             }
 
             .navbar-menu.at-mobile li {
-                border-bottom-color: ${defaultPalette[700]} !important;
+                border-bottom-color: ${defaultPalette[300]} !important;
             }
             
             .nav-submenu {
-                background-color: ${defaultPalette[800]} !important;
-                border-bottom-color: ${defaultPalette[700]} !important;
+                background-color: ${defaultPalette[200]} !important;
+                border-bottom-color: ${defaultPalette[300]} !important;
             }
             
             #noti-icon.active,
             .nav-user_icon.active {
-                background-color: ${defaultPalette[800]} !important;
+                background-color: ${defaultPalette[200]} !important;
             }
 
             .summary-more.more-state:hover,
@@ -1080,7 +1097,7 @@
             }
             
             .ln-comment-group:nth-child(odd) .expand {
-                background: linear-gradient(180deg, rgba(248,249,250,0) 1%, ${defaultPalette[50]} 75%, ${defaultPalette[50]}) !important;
+                background: linear-gradient(180deg, rgba(248,249,250,0) 1%, ${defaultPalette[200]} 75%, ${defaultPalette[200]}) !important;
             }
             
             .visible-toolkit .visible-toolkit-item.do-like.liked {
@@ -1091,58 +1108,62 @@
 
             /* Additional styles for TinyMCE editor and search */
             .navbar-search .search-input {
-                background-color: ${defaultPalette[900]} !important;
+                background-color: ${defaultPalette[100]} !important;
             }
 
             .button-green {
-                background-color: ${defaultPalette[400]} !important;
-                border-color: ${defaultPalette[600]} !important;
-                color: #000 !important;
+                background-color: ${defaultPalette[600]} !important;
+                border-color: ${defaultPalette[400]} !important;
+                color: ${textColor} !important;
+            }
+
+            :is(.dark .dark\:ring-cyan-900) {
+                --tw-ring-color: ${defaultPalette[200]} !important;
             }
 
             #mainpart.reading-page.style-6 #rd-side_icon {
-                background-color: ${defaultPalette[800]} !important;
+                background-color: ${defaultPalette[200]} !important;
             }
 
             #rd-side_icon {
-                border: 1px solid ${defaultPalette[700]} !important;
+                border: 1px solid ${defaultPalette[300]} !important;
             }
 
             .rd_sidebar-header {
-                background-color: ${defaultPalette[900]} !important;
+                background-color: ${defaultPalette[100]} !important;
             }
 
             .rd_sidebar main {
-                background-color: ${defaultPalette[50]} !important;
+                background-color: ${defaultPalette[950]} !important;
             }
 
             .black-click {
-                background-color: ${defaultPalette[900]} !important;
+                background-color: ${defaultPalette[100]} !important;
             }
 
             [href*="/the-loai/"]:hover {
-                background-color: ${defaultPalette[300]} !important;
-                border: 1px solid ${defaultPalette[600]} !important;
-                color: ${defaultPalette[800]} !important;
+                background-color: ${defaultPalette[700]} !important;
+                border: 1px solid ${defaultPalette[400]} !important;
+                color: ${defaultPalette[200]} !important;
             }
 
             .button.button-green:hover,
             .button.button-red:hover {
-                background-color: ${defaultPalette[900]} !important;
+                background-color: ${defaultPalette[100]} !important;
             }
 
             .ln-comment-toolkit-item:hover {
-                background-color: ${defaultPalette[700]} !important;
+                background-color: ${palette[300]} !important;
                 color: ${textColor} !important;
             }
 
-            .ring-cyan-500 {
-              --tw-ring-color: ${defaultPalette[500]} !important;
+            :is(.dark .dark\\:ring-cyan-900) {
+                --tw-ring-color: ${defaultPalette[100]} !important;
             }
 
             .button-blue {
                 background-color: ${defaultPalette[500]};
-                border-color: ${defaultPalette[700]};
+                border-color: ${defaultPalette[300]};
                 color: ${textColor};
             }
 
@@ -1153,32 +1174,32 @@
 
             .noti-unread {
               background-color: ${defaultPalette[500]};
-              border-bottom: 1px solid ${defaultPalette[700]};
+              border-bottom: 1px solid ${defaultPalette[300]};
               color: ${textColor};
             }
 
             .statistic-list, .feature-section .summary-wrapper,
             .statistic-list .block-wide.at-mobile {
-                border-top-color: ${defaultPalette[200]} !important;
+                border-top-color: ${defaultPalette[800]} !important;
             }
 
             .statistic-list .block-wide.at-mobile {
-                border-bottom-color: ${defaultPalette[200]} !important;
+                border-bottom-color: ${defaultPalette[800]} !important;
             }
 
             .user-private-tabs li a {
-                border-bottom-color: ${defaultPalette[800]} !important;
+                border-bottom-color: ${defaultPalette[200]} !important;
             }
         `;
 
         GM_addStyle(css);
-        debugLog('Applied default light color scheme:', defaultColor);
+        debugLog('Đã áp dụng màu mặc định từ config:', defaultColor);
     }
     
     // Khởi chạy module
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initPageInfoTruyenLight);
+        document.addEventListener('DOMContentLoaded', initPageInfoTruyen);
     } else {
-        initPageInfoTruyenLight();
+        initPageInfoTruyen();
     }
 })();
