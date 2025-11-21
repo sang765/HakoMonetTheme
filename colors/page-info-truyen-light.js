@@ -617,7 +617,7 @@ function rgbToHex(r, g, b) {
             }
             
             .bg-gray-100 {
-                background-color: ${palette[100]} !important;
+                background-color: ${palette[200]} !important;
             }
             
             #footer {
@@ -1035,7 +1035,7 @@ function rgbToHex(r, g, b) {
             }
             
             .bg-gray-100 {
-                background-color: ${defaultPalette[100]} !important;
+                background-color: ${defaultPalette[200]} !important;
             }
             
             #footer {
