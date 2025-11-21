@@ -858,7 +858,8 @@
                 border-top-color: ${palette[800]} !important;
             }
 
-            .statistic-list .block-wide.at-mobile {
+            .statistic-list .block-wide.at-mobile,
+            .account-sidebar li {
                 border-bottom-color: ${palette[800]} !important;
             }
 
@@ -1153,7 +1154,8 @@
                 border-top-color: ${defaultPalette[800]} !important;
             }
 
-            .statistic-list .block-wide.at-mobile {
+            .statistic-list .block-wide.at-mobile,
+            .account-sidebar li {
                 border-bottom-color: ${defaultPalette[800]} !important;
             }
 
