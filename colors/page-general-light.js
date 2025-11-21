@@ -18,9 +18,9 @@
     }
 
     function initPageGeneral() {
-        // Check if in dark mode
-        if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
-            debugLog('Not in light mode, skipping light theme application');
+        // Check if in light mode
+        if (!window.__themeDetectorLoaded || !window.ThemeDetector || window.ThemeDetector.isDark()) {
+            debugLog('In dark mode, skipping light theme application');
             return;
         }
 
@@ -180,11 +180,11 @@
         (window.top || window).document.addEventListener('hmtColorChanged', function(event) {
             debugLog('Nhận sự kiện màu sắc thay đổi:', event.detail);
 
-            // Check if in dark mode
-            if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
-            debugLog('Not in light mode, skipping light theme application');
-            return;
-        }
+            // Check if in light mode
+            if (!window.__themeDetectorLoaded || !window.ThemeDetector || window.ThemeDetector.isDark()) {
+                debugLog('In dark mode, skipping light theme application');
+                return;
+            }
 
             // Kiểm tra chế độ màu và cài đặt trích xuất màu từ avatar
             const colorMode = window.HMTConfig && window.HMTConfig.getColorMode ? window.HMTConfig.getColorMode() : 'default';
@@ -217,11 +217,11 @@
             const isDisabled = event.detail.disabled;
             debugLog('Nhận sự kiện tắt màu thay đổi:', isDisabled);
 
-            // Check if in dark mode
-            if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
-            debugLog('Not in light mode, skipping light theme application');
-            return;
-        }
+            // Check if in light mode
+            if (!window.__themeDetectorLoaded || !window.ThemeDetector || window.ThemeDetector.isDark()) {
+                debugLog('In dark mode, skipping light theme application');
+                return;
+            }
 
             if (document.querySelector('.rd-basic_icon.row')) {
                 if (isDisabled) {
@@ -276,11 +276,11 @@
             const newMode = event.detail.mode;
             debugLog('Nhận sự kiện chế độ màu thay đổi:', newMode);
 
-            // Check if in dark mode
-            if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
-            debugLog('Not in light mode, skipping light theme application');
-            return;
-        }
+            // Check if in light mode
+            if (!window.__themeDetectorLoaded || !window.ThemeDetector || window.ThemeDetector.isDark()) {
+                debugLog('In dark mode, skipping light theme application');
+                return;
+            }
 
             if (document.querySelector('.rd-basic_icon.row')) {
                 const isDisabled = window.HMTConfig.getDisableColorsOnReadingPage();
@@ -340,11 +340,11 @@
             const extract = event.detail.extract;
             debugLog('Nhận sự kiện trích xuất màu từ avatar thay đổi:', extract);
 
-            // Check if in dark mode
-            if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
-            debugLog('Not in light mode, skipping light theme application');
-            return;
-        }
+            // Check if in light mode
+            if (!window.__themeDetectorLoaded || !window.ThemeDetector || window.ThemeDetector.isDark()) {
+                debugLog('In dark mode, skipping light theme application');
+                return;
+            }
 
             // Áp dụng lại màu dựa trên cài đặt mới
             applyCurrentColorScheme();

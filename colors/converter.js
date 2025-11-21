@@ -39,11 +39,11 @@ function reverseDefaultPalette(content) {
 
 // Function to change theme check
 function changeThemeCheck(content) {
-    // Invert theme detection logic for light mode (breaking change fix)
+    // Fix theme detection logic for light mode (breaking change fix)
     content = content.replace(
         /if \(!window\.__themeDetectorLoaded \|\| !window\.ThemeDetector \|\| !window\.ThemeDetector\.isDark\(\)\) \{[\s\S]*?debugLog\('Not in dark mode, skipping color application'\);[\s\S]*?return;[\s\S]*?\}/g,
-        `if (!window.__themeDetectorLoaded || !window.ThemeDetector || !window.ThemeDetector.isDark()) {
-            debugLog('Not in light mode, skipping light theme application');
+        `if (!window.__themeDetectorLoaded || !window.ThemeDetector || window.ThemeDetector.isDark()) {
+            debugLog('In dark mode, skipping light theme application');
             return;
         }`
     );
