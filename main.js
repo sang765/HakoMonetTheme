@@ -38,127 +38,70 @@
             console.error('[Main] Update Checker API not loaded');
             debugLog('Update Checker API chưa được tải');
         }
-        
-        // Load các module
-        try {
-            const monetJS = GM_getResourceText('monetJS');
-            const updateCheckerJS = GM_getResourceText('updateCheckerJS');
-            const simpleCORSJS = GM_getResourceText('simpleCORSJS');
-            const themeDetectorJS = GM_getResourceText('themeDetectorJS');
-            const infoTruyenJS = GM_getResourceText('infoTruyenJS');
-            const animationJS = GM_getResourceText('animationJS');
-            const monetAPIJS = GM_getResourceText('monetAPIJS');
-            const monetTestJS = GM_getResourceText('monetTestJS');
-            const tagColorJS = GM_getResourceText('tagColorJS');
-            const colorinfotruyen = GM_getResourceText('colorinfotruyen');
-            const imageAnalyzerJS = GM_getResourceText('imageAnalyzerJS');
-            const html2canvasJS = GM_getResourceText('html2canvasJS');
-            const colorisJS = GM_getResourceText('colorisJS');
-            const colorisCSS = GM_getResourceText('colorisCSS');
-            const configJS = GM_getResourceText('configJS');
-            const adBlockerJS = GM_getResourceText('adBlockerJS');
-            const antiPopupJS = GM_getResourceText('antiPopupJS');
-            const fullscreenJS = GM_getResourceText('fullscreenJS');
-            const deviceCSSLoaderJS = GM_getResourceText('deviceCSSLoaderJS');
 
-            // Load các module theo thứ tự
-            console.log('[Main] Loading update-checker.js');
-            loadScript(updateCheckerJS, 'update-checker.js');
-            loadScript(simpleCORSJS, 'simple-cors.js');
-            loadScript(themeDetectorJS, 'theme-detector.js');
-            loadScript(imageAnalyzerJS, 'image-analyzer.js');
-            loadScript(html2canvasJS, 'html2canvas.min.js');
-            loadScript(colorisJS, 'coloris.min.js');
+        // Kiểm tra cập nhật tự động được xử lý bởi update-checker API
+        // để tránh duplicate notifications
 
-            // Load Coloris CSS
-            if (colorisCSS) {
-                GM_addStyle(colorisCSS);
-                debugLog('Đã tải Coloris CSS');
+        // Thêm CSS cho update notification
+        GM_addStyle(`
+            .hmt-update-notification {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 15px 20px;
+                border-radius: 10px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+                z-index: 10000;
+                max-width: 300px;
+                animation: hmtSlideIn 0.5s ease-out;
+                cursor: pointer;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             }
 
-            loadScript(infoTruyenJS, 'info-truyen.js');
-            loadScript(tagColorJS, 'tag-color.js');
-            loadScript(monetAPIJS, 'monet.js');
-            loadScript(monetTestJS, 'monet-test.js');
-            loadScript(animationJS, 'animation.js');
-            loadScript(monetJS, 'monet.js');
-            loadScript(configJS, 'config.js');
-            loadScript(adBlockerJS, 'ad-blocker.js');
-            loadScript(antiPopupJS, 'anti-popup.js');
-            loadScript(fullscreenJS, 'fullscreen.js');
-            loadScript(colorinfotruyen, 'info-truyen-dark.js');
-            loadScript(deviceCSSLoaderJS, 'device-css-loader.js');
-            
-            debugLog('Tất cả module đã được tải');
+            .hmt-update-notification h4 {
+                margin: 0 0 8px 0;
+                font-size: 16px;
+                font-weight: 600;
+            }
 
-            // Kiểm tra cập nhật tự động được xử lý bởi update-checker API
-            // để tránh duplicate notifications
+            .hmt-update-notification p {
+                margin: 0;
+                font-size: 14px;
+                opacity: 0.9;
+            }
 
-            // Thêm CSS cho update notification
-            GM_addStyle(`
-                .hmt-update-notification {
-                    position: fixed;
-                    bottom: 20px;
-                    right: 20px;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    color: white;
-                    padding: 15px 20px;
-                    border-radius: 10px;
-                    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-                    z-index: 10000;
-                    max-width: 300px;
-                    animation: hmtSlideIn 0.5s ease-out;
-                    cursor: pointer;
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            .hmt-update-notification .close-btn {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: rgba(255, 255, 255, 0.2);
+                border: none;
+                color: white;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                cursor: pointer;
+                font-size: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            @keyframes hmtSlideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
                 }
-                
-                .hmt-update-notification h4 {
-                    margin: 0 0 8px 0;
-                    font-size: 16px;
-                    font-weight: 600;
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
                 }
-                
-                .hmt-update-notification p {
-                    margin: 0;
-                    font-size: 14px;
-                    opacity: 0.9;
-                }
-                
-                .hmt-update-notification .close-btn {
-                    position: absolute;
-                    top: 10px;
-                    right: 10px;
-                    background: rgba(255, 255, 255, 0.2);
-                    border: none;
-                    color: white;
-                    width: 20px;
-                    height: 20px;
-                    border-radius: 50%;
-                    cursor: pointer;
-                    font-size: 12px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-                
-                @keyframes hmtSlideIn {
-                    from {
-                        transform: translateX(100%);
-                        opacity: 0;
-                    }
-                    to {
-                        transform: translateX(0);
-                        opacity: 1;
-                    }
-                }
-            `);
-            
-        } catch (error) {
-            debugLog('Lỗi khi tải module:', error);
-            
-            // Hiển thị thông báo lỗi
-            showErrorNotification('Lỗi khi tải HakoMonetTheme. Vui lòng làm mới trang.');
-        }
+            }
+        `);
+
+        debugLog('Khởi tạo HakoMonetTheme hoàn tất');
     }
     
     function showErrorNotification(message) {

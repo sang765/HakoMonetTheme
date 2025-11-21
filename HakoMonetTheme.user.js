@@ -6,9 +6,9 @@
 // @description:vi Material You theme dành cho Hako/DocLN.
 // @icon         https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/.github/assets/logo.png
 // @author       sang765
-// @match        https://docln.sbs/*
-// @match        https://docln.net/*
-// @match        https://ln.hako.vn/*
+// @match        *://docln.sbs/*
+// @match        *://docln.net/*
+// @match        *://ln.hako.vn/*
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
 // @grant        GM_xmlhttpRequest
