@@ -38,10 +38,10 @@ const resourcePaths = {
     animationJS: 'http://localhost:8080/class/animation.js',
     tagColorJS: 'http://localhost:8080/class/tag-color.js',
     fontImportJS: 'http://localhost:8080/class/font-import.js',
-    colorinfotruyen: 'http://localhost:8080/canvas/page-info-truyen-dark.js',
-    pagegeneralJS: 'http://localhost:8080/canvas/page-general-dark.js',
-    pagegenerallightJS: 'http://localhost:8080/canvas/page-general-light.js',
-    colorinfotruyenlight: 'http://localhost:8080/canvas/page-info-truyen-light.js',
+    colorinfotruyen: 'http://localhost:8080/colors/page-info-truyen-dark.js',
+    pagegeneralJS: 'http://localhost:8080/colors/page-general-dark.js',
+    pagegenerallightJS: 'http://localhost:8080/colors/page-general-light.js',
+    colorinfotruyenlight: 'http://localhost:8080/colors/page-info-truyen-light.js',
     themeDetectorJS: 'http://localhost:8080/module/theme-detector.js',
     deviceDetectorJS: 'http://localhost:8080/module/device-detector.js',
     configJS: 'http://localhost:8080/module/config.js',
@@ -332,8 +332,7 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
         const resources = [
             'mainJS', 'monetAPIJS', 'monetTestJS', 'updateCheckerJS', 'CORSJS', 'infoTruyenJS',
             'animationJS', 'tagColorJS', 'fontImportJS', 'colorinfotruyen',
-            'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyenlight', 'themeDetectorJS',
-            'deviceDetectorJS', 'configJS', 'adBlockerJS', 'autoReloadJS', 'antiPopupJS',
+            'themeDetectorJS', 'deviceDetectorJS', 'configJS', 'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyenlight', 'adBlockerJS', 'autoReloadJS', 'antiPopupJS',
             'mainMenuJS', 'navbarLogoJS', 'updateManagerJS', 'darkModePrompterJS', 'fullscreenJS',
             'readingPageJS', 'deviceCSSLoaderJS', 'profileBannerCropperJS'
         ];
