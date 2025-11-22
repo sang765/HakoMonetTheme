@@ -3,7 +3,8 @@
 
     // Constants for better maintainability and readability
     const DEBUG = GM_getValue('debug_mode', false);
-    const FOLDER_URL = 'https://sang765.github.io/HakoMonetTheme/styles/';
+    const IS_LOCAL = GM_info.script.version === 'LocalDev';
+    const FOLDER_URL = IS_LOCAL ? 'http://localhost:8080/styles/' : 'https://sang765.github.io/HakoMonetTheme/styles/';
     const CSS_FILE = 'userscript/mainmenu/hmt-main-menu.css';
     const CSS_MAP_FILE = 'userscript/mainmenu/hmt-main-menu.css.map';
     const DIALOG_CLASS = 'hmt-main-menu-dialog';
@@ -18,7 +19,6 @@
     const DISCORD_URL = 'https://discord.gg/uvQ6A3CDPq';
     const UPDATE_CHECK_INTERVAL = 5 * 60 * 1000; // 5 minutes
     const NOTIFICATION_TIMEOUT = 3000;
-    const IS_LOCAL = GM_info.script.version === 'LocalDev';
 
     // Cached CSS blob URL to avoid repeated fetches
     let cachedCssBlobUrl = null;
@@ -157,7 +157,7 @@
                             ${IS_LOCAL ? `
                             <div class="${MENU_ITEM_CLASS}" data-action="reload-resources">
                                 <div class="hmt-menu-icon" id="local-icon-only">🔄</div>
-                                <div class="hmt-menu-text">
+                                <div class="hmt-menu-text" id="local-text-only">
                                     <h4>Reload Resources</h4>
                                     <p>Cập nhật code local mà không reload trang</p>
                                 </div>

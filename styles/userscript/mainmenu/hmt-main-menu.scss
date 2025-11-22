@@ -154,7 +154,7 @@
     width: 48px;
     height: 48px;
     border-radius: 12px;
-    background: linear-gradient(135deg, #ea6666 0%, #4b86a2 100%);
+    background: linear-gradient(135deg, #ea6666 0%, #4b86a2 100%) !important;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -162,6 +162,40 @@
     color: white;
     margin-right: 16px;
     flex-shrink: 0;
+}
+
+#local-text-only h4 {
+    background: linear-gradient(135deg, #ff6b35 0%, #f7931e 50%, #ffd23f 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+    font-weight: 700;
+    animation: gradientShift 3s ease-in-out infinite;
+    transition: all 0.3s ease;
+}
+
+#local-text-only h4:hover {
+    animation-duration: 1s;
+    transform: scale(1.05);
+}
+
+/* Dark mode support for gradient text */
+body.dark #local-text-only h4 {
+    background: linear-gradient(135deg, #ff8c42 0%, #ffb347 50%, #ffed4e 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+    animation: gradientShift 3s ease-in-out infinite;
+    transition: all 0.3s ease;
+}
+
+body.dark #local-text-only h4:hover {
+    animation-duration: 1s;
+    transform: scale(1.05);
 }
 
 .hmt-menu-text h4 {
@@ -261,6 +295,18 @@
     to {
         opacity: 1;
         transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
     }
 }
 

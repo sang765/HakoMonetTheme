@@ -1,25 +1,9 @@
-/**
- * File cấu hình của HakoMonetTheme
- *
- * File này quản lý tất cả các cài đặt và tùy chọn của theme. Nó giúp người dùng
- * tùy chỉnh giao diện và cách hoạt động của theme trên trang web một cách dễ dàng.
- *
- * Các tính năng chính:
- * - Chọn màu sắc mặc định: Cho phép chọn màu chủ đạo khi không thể lấy màu từ ảnh bìa truyện
- * - Ẩn cảnh báo tên miền: Ẩn các thông báo cảnh báo về tên miền không chính thức
- * - Tắt màu trên trang đọc truyện: Ngăn theme áp dụng màu sắc vào trang đọc truyện
- * - Chế độ màu: Chọn giữa sử dụng màu từ cấu hình hoặc từ ảnh bìa truyện
- *
- * Cách sử dụng:
- * File này tự động tải khi theme khởi động và cung cấp giao diện cài đặt
- * thông qua menu chính của HakoMonetTheme.
- */
-
 (function() {
     'use strict';
 
     const DEBUG = GM_getValue('debug_mode', false);
-    const FOLDER_URL = 'https://sang765.github.io/HakoMonetTheme/styles/';
+    const IS_LOCAL = GM_info.script.version === 'LocalDev';
+    const FOLDER_URL = IS_LOCAL ? 'http://localhost:8080/styles/' : 'https://sang765.github.io/HakoMonetTheme/styles/';
     const CSS_FILE = 'userscript/configmenu/hmt-config-menu.css';
     const CSS_MAP_FILE = 'userscript/configmenu/hmt-config-menu.css.map';
 
@@ -27,9 +11,9 @@
     let cachedCssBlobUrl = null;
 
     // Coloris library URLs (local versions for userscript compatibility)
-    const COLORIS_CSS_URL = 'https://sang765.github.io/HakoMonetTheme/api/coloris.min.css';
-    const COLORIS_JS_URL = 'https://sang765.github.io/HakoMonetTheme/api/coloris.min.js';
-    const COLORIS_COLORS_URL = 'https://sang765.github.io/HakoMonetTheme/api/coloris-colors.json';
+    const COLORIS_CSS_URL = IS_LOCAL ? 'http://localhost:8080/api/coloris.min.css' : 'https://sang765.github.io/HakoMonetTheme/api/coloris.min.css';
+    const COLORIS_JS_URL = IS_LOCAL ? 'http://localhost:8080/api/coloris.min.js' : 'https://sang765.github.io/HakoMonetTheme/api/coloris.min.js';
+    const COLORIS_COLORS_URL = IS_LOCAL ? 'http://localhost:8080/api/coloris-colors.json' : 'https://sang765.github.io/HakoMonetTheme/api/coloris-colors.json';
 
     // Cached Coloris resources
     let cachedColorisCss = null;
