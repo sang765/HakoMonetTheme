@@ -875,6 +875,10 @@
             #footer span {
                 color: ${palette[700]} !important;
             }
+
+            .text-indigo-600 {
+                color: ${palette[500]} !important;
+            }
         `;
 
         GM_addStyle(css);
@@ -1170,6 +1174,10 @@
 
             #footer span {
                 color: ${defaultPalette[700]} !important;
+            }
+
+            .text-indigo-600 {
+                color: ${defaultPalette[500]} !important;
             }
         `;
 
