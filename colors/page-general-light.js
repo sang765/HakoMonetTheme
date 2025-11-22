@@ -1114,10 +1114,12 @@
 
             .daily-recent_views .top-tab_title.title-active {
                 background-color: ${palette[400]} !important;
+                color: #000;
             }
 
             .sts-bold {
                 background-color: ${palette[400]} !important;
+                color: #000;
             }
 
             .filters-wrapper {
@@ -1749,6 +1751,7 @@
 
             .daily-recent_views .top-tab_title.title-active {
                 background-color: ${defaultPalette[400]} !important;
+                color: #000;
             }
 
             .sts-bold {
