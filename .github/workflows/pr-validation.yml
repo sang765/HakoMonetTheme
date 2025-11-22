@@ -1,0 +1,46 @@
+name: PR Validation
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Get diff excluding local files
+      id: diff
+      run: |
+        git diff --no-pager main...HEAD -- . \
+          ':(exclude)HakoMonetTheme.user.js' \
+          ':(exclude)run_local_host.bat' \
+          ':(exclude)run_local_host.sh' \
+          ':(exclude)docs/local-tutorial.md' \
+          ':(exclude)README.md' \
+          ':(exclude).github/workflows/pr-validation.yml' > diff.txt
+        if [ -s diff.txt ]; then
+          echo "has_changes=true" >> $GITHUB_OUTPUT
+          echo "## Diff excluding local development files" > comment.md
+          echo "" >> comment.md
+          echo '```diff' >> comment.md
+          cat diff.txt >> comment.md
+          echo '```' >> comment.md
+        else
+          echo "has_changes=false" >> $GITHUB_OUTPUT
+          echo "No changes found excluding local development files." > comment.md
+        fi
+    - name: Comment on PR
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const comment = fs.readFileSync('comment.md', 'utf8');
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
