@@ -964,7 +964,8 @@
             .basic-section .sect-header,
             .detail-list header.section-title,
             .modal-header,
-            .private-tabs header {
+            .private-tabs header,
+            .comment_toolkit {
                 background-color: ${palette[800]} !important;
             }
 
@@ -1142,6 +1143,14 @@
 
             :is(.dark .dark\\:ring-cyan-900) {
                 --tw-ring-color: ${palette[800]} !important;
+            }
+
+            :is(.dark .dark\\:bg-zinc-900) {
+                background-color: ${palette[900]};
+            }
+
+            :is(.dark .dark\\:bg-zinc-800) {
+                background-color: ${palette[800]};
             }
 
             #mainpart.custome-page, #mainpart.page-board {
@@ -1376,10 +1385,6 @@
                 border-right-color: ${palette[900]} !important;
             }
 
-            :is(.dark .dark\\:ring-cyan-900) {
-                --tw-ring-color: ${palette[900]} !important;
-            }
-
             .button-blue {
               background-color: ${palette[500]};
               border-color: ${palette[700]};
@@ -1607,7 +1612,8 @@
             .basic-section .sect-header,
             .detail-list header.section-title,
             .modal-header,
-            .private-tabs header {
+            .private-tabs header,
+            .comment_toolkit {
                 background-color: ${defaultPalette[800]} !important;
             }
 
@@ -1769,10 +1775,6 @@
 
             .paging_item {
                 color: ${defaultPalette[400]} !important;
-            }
-
-            :is(.dark .dark\\:ring-cyan-900) {
-                --tw-ring-color: ${defaultPalette[800]} !important;
             }
 
             .button-green {
@@ -1981,7 +1983,15 @@
             }
 
             :is(.dark .dark\\:ring-cyan-900) {
-                --tw-ring-color: ${defaultPalette[900]} !important;
+                --tw-ring-color: ${defaultPalette[800]} !important;
+            }
+
+            :is(.dark .dark\\:bg-zinc-900) {
+                background-color: ${defaultPalette[900]};
+            }
+
+            :is(.dark .dark\\:bg-zinc-800) {
+                background-color: ${defaultPalette[800]};
             }
 
             .button-blue {

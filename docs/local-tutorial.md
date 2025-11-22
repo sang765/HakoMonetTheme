@@ -139,6 +139,15 @@ npx http-server -p 8080 -c-1 --cors
 - Restart userscript manager
 - Kiểm tra file có được save không
 
+### Cloudflare Rate Limit
+
+Nếu bạn gặp lỗi từ Cloudflare về rate limit khi truy cập các trang target:
+
+- Chờ một thời gian trước khi thử lại (thường 5-10 phút)
+- Sử dụng VPN hoặc proxy để thay đổi IP
+- Giảm tần suất reload trang trong quá trình phát triển
+- Kiểm tra console để xem chi tiết lỗi
+
 ## Tips Phát Triển
 
 ### Debug Mode
