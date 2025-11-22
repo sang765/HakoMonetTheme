@@ -1,5 +1,6 @@
 // ==UserScript==
 // @name         Hako: Monet Theme - Local Version
+// @icon         https://github.com/sang765/HakoMonetTheme/raw/main/.github/assets/logo.png
 // @version      LocalDev
 // @description  Material You theme for Hako/DocLN.
 // @description:vi Material You theme dành cho Hako/DocLN.
