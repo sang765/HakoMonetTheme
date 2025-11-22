@@ -12,6 +12,10 @@
     const CHECK_UPDATE_INTERVAL = 5 * 60 * 1000; // 5 phút
     const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/HakoMonetTheme.user.js';
 
+    // Detect local development mode
+    const IS_LOCAL_DEV = GM_info.script.version === 'LocalDev' ||
+                        (typeof window !== 'undefined' && window.location && window.location.hostname === 'localhost');
+
     // 🚀 ADVANCED FEATURES CONFIG
     const ADVANCED_FEATURES = {
         SMART_DELTA: true,           // Chỉ update các phần thay đổi
@@ -254,6 +258,14 @@
     function checkForUpdates(callback) {
         console.log('[UpdateChecker] checkForUpdates called');
         const startTime = performance.now();
+
+        // Skip external API calls in local development mode
+        if (IS_LOCAL_DEV) {
+            debugLog('Local development mode - skipping update check');
+            GM_setValue('lastUpdateCheck', Date.now());
+            if (callback) callback(null);
+            return;
+        }
 
         // Kiểm tra xem người dùng có bật thông báo cập nhật không
         const updateNotificationsEnabled = GM_getValue('update_notifications_enabled', true);
@@ -579,6 +591,15 @@
 
     function fallbackUpdateCheck(callback) {
         console.log('[UpdateChecker] fallbackUpdateCheck called');
+
+        // Skip external API calls in local development mode
+        if (IS_LOCAL_DEV) {
+            debugLog('Local development mode - skipping fallback update check');
+            GM_setValue('lastUpdateCheck', Date.now());
+            if (callback) callback(null);
+            return;
+        }
+
         debugLog('Sử dụng phương pháp kiểm tra cập nhật cũ...');
 
         GM_xmlhttpRequest({
@@ -627,6 +648,13 @@
 
     function setupAutoUpdate() {
         console.log('[UpdateChecker] setupAutoUpdate called');
+
+        // Skip auto-update in local development mode
+        if (IS_LOCAL_DEV) {
+            debugLog('Local development mode - skipping auto-update setup');
+            return;
+        }
+
         // Kiểm tra xem người dùng có bật tự động kiểm tra cập nhật không
         const autoUpdateEnabled = GM_getValue('auto_update_enabled', true);
         console.log('[UpdateChecker] autoUpdateEnabled:', autoUpdateEnabled);
@@ -713,6 +741,14 @@
 
     function checkForUpdatesManual() {
         console.log('[UpdateChecker] checkForUpdatesManual called');
+
+        // Skip external API calls in local development mode
+        if (IS_LOCAL_DEV) {
+            debugLog('Local development mode - skipping manual update check');
+            console.log('[UpdateChecker] Local development mode - no update check performed');
+            return;
+        }
+
         debugLog('Kiểm tra cập nhật thủ công...');
         checkForUpdates(function(latestVersion) {
             console.log('[UpdateChecker] Manual check callback with version:', latestVersion);
