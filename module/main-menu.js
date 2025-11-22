@@ -18,6 +18,7 @@
     const DISCORD_URL = 'https://discord.gg/uvQ6A3CDPq';
     const UPDATE_CHECK_INTERVAL = 5 * 60 * 1000; // 5 minutes
     const NOTIFICATION_TIMEOUT = 3000;
+    const IS_LOCAL = GM_info.script.version === 'LocalDev';
 
     // Cached CSS blob URL to avoid repeated fetches
     let cachedCssBlobUrl = null;
@@ -159,7 +160,7 @@
                         <div class="hmt-footer-version-info">
                             <div class="hmt-version-info">
                                 <div class="hmt-script-version" id="${VERSION_DISPLAY_ID}">Phiên bản: <strong>Loading...</strong></div>
-                                <a href="#" class="${CHECK_UPDATES_LINK_CLASS}">Kiểm tra cập nhật</a>
+                                ${IS_LOCAL ? '' : `<a href="#" class="${CHECK_UPDATES_LINK_CLASS}">Kiểm tra cập nhật</a>`}
                             </div>
                         </div>
                         <button class="${CLOSE_BTN_FOOTER_CLASS}">Đóng</button>
@@ -365,6 +366,11 @@
      */
     function checkForUpdatesOnMenuOpen() {
         try {
+            if (IS_LOCAL) {
+                debugLog('Skipping update check on menu open (local version)');
+                return;
+            }
+
             const lastCheck = GM_getValue('last_menu_update_check', 0);
             const now = Date.now();
 
