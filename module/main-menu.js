@@ -156,7 +156,7 @@
                             </div>
                             ${IS_LOCAL ? `
                             <div class="${MENU_ITEM_CLASS}" data-action="reload-resources">
-                                <div class="hmt-menu-icon">🔄</div>
+                                <div class="hmt-menu-icon" id="local-icon-only">🔄</div>
                                 <div class="hmt-menu-text">
                                     <h4>Reload Resources</h4>
                                     <p>Cập nhật code local mà không reload trang</p>
