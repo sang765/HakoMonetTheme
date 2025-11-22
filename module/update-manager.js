@@ -13,6 +13,10 @@
     const GITHUB_REPO = 'https://github.com/sang765/HakoMonetTheme';
     const RAW_GITHUB_URL = 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/';
 
+    // Detect local development mode
+    const IS_LOCAL_DEV = GM_info.script.version === 'LocalDev' ||
+                        (typeof window !== 'undefined' && window.location && window.location.hostname === 'localhost');
+
     let isCheckingForUpdate = false;
     let notificationQueue = [];
     let activeNotifications = new Set();
@@ -534,6 +538,13 @@
 
     function fetchChangelog(currentVersion, newVersion) {
         return new Promise((resolve) => {
+            // Skip external API calls in local development mode
+            if (IS_LOCAL_DEV) {
+                debugLog('Local development mode - skipping changelog fetch');
+                resolve(['Chế độ phát triển local - bỏ qua tải nhật ký thay đổi.']);
+                return;
+            }
+
             // Check if we have cached changelog for this version pair
             const cacheKey = `changelog_${currentVersion}_${newVersion}`;
             const cachedChangelog = GM_getValue(cacheKey, null);
@@ -1004,6 +1015,17 @@
     function performSmartUpdate(newVersion, overlay, currentVersion) {
         debugLog(`🚀 Starting smart update from ${currentVersion} to ${newVersion}`);
 
+        // Skip external downloads in local development mode
+        if (IS_LOCAL_DEV) {
+            debugLog('Local development mode - skipping external update download');
+            showSmartNotification('Cập nhật local', 'Chế độ phát triển local - bỏ qua tải update từ external sources.', {
+                style: NOTIFICATION_STYLES.TOAST,
+                timeout: 3000
+            });
+            overlay.remove();
+            return;
+        }
+
         // Enhanced CDN sources with performance metrics
         const updateSources = [
             {
@@ -1437,6 +1459,14 @@ Chọn thiết lập cần thay đổi:
             showNotification('Thông tin', 'Đang kiểm tra cập nhật...', 3000);
             return;
         }
+
+        // Skip external API calls in local development mode
+        if (IS_LOCAL_DEV) {
+            debugLog('Local development mode - skipping manual update check');
+            showNotification('Local Development', 'Chế độ phát triển local - bỏ qua kiểm tra cập nhật.', 3000);
+            return;
+        }
+
         isCheckingForUpdate = true;
         showNotification('Kiểm tra cập nhật', 'Đang kiểm tra phiên bản mới...', 3000);
 
