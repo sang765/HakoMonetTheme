@@ -75,7 +75,8 @@ body:not(.dark) .list-chapters li:hover {
     max-width: calc(100% - 31px);
 }
 
-.summary-more.more-state .see_more {
+.summary-more.more-state .see_more,
+.summary-more.less-state .see_more {
     text-align: center;
 }
 /*# sourceMappingURL=https://sang765.github.io/HakoMonetTheme/styles/info-truyen/series-enhancement.css.map */
