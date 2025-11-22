@@ -14,7 +14,7 @@ jobs:
     - name: Get diff excluding local files
       id: diff
       run: |
-        git diff --no-pager main...HEAD -- . \
+        git diff --no-pager origin/main...HEAD -- . \
           ':(exclude)HakoMonetTheme.user.js' \
           ':(exclude)run_local_host.bat' \
           ':(exclude)run_local_host.sh' \
