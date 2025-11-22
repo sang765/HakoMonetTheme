@@ -132,7 +132,9 @@
     }
 
     function getExtractColorFromAvatar() {
-        return GM_getValue('extract_color_from_avatar', false);
+        const value = GM_getValue('extract_color_from_avatar', false);
+        debugLog('getExtractColorFromAvatar() returning:', value);
+        return value;
     }
 
     function setExtractColorFromAvatar(extract) {

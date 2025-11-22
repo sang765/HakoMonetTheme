@@ -125,12 +125,17 @@
             const extractFromAvatar = window.HMTConfig && window.HMTConfig.getExtractColorFromAvatar ?
                 window.HMTConfig.getExtractColorFromAvatar() : false;
 
+            debugLog('Checking avatar extraction setting:', extractFromAvatar);
+            debugLog('HMTConfig available:', !!window.HMTConfig);
+            debugLog('getExtractColorFromAvatar function available:', !!(window.HMTConfig && window.HMTConfig.getExtractColorFromAvatar));
+
             if (extractFromAvatar) {
                 debugLog('Trích xuất màu từ avatar được bật, áp dụng màu từ avatar');
                 applyAvatarColorScheme();
                 return;
             }
 
+            debugLog('Avatar extraction disabled, using config color');
             // Sử dụng hàm applyConfigColor thay vì duplicate code
             applyConfigColor();
         }
@@ -141,6 +146,12 @@
 
             // Tìm avatar element
             const avatarElement = document.querySelector('.nav-user_avatar img');
+            debugLog('Avatar element found:', !!avatarElement);
+            if (avatarElement) {
+                debugLog('Avatar element src:', avatarElement.src);
+                debugLog('Avatar element data-src:', avatarElement.getAttribute('data-src'));
+            }
+
             if (!avatarElement) {
                 debugLog('Không tìm thấy avatar element, fallback về màu config');
                 applyConfigColor();

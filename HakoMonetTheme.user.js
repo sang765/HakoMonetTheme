@@ -27,6 +27,10 @@
 // @homepageURL  https://github.com/sang765/HakoMonetTheme
 // @license      MIT
 // @discord      https://discord.gg/uvQ6A3CDPq
+// @connect      html2canvas.hertzen.com
+// @connect      hertzen.com
+// ==/UserScript==
+
 // Local resource paths for development (hot-reload enabled)
 // Note: For local development, run 'run_local_host.bat' to start a server,
 // then change paths below to use localhost URLs (e.g., 'http://localhost:8080/main.js')
@@ -64,9 +68,6 @@ const resourcePaths = {
     colorisCSS: 'http://localhost:8080/api/coloris.min.css',
     colorisColors: 'http://localhost:8080/api/coloris-colors.json'
 };
-// @connect      html2canvas.hertzen.com
-// @connect      hertzen.com
-// ==/UserScript==
 
 (function() {
     'use strict';
