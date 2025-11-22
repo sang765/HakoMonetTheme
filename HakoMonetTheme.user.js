@@ -1,10 +1,8 @@
 // ==UserScript==
 // @name         Hako: Monet Theme - Local Version
-// @namespace    https://github.com/sang765
 // @version      LocalDev
 // @description  Material You theme for Hako/DocLN.
 // @description:vi Material You theme dành cho Hako/DocLN.
-// @icon         https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/.github/assets/logo.png
 // @author       sang765
 // @match        *://docln.sbs/*
 // @match        *://docln.net/*
@@ -21,14 +19,9 @@
 // @grant        GM_listValues
 // @grant        GM_openInTab
 // @grant        unsafeWindow
-// @connect      *
 // @run-at       document-start
-// @supportURL   https://github.com/sang765/HakoMonetTheme/issues
-// @homepageURL  https://github.com/sang765/HakoMonetTheme
 // @license      MIT
 // @discord      https://discord.gg/uvQ6A3CDPq
-// @connect      html2canvas.hertzen.com
-// @connect      hertzen.com
 // ==/UserScript==
 
 // Local resource paths for development (hot-reload enabled)
@@ -73,9 +66,7 @@ const resourcePaths = {
     'use strict';
 
     const DEBUG = GM_getValue('debug_mode', false);
-    const SCRIPT_NAME = 'Hako: Monet Theme';
-    const GITHUB_REPO = 'https://github.com/sang765/HakoMonetTheme';
-    const RAW_GITHUB_URL = 'https://sang765.github.io/HakoMonetTheme';
+    const SCRIPT_NAME = 'Hako: Monet Theme - Local Version';
 
     let isCheckingForUpdate = false;
 
@@ -179,8 +170,6 @@ const resourcePaths = {
                 }
             }, 'm');
             GM_registerMenuCommand('📊 Thông tin script', showScriptInfo, 'i');
-            GM_registerMenuCommand('🐛 Báo cáo lỗi', reportBug, 'b');
-            GM_registerMenuCommand('💡 Đề xuất tính năng', suggestFeature, 'f');
 
             debugLog('Đã đăng ký menu commands');
         }
@@ -261,24 +250,12 @@ Mô tả: ${GM_info.script.description}
 
 Handler: ${GM_info.scriptHandler || 'Không rõ'}
 Engine: ${GM_info.scriptEngine || 'Không rõ'}
-
-GitHub: ${GITHUB_REPO}
-Báo cáo lỗi: ${GITHUB_REPO}/issues
         `.trim();
 
         alert(info);
         debugLog('Hiển thị thông tin script');
     }
     
-    function reportBug() {
-        GM_openInTab(GITHUB_REPO + '/issues/new?template=bug_report.md');
-        showNotification('Báo cáo lỗi', 'Mở trang báo cáo lỗi trên GitHub...', 3000);
-    }
-    
-    function suggestFeature() {
-        GM_openInTab(GITHUB_REPO + '/issues/new?template=feature_request.md');
-        showNotification('Đề xuất tính năng', 'Mở trang đề xuất tính năng trên GitHub...', 3000);
-    }
     
     function joinDiscord() {
         const discordURL = 'https://discord.gg/uvQ6A3CDPq';
