@@ -575,7 +575,8 @@
             .basic-section .sect-header,
             .detail-list header.section-title,
             .modal-header,
-            .private-tabs header {
+            .private-tabs header,
+            .comment_toolkit {
                 background-color: ${palette[800]} !important;
             }
             
@@ -868,6 +869,13 @@
             .user-private-tabs li a {
                 border-bottom-color: ${palette[800]} !important;
             }
+
+            .d-flex.justify-content-around .text-yellow-400,
+            [class="side-feature-button button-follow follow"] [class="far fa-heart"],
+            .button-follow .feature-value, .button-follow.followed .feature-value,
+            .series-rating .feature-value {
+                color: ${palette[300]};
+            }
         `;
 
         GM_addStyle(css);
@@ -994,7 +1002,8 @@
             .basic-section .sect-header,
             .detail-list header.section-title,
             .modal-header,
-            .private-tabs header {
+            .private-tabs header,
+            .comment_toolkit {
                 background-color: ${defaultPalette[800]} !important;
             }
             
@@ -1159,6 +1168,13 @@
 
             .user-private-tabs li a {
                 border-bottom-color: ${defaultPalette[800]} !important;
+            }
+
+            .d-flex.justify-content-around .text-yellow-400,
+            [class="side-feature-button button-follow follow"] [class="far fa-heart"],
+            .button-follow .feature-value, .button-follow.followed .feature-value,
+            .series-rating .feature-value {
+                color: ${defaultPalette[300]};
             }
         `;
 

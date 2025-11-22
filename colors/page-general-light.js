@@ -978,7 +978,8 @@
             .basic-section .sect-header,
             .detail-list header.section-title,
             .modal-header,
-            .private-tabs header {
+            .private-tabs header,
+            .comment_toolkit {
                 background-color: ${palette[200]} !important;
             }
 
@@ -1154,10 +1155,6 @@
 
             .paging_item {
                 color: ${palette[600]} !important;
-            }
-
-            :is(.dark .dark\\:ring-cyan-900) {
-                --tw-ring-color: ${palette[200]} !important;
             }
 
             #mainpart.custome-page, #mainpart.page-board {
@@ -1396,6 +1393,14 @@
                 --tw-ring-color: ${palette[100]} !important;
             }
 
+            .bg-\\[\\#fff\\] {
+                background-color: ${palette[300]} !important;
+            }
+
+            .bg-slate-100 {
+                background-color: ${palette[200]} !important;
+            }
+
             .button-blue {
               background-color: ${palette[500]};
               border-color: ${palette[300]};
@@ -1627,7 +1632,8 @@
             .basic-section .sect-header,
             .detail-list header.section-title,
             .modal-header,
-            .private-tabs header {
+            .private-tabs header,
+            .comment_toolkit {
                 background-color: ${defaultPalette[200]} !important;
             }
 
@@ -1790,10 +1796,6 @@
 
             .paging_item {
                 color: ${defaultPalette[600]} !important;
-            }
-
-            :is(.dark .dark\\:ring-cyan-900) {
-                --tw-ring-color: ${defaultPalette[200]} !important;
             }
 
             .button-green {
@@ -2003,6 +2005,14 @@
 
             :is(.dark .dark\\:ring-cyan-900) {
                 --tw-ring-color: ${defaultPalette[100]} !important;
+            }
+
+            .bg-\\[\\#fff\\] {
+                background-color: ${defaultPalette[300]} !important;
+            }
+
+            .bg-slate-100 {
+                background-color: ${defaultPalette[200]} !important;
             }
 
             .button-blue {
