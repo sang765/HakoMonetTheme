@@ -396,12 +396,29 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
             } else {
                 showNotification(
                     'Cảnh báo',
-                    `Không thể tải ${failedCount} resources. Một số tính năng có thể không hoạt động.`,
+                    `Không thể tải ${failedCount} resources: ${failedResources.join(', ')}. Một số tính năng có thể không hoạt động.`,
                     5000
                 );
             }
         } else {
             Logger.success('main', 'Tất cả resources đã được tải thành công');
+        }
+
+        // UI debug notifications
+        if (DEBUG) {
+            if (failedCount > 0) {
+                showNotification(
+                    'Import thất bại',
+                    `Các modules thất bại: ${failedResources.join(', ')}`,
+                    5000
+                );
+            } else {
+                showNotification(
+                    'Import hoàn tất',
+                    `Tất cả ${loadedCount} modules đã được tải thành công.`,
+                    3000
+                );
+            }
         }
 
         return { loadedCount, loadedResources, failedCount, failedResources };
