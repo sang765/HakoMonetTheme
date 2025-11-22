@@ -165,6 +165,22 @@
         debugLog('Đã phát sự kiện proxy ưu tiên thay đổi:', proxy);
     }
 
+    function getAutoReloadEnabled() {
+        return GM_getValue('auto_reload_enabled', false);
+    }
+
+    function setAutoReloadEnabled(enabled) {
+        GM_setValue('auto_reload_enabled', enabled);
+        debugLog('Đã lưu cài đặt tự động reload resources:', enabled);
+
+        // Phát sự kiện để các module khác cập nhật
+        const autoReloadChangeEvent = new CustomEvent('hmtAutoReloadChanged', {
+            detail: { enabled: enabled }
+        });
+        (window.top || window).document.dispatchEvent(autoReloadChangeEvent);
+        debugLog('Đã phát sự kiện tự động reload thay đổi:', enabled);
+    }
+
     function applyDomainWarningVisibility() {
         const shouldHide = getHideDomainWarning();
         const warningElements = document.querySelectorAll('.border-l-4.border-yellow-400.bg-yellow-50.p-4');
@@ -996,6 +1012,19 @@ ${!isInfoPage() ? `
                                 </select>
                             </div>
                         </div>
+
+                        <div class="hmt-config-section">
+                            <h4>Tự động reload resources (Local)</h4>
+                            <p>Tự động reload CSS/JS resources khi phát triển local mà không cần reload trang. Chỉ hoạt động khi dùng localhost.</p>
+
+                            <div class="hmt-auto-reload-toggle">
+                                <label class="hmt-toggle-label">
+                                    <input type="checkbox" ${getAutoReloadEnabled() ? 'checked' : ''} class="hmt-auto-reload-toggle-input">
+                                    <span class="hmt-toggle-switch"></span>
+                                    Bật tự động reload resources
+                                </label>
+                            </div>
+                        </div>
 ` : ''}
 
 ${!isInfoPage() ? `
@@ -1095,6 +1124,7 @@ ${!isInfoPage() ? `
         const avatarColorToggle = dialog.querySelector('.hmt-avatar-color-toggle-input');
         const proxyToggle = dialog.querySelector('.hmt-proxy-toggle-input');
         const proxySelect = dialog.querySelector('#hmt-proxy-select');
+        const autoReloadToggle = dialog.querySelector('.hmt-auto-reload-toggle-input');
 
         // Lưu màu hiện tại để có thể khôi phục nếu không lưu
          const currentColor = dialog._currentColor || getDefaultColor();
@@ -1552,7 +1582,8 @@ ${!isInfoPage() ? `
                  hide_domain_warning: false,
                  disable_colors_on_reading_page: false,
                  color_mode: 'default',
-                 extract_color_from_avatar: false
+                 extract_color_from_avatar: false,
+                 auto_reload_enabled: false
              };
 
              // Cập nhật preview color
@@ -1586,6 +1617,9 @@ ${!isInfoPage() ? `
              }
              if (avatarColorToggle) {
                  avatarColorToggle.checked = defaultSettings.extract_color_from_avatar;
+             }
+             if (autoReloadToggle) {
+                 autoReloadToggle.checked = false; // Default is false
              }
 
              // Reset color mode dropdown
@@ -1654,6 +1688,14 @@ ${!isInfoPage() ? `
             proxySelect.addEventListener('change', function() {
                 setPreferredProxy(this.value);
                 showNotification('Đã cập nhật proxy ưu tiên!', 3000);
+            });
+        }
+
+        // Auto reload toggle
+        if (autoReloadToggle) {
+            autoReloadToggle.addEventListener('change', function() {
+                setAutoReloadEnabled(this.checked);
+                showNotification('Đã cập nhật cài đặt tự động reload resources!', 3000);
             });
         }
 
@@ -1793,6 +1835,8 @@ ${!isInfoPage() ? `
         setUseProxy: setUseProxy,
         getPreferredProxy: getPreferredProxy,
         setPreferredProxy: setPreferredProxy,
+        getAutoReloadEnabled: getAutoReloadEnabled,
+        setAutoReloadEnabled: setAutoReloadEnabled,
         openConfigDialog: openConfigDialog,
         initialize: initializeConfig,
         ensureDomainWarningCookies: ensureDomainWarningCookies,
