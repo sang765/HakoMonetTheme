@@ -983,7 +983,7 @@
             }
 
             .bg-gray-100 {
-                background-color: ${palette[200]} !important;
+                background-color: ${palette[300]} !important;
             }
 
             #footer {
@@ -1046,7 +1046,7 @@
             }
 
             .expand, .mobile-more, .summary-more.more-state {
-                background: linear-gradient(180deg, rgba(255,255,255,0) 1%, ${palette[100]} 75%, ${palette[100]}) !important;
+                background: linear-gradient(180deg, rgba(255,255,255,0) 1%, ${palette[200]} 75%, ${palette[200]}) !important;
                 filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#001f1f1f",endColorstr="${palette[100]}",GradientType=0) !important;
             }
 
@@ -1632,7 +1632,7 @@
             }
 
             .bg-gray-100 {
-                background-color: ${defaultPalette[200]} !important;
+                background-color: ${defaultPalette[300]} !important;
             }
 
             #footer {
@@ -1695,7 +1695,7 @@
             }
 
             .expand, .mobile-more, .summary-more.more-state {
-                background: linear-gradient(180deg, rgba(255,255,255,0) 1%, ${defaultPalette[100]} 75%, ${defaultPalette[100]}) !important;
+                background: linear-gradient(180deg, rgba(255,255,255,0) 1%, ${defaultPalette[200]} 75%, ${defaultPalette[200]}) !important;
                 filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#001f1f1f",endColorstr="${defaultPalette[100]}",GradientType=0) !important;
             }
 
