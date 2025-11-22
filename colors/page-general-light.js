@@ -1505,7 +1505,9 @@
                 background-color: ${palette[500]} !important;
             }
 
-            #footer span {
+            #footer span,
+            .text-blue-700,
+            [class="w-full bg-gray-200 rounded-full dark:bg-gray-700 relative"] {
                 color: ${palette[700]} !important;
             }
         `;
@@ -2118,7 +2120,9 @@
                 background-color: ${defaultPalette[500]} !important;
             }
 
-            #footer span {
+            #footer span,
+            .text-blue-700,
+            [class="w-full bg-gray-200 rounded-full dark:bg-gray-700 relative"] {
                 color: ${defaultPalette[700]} !important;
             }
         `;
