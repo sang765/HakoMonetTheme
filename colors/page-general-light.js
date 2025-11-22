@@ -1510,6 +1510,11 @@
             [class="w-full bg-gray-200 rounded-full dark:bg-gray-700 relative"] {
                 color: ${palette[700]} !important;
             }
+
+            [class="text-yellow-400"],
+            .series-rating .feature-value, .star-1:hover, .star-2:hover, .star-2:hover ~ .star-1, .star-3:hover, .star-3:hover ~ .star-1, .star-3:hover ~ .star-2, .star-4:hover, .star-4:hover ~ .star-1, .star-4:hover ~ .star-2, .star-4:hover ~ .star-3, .star-5:hover, .star-5:hover ~ .star-1, .star-5:hover ~ .star-2, .star-5:hover ~ .star-3, .star-5:hover ~ .star-4, .star-evaluate-item.rated {
+                color: ${palette[600]};
+            }
         `;
 
         GM_addStyle(css);
@@ -2124,6 +2129,11 @@
             .text-blue-700,
             [class="w-full bg-gray-200 rounded-full dark:bg-gray-700 relative"] {
                 color: ${defaultPalette[700]} !important;
+            }
+
+            [class="text-yellow-400"],
+            .series-rating .feature-value, .star-1:hover, .star-2:hover, .star-2:hover ~ .star-1, .star-3:hover, .star-3:hover ~ .star-1, .star-3:hover ~ .star-2, .star-4:hover, .star-4:hover ~ .star-1, .star-4:hover ~ .star-2, .star-4:hover ~ .star-3, .star-5:hover, .star-5:hover ~ .star-1, .star-5:hover ~ .star-2, .star-5:hover ~ .star-3, .star-5:hover ~ .star-4, .star-evaluate-item.rated {
+                color: ${defaultPalette[600]};
             }
         `;
 
