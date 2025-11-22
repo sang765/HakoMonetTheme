@@ -1668,8 +1668,8 @@ Chọn thiết lập cần thay đổi:
     // 🎮 INTERACTIVE SETTINGS PANEL
     function openEnhancedUpdateSettings() {
         const settings = {
-            autoUpdate: GM_getValue('auto_update_enabled', true),
-            notifications: GM_getValue('update_notifications_enabled', true),
+            autoUpdate: IS_LOCAL_DEV ? false : GM_getValue('auto_update_enabled', true),
+            notifications: IS_LOCAL_DEV ? false : GM_getValue('update_notifications_enabled', true),
             notificationStyle: GM_getValue('preferred_notification_style', 'toast'),
             analytics: GM_getValue('analytics_enabled', false),
             canaryReleases: GM_getValue('canary_releases_enabled', false),
@@ -1849,16 +1849,17 @@ Chọn thiết lập cần thay đổi:
 
                 <div class="setting-group">
                     <h3>🔄 Tự động cập nhật</h3>
+                    ${IS_LOCAL_DEV ? '<div class="setting-item"><span class="setting-label" style="color: #6c757d;">Cập nhật bị tắt hoàn toàn cho phiên bản local</span></div>' : ''}
                     <div class="setting-item">
                         <span class="setting-label">Bật tự động kiểm tra cập nhật</span>
                         <div class="setting-control">
-                            <div class="toggle-switch ${settings.autoUpdate ? 'active' : ''}" data-setting="auto_update_enabled"></div>
+                            <div class="toggle-switch ${settings.autoUpdate ? 'active' : ''} ${IS_LOCAL_DEV ? 'disabled' : ''}" data-setting="auto_update_enabled" ${IS_LOCAL_DEV ? 'style="pointer-events: none; opacity: 0.5;"' : ''}></div>
                         </div>
                     </div>
                     <div class="setting-item">
                         <span class="setting-label">Hiển thị thông báo cập nhật</span>
                         <div class="setting-control">
-                            <div class="toggle-switch ${settings.notifications ? 'active' : ''}" data-setting="update_notifications_enabled"></div>
+                            <div class="toggle-switch ${settings.notifications ? 'active' : ''} ${IS_LOCAL_DEV ? 'disabled' : ''}" data-setting="update_notifications_enabled" ${IS_LOCAL_DEV ? 'style="pointer-events: none; opacity: 0.5;"' : ''}></div>
                         </div>
                     </div>
                 </div>
@@ -1961,6 +1962,10 @@ Chọn thiết lập cần thay đổi:
 
             // Save settings
             Object.keys(newSettings).forEach(key => {
+                // Skip saving update-related settings for local dev
+                if (IS_LOCAL_DEV && (key === 'auto_update_enabled' || key === 'update_notifications_enabled')) {
+                    return;
+                }
                 GM_setValue(key, newSettings[key]);
             });
 
