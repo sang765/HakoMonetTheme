@@ -877,7 +877,7 @@
             }
 
             .text-indigo-600 {
-                color: ${palette[500]} !important;
+                color: ${palette[700]} !important;
             }
         `;
 
@@ -1177,7 +1177,7 @@
             }
 
             .text-indigo-600 {
-                color: ${defaultPalette[500]} !important;
+                color: ${defaultPalette[700]} !important;
             }
         `;
 
