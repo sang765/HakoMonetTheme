@@ -1488,6 +1488,11 @@
             .hmt-crop-upload {
                 background-color: ${palette[500]} !important;
             }
+
+            [class="text-yellow-400"],
+            .series-rating .feature-value, .star-1:hover, .star-2:hover, .star-2:hover ~ .star-1, .star-3:hover, .star-3:hover ~ .star-1, .star-3:hover ~ .star-2, .star-4:hover, .star-4:hover ~ .star-1, .star-4:hover ~ .star-2, .star-4:hover ~ .star-3, .star-5:hover, .star-5:hover ~ .star-1, .star-5:hover ~ .star-2, .star-5:hover ~ .star-3, .star-5:hover ~ .star-4, .star-evaluate-item.rated {
+                color: ${palette[400]};
+            }
         `;
 
         GM_addStyle(css);
@@ -2096,6 +2101,11 @@
             }
             .hmt-crop-upload {
                 background-color: ${defaultPalette[500]} !important;
+            }
+
+            [class="text-yellow-400"],
+            .series-rating .feature-value, .star-1:hover, .star-2:hover, .star-2:hover ~ .star-1, .star-3:hover, .star-3:hover ~ .star-1, .star-3:hover ~ .star-2, .star-4:hover, .star-4:hover ~ .star-1, .star-4:hover ~ .star-2, .star-4:hover ~ .star-3, .star-5:hover, .star-5:hover ~ .star-1, .star-5:hover ~ .star-2, .star-5:hover ~ .star-3, .star-5:hover ~ .star-4, .star-evaluate-item.rated {
+                color: ${defaultPalette[400]};
             }
         `;
 
