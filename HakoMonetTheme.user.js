@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Hako: Monet Theme
+// @name         Hako: Monet Theme - Local Version
 // @namespace    https://github.com/sang765
-// @version      5.3.3
+// @version      LocalDev
 // @description  Material You theme for Hako/DocLN.
 // @description:vi Material You theme dành cho Hako/DocLN.
 // @icon         https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/.github/assets/logo.png
@@ -24,42 +24,46 @@
 // @connect      *
 // @run-at       document-start
 // @supportURL   https://github.com/sang765/HakoMonetTheme/issues
-// @updateURL    https://sang765.github.io/HakoMonetTheme/HakoMonetTheme.user.js
-// @downloadURL  https://sang765.github.io/HakoMonetTheme/HakoMonetTheme.user.js
 // @homepageURL  https://github.com/sang765/HakoMonetTheme
 // @license      MIT
 // @discord      https://discord.gg/uvQ6A3CDPq
-// @resource     mainJS ./main.js
-// @resource     monetAPIJS ./api/monet.js
-// @resource     updateCheckerJS ./api/update-checker.js
-// @resource     CORSJS ./module/cors.js
-// @resource     infoTruyenJS ./class/info-truyen.js
-// @resource     readingPageJS ./class/reading-page.js
-// @resource     animationJS ./class/animation.js
-// @resource     tagColorJS ./class/tag-color.js
-// @resource     fontImportJS ./class/font-import.js
-// @resource     colorinfotruyen ./colors/page-info-truyen-dark.js
-// @resource     pagegeneralJS ./colors/page-general-dark.js
-// @resource     pagegenerallightJS ./colors/page-general-light.js
-// @resource     colorinfotruyenlight ./colors/page-info-truyen-light.js
-// @resource     themeDetectorJS ./module/theme-detector.js
-// @resource     deviceDetectorJS ./module/device-detector.js
-// @resource     configJS ./module/config.js
-// @resource     adBlockerJS ./module/ad-blocker.js
-// @resource     autoReloadJS ./module/auto-reload.js
-// @resource     antiPopupJS ./module/anti-popup.js
-// @resource     mainMenuJS ./module/main-menu.js
-// @resource     navbarLogoJS ./module/navbar-logo.js
-// @resource     updateManagerJS ./module/update-manager.js
-// @resource     darkModePrompterJS ./module/dark-mode-prompter.js
-// @resource     fullscreenJS ./module/fullscreen.js
-// @resource     deviceCSSLoaderJS ./module/device-css-loader.js
-// @resource     profileBannerCropperJS ./module/profile-banner-cropper.js
-// @resource     html2canvasJS ./api/html2canvas.min.js
-// @resource     monetTestJS ./api/monet-test.js
-// @resource     colorisJS ./api/coloris.min.js
-// @resource     colorisCSS ./api/coloris.min.css
-// @resource     colorisColors ./api/coloris-colors.json
+// Local resource paths for development (hot-reload enabled)
+// Note: For local development, run 'run_local_host.bat' to start a server,
+// then change paths below to use localhost URLs (e.g., 'http://localhost:8080/main.js')
+// For production, keep relative paths './main.js'
+const resourcePaths = {
+    mainJS: 'http://localhost:8080/main.js',
+    monetAPIJS: 'http://localhost:8080/api/monet.js',
+    updateCheckerJS: 'http://localhost:8080/api/update-checker.js',
+    CORSJS: 'http://localhost:8080/module/cors.js',
+    infoTruyenJS: 'http://localhost:8080/class/info-truyen.js',
+    readingPageJS: 'http://localhost:8080/class/reading-page.js',
+    animationJS: 'http://localhost:8080/class/animation.js',
+    tagColorJS: 'http://localhost:8080/class/tag-color.js',
+    fontImportJS: 'http://localhost:8080/class/font-import.js',
+    colorinfotruyen: 'http://localhost:8080/canvas/page-info-truyen-dark.js',
+    pagegeneralJS: 'http://localhost:8080/canvas/page-general-dark.js',
+    pagegenerallightJS: 'http://localhost:8080/canvas/page-general-light.js',
+    colorinfotruyenlight: 'http://localhost:8080/canvas/page-info-truyen-light.js',
+    themeDetectorJS: 'http://localhost:8080/module/theme-detector.js',
+    deviceDetectorJS: 'http://localhost:8080/module/device-detector.js',
+    configJS: 'http://localhost:8080/module/config.js',
+    adBlockerJS: 'http://localhost:8080/module/ad-blocker.js',
+    autoReloadJS: 'http://localhost:8080/module/auto-reload.js',
+    antiPopupJS: 'http://localhost:8080/module/anti-popup.js',
+    mainMenuJS: 'http://localhost:8080/module/main-menu.js',
+    navbarLogoJS: 'http://localhost:8080/module/navbar-logo.js',
+    updateManagerJS: 'http://localhost:8080/module/update-manager.js',
+    darkModePrompterJS: 'http://localhost:8080/module/dark-mode-prompter.js',
+    fullscreenJS: 'http://localhost:8080/module/fullscreen.js',
+    deviceCSSLoaderJS: 'http://localhost:8080/module/device-css-loader.js',
+    profileBannerCropperJS: 'http://localhost:8080/module/profile-banner-cropper.js',
+    html2canvasJS: 'http://localhost:8080/api/html2canvas.min.js',
+    monetTestJS: 'http://localhost:8080/api/monet-test.js',
+    colorisJS: 'http://localhost:8080/api/coloris.min.js',
+    colorisCSS: 'http://localhost:8080/api/coloris.min.css',
+    colorisColors: 'http://localhost:8080/api/coloris-colors.json'
+};
 // @connect      html2canvas.hertzen.com
 // @connect      hertzen.com
 // ==/UserScript==
@@ -307,7 +311,46 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
         }
     }
     
-    function loadAllResources() {
+    function loadResource(resourceName) {
+        return new Promise((resolve, reject) => {
+            const path = resourcePaths[resourceName];
+            if (!path) {
+                reject(new Error(`No path defined for resource: ${resourceName}`));
+                return;
+            }
+
+            Logger.log('main', `Loading resource: ${resourceName} from ${path}`);
+
+            GM_xmlhttpRequest({
+                method: 'GET',
+                url: path,
+                onload: function(response) {
+                    if (response.status === 200) {
+                        try {
+                            eval(response.responseText);
+                            Logger.success('main', `Loaded ${resourceName}`);
+                            resolve(resourceName);
+                        } catch (error) {
+                            Logger.error('main', `Eval error for ${resourceName}:`, error);
+                            reject(error);
+                        }
+                    } else {
+                        reject(new Error(`HTTP ${response.status} for ${resourceName}`));
+                    }
+                },
+                onerror: function(error) {
+                    Logger.error('main', `Network error loading ${resourceName}:`, error);
+                    reject(error);
+                },
+                ontimeout: function() {
+                    Logger.error('main', `Timeout loading ${resourceName}`);
+                    reject(new Error('Timeout'));
+                }
+            });
+        });
+    }
+
+    async function loadAllResources() {
         const resources = [
             'mainJS', 'monetAPIJS', 'monetTestJS', 'updateCheckerJS', 'CORSJS', 'infoTruyenJS',
             'animationJS', 'tagColorJS', 'fontImportJS', 'colorinfotruyen',
@@ -317,56 +360,55 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
             'readingPageJS', 'deviceCSSLoaderJS', 'profileBannerCropperJS'
         ];
 
+        const promises = resources.map(resourceName => loadResource(resourceName));
+        const results = await Promise.allSettled(promises);
+
         let loadedCount = 0;
         let failedCount = 0;
         const loadedResources = [];
         const failedResources = [];
 
-        resources.forEach(resourceName => {
-            try {
-                debugLog(`Attempting to load resource: ${resourceName}`);
-                const resourceContent = GM_getResourceText(resourceName);
-                debugLog(`GM_getResourceText for ${resourceName} returned: ${resourceContent ? 'content (length: ' + resourceContent.length + ')' : 'null/undefined'}`);
-                if (resourceContent) {
-                    eval(resourceContent);
-                    loadedCount++;
-                    loadedResources.push(resourceName);
-                    debugLog(`Đã tải ${resourceName}`);
-                } else {
-                    debugLog(`Không tìm thấy resource: ${resourceName}`);
-                    failedCount++;
-                    failedResources.push(resourceName);
-                }
-            } catch (error) {
-                debugLog(`Lỗi khi tải ${resourceName}:`, error);
-                debugLog(`Full error details for ${resourceName}:`, error.stack || error.message);
+        results.forEach((result, index) => {
+            const resourceName = resources[index];
+            if (result.status === 'fulfilled') {
+                loadedCount++;
+                loadedResources.push(resourceName);
+            } else {
                 failedCount++;
                 failedResources.push(resourceName);
+                Logger.warn('main', `Failed to load ${resourceName}:`, result.reason.message);
             }
         });
 
+        Logger.log('main', `Resource loading complete: ${loadedCount} loaded, ${failedCount} failed`);
+
         if (failedCount > 0) {
-            debugLog(`Tải resources: ${loadedCount} thành công, ${failedCount} thất bại`);
-            debugLog(`Loaded: ${loadedResources.join(', ')}`);
-            debugLog(`Failed: ${failedResources.join(', ')}`);
+            Logger.log('main', `Loaded: ${loadedResources.join(', ')}`);
+            Logger.log('main', `Failed: ${failedResources.join(', ')}`);
 
             if (failedCount === resources.length) {
                 showNotification(
                     'Lỗi nghiêm trọng',
-                    'Không thể tải bất kỳ resource nào. Vui lòng cài đặt lại script.',
+                    'Không thể tải bất kỳ resource nào. Vui lòng kiểm tra đường dẫn local.',
                     10000
+                );
+            } else {
+                showNotification(
+                    'Cảnh báo',
+                    `Không thể tải ${failedCount} resources. Một số tính năng có thể không hoạt động.`,
+                    5000
                 );
             }
         } else {
-            debugLog('Đã tải tất cả resources thành công');
+            Logger.success('main', 'Tất cả resources đã được tải thành công');
         }
 
         return { loadedCount, loadedResources, failedCount, failedResources };
     }
 
-    function updateAllResources() {
-        debugLog('Bắt đầu cập nhật tất cả resources...');
-        const { loadedCount, loadedResources, failedCount, failedResources } = loadAllResources();
+    async function updateAllResources() {
+        Logger.log('main', 'Bắt đầu cập nhật tất cả resources...');
+        const { loadedCount, loadedResources, failedCount, failedResources } = await loadAllResources();
         if (loadedCount > 0) {
             const resourceList = loadedResources.join(', ');
             showNotification(
@@ -390,11 +432,11 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
                 5000
             );
         }
-        debugLog('Cập nhật resources hoàn tất');
+        Logger.log('main', 'Cập nhật resources hoàn tất');
     }
 
-    function initializeScript() {
-        debugLog(`Bắt đầu khởi tạo ${SCRIPT_NAME} v${GM_info.script.version}`);
+    async function initializeScript() {
+        Logger.log('main', `Bắt đầu khởi tạo ${SCRIPT_NAME} v${GM_info.script.version}`);
 
         // Check if we need to auto-reload after update
         const pendingReload = GM_getValue('pending_update_reload', false);
@@ -404,7 +446,7 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
         const now = Date.now();
 
         if (pendingReload && (now - pendingTime) < 30000) { // Within 30 seconds
-            debugLog('Auto-reload sau khi cập nhật');
+            Logger.log('main', 'Auto-reload sau khi cập nhật');
             GM_deleteValue('pending_update_reload');
             GM_deleteValue('pending_update_time');
 
@@ -428,7 +470,7 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
         registerMenuCommands();
 
         // Tải tất cả resources
-        const { loadedCount } = loadAllResources();
+        const { loadedCount } = await loadAllResources();
 
         // Only show initialization notification if user has enabled it or if there are errors
         const showInitNotification = GM_getValue('show_init_notification', false);
@@ -443,7 +485,7 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
         // Kiểm tra cập nhật tự động được xử lý bởi main.js
         // để tránh duplicate notifications
 
-        debugLog('Khởi tạo script hoàn tất');
+        Logger.log('main', 'Khởi tạo script hoàn tất');
     }
     
     // Khởi chạy script
