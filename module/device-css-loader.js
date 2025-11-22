@@ -2,6 +2,7 @@
     'use strict';
 
     const DEBUG = GM_getValue('debug_mode', false);
+    const IS_LOCAL = GM_info.script.version === 'LocalDev';
 
     function debugLog(...args) {
         if (DEBUG) {
@@ -10,7 +11,7 @@
     }
 
     // Base URL for device CSS files
-    const FOLDER_URL = 'https://sang765.github.io/HakoMonetTheme/styles/device/';
+    const FOLDER_URL = IS_LOCAL ? 'http://localhost:8080/styles/device/' : 'https://sang765.github.io/HakoMonetTheme/styles/device/';
 
     // CSS files mapping for each device type
     const CSS_FILES = {

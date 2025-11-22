@@ -3,7 +3,8 @@
 
     // Constants for better maintainability and readability
     const DEBUG = GM_getValue('debug_mode', false);
-    const FOLDER_URL = 'https://sang765.github.io/HakoMonetTheme/styles/';
+    const IS_LOCAL = GM_info.script.version === 'LocalDev';
+    const FOLDER_URL = IS_LOCAL ? 'http://localhost:8080/styles/' : 'https://sang765.github.io/HakoMonetTheme/styles/';
     const CSS_FILE = 'userscript/mainmenu/hmt-main-menu.css';
     const CSS_MAP_FILE = 'userscript/mainmenu/hmt-main-menu.css.map';
     const DIALOG_CLASS = 'hmt-main-menu-dialog';
@@ -153,13 +154,22 @@
                                     <p>The Mavericks</p>
                                 </div>
                             </div>
+                            ${IS_LOCAL ? `
+                            <div class="${MENU_ITEM_CLASS}" data-action="reload-resources">
+                                <div class="hmt-menu-icon" id="local-icon-only">🔄</div>
+                                <div class="hmt-menu-text" id="local-text-only">
+                                    <h4>Reload Resources</h4>
+                                    <p>Cập nhật code local mà không reload trang</p>
+                                </div>
+                            </div>
+                            ` : ''}
                         </div>
                     </div>
                     <div class="hmt-main-menu-footer">
                         <div class="hmt-footer-version-info">
                             <div class="hmt-version-info">
                                 <div class="hmt-script-version" id="${VERSION_DISPLAY_ID}">Phiên bản: <strong>Loading...</strong></div>
-                                <a href="#" class="${CHECK_UPDATES_LINK_CLASS}">Kiểm tra cập nhật</a>
+                                ${IS_LOCAL ? '' : `<a href="#" class="${CHECK_UPDATES_LINK_CLASS}">Kiểm tra cập nhật</a>`}
                             </div>
                         </div>
                         <button class="${CLOSE_BTN_FOOTER_CLASS}">Đóng</button>
@@ -328,7 +338,14 @@
                 }
             },
             'discord': joinDiscord,
-            'debug-toggle': toggleDebugMode
+            'debug-toggle': toggleDebugMode,
+            'reload-resources': () => {
+                if (typeof window.updateAllResources === 'function') {
+                    window.updateAllResources();
+                } else {
+                    showNotification('Lỗi', 'Hàm reload resources chưa khả dụng. Vui lòng làm mới trang.', NOTIFICATION_TIMEOUT);
+                }
+            }
         };
 
         const handler = actions[action];
@@ -365,6 +382,11 @@
      */
     function checkForUpdatesOnMenuOpen() {
         try {
+            if (IS_LOCAL) {
+                debugLog('Skipping update check on menu open (local version)');
+                return;
+            }
+
             const lastCheck = GM_getValue('last_menu_update_check', 0);
             const now = Date.now();
 
