@@ -154,6 +154,15 @@
                                     <p>The Mavericks</p>
                                 </div>
                             </div>
+                            ${IS_LOCAL ? `
+                            <div class="${MENU_ITEM_CLASS}" data-action="reload-resources">
+                                <div class="hmt-menu-icon">🔄</div>
+                                <div class="hmt-menu-text">
+                                    <h4>Reload Resources</h4>
+                                    <p>Cập nhật code local mà không reload trang</p>
+                                </div>
+                            </div>
+                            ` : ''}
                         </div>
                     </div>
                     <div class="hmt-main-menu-footer">
@@ -329,7 +338,14 @@
                 }
             },
             'discord': joinDiscord,
-            'debug-toggle': toggleDebugMode
+            'debug-toggle': toggleDebugMode,
+            'reload-resources': () => {
+                if (typeof window.updateAllResources === 'function') {
+                    window.updateAllResources();
+                } else {
+                    showNotification('Lỗi', 'Hàm reload resources chưa khả dụng. Vui lòng làm mới trang.', NOTIFICATION_TIMEOUT);
+                }
+            }
         };
 
         const handler = actions[action];

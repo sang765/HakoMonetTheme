@@ -429,6 +429,9 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
         Logger.log('main', 'Cập nhật resources hoàn tất');
     }
 
+    // Expose updateAllResources globally for live reload functionality
+    window.updateAllResources = updateAllResources;
+
     async function initializeScript() {
         Logger.log('main', `Bắt đầu khởi tạo ${SCRIPT_NAME} v${GM_info.script.version}`);
 
