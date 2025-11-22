@@ -474,7 +474,7 @@
 
             a:hover:not([href*="/the-loai/"]),
             .long-text a:hover {
-                color: ${palette[500]} !important;
+                color: ${palette[700]} !important;
             }
             
             .text-slate-500,
