@@ -149,8 +149,40 @@
 
             const avatarSrc = avatarElement.src || avatarElement.getAttribute('data-src');
             if (!avatarSrc) {
-                debugLog('Avatar không có src, fallback về màu config');
-                applyConfigColor();
+                debugLog('Avatar không có src, sẽ thử lại sau khi ảnh load');
+                // Thử lại sau khi ảnh load
+                avatarElement.addEventListener('load', () => {
+                    debugLog('Avatar đã load, thử trích xuất màu lại');
+                    const retrySrc = avatarElement.src || avatarElement.getAttribute('data-src');
+                    if (retrySrc) {
+                        analyzeImageColorTraditionalAccent(retrySrc)
+                            .then(dominantColor => {
+                                debugLog('Màu chủ đạo từ avatar (sau khi load):', dominantColor);
+                                if (isValidColor(dominantColor)) {
+                                    const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
+                                    const isLightColor = MonetAPI.isColorLight(dominantColor);
+                                    applyMonetColorScheme(monetPalette, isLightColor);
+                                } else {
+                                    debugLog('Màu từ avatar không hợp lệ sau khi load, fallback về màu config');
+                                    applyConfigColor();
+                                }
+                            })
+                            .catch(error => {
+                                debugLog('Lỗi khi phân tích màu từ avatar sau khi load:', error);
+                                applyConfigColor();
+                            });
+                    } else {
+                        debugLog('Vẫn không có src sau khi load, fallback về màu config');
+                        applyConfigColor();
+                    }
+                });
+                // Timeout fallback sau 5 giây
+                setTimeout(() => {
+                    if (!avatarSrc) {
+                        debugLog('Timeout chờ avatar load, fallback về màu config');
+                        applyConfigColor();
+                    }
+                }, 5000);
                 return;
             }
 
@@ -160,13 +192,13 @@
             analyzeImageColorTraditionalAccent(avatarSrc)
                 .then(dominantColor => {
                     debugLog('Màu chủ đạo từ avatar:', dominantColor);
-    
+
                     if (!isValidColor(dominantColor)) {
                         debugLog('Màu từ avatar không hợp lệ, fallback về màu config');
                         applyConfigColor();
                         return;
                     }
-    
+
                     const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
                     const isLightColor = MonetAPI.isColorLight(dominantColor);
                     applyMonetColorScheme(monetPalette, isLightColor);
