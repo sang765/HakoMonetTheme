@@ -569,8 +569,8 @@
             .series-users,
             .showcase-item,
             .sub-index-style {
-                background-color: ${palette[100]} !important;
-                border-color: ${palette[100]} ${palette[0]} ${palette[0]} !important;
+                background-color: ${palette[200]} !important;
+                border-color: ${palette[200]} ${palette[0]} ${palette[0]} !important;
             }
             
             #licensed-list header.section-title,
@@ -579,11 +579,11 @@
             .detail-list header.section-title,
             .modal-header,
             .private-tabs header {
-                background-color: ${palette[200]} !important;
+                background-color: ${palette[300]} !important;
             }
             
             .bg-gray-100 {
-                background-color: ${palette[200]} !important;
+                background-color: ${palette[300]} !important;
             }
             
             #footer {
@@ -646,7 +646,7 @@
             }
             
             .expand, .mobile-more, .summary-more.more-state {
-                background: linear-gradient(180deg, rgba(255,255,255,0) 1%, ${palette[100]} 75%, ${palette[100]}) !important;
+                background: linear-gradient(180deg, rgba(255,255,255,0) 1%, ${palette[200]} 75%, ${palette[200]}) !important;
             }
             
             .ln-comment-group:nth-child(odd) .expand {
@@ -996,8 +996,8 @@
             .series-users,
             .showcase-item,
             .sub-index-style {
-                background-color: ${defaultPalette[100]} !important;
-                border-color: ${defaultPalette[100]} ${defaultPalette[0]} ${defaultPalette[0]} !important;
+                background-color: ${defaultPalette[200]} !important;
+                border-color: ${defaultPalette[200]} ${defaultPalette[0]} ${defaultPalette[0]} !important;
             }
             
             #licensed-list header.section-title,
@@ -1006,11 +1006,11 @@
             .detail-list header.section-title,
             .modal-header,
             .private-tabs header {
-                background-color: ${defaultPalette[200]} !important;
+                background-color: ${defaultPalette[300]} !important;
             }
             
             .bg-gray-100 {
-                background-color: ${defaultPalette[200]} !important;
+                background-color: ${defaultPalette[300]} !important;
             }
             
             #footer {
@@ -1073,7 +1073,7 @@
             }
             
             .expand, .mobile-more, .summary-more.more-state {
-                background: linear-gradient(180deg, rgba(255,255,255,0) 1%, ${defaultPalette[100]} 75%, ${defaultPalette[100]}) !important;
+                background: linear-gradient(180deg, rgba(255,255,255,0) 1%, ${defaultPalette[200]} 75%, ${defaultPalette[200]}) !important;
             }
             
             .ln-comment-group:nth-child(odd) .expand {
