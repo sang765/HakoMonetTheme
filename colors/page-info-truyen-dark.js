@@ -644,7 +644,7 @@
             }
             
             .expand, .mobile-more, .summary-more.more-state {
-                background: linear-gradient(180deg, rgba(31,31,31,0) 1%, ${palette[900]} 75%, ${palette[900]}) !important;
+                background: linear-gradient(180deg, rgba(31,31,31,0) 1%, ${palette[800]} 75%, ${palette[800]}) !important;
             }
             
             .ln-comment-group:nth-child(odd) .expand {
@@ -1071,7 +1071,7 @@
             }
             
             .expand, .mobile-more, .summary-more.more-state {
-                background: linear-gradient(180deg, rgba(31,31,31,0) 1%, ${defaultPalette[900]} 75%, ${defaultPalette[900]}) !important;
+                background: linear-gradient(180deg, rgba(31,31,31,0) 1%, ${defaultPalette[800]} 75%, ${defaultPalette[800]}) !important;
             }
             
             .ln-comment-group:nth-child(odd) .expand {
