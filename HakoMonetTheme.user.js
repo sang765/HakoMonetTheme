@@ -59,7 +59,8 @@ const resourcePaths = {
     monetTestJS: 'http://localhost:8080/api/monet-test.js',
     colorisJS: 'http://localhost:8080/api/coloris.min.js',
     colorisCSS: 'http://localhost:8080/api/coloris.min.css',
-    colorisColors: 'http://localhost:8080/api/coloris-colors.json'
+    colorisColors: 'http://localhost:8080/api/coloris-colors.json',
+    autoReloadJS: 'http://localhost:8080/module/auto-reload.js'
 };
 
 (function() {
@@ -96,7 +97,8 @@ const resourcePaths = {
             pageGeneralLight: '[PageGeneralLight]',
             pageInfoTruyen: '[PageInfoTruyen]',
             pageInfoTruyenLight: '[PageInfoTruyenLight]',
-            corsMaster: '[CORSMaster]'
+            corsMaster: '[CORSMaster]',
+            autoReload: '[AutoReload]'
         },
 
         // Simple logging functions
@@ -374,7 +376,7 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
         const resources = [
             'mainJS', 'monetAPIJS', 'monetTestJS', 'updateCheckerJS', 'CORSJS', 'infoTruyenJS',
             'animationJS', 'tagColorJS', 'fontImportJS', 'colorinfotruyen',
-            'themeDetectorJS', 'deviceDetectorJS', 'configJS', 'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyenlight', 'adBlockerJS', 'antiPopupJS',
+            'themeDetectorJS', 'deviceDetectorJS', 'configJS', 'autoReloadJS', 'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyenlight', 'adBlockerJS', 'antiPopupJS',
             'mainMenuJS', 'navbarLogoJS', 'updateManagerJS', 'darkModePrompterJS', 'fullscreenJS',
             'readingPageJS', 'deviceCSSLoaderJS', 'profileBannerCropperJS'
         ];

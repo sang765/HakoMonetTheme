@@ -1037,12 +1037,19 @@
                 background-color: ${palette[200]} !important;
             }
 
-            .summary-more.more-state:hover,
-            .mobile-more:hover {
+.summary-more.more-state:hover,
+            .mobile-more:hover,
+            .summary-more.less-state .see_more:hover,
+            [class="sub-index-style js-tongtien"] [class="select-wrapper"] {
                 color: ${palette[500]} !important;
             }
 
-            .summary-more.less-state .see_more:hover {
+            .licensed-list-page #search-by-month {
+                border-left: 4px solid ${palette[500]} !important;
+                border-left-color: ${palette[500]};
+            }
+
+            [type="checkbox"], [type="radio"] {
                 color: ${palette[500]} !important;
             }
 
@@ -1695,11 +1702,18 @@
             }
 
             .summary-more.more-state:hover,
-            .mobile-more:hover {
+            .mobile-more:hover,
+            .summary-more.less-state .see_more:hover,
+            [class="sub-index-style js-tongtien"] [class="select-wrapper"] {
                 color: ${defaultColor} !important;
             }
 
-            .summary-more.less-state .see_more:hover {
+            .licensed-list-page #search-by-month {
+                border-left: 4px solid ${defaultColor} !important;
+                border-left-color: ${defaultColor};
+            }
+
+            [type="checkbox"], [type="radio"] {
                 color: ${defaultColor} !important;
             }
 
