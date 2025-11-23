@@ -1165,24 +1165,28 @@
             }
 
             .button-green {
-                background-color: ${palette[600]} !important;
+                background-color: ${palette[500]} !important;
                 border-color: ${palette[400]} !important;
                 color: ${textColor} !important;
             }
             .button-green:hover {
                 background-color: ${textColor} !important;
                 border-color: ${palette[400]} !important;
-                color: ${palette[600]} !important;
+                color: ${palette[500]} !important;
             }
 
             .button.to-contact.button-green:hover {
                 background-color: ${textColor} !important;
-                color: ${palette[600]} !important;
-                border-color: ${palette[600]} !important;
+                color: ${palette[500]} !important;
+                border-color: ${palette[500]} !important;
             }
 
             .profile-nav {
                 background-color: ${palette[200]} !important;
+            }
+
+            .bg-gray-200 {
+                background-color: ${palette[900]} !important;
             }
 
             .bg-blue-600 {
@@ -1431,15 +1435,19 @@
                 color: ${textColor} !important;
             }
 
+            .profile-showcase header, ol.list-volume li {
+                border-bottom-color: ${palette[200]} !important;
+            }
+
             .statistic-top,
             .comment-item,
-            .profile-showcase header, ol.list-volume li,
             .licensed-list-page #licensed-list .info-item,
             .detail-list .detail-list-item,
             .user-private-tabs li a,
             .account-sidebar li,
-            .comment-item-at-index {
-                border-bottom-color: ${palette[200]} !important;
+            .comment-item-at-index,
+            #licensed-list .listall-item {
+                border-bottom-color: ${palette[800]} !important;
             }
 
             .see-more_text {
@@ -1517,6 +1525,16 @@
             [class="text-yellow-400"],
             .series-rating .feature-value, .star-1:hover, .star-2:hover, .star-2:hover ~ .star-1, .star-3:hover, .star-3:hover ~ .star-1, .star-3:hover ~ .star-2, .star-4:hover, .star-4:hover ~ .star-1, .star-4:hover ~ .star-2, .star-4:hover ~ .star-3, .star-5:hover, .star-5:hover ~ .star-1, .star-5:hover ~ .star-2, .star-5:hover ~ .star-3, .star-5:hover ~ .star-4, .star-evaluate-item.rated {
                 color: ${palette[600]};
+            }
+
+            [class="button inline-block filter-submit button-primary-green"]:hover,
+            .search-form.submit {
+                background-color: ${palette[500]};
+                color: ${textColor};
+            }
+
+            .profile-cover:hover .p-c_wrapper {
+                background-color: ${MonetAPI.paletteToRgba(palette, 400, .6)};
             }
         `;
 
@@ -1813,24 +1831,28 @@
             }
 
             .button-green {
-                background-color: ${defaultPalette[600]} !important;
+                background-color: ${defaultPalette[500]} !important;
                 border-color: ${defaultPalette[400]} !important;
                 color: ${textColor} !important;
             }
             .button-green:hover {
                 background-color: ${textColor} !important;
                 border-color: ${defaultPalette[400]} !important;
-                color: ${defaultPalette[600]} !important;
+                color: ${defaultPalette[500]} !important;
             }
 
             .button.to-contact.button-green:hover {
                 background-color: ${textColor} !important;
-                color: ${defaultPalette[600]} !important;
-                border-color: ${defaultPalette[600]} !important;
+                color: ${defaultPalette[500]} !important;
+                border-color: ${defaultPalette[500]} !important;
             }
 
             .profile-nav {
                 background-color: ${defaultPalette[200]} !important;
+            }
+
+            .bg-gray-200 {
+                background-color: ${defaultPalette[900]} !important;
             }
 
             .bg-blue-600 {
@@ -2056,15 +2078,19 @@
                 color: ${textColor} !important;
             }
 
+            .profile-showcase header {
+                border-bottom-color: ${defaultPalette[200]} !important;
+            }
+
             .statistic-top,
             .comment-item,
-            .profile-showcase header, ol.list-volume li,
             .licensed-list-page #licensed-list .info-item,
             .detail-list .detail-list-item,
             .user-private-tabs li a,
             .account-sidebar li,
-            .comment-item-at-index {
-                border-bottom-color: ${defaultPalette[200]} !important;
+            .comment-item-at-index,
+            #licensed-list .listall-item {
+                border-bottom-color: ${defaultPalette[800]} !important;
             }
 
             .see-more_text {
@@ -2141,6 +2167,16 @@
             [class="text-yellow-400"],
             .series-rating .feature-value, .star-1:hover, .star-2:hover, .star-2:hover ~ .star-1, .star-3:hover, .star-3:hover ~ .star-1, .star-3:hover ~ .star-2, .star-4:hover, .star-4:hover ~ .star-1, .star-4:hover ~ .star-2, .star-4:hover ~ .star-3, .star-5:hover, .star-5:hover ~ .star-1, .star-5:hover ~ .star-2, .star-5:hover ~ .star-3, .star-5:hover ~ .star-4, .star-evaluate-item.rated {
                 color: ${defaultPalette[600]};
+            }
+
+            [class="button inline-block filter-submit button-primary-green"]:hover,
+            .search-form.submit {
+                background-color: ${defaultPalette[500]};
+                color: ${textColor};
+            }
+
+            .profile-cover:hover .p-c_wrapper {
+                background-color: ${MonetAPI.paletteToRgba(palette, 400, .6)};
             }
         `;
 
