@@ -7,6 +7,9 @@
 ~~Material You theme dành cho Hako/DocLN.~~  
 **KHÔNG CHỈ ĐƠN GIẢN LÀ MỘT THEME. NÓ CÒN HƠN THẾ NỮA!!!**
 
+![Homepage](/.github/assets/home-theme-preview.webp)
+![Novel](/.github/assets/info-truyen-theme-preview.webp)
+
 ![Tampermonkey](https://img.shields.io/badge/Tampermonkey-Supported-green.svg)
 ![Violentmonkey](https://img.shields.io/badge/Violentmonkey-Supported-green.svg)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)  
