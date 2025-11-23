@@ -1024,11 +1024,18 @@
             }
 
             .summary-more.more-state:hover,
-            .mobile-more:hover {
+            .mobile-more:hover,
+            .summary-more.less-state .see_more:hover,
+            [class="sub-index-style js-tongtien"] [class="select-wrapper"] {
                 color: ${palette[500]} !important;
             }
 
-            .summary-more.less-state .see_more:hover {
+            .licensed-list-page #search-by-month {
+                border-left: 4px solid ${palette[500]} !important;
+                border-left-color: ${palette[500]};
+            }
+
+            [type="checkbox"], [type="radio"] {
                 color: ${palette[500]} !important;
             }
 
@@ -1412,15 +1419,18 @@
                 color: ${textColor} !important;
             }
 
+            .profile-showcase header, ol.list-volume li {
+                border-bottom-color: ${palette[800]} !important;}
+
             .statistic-top,
             .comment-item,
-            .profile-showcase header, ol.list-volume li,
             .licensed-list-page #licensed-list .info-item,
             .detail-list .detail-list-item,
             .user-private-tabs li a,
             .account-sidebar li,
-            .comment-item-at-index {
-                border-bottom-color: ${palette[800]} !important;
+            .comment-item-at-index,
+            #licensed-list .listall-item {
+                border-bottom-color: ${palette[200]} !important;
             }
 
             .see-more_text {
@@ -1492,6 +1502,16 @@
             [class="text-yellow-400"],
             .series-rating .feature-value, .star-1:hover, .star-2:hover, .star-2:hover ~ .star-1, .star-3:hover, .star-3:hover ~ .star-1, .star-3:hover ~ .star-2, .star-4:hover, .star-4:hover ~ .star-1, .star-4:hover ~ .star-2, .star-4:hover ~ .star-3, .star-5:hover, .star-5:hover ~ .star-1, .star-5:hover ~ .star-2, .star-5:hover ~ .star-3, .star-5:hover ~ .star-4, .star-evaluate-item.rated {
                 color: ${palette[400]};
+            }
+
+            [class="button inline-block filter-submit button-primary-green"]:hover,
+            .search-form.submit {
+                background-color: ${palette[500]};
+                color: ${textColor};
+            }
+
+            .profile-cover:hover .p-c_wrapper {
+                background-color: ${MonetAPI.paletteToRgba(palette, 600, .6)};
             }
         `;
 
@@ -1677,11 +1697,18 @@
             }
 
             .summary-more.more-state:hover,
-            .mobile-more:hover {
+            .mobile-more:hover,
+            .summary-more.less-state .see_more:hover,
+            [class="sub-index-style js-tongtien"] [class="select-wrapper"] {
                 color: ${defaultColor} !important;
             }
 
-            .summary-more.less-state .see_more:hover {
+            .licensed-list-page #search-by-month {
+                border-left: 4px solid ${defaultColor} !important;
+                border-left-color: ${defaultColor};
+            }
+
+            [type="checkbox"], [type="radio"] {
                 color: ${defaultColor} !important;
             }
 
@@ -2026,15 +2053,19 @@
                 color: ${textColor} !important;
             }
 
+            .profile-showcase header, ol.list-volume li {
+                border-bottom-color: ${defaultPalette[800]} !important;
+            }
+
             .statistic-top,
             .comment-item,
-            .profile-showcase header, ol.list-volume li,
             .licensed-list-page #licensed-list .info-item,
             .detail-list .detail-list-item,
             .user-private-tabs li a,
             .account-sidebar li,
-            .comment-item-at-index {
-                border-bottom-color: ${defaultPalette[800]} !important;
+            .comment-item-at-index,
+            #licensed-list .listall-item {
+                border-bottom-color: ${defaultPalette[200]} !important;
             }
 
             .see-more_text {
@@ -2106,6 +2137,16 @@
             [class="text-yellow-400"],
             .series-rating .feature-value, .star-1:hover, .star-2:hover, .star-2:hover ~ .star-1, .star-3:hover, .star-3:hover ~ .star-1, .star-3:hover ~ .star-2, .star-4:hover, .star-4:hover ~ .star-1, .star-4:hover ~ .star-2, .star-4:hover ~ .star-3, .star-5:hover, .star-5:hover ~ .star-1, .star-5:hover ~ .star-2, .star-5:hover ~ .star-3, .star-5:hover ~ .star-4, .star-evaluate-item.rated {
                 color: ${defaultPalette[400]};
+            }
+
+            [class="button inline-block filter-submit button-primary-green"]:hover,
+            .search-form.submit {
+                background-color: ${defaultPalette[500]};
+                color: ${textColor};
+            }
+
+            .profile-cover:hover .p-c_wrapper {
+                background-color: ${MonetAPI.paletteToRgba(defaultPalette, 600, .6)};
             }
         `;
 
