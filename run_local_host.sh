@@ -62,7 +62,7 @@ show_menu() {
     echo "Choose your preferred server:"
     echo "[1] Python HTTP Server (Port 8000)"
     echo "[2] Node.js HTTP Server (Port 8080)"
-    echo "[3] Node.js Auto-Reload Server (Port 8080)"
+    echo "[3] Node.js Auto-Reload Server (Port 8080) [EXPERIMENTAL]"
     echo "[4] Check Server Status"
     echo "[5] Kill Running Servers"
     echo "[6] Exit"
