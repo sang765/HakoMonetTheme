@@ -47,7 +47,6 @@ const resourcePaths = {
     deviceDetectorJS: 'http://localhost:8080/module/device-detector.js',
     configJS: 'http://localhost:8080/module/config.js',
     adBlockerJS: 'http://localhost:8080/module/ad-blocker.js',
-    autoReloadJS: 'http://localhost:8080/module/auto-reload.js',
     antiPopupJS: 'http://localhost:8080/module/anti-popup.js',
     mainMenuJS: 'http://localhost:8080/module/main-menu.js',
     navbarLogoJS: 'http://localhost:8080/module/navbar-logo.js',
@@ -159,7 +158,31 @@ const resourcePaths = {
 
     // Expose Logger globally for modules
     window.Logger = Logger;
-    
+
+    // Auto-reload functionality for local development
+    function setupAutoReload() {
+        try {
+            const ws = new WebSocket('ws://localhost:8080');
+            ws.onopen = () => {
+                Logger.log('main', 'Connected to auto-reload server');
+            };
+            ws.onmessage = (event) => {
+                if (event.data === 'reload') {
+                    Logger.log('main', 'Received reload signal, refreshing page...');
+                    window.location.reload();
+                }
+            };
+            ws.onclose = () => {
+                Logger.log('main', 'Disconnected from auto-reload server');
+            };
+            ws.onerror = (error) => {
+                Logger.debug('main', 'WebSocket error (server may not be running):', error);
+            };
+        } catch (error) {
+            Logger.debug('main', 'Failed to setup auto-reload:', error);
+        }
+    }
+
     function registerMenuCommands() {
         if (typeof GM_registerMenuCommand === 'function') {
             GM_registerMenuCommand('📋 Menu chính', function() {
@@ -333,7 +356,7 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
         const resources = [
             'mainJS', 'monetAPIJS', 'monetTestJS', 'updateCheckerJS', 'CORSJS', 'infoTruyenJS',
             'animationJS', 'tagColorJS', 'fontImportJS', 'colorinfotruyen',
-            'themeDetectorJS', 'deviceDetectorJS', 'configJS', 'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyenlight', 'adBlockerJS', 'autoReloadJS', 'antiPopupJS',
+            'themeDetectorJS', 'deviceDetectorJS', 'configJS', 'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyenlight', 'adBlockerJS', 'antiPopupJS',
             'mainMenuJS', 'navbarLogoJS', 'updateManagerJS', 'darkModePrompterJS', 'fullscreenJS',
             'readingPageJS', 'deviceCSSLoaderJS', 'profileBannerCropperJS'
         ];
@@ -466,6 +489,9 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
 
         // Đăng ký menu commands
         registerMenuCommands();
+
+        // Setup auto-reload for local development
+        setupAutoReload();
 
         // Tải tất cả resources
         const { loadedCount } = await loadAllResources();

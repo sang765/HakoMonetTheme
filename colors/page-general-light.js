@@ -1113,14 +1113,10 @@
                 font-weight: 400 !important;
             }
 
-            .daily-recent_views .top-tab_title.title-active {
-                background-color: ${palette[400]} !important;
-                color: #000;
-            }
-
+            .daily-recent_views .top-tab_title.title-active,
             .sts-bold {
                 background-color: ${palette[400]} !important;
-                color: #000;
+                color: ${textColor} !important;
             }
 
             .filters-wrapper {
@@ -1762,13 +1758,10 @@
                 font-weight: 400 !important;
             }
 
-            .daily-recent_views .top-tab_title.title-active {
-                background-color: ${defaultPalette[400]} !important;
-                color: #000;
-            }
-
+            .daily-recent_views .top-tab_title.title-active,
             .sts-bold {
-                background-color: ${defaultPalette[400]} !important;
+                background-color: ${palette[400]} !important;
+                color: ${textColor} !important;
             }
 
             .filters-wrapper {

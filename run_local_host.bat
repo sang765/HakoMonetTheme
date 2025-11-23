@@ -5,14 +5,16 @@ echo ========================================
 echo.
 echo Choose your preferred server:
 echo 1. Python (recommended)
-echo 2. Node.js
-echo 3. Exit
+echo 2. Node.js (http-server)
+echo 3. Node.js with Auto-Reload
+echo 4. Exit
 echo.
-set /p choice="Enter your choice (1-3): "
+set /p choice="Enter your choice (1-4): "
 
 if "%choice%"=="1" goto python
 if "%choice%"=="2" goto nodejs
-if "%choice%"=="3" goto exit
+if "%choice%"=="3" goto nodejs_autoreload
+if "%choice%"=="4" goto exit
 
 echo Invalid choice. Please run again.
 pause
@@ -52,6 +54,27 @@ echo Press Ctrl+C to stop the server
 echo Note: http-server will be installed automatically if not present
 echo.
 npx http-server -p 8080 -c-1 --cors
+goto end
+
+:nodejs_autoreload
+echo Checking Node.js...
+node --version >nul 2>&1
+if errorlevel 1 (
+    echo Node.js is not installed or not in PATH.
+    echo Please install Node.js from https://nodejs.org
+    pause
+    goto end
+)
+
+echo Installing dependencies if needed...
+npm install
+
+echo Starting Node.js auto-reload server on port 8080...
+echo Access your files at: http://localhost:8080
+echo Auto-reload enabled: Save files in VSCode to refresh browser automatically
+echo Press Ctrl+C to stop the server
+echo.
+node server.js
 goto end
 
 :exit
