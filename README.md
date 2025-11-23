@@ -11,6 +11,9 @@ Vui lòng không sử dụng nhánh này cho mục đích sử dụng hàng ngà
 ~~Material You theme dành cho Hako/DocLN.~~  
 **KHÔNG CHỈ ĐƠN GIẢN LÀ MỘT THEME. NÓ CÒN HƠN THẾ NỮA!!!**
 
+![Homepage](/.github/assets/home-theme-preview.webp)
+![Novel](/.github/assets/info-truyen-theme-preview.webp)
+
 ![Tampermonkey](https://img.shields.io/badge/Tampermonkey-Supported-green.svg)
 ![Violentmonkey](https://img.shields.io/badge/Violentmonkey-Supported-green.svg)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)  
@@ -122,6 +125,7 @@ Nếu bạn gặp vấn đề hoặc có đề xuất cải tiến, vui lòng:
 | **Preview Novel 3-1** | **Peview Novel 3-2** | **Peview Novel 3-3** | 
 | ![Menu](/.github/assets/menu.png) | ![Notification](/.github/assets/notification.png) | ![Account](/.github/assets/account.png) |
 | **Preview Menu** | **Peview Thông Báo** | **Peview Menu Account** | 
+| | | |
 
 ### 💻 **Trên Desktop** 💻
 
@@ -131,7 +135,7 @@ Nếu bạn gặp vấn đề hoặc có đề xuất cải tiến, vui lòng:
 | **Preview Trang Chủ** | **Peview Trang Thông Tin Truyện** | **Trang Thông Tin Truyện - GIF** | 
 | ![Desktop Settings GIF](/.github/assets/desktop-settings.gif) | ![Desktop Block Banner GIF](/.github/assets/desktop-block-banner.gif) | |
 | **Preview Cài Đặt Userscript** | **Peview Chặn Banner** | | 
-
+| | | |
 
 ## 🔧 Technical Details 🔧
 
