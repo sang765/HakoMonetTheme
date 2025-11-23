@@ -1,6 +1,6 @@
 <div align="center">
 
-**Lưu Ý:** Để xem hướng dẫn chạy local server và phát triển userscript, vui lòng tham khảo [Hướng dẫn phát triển local](./local-tutorial.md)
+**Lưu Ý:** Để xem hướng dẫn chạy local server và phát triển userscript, vui lòng tham khảo [Hướng dẫn phát triển local](./docs/local-tutorial.md)
 Branch này được tạo để phát triển và kiểm tra tính năng mới trước khi hợp nhất vào nhánh chính (main branch). Vui lòng không sử dụng nhánh này cho mục đích sử dụng hàng ngày.
 
 <img src="./.github/assets/logo.png" width="300" height="300">
