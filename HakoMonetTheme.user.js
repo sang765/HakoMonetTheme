@@ -156,6 +156,22 @@ const resourcePaths = {
         Logger.log('main', ...args);
     }
 
+    // Centralized notification function
+    function showNotification(title, body, timeout = 5000) {
+        try {
+            GM_notification({
+                title: title,
+                text: body,
+                timeout: timeout,
+                ondone: function() { /* Do nothing */ }
+            });
+        } catch (e) {
+            Logger.error('main', 'Failed to show notification:', e);
+            // Fallback for environments where GM_notification is not available
+            alert(`${title}\n\n${body}`);
+        }
+    }
+
     // Expose Logger globally for modules
     window.Logger = Logger;
 
@@ -341,8 +357,10 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
                     }
                 },
                 onerror: function(error) {
-                    Logger.error('main', `Network error loading ${resourceName}:`, error);
-                    reject(error);
+                    const errorMessage = `Network error loading ${resourceName}. Is the local server running?`;
+                    Logger.error('main', errorMessage, error);
+                    showNotification('Network Error', `${resourceName}: ${errorMessage}`, 5000);
+                    reject(new Error(errorMessage));
                 },
                 ontimeout: function() {
                     Logger.error('main', `Timeout loading ${resourceName}`);
