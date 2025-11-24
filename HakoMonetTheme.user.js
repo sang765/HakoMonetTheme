@@ -374,11 +374,22 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
 
     async function loadAllResources() {
         const resources = [
-            'mainJS', 'monetAPIJS', 'monetTestJS', 'updateCheckerJS', 'CORSJS', 'infoTruyenJS',
-            'animationJS', 'tagColorJS', 'fontImportJS', 'colorinfotruyen',
-            'themeDetectorJS', 'deviceDetectorJS', 'configJS', 'autoReloadJS', 'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyenlight', 'adBlockerJS', 'antiPopupJS',
-            'mainMenuJS', 'navbarLogoJS', 'updateManagerJS', 'darkModePrompterJS', 'fullscreenJS',
-            'readingPageJS', 'deviceCSSLoaderJS', 'profileBannerCropperJS'
+            // main
+            'mainJS',
+            // api
+            'monetAPIJS', 'monetTestJS', 'updateCheckerJS', 'CORSJS', 'html2canvasJS', 'colorisJS', 'colorisCSS', 'colorisColors',
+            // config
+            'configJS',
+            // menu
+            'mainMenuJS',
+            // core (adblock, antipopup)
+            'adBlockerJS', 'antiPopupJS',
+            // css (other modules)
+            'infoTruyenJS', 'animationJS', 'tagColorJS', 'fontImportJS', 'themeDetectorJS', 'deviceDetectorJS', 'autoReloadJS',
+            'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyen', 'colorinfotruyenlight',
+            'navbarLogoJS', 'updateManagerJS', 'darkModePrompterJS', 'fullscreenJS', 'readingPageJS',
+            // dynamic css
+            'deviceCSSLoaderJS', 'profileBannerCropperJS'
         ];
 
         const promises = resources.map(resourceName => loadResource(resourceName));

@@ -115,10 +115,16 @@
 
         debugLog('Đang phân tích màu từ ảnh bìa:', coverUrl);
 
+        // Kiểm tra chế độ màu trang thông tin
+        const infoPageColorMode = window.HMTConfig && window.HMTConfig.getInfoPageColorMode ?
+            window.HMTConfig.getInfoPageColorMode() : 'thumbnail';
+
+        debugLog('Chế độ màu trang thông tin:', infoPageColorMode);
+
         // Hàm áp dụng màu sắc hiện tại
         function applyCurrentColorScheme() {
-            const defaultColor = window.HMTConfig && window.HMTConfig.getDefaultColor ?
-                window.HMTConfig.getDefaultColor() : '#FCE4EC';
+            const defaultColor = window.HMTConfig && window.HMTConfig.getInfoPageDefaultColor ?
+                window.HMTConfig.getInfoPageDefaultColor() : '#FCE4EC';
 
             debugLog('Áp dụng màu mặc định từ config:', defaultColor);
 
@@ -151,11 +157,15 @@
                         return;
                     }
 
+                    // Create tinted white using color for light mode
+                    const tintedWhite = createTintedWhite(dominantColor);
+                    debugLog('Tinted white cho light mode:', tintedWhite);
+
                     // Gọi API Monet để tạo palette
-                    const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
+                    const monetPalette = MonetAPI.generateMonetPalette(tintedWhite);
                     debugLog('Monet Palette:', monetPalette);
 
-                    const isLightColor = MonetAPI.isColorLight(dominantColor);
+                    const isLightColor = MonetAPI.isColorLight(tintedWhite);
                     debugLog('Màu sáng?', isLightColor);
 
                     applyMonetColorScheme(monetPalette, isLightColor);
@@ -166,8 +176,14 @@
                 });
         }
 
-        // Áp dụng màu sắc lần đầu
-        analyzeAndApplyImageColor();
+        // Áp dụng màu sắc lần đầu dựa trên chế độ
+        if (infoPageColorMode === 'default') {
+            applyCurrentColorScheme();
+        } else if (infoPageColorMode === 'thumbnail') {
+            analyzeAndApplyImageColor();
+        } else if (infoPageColorMode === 'avatar') {
+            analyzeAndApplyAvatarColor();
+        }
 
         // Lắng nghe sự kiện màu sắc thay đổi để cập nhật real-time
         (window.top || window).document.addEventListener('hmtColorChanged', function(event) {
@@ -180,8 +196,11 @@
                 return;
             }
 
-            // Kiểm tra chế độ màu
-            const colorMode = window.HMTConfig && window.HMTConfig.getColorMode ? window.HMTConfig.getColorMode() : 'default';
+            // Kiểm tra chế độ màu phù hợp (info page mode cho trang info, general mode cho các trang khác)
+            const isInfoPage = document.querySelector('div.col-4.col-md.feature-item.width-auto-xl') !== null;
+            const colorMode = isInfoPage ?
+                (window.HMTConfig && window.HMTConfig.getInfoPageColorMode ? window.HMTConfig.getInfoPageColorMode() : 'thumbnail') :
+                (window.HMTConfig && window.HMTConfig.getColorMode ? window.HMTConfig.getColorMode() : 'default');
 
             // Chỉ áp dụng màu thực sự nếu không phải preview mode và chế độ là default
             if (!event.detail.isPreview && colorMode === 'default') {
@@ -193,10 +212,146 @@
                 // Nếu là preview mode, áp dụng màu ngay lập tức
                 const previewColor = event.detail.color;
                 if (previewColor && isValidColor(previewColor)) {
-                    const monetPalette = MonetAPI.generateMonetPalette(previewColor);
-                    const isLightColor = MonetAPI.isColorLight(previewColor);
+                    // Create tinted white using color for light mode
+                    const tintedWhite = createTintedWhite(previewColor);
+                    const monetPalette = MonetAPI.generateMonetPalette(tintedWhite);
+                    const isLightColor = MonetAPI.isColorLight(tintedWhite);
                     applyMonetColorScheme(monetPalette, isLightColor);
                 }
+            }
+        });
+
+        // Lắng nghe sự kiện màu mặc định trang thông tin thay đổi
+        (window.top || window).document.addEventListener('hmtInfoPageDefaultColorChanged', function(event) {
+            debugLog('Nhận sự kiện màu mặc định trang thông tin thay đổi:', event.detail);
+
+            // Check if in dark mode
+            const isDarkMode = document.cookie.includes('night_mode=true');
+            if (isDarkMode) {
+                debugLog('In dark mode, skipping light theme application');
+                return;
+            }
+
+            const infoPageColorMode = window.HMTConfig && window.HMTConfig.getInfoPageColorMode ?
+                window.HMTConfig.getInfoPageColorMode() : 'thumbnail';
+
+            // Chỉ áp dụng nếu chế độ là default
+            if (infoPageColorMode === 'default') {
+                // Đợi một chút để đảm bảo màu đã được lưu vào storage
+                setTimeout(() => {
+                    applyCurrentColorScheme();
+                }, 100);
+            }
+        });
+
+        // Hàm phân tích và áp dụng màu từ avatar
+        function analyzeAndApplyAvatarColor() {
+            debugLog('Bắt đầu trích xuất màu từ avatar cho trang info (light mode)');
+
+            // Tìm avatar element
+            const avatarElement = document.querySelector('.nav-user_avatar img');
+            debugLog('Avatar element found:', !!avatarElement);
+            if (avatarElement) {
+                debugLog('Avatar element src:', avatarElement.src);
+                debugLog('Avatar element data-src:', avatarElement.getAttribute('data-src'));
+            }
+
+            if (!avatarElement) {
+                debugLog('Không tìm thấy avatar element, fallback về màu config');
+                applyCurrentColorScheme();
+                return;
+            }
+
+            const avatarSrc = avatarElement.src || avatarElement.getAttribute('data-src');
+            if (!avatarSrc) {
+                debugLog('Avatar không có src, sẽ thử lại sau khi ảnh load');
+                // Thử lại sau khi ảnh load
+                avatarElement.addEventListener('load', () => {
+                    debugLog('Avatar đã load, thử trích xuất màu lại');
+                    const retrySrc = avatarElement.src || avatarElement.getAttribute('data-src');
+                    if (retrySrc) {
+                        analyzeImageColorTraditionalAccent(retrySrc)
+                            .then(dominantColor => {
+                                debugLog('Màu chủ đạo từ avatar (sau khi load):', dominantColor);
+                                if (isValidColor(dominantColor)) {
+                                    // Create tinted white using color for light mode
+                                    const tintedWhite = createTintedWhite(dominantColor);
+                                    debugLog('Tinted white cho light mode:', tintedWhite);
+
+                                    const monetPalette = MonetAPI.generateMonetPalette(tintedWhite);
+                                    const isLightColor = MonetAPI.isColorLight(tintedWhite);
+                                    applyMonetColorScheme(monetPalette, isLightColor);
+                                } else {
+                                    debugLog('Màu từ avatar không hợp lệ sau khi load, fallback về màu config');
+                                    applyCurrentColorScheme();
+                                }
+                            })
+                            .catch(error => {
+                                debugLog('Lỗi khi phân tích màu từ avatar sau khi load:', error);
+                                applyCurrentColorScheme();
+                            });
+                    } else {
+                        debugLog('Vẫn không có src sau khi load, fallback về màu config');
+                        applyCurrentColorScheme();
+                    }
+                });
+                // Timeout fallback sau 5 giây
+                setTimeout(() => {
+                    if (!avatarSrc) {
+                        debugLog('Timeout chờ avatar load, fallback về màu config');
+                        applyCurrentColorScheme();
+                    }
+                }, 5000);
+                return;
+            }
+
+            debugLog('Tìm thấy avatar src:', avatarSrc);
+
+            // Phân tích màu từ avatar
+            analyzeImageColorTraditionalAccent(avatarSrc)
+                .then(dominantColor => {
+                    debugLog('Màu chủ đạo từ avatar:', dominantColor);
+
+                    if (!isValidColor(dominantColor)) {
+                        debugLog('Màu từ avatar không hợp lệ, fallback về màu config');
+                        applyCurrentColorScheme();
+                        return;
+                    }
+
+                    // Create tinted white using color for light mode
+                    const tintedWhite = createTintedWhite(dominantColor);
+                    debugLog('Tinted white cho light mode:', tintedWhite);
+
+                    const monetPalette = MonetAPI.generateMonetPalette(tintedWhite);
+                    const isLightColor = MonetAPI.isColorLight(tintedWhite);
+                    applyMonetColorScheme(monetPalette, isLightColor);
+                })
+                .catch(error => {
+                    debugLog('Lỗi khi phân tích màu từ avatar:', error);
+                    applyCurrentColorScheme(); // Fallback to config color
+                });
+        }
+
+        // Lắng nghe sự kiện thay đổi chế độ màu trang thông tin
+        (window.top || window).document.addEventListener('hmtInfoPageColorModeChanged', function(event) {
+            debugLog('Nhận sự kiện thay đổi chế độ màu trang thông tin:', event.detail);
+
+            // Check if in dark mode
+            const isDarkMode = document.cookie.includes('night_mode=true');
+            if (isDarkMode) {
+                debugLog('In dark mode, skipping light theme application');
+                return;
+            }
+
+            const newMode = event.detail.mode;
+            debugLog('Chế độ màu mới:', newMode);
+
+            if (newMode === 'default') {
+                applyCurrentColorScheme();
+            } else if (newMode === 'thumbnail') {
+                analyzeAndApplyImageColor();
+            } else if (newMode === 'avatar') {
+                analyzeAndApplyAvatarColor();
             }
         });
 
@@ -205,6 +360,41 @@
     
     function isValidColor(color) {
         return MonetAPI.isValidColor(color);
+    }
+
+    // Function to create tinted white using config color for light mode
+    function createTintedWhite(tintColor) {
+        const BASE_WHITE = '#ffffff';    // Base white color
+        const TINT_STRENGTH = 0.1;       // 10% tint strength for subtle effect
+
+        // Convert hex to RGB
+        const white = hexToRgb(BASE_WHITE);
+        const tint = hexToRgb(tintColor);
+
+        // Mix: 90% white + 10% tint color
+        const result = {
+            r: Math.round(white.r * (1 - TINT_STRENGTH) + tint.r * TINT_STRENGTH),
+            g: Math.round(white.g * (1 - TINT_STRENGTH) + tint.g * TINT_STRENGTH),
+            b: Math.round(white.b * (1 - TINT_STRENGTH) + tint.b * TINT_STRENGTH)
+        };
+
+        return rgbToHex(result.r, result.g, result.b);
+    }
+
+    // Helper functions for color conversion
+    function hexToRgb(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        };
+    }
+
+    function rgbToHex(r, g, b) {
+        return '#' + [r, g, b].map(x =>
+            x.toString(16).padStart(2, '0')
+        ).join('');
     }
 
     // Hàm phân tích ảnh với focus vào accent color truyền thống
@@ -895,8 +1085,8 @@
     
     function applyDefaultColorScheme() {
         // Lấy màu mặc định từ config, fallback về màu cũ nếu không có
-        const defaultColor = (window.HMTConfig && window.HMTConfig.getDefaultColor) ?
-            window.HMTConfig.getDefaultColor() : '#FCE4EC';
+        const defaultColor = (window.HMTConfig && window.HMTConfig.getInfoPageDefaultColor) ?
+            window.HMTConfig.getInfoPageDefaultColor() : '#FCE4EC';
         const defaultPalette = MonetAPI.generateMonetPalette(defaultColor);
         
         if (!defaultPalette) {

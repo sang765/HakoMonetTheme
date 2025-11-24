@@ -703,17 +703,32 @@ body.dark .hmt-config-reset:hover {
   margin-top: 16px;
 }
 
-.hmt-color-mode-dropdown {
+.hmt-color-settings-row {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
   margin-top: 16px;
 }
 
-.hmt-color-mode-select {
+.hmt-color-setting {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hmt-color-setting label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.hmt-color-mode-select,
+.hmt-info-page-color-mode-select,
+.hmt-proxy-select {
   width: 100%;
   padding: 8px 12px;
-  border: 2px solid #e9ecef;
   border-radius: 6px;
-  background: #f8f9fa;
-  color: #495057;
   font-size: 14px;
   font-family: inherit;
   box-sizing: border-box;
@@ -722,7 +737,11 @@ body.dark .hmt-config-reset:hover {
 .hmt-color-mode-select:focus {
   outline: none;
   border-color: #667eea;
-  background: white;
+}
+
+.hmt-color-mode-dropdown,
+.hmt-info-page-color-mode-dropdown {
+  margin-top: 16px;
 }
 
 .hmt-toggle-label {
@@ -772,7 +791,8 @@ body.dark .hmt-config-reset:hover {
   transform: translateX(26px);
 }
 
-.hmt-color-mode-dropdown label {
+.hmt-color-mode-dropdown label,
+.hmt-info-page-color-mode-dropdown label {
   color: #333;
 }
 
