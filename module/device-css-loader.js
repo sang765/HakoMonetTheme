@@ -13,6 +13,9 @@
     // Base URL for device CSS files
     const FOLDER_URL = IS_LOCAL ? 'http://localhost:8080/styles/device/' : 'https://sang765.github.io/HakoMonetTheme/styles/device/';
 
+    // Add timestamp to force reload in local development
+    const CACHE_BUSTER = IS_LOCAL ? '?t=' + Date.now() : '';
+
     // CSS files mapping for each device type
     const CSS_FILES = {
         general: 'genaral.css',  // General styles applied to all devices
@@ -83,7 +86,7 @@
         debugLog('Detected device type:', deviceType);
 
         // Load general CSS first (applied to all devices)
-        loadCSS(FOLDER_URL + CSS_FILES.general)
+        loadCSS(FOLDER_URL + CSS_FILES.general + CACHE_BUSTER)
             .then(() => {
                 debugLog('General CSS loaded successfully');
 
@@ -91,10 +94,10 @@
                 const deviceFile = CSS_FILES[deviceType];
                 if (deviceFile) {
                     debugLog('Loading device-specific CSS for:', deviceType);
-                    return loadCSS(FOLDER_URL + deviceFile);
+                    return loadCSS(FOLDER_URL + deviceFile + CACHE_BUSTER);
                 } else {
                     debugLog('No specific CSS file found for device type:', deviceType, '- using desktop as fallback');
-                    return loadCSS(FOLDER_URL + CSS_FILES.desktop);
+                    return loadCSS(FOLDER_URL + CSS_FILES.desktop + CACHE_BUSTER);
                 }
             })
             .then(() => {
@@ -122,8 +125,8 @@
         const deviceType = window.DeviceDetector ? window.DeviceDetector.getCurrentDevice() : 'unknown';
         return {
             deviceType: deviceType,
-            generalCSS: FOLDER_URL + CSS_FILES.general,
-            deviceCSS: FOLDER_URL + (CSS_FILES[deviceType] || CSS_FILES.desktop),
+            generalCSS: FOLDER_URL + CSS_FILES.general + CACHE_BUSTER,
+            deviceCSS: FOLDER_URL + (CSS_FILES[deviceType] || CSS_FILES.desktop) + CACHE_BUSTER,
             folderURL: FOLDER_URL,
             availableDevices: Object.keys(CSS_FILES).filter(key => key !== 'general')
         };

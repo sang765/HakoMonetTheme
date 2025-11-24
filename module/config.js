@@ -32,6 +32,10 @@
         return GM_getValue('default_color', '#063c30');
     }
 
+    function getInfoPageDefaultColor() {
+        return GM_getValue('info_page_default_color', '#063c30');
+    }
+
     function getLastPickedColor() {
         return GM_getValue('last_picked_color', null);
     }
@@ -54,6 +58,21 @@
         });
         (window.top || window).document.dispatchEvent(colorChangeEvent);
         debugLog('Đã phát sự kiện màu sắc thay đổi:', color);
+    }
+
+    function setInfoPageDefaultColor(color) {
+        GM_setValue('info_page_default_color', color);
+        debugLog('Đã lưu màu mặc định trang thông tin:', color);
+
+        // Phát sự kiện màu sắc thay đổi để các module khác cập nhật real-time
+        const colorChangeEvent = new CustomEvent('hmtInfoPageDefaultColorChanged', {
+            detail: {
+                color: color,
+                timestamp: Date.now()
+            }
+        });
+        (window.top || window).document.dispatchEvent(colorChangeEvent);
+        debugLog('Đã phát sự kiện màu mặc định trang thông tin thay đổi:', color);
     }
 
     function getHideDomainWarning() {
@@ -113,6 +132,22 @@
         });
         (window.top || window).document.dispatchEvent(modeChangeEvent);
         debugLog('Đã phát sự kiện chế độ màu thay đổi:', mode);
+    }
+
+    function getInfoPageColorMode() {
+        return GM_getValue('info_page_color_mode', 'default');
+    }
+
+    function setInfoPageColorMode(mode) {
+        GM_setValue('info_page_color_mode', mode);
+        debugLog('Đã lưu chế độ màu trang thông tin:', mode);
+
+        // Phát sự kiện chế độ màu trang thông tin thay đổi
+        const modeChangeEvent = new CustomEvent('hmtInfoPageColorModeChanged', {
+            detail: { mode: mode }
+        });
+        (window.top || window).document.dispatchEvent(modeChangeEvent);
+        debugLog('Đã phát sự kiện chế độ màu trang thông tin thay đổi:', mode);
     }
 
     function getExtractColorFromAvatar() {
@@ -807,7 +842,7 @@
         dialog.className = 'hmt-config-dialog';
 
         // Lấy màu hiện tại từ storage
-        const currentColor = getDefaultColor();
+        const currentColor = isInfoPage() ? getInfoPageDefaultColor() : getDefaultColor();
 
         // Hàm chuyển đổi HEX sang HSL để lấy giá trị mặc định cho sliders
         function hexToHsl(hex) {
@@ -842,6 +877,9 @@
 
         const currentHsl = hexToHsl(currentColor);
 
+        const showDefaultColorSection = isInfoPage() && getInfoPageColorMode() === 'default';
+        debugLog('Initial showDefaultColorSection:', showDefaultColorSection, 'isInfoPage:', isInfoPage(), 'infoPageMode:', getInfoPageColorMode(), 'avatarExtract:', getExtractColorFromAvatar());
+
         dialog.innerHTML = `
             <div class="hmt-config-overlay">
                 <div class="hmt-config-content">
@@ -850,8 +888,8 @@
                             <button class="hmt-config-back">← Quay lại</button>
                             <div class="hmt-logo-section">
                                 <img src="https://github.com/sang765/HakoMonetTheme/blob/main/.github/assets/logo.png?raw=true"
-                                     alt="HakoMonetTheme Logo"
-                                     class="hmt-logo">
+                                      alt="HakoMonetTheme Logo"
+                                      class="hmt-logo">
                                 <div class="hmt-title-section">
                                     <h3>HakoMonetTheme</h3>
                                     <span class="hmt-subtitle">Cài đặt</span>
@@ -861,12 +899,11 @@
                         <button class="hmt-config-close">&times;</button>
                     </div>
                     <div class="hmt-config-body">
-${!isInfoPage() ? `
-                        <div class="hmt-config-section">
+                        <div class="hmt-config-section" ${showDefaultColorSection ? '' : 'style="display: none;"'} id="hmt-default-color-section">
                             <h4>Màu mặc định</h4>
                             <p>Chọn màu sẽ được sử dụng khi không thể lấy màu từ ảnh bìa truyện. Sử dụng thanh trượt HSL để điều chỉnh màu sắc theo ý muốn.</p>
 
-                            <div class="hmt-custom-color" ${getExtractColorFromAvatar() ? 'style="display: none;"' : ''}>
+                            <div class="hmt-custom-color">
                                 <label for="hmt-custom-color-input">Chọn màu tùy chỉnh:</label>
                                 <div class="hmt-color-input-group">
                                     <div class="hmt-color-picker-wrapper">
@@ -894,7 +931,7 @@ ${!isInfoPage() ? `
                                                     <div class="hmt-slider-with-buttons">
                                                         <button class="hmt-slider-btn hmt-minus-btn" data-target="hmt-sat-slider" data-action="decrease">-</button>
                                                         <input type="range" class="hmt-color-slider hmt-sat-slider" id="hmt-sat-slider" min="0" max="100" value="${currentHsl.s}">
-                                                        <button class="hmt-slider-btn hmt-plus-btn" data-target="hmt-sat-slider" data-action="increase">+</button>
+                                                        <button class="hmt-slider-btn hmt-plus-btn" data-target="hmt-sat-slider" data-action="decrease">+</button>
                                                     </div>
                                                 </div>
                                                 <div class="hmt-hsl-slider-group">
@@ -907,10 +944,10 @@ ${!isInfoPage() ? `
                                                 </div>
                                             </div>
                                             <input type="text"
-                                                   id="hmt-custom-color-text"
-                                                   value="${currentColor}"
-                                                   class="hmt-color-text"
-                                                   placeholder="#206452">
+                                                    id="hmt-custom-color-text"
+                                                    value="${currentColor}"
+                                                    class="hmt-color-text"
+                                                    placeholder="#206452">
                                         </div>
                                         <span class="hmt-color-picker-label">Thanh trượt HSL</span>
                                     </div>
@@ -918,7 +955,6 @@ ${!isInfoPage() ? `
                                 <small class="hmt-color-help">Kéo thanh trượt HSL để chọn màu, sử dụng nút +/- để điều chỉnh chi tiết, hoặc nhập mã HEX trực tiếp</small>
                             </div>
                         </div>
-` : ''}
 
                         <div class="hmt-config-section">
                             <h4>Ẩn cảnh báo tên miền</h4>
@@ -984,29 +1020,34 @@ ${!isInfoPage() ? `
                             </div>
                         </div>
 
+<div class="hmt-config-section">
+    <h4>Cài đặt màu</h4>
+    <div class="hmt-color-settings-row">
+        <div class="hmt-color-setting">
+            <label for="hmt-color-mode-select">Trang đọc:</label>
+            <select id="hmt-color-mode-select" class="hmt-color-mode-select">
+                <option value="default" ${getColorMode() === 'default' ? 'selected' : ''}>Mặc định</option>
+                <option value="thumbnail" ${getColorMode() === 'thumbnail' ? 'selected' : ''}>Thumbnail</option>
+            </select>
+        </div>
+        <div class="hmt-color-setting">
+            <label for="hmt-info-page-color-mode-select">Trang thông tin truyện:</label>
+            <select id="hmt-info-page-color-mode-select" class="hmt-info-page-color-mode-select">
+                <option value="default" ${getInfoPageColorMode() === 'default' ? 'selected' : ''}>Mặc định (Màu từ config)</option>
+                <option value="avatar" ${getInfoPageColorMode() === 'avatar' ? 'selected' : ''}>Avatar</option>
+                <option value="thumbnail" ${getInfoPageColorMode() === 'thumbnail' ? 'selected' : ''}>Thumbnail</option>
+            </select>
+        </div>
+    </div>
+</div>
+
 ${!isInfoPage() ? `
-                        <div class="hmt-config-section">
-                            <h4>Chế độ màu</h4>
-                            <p>Chọn loại màu để áp dụng cho theme: Mặc định sử dụng màu từ config, Thumbnail sử dụng màu lấy từ ảnh bìa truyện.</p>
-
-                            <div class="hmt-color-mode-dropdown">
-                                <label for="hmt-color-mode-select">Chế độ màu:</label>
-                                <select id="hmt-color-mode-select" class="hmt-color-mode-select">
-                                    <option value="default" ${getColorMode() === 'default' ? 'selected' : ''}>Mặc định</option>
-                                    <option value="thumbnail" ${getColorMode() === 'thumbnail' ? 'selected' : ''}>Thumbnail</option>
-                                </select>
-                            </div>
-                        </div>
-
-` : ''}
-
-${!isInfoPage() ? `
-                        <div class="hmt-config-preview">
-                            <h4>Xem trước</h4>
-                            <div class="hmt-preview-box" style="background-color: ${currentColor}">
-                                <span>Màu chủ đạo</span>
-                            </div>
-                        </div>
+                         <div class="hmt-config-preview">
+                             <h4>Xem trước</h4>
+                             <div class="hmt-preview-box" style="background-color: ${currentColor}">
+                                 <span>Màu chủ đạo</span>
+                             </div>
+                         </div>
 ` : ''}
                     </div>
                     <div class="hmt-config-footer">
@@ -1099,8 +1140,8 @@ ${!isInfoPage() ? `
         const proxySelect = dialog.querySelector('#hmt-proxy-select');
 
         // Lưu màu hiện tại để có thể khôi phục nếu không lưu
-         const currentColor = dialog._currentColor || getDefaultColor();
-         let previewColor = currentColor; // Màu đang preview
+          const currentColor = dialog._currentColor || (isInfoPage() ? getInfoPageDefaultColor() : getDefaultColor());
+          let previewColor = currentColor; // Màu đang preview
 
          // Throttle cho event dispatching để tránh quá tải
          let lastEventTime = 0;
@@ -1515,8 +1556,19 @@ ${!isInfoPage() ? `
               const selectedColor = previewColor; // Lưu màu đang preview
               debugLog('[Config] Lưu cài đặt màu:', selectedColor);
               if (isValidHexColor(selectedColor)) {
+                  // Lưu chế độ màu hiện tại
+                  const infoPageColorModeSelect = dialog.querySelector('#hmt-info-page-color-mode-select');
+                  if (infoPageColorModeSelect) {
+                      setInfoPageColorMode(infoPageColorModeSelect.value);
+                      debugLog('[Config] Lưu chế độ màu trang info:', infoPageColorModeSelect.value);
+                  }
+
                   // Thực sự lưu màu vào storage và phát sự kiện chính thức
-                  setDefaultColor(selectedColor);
+                  if (isInfoPage()) {
+                      setInfoPageDefaultColor(selectedColor);
+                  } else {
+                      setDefaultColor(selectedColor);
+                  }
 
                   // Cập nhật tất cả các elements UI với màu đã lưu
                   syncUIWithColor(selectedColor);
@@ -1549,12 +1601,14 @@ ${!isInfoPage() ? `
 
              // Reset tất cả cài đặt về giá trị mặc định
              const defaultColor = '#063c30'; // Sử dụng giá trị mặc định thực tế
+             const resetColor = isInfoPage() ? getInfoPageDefaultColor() : getDefaultColor();
              const defaultSettings = {
                  default_color: defaultColor,
                  hide_domain_warning: false,
                  disable_colors_on_reading_page: false,
                  color_mode: 'default',
-                 extract_color_from_avatar: false
+                 extract_color_from_avatar: false,
+                 info_page_color_mode: 'thumbnail'
              };
 
              // Cập nhật preview color
@@ -1591,17 +1645,27 @@ ${!isInfoPage() ? `
              }
 
              // Reset color mode dropdown
-             if (!isInfoPage()) {
-                 const colorModeSelect = dialog.querySelector('#hmt-color-mode-select');
-                 if (colorModeSelect) {
-                     colorModeSelect.value = defaultSettings.color_mode;
-                 }
+             const colorModeSelect = dialog.querySelector('#hmt-color-mode-select');
+             if (colorModeSelect) {
+                 colorModeSelect.value = defaultSettings.color_mode;
              }
 
-             // Hiển thị lại custom color picker nếu avatar extraction bị tắt
-             const customColorSection = dialog.querySelector('.hmt-custom-color');
-             if (customColorSection) {
-                 customColorSection.style.display = defaultSettings.extract_color_from_avatar ? 'none' : '';
+             // Reset info page color mode dropdown
+             const infoPageColorModeSelect = dialog.querySelector('#hmt-info-page-color-mode-select');
+             if (infoPageColorModeSelect) {
+                 infoPageColorModeSelect.value = defaultSettings.info_page_color_mode;
+             }
+
+             // Hiển thị lại custom color section cho info page
+             const defaultColorSection = dialog.querySelector('#hmt-default-color-section');
+             if (defaultColorSection) {
+                 if (isInfoPage() && defaultSettings.info_page_color_mode === 'default') {
+                     defaultColorSection.style.display = '';
+                     debugLog('Reset: Showing default color section on info page default mode');
+                 } else {
+                     defaultColorSection.style.display = 'none';
+                     debugLog('Reset: Hiding default color section');
+                 }
              }
 
              showNotification('Đã khôi phục tất cả cài đặt về mặc định!', 3000);
@@ -1631,15 +1695,8 @@ ${!isInfoPage() ? `
                 setExtractColorFromAvatar(this.checked);
                 showNotification('Đã cập nhật cài đặt trích xuất màu từ avatar!', 3000);
 
-                // Hide/show custom color picker based on avatar extraction setting
-                const customColorSection = dialog.querySelector('.hmt-custom-color');
-                if (customColorSection) {
-                    if (this.checked) {
-                        customColorSection.style.display = 'none';
-                    } else {
-                        customColorSection.style.display = '';
-                    }
-                }
+                // Avatar extraction affects general interface, not info page custom color
+                debugLog('Avatar extraction toggled, but does not affect info page custom color section');
             });
         }
 
@@ -1661,14 +1718,33 @@ ${!isInfoPage() ? `
 
 
         // Color mode dropdown
-        if (!isInfoPage()) {
-            const colorModeSelect = dialog.querySelector('#hmt-color-mode-select');
-            if (colorModeSelect) {
-                colorModeSelect.addEventListener('change', function() {
-                    setColorMode(this.value);
-                    showNotification('Đã cập nhật chế độ màu!', 3000);
-                });
-            }
+        const colorModeSelect = dialog.querySelector('#hmt-color-mode-select');
+        if (colorModeSelect) {
+            colorModeSelect.addEventListener('change', function() {
+                setColorMode(this.value);
+                showNotification('Đã cập nhật chế độ màu trang đọc!', 3000);
+            });
+        }
+
+        // Info page color mode dropdown
+        const infoPageColorModeSelect = dialog.querySelector('#hmt-info-page-color-mode-select');
+        if (infoPageColorModeSelect) {
+            infoPageColorModeSelect.addEventListener('change', function() {
+                setInfoPageColorMode(this.value);
+                showNotification('Đã cập nhật chế độ màu trang thông tin truyện!', 3000);
+
+                // Show/hide custom color section
+                const defaultColorSection = dialog.querySelector('#hmt-default-color-section');
+                if (defaultColorSection) {
+                    if (isInfoPage() && this.value === 'default') {
+                        defaultColorSection.style.display = '';
+                        debugLog('Showing default color section for info page default mode');
+                    } else {
+                        defaultColorSection.style.display = 'none';
+                        debugLog('Hiding default color section for mode:', this.value);
+                    }
+                }
+            });
         }
 
         // Đóng khi nhấn ESC
@@ -1780,7 +1856,9 @@ ${!isInfoPage() ? `
     // Xuất các hàm cần thiết
     window.HMTConfig = {
         getDefaultColor: getDefaultColor,
+        getInfoPageDefaultColor: getInfoPageDefaultColor,
         setDefaultColor: setDefaultColor,
+        setInfoPageDefaultColor: setInfoPageDefaultColor,
         getLastPickedColor: getLastPickedColor,
         setLastPickedColor: setLastPickedColor,
         getHideDomainWarning: getHideDomainWarning,
@@ -1792,6 +1870,8 @@ ${!isInfoPage() ? `
         setColorMode: setColorMode,
         getExtractColorFromAvatar: getExtractColorFromAvatar,
         setExtractColorFromAvatar: setExtractColorFromAvatar,
+        getInfoPageColorMode: getInfoPageColorMode,
+        setInfoPageColorMode: setInfoPageColorMode,
         getUseProxy: getUseProxy,
         setUseProxy: setUseProxy,
         getPreferredProxy: getPreferredProxy,

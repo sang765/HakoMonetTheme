@@ -75,6 +75,9 @@
                 return; // Dừng việc tải các module khác
             }
 
+            // Load config with high priority
+            loadScript(configJS, 'config.js');
+
             // Load các module theo thứ tự
             console.log('[Main] Loading update-checker.js');
             loadScript(updateCheckerJS, 'update-checker.js');
@@ -96,7 +99,6 @@
             loadScript(monetTestJS, 'monet-test.js');
             loadScript(animationJS, 'animation.js');
             loadScript(monetJS, 'monet.js');
-            loadScript(configJS, 'config.js');
             loadScript(adBlockerJS, 'ad-blocker.js');
             loadScript(antiPopupJS, 'anti-popup.js');
             loadScript(fullscreenJS, 'fullscreen.js');
