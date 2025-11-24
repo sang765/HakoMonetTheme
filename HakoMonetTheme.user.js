@@ -309,12 +309,22 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
     
     function loadAllResources() {
         const resources = [
-            'mainJS', 'monetAPIJS', 'monetTestJS', 'updateCheckerJS', 'CORSJS', 'infoTruyenJS',
-            'animationJS', 'tagColorJS', 'fontImportJS', 'colorinfotruyen',
-            'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyenlight', 'themeDetectorJS',
-            'deviceDetectorJS', 'configJS', 'adBlockerJS', 'autoReloadJS', 'antiPopupJS',
-            'mainMenuJS', 'navbarLogoJS', 'updateManagerJS', 'darkModePrompterJS', 'fullscreenJS',
-            'readingPageJS', 'deviceCSSLoaderJS', 'profileBannerCropperJS'
+            // main
+            'mainJS',
+            // api
+            'monetAPIJS', 'monetTestJS', 'updateCheckerJS', 'CORSJS', 'html2canvasJS', 'colorisJS', 'colorisCSS', 'colorisColors',
+            // config
+            'configJS',
+            // menu
+            'mainMenuJS',
+            // core (adblock, antipopup)
+            'adBlockerJS', 'antiPopupJS',
+            // css (other modules)
+            'infoTruyenJS', 'animationJS', 'tagColorJS', 'fontImportJS', 'themeDetectorJS', 'deviceDetectorJS', 'autoReloadJS',
+            'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyen', 'colorinfotruyenlight',
+            'navbarLogoJS', 'updateManagerJS', 'darkModePrompterJS', 'fullscreenJS', 'readingPageJS',
+            // dynamic css
+            'deviceCSSLoaderJS', 'profileBannerCropperJS'
         ];
 
         let loadedCount = 0;
