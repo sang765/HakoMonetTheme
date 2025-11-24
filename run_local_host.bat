@@ -2,6 +2,7 @@
 setlocal enabledelayedexpansion
 title HakoMonetTheme Development Server
 
+:menu
 echo.
 echo ========================================
 echo   HakoMonetTheme Local Development Server
@@ -26,7 +27,7 @@ if "%choice%"=="6" goto exit
 
 echo [ERROR] Invalid choice. Please run again.
 pause
-goto start
+goto menu
 
 :check_status
 echo.
@@ -50,7 +51,7 @@ if %errorlevel%==0 (
 )
 echo.
 pause
-goto start
+goto menu
 
 :kill_servers
 echo.
@@ -77,7 +78,7 @@ if %errorlevel%==0 (
 )
 echo.
 pause
-goto start
+goto menu
 
 :python
 echo.
@@ -100,7 +101,7 @@ echo.
 python -m http.server 8000
 echo.
 echo [STOPPED] Python server stopped
-goto start
+goto menu
 
 :nodejs
 echo.
@@ -123,7 +124,7 @@ echo.
 npx http-server -p 8080 -c-1 --cors
 echo.
 echo [STOPPED] Node.js HTTP server stopped
-goto start
+goto menu
 
 :nodejs_autoreload
 echo.
@@ -155,15 +156,12 @@ echo.
 node server.js
 echo.
 echo [STOPPED] Auto-Reload server stopped
-goto start
+goto menu
 
 :exit
 echo.
 echo [INFO] Exiting HakoMonetTheme Development Server
 echo [BYE] Goodbye!
 goto end
-
-:start
-goto :eof
 
 :end

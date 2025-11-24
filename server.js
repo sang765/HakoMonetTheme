@@ -32,8 +32,28 @@ const app = express();
 // Middleware
 app.use(express.json());
 
-// Serve project files from root (for Userscript)
-app.use(express.static(CONFIG.WATCH_PATH));
+// Log static file requests
+app.use((req, res, next) => {
+  const timestamp = new Date().toISOString();
+  if (req.url.match(/\.(css|js|scss|map)$/)) {
+    console.log(`[REQUEST] ${timestamp} - ${req.method} ${req.url}`);
+  }
+  next();
+});
+
+// Serve project files from root (for Userscript) with no-cache for CSS/JS
+app.use(express.static(CONFIG.WATCH_PATH, {
+  setHeaders: (res, path) => {
+    if (path.endsWith('.css') || path.endsWith('.js') || path.endsWith('.scss') || path.endsWith('.map')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      console.log(`[CACHE] Disabled cache for: ${path}`);
+    } else {
+      console.log(`[CACHE] Default cache for: ${path}`);
+    }
+  }
+}));
 
 // Serve dashboard from web folder at /dashboard
 app.use('/dashboard', express.static(path.join(__dirname, 'web')));
@@ -490,7 +510,12 @@ try {
 
   watcher.on('change', (filePath) => {
     const relativePath = path.relative(CONFIG.WATCH_PATH, filePath);
-    console.log(`📝 File changed: ${relativePath}`);
+    const timestamp = new Date().toISOString();
+    console.log(`📝 File changed: ${relativePath} at ${timestamp}`);
+    if (relativePath.endsWith('.css') || relativePath.endsWith('.scss')) {
+      console.log(`[CSS] CSS file changed, skipping broadcast to avoid full reload`);
+      return; // Don't broadcast for CSS changes to avoid full page reload
+    }
     broadcast('reload');
   });
 

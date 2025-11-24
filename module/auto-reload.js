@@ -48,7 +48,7 @@
 
             try {
                 // Check multiple key files for changes
-                const filesToCheck = ['/main.js', '/module/config.js', '/module/auto-reload.js'];
+                const filesToCheck = ['/main.js', '/module/config.js', '/module/auto-reload.js', '/styles/device/genaral.css', '/styles/device/desktop.css'];
                 let hasChanges = false;
 
                 for (const file of filesToCheck) {
