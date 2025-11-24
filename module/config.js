@@ -877,7 +877,7 @@
 
         const currentHsl = hexToHsl(currentColor);
 
-        const showDefaultColorSection = isInfoPage() && getInfoPageColorMode() === 'default';
+        const showDefaultColorSection = (isInfoPage() && getInfoPageColorMode() === 'default') || (!isInfoPage() && !getExtractColorFromAvatar());
         debugLog('Initial showDefaultColorSection:', showDefaultColorSection, 'isInfoPage:', isInfoPage(), 'infoPageMode:', getInfoPageColorMode(), 'avatarExtract:', getExtractColorFromAvatar());
 
         dialog.innerHTML = `
@@ -1238,6 +1238,9 @@ ${!isInfoPage() ? `
                     if (satSlider) satSlider.value = currentSat;
                     if (lightSlider) lightSlider.value = currentLight;
 
+                    // Update saturation slider background
+                    updateSaturationSliderBackground();
+
                     // Apply preview color
                     applyPreviewColor(selectedColor);
                 }
@@ -1283,6 +1286,16 @@ ${!isInfoPage() ? `
         let currentHue = currentHsl.h;
         let currentSat = currentHsl.s;
         let currentLight = currentHsl.l;
+
+        // Hàm cập nhật background của saturation slider dựa trên hue hiện tại
+        function updateSaturationSliderBackground() {
+            const hueColor = hslToHex(currentHue, 100, 50); // Màu với saturation 100%, lightness 50%
+            const grayColor = hslToHex(currentHue, 0, 50); // Màu xám với cùng lightness
+            const satSlider = dialog.querySelector('#hmt-sat-slider');
+            if (satSlider) {
+                satSlider.style.background = `linear-gradient(to right, ${grayColor} 0%, ${hueColor} 100%)`;
+            }
+        }
 
         // Hàm chuyển đổi HSL sang HEX
         function hslToHex(h, s, l) {
@@ -1355,6 +1368,7 @@ ${!isInfoPage() ? `
             hueSlider.addEventListener('input', function() {
                 currentHue = parseInt(this.value);
                 debugLog('Hue thay đổi:', currentHue);
+                updateSaturationSliderBackground();
                 updateColorFromHSL();
             });
         }
@@ -1499,6 +1513,9 @@ ${!isInfoPage() ? `
                     if (satSlider) satSlider.value = currentSat;
                     if (lightSlider) lightSlider.value = currentLight;
 
+                    // Cập nhật background của saturation slider
+                    updateSaturationSliderBackground();
+
                     // Hiện lại config dialog
                     dialog.style.display = '';
 
@@ -1520,6 +1537,9 @@ ${!isInfoPage() ? `
           // Đồng bộ các elements với màu hiện tại (không gửi sự kiện preview)
           syncUIWithColor(currentColor);
 
+          // Cập nhật background của saturation slider
+          updateSaturationSliderBackground();
+
         // Xử lý text input
         if (colorText) {
             colorText.addEventListener('input', function() {
@@ -1538,6 +1558,9 @@ ${!isInfoPage() ? `
                     if (hueSlider) hueSlider.value = currentHue;
                     if (satSlider) satSlider.value = currentSat;
                     if (lightSlider) lightSlider.value = currentLight;
+
+                    // Cập nhật background của saturation slider
+                    updateSaturationSliderBackground();
 
                     // Cập nhật tất cả các elements UI
                     syncUIWithColor(color);
@@ -1627,6 +1650,9 @@ ${!isInfoPage() ? `
              if (satSlider) satSlider.value = currentSat;
              if (lightSlider) lightSlider.value = currentLight;
 
+             // Cập nhật background của saturation slider
+             updateSaturationSliderBackground();
+
              // Cập nhật tất cả các elements UI
              syncUIWithColor(defaultColor);
 
@@ -1656,12 +1682,12 @@ ${!isInfoPage() ? `
                  infoPageColorModeSelect.value = defaultSettings.info_page_color_mode;
              }
 
-             // Hiển thị lại custom color section cho info page
+             // Hiển thị lại custom color section
              const defaultColorSection = dialog.querySelector('#hmt-default-color-section');
              if (defaultColorSection) {
-                 if (isInfoPage() && defaultSettings.info_page_color_mode === 'default') {
+                 if ((isInfoPage() && defaultSettings.info_page_color_mode === 'default') || (!isInfoPage() && !defaultSettings.extract_color_from_avatar)) {
                      defaultColorSection.style.display = '';
-                     debugLog('Reset: Showing default color section on info page default mode');
+                     debugLog('Reset: Showing default color section on info page default mode or general page without avatar extraction');
                  } else {
                      defaultColorSection.style.display = 'none';
                      debugLog('Reset: Hiding default color section');
@@ -1695,8 +1721,19 @@ ${!isInfoPage() ? `
                 setExtractColorFromAvatar(this.checked);
                 showNotification('Đã cập nhật cài đặt trích xuất màu từ avatar!', 3000);
 
-                // Avatar extraction affects general interface, not info page custom color
-                debugLog('Avatar extraction toggled, but does not affect info page custom color section');
+                // Show/hide default color section on general pages
+                if (!isInfoPage()) {
+                    const defaultColorSection = dialog.querySelector('#hmt-default-color-section');
+                    if (defaultColorSection) {
+                        if (this.checked) {
+                            defaultColorSection.style.display = 'none';
+                            debugLog('Hiding default color section on general page when avatar extraction enabled');
+                        } else {
+                            defaultColorSection.style.display = '';
+                            debugLog('Showing default color section on general page when avatar extraction disabled');
+                        }
+                    }
+                }
             });
         }
 
@@ -1736,9 +1773,9 @@ ${!isInfoPage() ? `
                 // Show/hide custom color section
                 const defaultColorSection = dialog.querySelector('#hmt-default-color-section');
                 if (defaultColorSection) {
-                    if (isInfoPage() && this.value === 'default') {
+                    if ((isInfoPage() && this.value === 'default') || (!isInfoPage() && !getExtractColorFromAvatar())) {
                         defaultColorSection.style.display = '';
-                        debugLog('Showing default color section for info page default mode');
+                        debugLog('Showing default color section for info page default mode or general page without avatar extraction');
                     } else {
                         defaultColorSection.style.display = 'none';
                         debugLog('Hiding default color section for mode:', this.value);
