@@ -210,9 +210,6 @@ function convertDarkToLight(darkFilePath, lightFilePath) {
     // Apply transformations in correct order
     content = changeThemeCheck(content);
     content = changeDefaultColor(content);
-    content = addCreateTintedWhite(content);
-    content = modifyApplyConfigColor(content);
-    content = modifyApplyAvatarColorScheme(content);
     content = changeTextColor(content);
     content = changeRgbaValues(content);
     content = fixVariableScope(content);

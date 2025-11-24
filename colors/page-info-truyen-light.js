@@ -157,15 +157,11 @@
                         return;
                     }
 
-                    // Create tinted white using color for light mode
-                    const tintedWhite = createTintedWhite(dominantColor);
-                    debugLog('Tinted white cho light mode:', tintedWhite);
-
-                    // Gọi API Monet để tạo palette
-                    const monetPalette = MonetAPI.generateMonetPalette(tintedWhite);
+                    // Use dominant color directly for light mode
+                    const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
                     debugLog('Monet Palette:', monetPalette);
 
-                    const isLightColor = MonetAPI.isColorLight(tintedWhite);
+                    const isLightColor = MonetAPI.isColorLight(dominantColor);
                     debugLog('Màu sáng?', isLightColor);
 
                     applyMonetColorScheme(monetPalette, isLightColor);
@@ -212,10 +208,8 @@
                 // Nếu là preview mode, áp dụng màu ngay lập tức
                 const previewColor = event.detail.color;
                 if (previewColor && isValidColor(previewColor)) {
-                    // Create tinted white using color for light mode
-                    const tintedWhite = createTintedWhite(previewColor);
-                    const monetPalette = MonetAPI.generateMonetPalette(tintedWhite);
-                    const isLightColor = MonetAPI.isColorLight(tintedWhite);
+                    const monetPalette = MonetAPI.generateMonetPalette(previewColor);
+                    const isLightColor = MonetAPI.isColorLight(previewColor);
                     applyMonetColorScheme(monetPalette, isLightColor);
                 }
             }
@@ -274,12 +268,8 @@
                             .then(dominantColor => {
                                 debugLog('Màu chủ đạo từ avatar (sau khi load):', dominantColor);
                                 if (isValidColor(dominantColor)) {
-                                    // Create tinted white using color for light mode
-                                    const tintedWhite = createTintedWhite(dominantColor);
-                                    debugLog('Tinted white cho light mode:', tintedWhite);
-
-                                    const monetPalette = MonetAPI.generateMonetPalette(tintedWhite);
-                                    const isLightColor = MonetAPI.isColorLight(tintedWhite);
+                                    const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
+                                    const isLightColor = MonetAPI.isColorLight(dominantColor);
                                     applyMonetColorScheme(monetPalette, isLightColor);
                                 } else {
                                     debugLog('Màu từ avatar không hợp lệ sau khi load, fallback về màu config');
@@ -318,12 +308,8 @@
                         return;
                     }
 
-                    // Create tinted white using color for light mode
-                    const tintedWhite = createTintedWhite(dominantColor);
-                    debugLog('Tinted white cho light mode:', tintedWhite);
-
-                    const monetPalette = MonetAPI.generateMonetPalette(tintedWhite);
-                    const isLightColor = MonetAPI.isColorLight(tintedWhite);
+                    const monetPalette = MonetAPI.generateMonetPalette(dominantColor);
+                    const isLightColor = MonetAPI.isColorLight(dominantColor);
                     applyMonetColorScheme(monetPalette, isLightColor);
                 })
                 .catch(error => {
@@ -362,24 +348,6 @@
         return MonetAPI.isValidColor(color);
     }
 
-    // Function to create tinted white using config color for light mode
-    function createTintedWhite(tintColor) {
-        const BASE_WHITE = '#ffffff';    // Base white color
-        const TINT_STRENGTH = 0.1;       // 10% tint strength for subtle effect
-
-        // Convert hex to RGB
-        const white = hexToRgb(BASE_WHITE);
-        const tint = hexToRgb(tintColor);
-
-        // Mix: 90% white + 10% tint color
-        const result = {
-            r: Math.round(white.r * (1 - TINT_STRENGTH) + tint.r * TINT_STRENGTH),
-            g: Math.round(white.g * (1 - TINT_STRENGTH) + tint.g * TINT_STRENGTH),
-            b: Math.round(white.b * (1 - TINT_STRENGTH) + tint.b * TINT_STRENGTH)
-        };
-
-        return rgbToHex(result.r, result.g, result.b);
-    }
 
     // Helper functions for color conversion
     function hexToRgb(hex) {
