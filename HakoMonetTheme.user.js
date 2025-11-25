@@ -386,13 +386,11 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
             // menu
             'mainMenuJS',
             // core modules
-            'adBlockerJS', 'antiPopupJS', 'keyboardShortcutsJS',
-            // css (other modules)
-            'infoTruyenJS', 'animationJS', 'tagColorJS', 'fontImportJS', 'themeDetectorJS', 'deviceDetectorJS', 'autoReloadJS',
+            'deviceDetectorJS', 'adBlockerJS', 'antiPopupJS', 'keyboardShortcutsJS', 'updateManagerJS', 'darkModePrompterJS', 'fullscreenJS', 'autoReloadJS',
+            // css modules
+            'infoTruyenJS', 'animationJS', 'tagColorJS', 'fontImportJS', 'themeDetectorJS',
             'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyen', 'colorinfotruyenlight',
-            'navbarLogoJS', 'updateManagerJS', 'darkModePrompterJS', 'fullscreenJS', 'readingPageJS',
-            // text color adapter
-            'textColorAdapterJS',
+            'navbarLogoJS', 'readingPageJS', 'textColorAdapterJS',
             // dynamic css
             'deviceCSSLoaderJS', 'profileBannerCropperJS'
         ];
