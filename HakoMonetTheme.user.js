@@ -61,6 +61,7 @@
 // @resource     colorisCSS ./api/coloris.min.css
 // @resource     colorisColors ./api/coloris-colors.json
 // @resource     keyboardShortcutsJS ./module/keyboard-shortcuts.js
+// @resource     textColorAdapterJS ./module/text-color-adapter.js
 // @connect      html2canvas.hertzen.com
 // @connect      hertzen.com
 // ==/UserScript==
@@ -319,11 +320,11 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
             // menu
             'mainMenuJS',
             // core modules
-            'adBlockerJS', 'antiPopupJS', 'keyboardShortcutsJS',
+            'deviceDetectorJS', 'adBlockerJS', 'antiPopupJS', 'keyboardShortcutsJS', 'updateManagerJS', 'darkModePrompterJS', 'fullscreenJS', 'autoReloadJS',
             // css modules
-            'infoTruyenJS', 'animationJS', 'tagColorJS', 'fontImportJS', 'themeDetectorJS', 'deviceDetectorJS', 'autoReloadJS',
+            'infoTruyenJS', 'animationJS', 'tagColorJS', 'fontImportJS', 'themeDetectorJS',
             'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyen', 'colorinfotruyenlight',
-            'navbarLogoJS', 'updateManagerJS', 'darkModePrompterJS', 'fullscreenJS', 'readingPageJS',
+            'navbarLogoJS', 'readingPageJS', 'textColorAdapterJS',
             // dynamic css
             'deviceCSSLoaderJS', 'profileBannerCropperJS'
         ];
