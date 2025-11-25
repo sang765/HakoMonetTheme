@@ -9,7 +9,7 @@ echo   HakoMonetTheme Local Development Server
 echo ========================================
 echo.
 echo Choose your preferred server:
-echo [1] Python HTTP Server (Port 8000)
+echo [1] Python HTTP Server (Port 8080)
 echo [2] Node.js HTTP Server (Port 8080)
 echo [3] Node.js Auto-Reload Server (Port 8080)
 echo [4] Check Server Status
@@ -57,7 +57,7 @@ goto menu
 echo.
 echo [INFO] Killing running servers...
 echo.
-netstat -ano | findstr ":8000" >nul 2>&1
+netstat -ano | findstr ":8080" >nul 2>&1
 if %errorlevel%==0 (
     for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":8000"') do (
         taskkill /PID %%a /F >nul 2>&1
@@ -94,11 +94,12 @@ if errorlevel 1 (
 )
 
 echo [SUCCESS] Python found
-echo [STARTING] Python HTTP server on port 8000...
-echo [ACCESS] http://localhost:8000
+echo [STARTING] Python HTTP server on port 8080...
+echo [ACCESS] http://localhost:8080
+echo [NOTE] Wanna install userscript? Click this link for install: http://localhost:8080/HakoMonetTheme.user.js
 echo [STOP] Press Ctrl+C to stop the server
 echo.
-python -m http.server 8000
+python -m http.server 8080
 echo.
 echo [STOPPED] Python server stopped
 goto menu
@@ -118,6 +119,7 @@ if errorlevel 1 (
 echo [SUCCESS] Node.js found
 echo [STARTING] Node.js HTTP server on port 8080...
 echo [ACCESS] http://localhost:8080
+echo [NOTE] Wanna install userscript? Click this link for install: http://localhost:8080/HakoMonetTheme.user.js
 echo [STOP] Press Ctrl+C to stop the server
 echo [NOTE] http-server will be installed automatically if not present
 echo.
