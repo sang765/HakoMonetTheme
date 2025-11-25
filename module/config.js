@@ -135,7 +135,7 @@
     }
 
     function getInfoPageColorMode() {
-        return GM_getValue('info_page_color_mode', 'default');
+        return GM_getValue('info_page_color_mode', 'thumbnail');
     }
 
     function setInfoPageColorMode(mode) {

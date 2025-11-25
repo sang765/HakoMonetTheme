@@ -60,6 +60,7 @@
 // @resource     colorisJS ./api/coloris.min.js
 // @resource     colorisCSS ./api/coloris.min.css
 // @resource     colorisColors ./api/coloris-colors.json
+// @resource     keyboardShortcutsJS ./module/keyboard-shortcuts.js
 // @connect      html2canvas.hertzen.com
 // @connect      hertzen.com
 // ==/UserScript==
@@ -317,9 +318,9 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
             'configJS',
             // menu
             'mainMenuJS',
-            // core (adblock, antipopup)
-            'adBlockerJS', 'antiPopupJS',
-            // css (other modules)
+            // core modules
+            'adBlockerJS', 'antiPopupJS', 'keyboardShortcutsJS',
+            // css modules
             'infoTruyenJS', 'animationJS', 'tagColorJS', 'fontImportJS', 'themeDetectorJS', 'deviceDetectorJS', 'autoReloadJS',
             'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyen', 'colorinfotruyenlight',
             'navbarLogoJS', 'updateManagerJS', 'darkModePrompterJS', 'fullscreenJS', 'readingPageJS',
