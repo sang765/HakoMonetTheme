@@ -837,10 +837,6 @@
                 background-color: ${palette[200]} !important;
             }
 
-            #rd-side_icon {
-                border: 1px solid ${palette[300]} !important;
-            }
-
             .rd_sidebar-header {
                 background-color: ${palette[100]} !important;
             }
@@ -965,7 +961,11 @@
             }
 
             #rd-side_icon {
-                border: 1px solid ${palette[300]} !important;
+                border: 1px solid ${palette[500]} !important;
+            }
+
+            .rd_sd-button_item {
+                border-bottom: 1px solid ${palette[500]} !important;
             }
 
             .rd_sidebar-header {
@@ -1273,7 +1273,11 @@
             }
 
             #rd-side_icon {
-                border: 1px solid ${defaultPalette[300]} !important;
+                border: 1px solid ${defaultPalette[500]} !important;
+            }
+
+            .rd_sd-button_item {
+                border-bottom: 1px solid ${defaultPalette[500]} !important;
             }
 
             .rd_sidebar-header {
