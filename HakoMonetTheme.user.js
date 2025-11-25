@@ -56,6 +56,7 @@ const resourcePaths = {
     keyboardShortcutsJS: 'http://localhost:8080/module/keyboard-shortcuts.js',
     deviceCSSLoaderJS: 'http://localhost:8080/module/device-css-loader.js',
     profileBannerCropperJS: 'http://localhost:8080/module/profile-banner-cropper.js',
+    textColorAdapterJS: 'http://localhost:8080/module/text-color-adapter.js',
     html2canvasJS: 'http://localhost:8080/api/html2canvas.min.js',
     monetTestJS: 'http://localhost:8080/api/monet-test.js',
     colorisJS: 'http://localhost:8080/api/coloris.min.js',
@@ -390,6 +391,8 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
             'infoTruyenJS', 'animationJS', 'tagColorJS', 'fontImportJS', 'themeDetectorJS', 'deviceDetectorJS', 'autoReloadJS',
             'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyen', 'colorinfotruyenlight',
             'navbarLogoJS', 'updateManagerJS', 'darkModePrompterJS', 'fullscreenJS', 'readingPageJS',
+            // text color adapter
+            'textColorAdapterJS',
             // dynamic css
             'deviceCSSLoaderJS', 'profileBannerCropperJS'
         ];

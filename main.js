@@ -64,6 +64,7 @@
             const antiPopupJS = GM_getResourceText('antiPopupJS');
             const blacklistJS = GM_getResourceText('blacklistJS');
             const fullscreenJS = GM_getResourceText('fullscreenJS');
+            const textColorAdapterJS = GM_getResourceText('textColorAdapterJS');
             const deviceCSSLoaderJS = GM_getResourceText('deviceCSSLoaderJS');
 
             // Load module blacklist trước tiên (ưu tiên cao nhất)
@@ -102,6 +103,7 @@
             loadScript(adBlockerJS, 'ad-blocker.js');
             loadScript(antiPopupJS, 'anti-popup.js');
             loadScript(fullscreenJS, 'fullscreen.js');
+            loadScript(textColorAdapterJS, 'text-color-adapter.js');
 
             // Load color scripts - let them determine theme internally
             debugLog('Loading color scripts (they will check theme internally)');
@@ -114,7 +116,15 @@
             loadScript(pagegeneralJS, 'page-general-dark.js');
 
             loadScript(deviceCSSLoaderJS, 'device-css-loader.js');
-            
+
+            // Khởi tạo text color adapter
+            if (typeof window.HMTTextColorAdapter !== 'undefined' && typeof window.HMTTextColorAdapter.init === 'function') {
+                window.HMTTextColorAdapter.init();
+                debugLog('Text Color Adapter đã được khởi tạo');
+            } else {
+                debugLog('Text Color Adapter module chưa được tải');
+            }
+
             debugLog('Tất cả module đã được tải');
 
             // Kiểm tra cập nhật tự động được xử lý bởi update-checker API
