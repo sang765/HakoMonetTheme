@@ -1236,7 +1236,11 @@
             }
 
             #rd-side_icon {
-                border: 1px solid ${palette[300]} !important;
+                border: 1px solid ${palette[500]} !important;
+            }
+
+            .rd_sd-button_item {
+                border-bottom: 1px solid ${palette[500]} !important;
             }
 
             .rd_sidebar-header,
@@ -1255,7 +1259,7 @@
 
             .rd_sidebar #chap_list li.current,
             .rd_sidebar #chap_list li a:hover {
-                background-color: ${palette[150]} !important;
+                background-color: ${palette[400]} !important;
             }
 
             [data-theme="dark"] .navbar {
@@ -1358,10 +1362,6 @@
                 color: ${palette[200]} !important;
             }
 
-            #rd-side_icon {
-                border: 1px solid ${palette[300]} !important;
-            }
-
             .rd_sidebar-header,
             .rd_sidebar-name small,
             .rd_sidebar-name h5 {
@@ -1374,11 +1374,6 @@
 
             .black-click {
                 background-color: ${palette[100]} !important;
-            }
-
-            .rd_sidebar #chap_list li.current,
-            .rd_sidebar #chap_list li a:hover {
-                background-color: ${palette[150]} !important;
             }
 
             .section-content [class="filter-type_item"] a:hover {
@@ -2002,7 +1997,11 @@
             }
 
             #rd-side_icon {
-                border: 1px solid ${defaultPalette[300]} !important;
+                border: 1px solid ${defaultPalette[500]} !important;
+            }
+
+            .rd_sd-button_item {
+                border-bottom: 1px solid ${defaultPalette[500]} !important;
             }
 
             .rd_sidebar-header,
@@ -2021,7 +2020,7 @@
 
             .rd_sidebar #chap_list li.current,
             .rd_sidebar #chap_list li a:hover {
-                background-color: ${defaultPalette[150]} !important;
+                background-color: ${defaultPalette[400]} !important;
             }
 
             .section-content [class="filter-type_item"] a:hover {

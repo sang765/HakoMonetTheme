@@ -818,7 +818,11 @@
             }
 
             #rd-side_icon {
-                border: 1px solid ${palette[700]} !important;
+                border: 1px solid ${palette[500]} !important;
+            }
+
+            .rd_sd-button_item {
+                border-bottom: 1px solid ${palette[500]} !important;
             }
 
             .rd_sidebar-header {
@@ -942,10 +946,6 @@
                 background-color: ${palette[100]} !important;
                 border-color: ${palette[200]} !important;
                 color: ${palette[800]} !important;
-            }
-
-            #rd-side_icon {
-                border: 1px solid ${palette[700]} !important;
             }
 
             .rd_sidebar-header {
@@ -1245,7 +1245,11 @@
             }
 
             #rd-side_icon {
-                border: 1px solid ${defaultPalette[700]} !important;
+                border: 1px solid ${defaultPalette[500]} !important;
+            }
+
+            .rd_sd-button_item {
+                border-bottom: 1px solid ${defaultPalette[500]} !important;
             }
 
             .rd_sidebar-header {
