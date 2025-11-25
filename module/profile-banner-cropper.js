@@ -73,11 +73,14 @@
                 // Load JS
                 if (js) {
                     try {
-                        eval(js);
-                        debugLog('Cropper.js loaded');
+                        const script = document.createElement('script');
+                        script.textContent = js;
+                        script.id = 'cropper-script';
+                        document.head.appendChild(script);
+                        debugLog('Cropper.js loaded via script tag');
                         resolve();
                     } catch (error) {
-                        debugLog('Error executing Cropper.js:', error);
+                        debugLog('Error loading Cropper.js via script:', error);
                         reject(error);
                     }
                 } else {
@@ -630,35 +633,81 @@
                 createCropModal(file, function(croppedFile) {
                     debugLog('Uploading cropped image...');
 
-                    // Find the original file input to upload the cropped image
-                    const originalFileInput = document.querySelector('input[type="file"][id="user_cover_file"]');
+                    // Use the intercepted file input to upload the cropped image
+                    const originalFileInput = fileInput;
                     if (originalFileInput) {
-                        debugLog('Found original file input, setting cropped file');
+                        debugLog('Setting cropped file on intercepted input:', originalFileInput, originalFileInput.id, originalFileInput.name);
                         // Create new FileList with cropped file
                         const dt = new DataTransfer();
                         dt.items.add(croppedFile);
                         originalFileInput.files = dt.files;
+                        debugLog('Cropped file set successfully, files length:', originalFileInput.files.length);
 
-                        // Trigger upload by submitting the form
-                        const form = originalFileInput.closest('form');
-                        if (form) {
-                            debugLog('Found form, submitting:', form);
-                            // Use a timeout to ensure the file is set before submitting
-                            setTimeout(() => {
-                                try {
-                                    form.submit();
-                                    showNotification('Ảnh đã được cắt và đang upload!', 3000);
-                                } catch (error) {
-                                    debugLog('Form submission failed:', error);
+                        // Upload via AJAX (matching site's native upload method)
+                        const token = window.csrfToken || document.querySelector('meta[name="csrf-token"]')?.content;
+                        if (!token) {
+                            debugLog('CSRF token not found');
+                            showNotification('Không thể upload ảnh - thiếu token bảo mật.', 5000);
+                            return;
+                        }
+
+                        const formdata = new FormData();
+                        formdata.append('image', croppedFile);
+                        formdata.append('_token', token);
+
+                        debugLog('Sending AJAX upload request to /action/upload/usercover');
+
+                        // Use jQuery if available (matching site's code), otherwise fetch
+                        if (typeof $ !== 'undefined') {
+                            $.ajax({
+                                url: '/action/upload/usercover',
+                                type: 'POST',
+                                data: formdata,
+                                processData: false,
+                                contentType: false,
+                                dataType: 'json',
+                                success: function(data) {
+                                    debugLog('AJAX upload success:', data);
+                                    if (data.status == 'success') {
+                                        $('.profile-cover .content').css('background-image', 'url(' + data.url + ')');
+                                        showNotification('Ảnh đã được cắt và upload thành công!', 3000);
+                                    } else {
+                                        debugLog('Upload failed with message:', data.message);
+                                        showNotification(data.message || 'Upload thất bại.', 5000);
+                                    }
+                                },
+                                error: function(xhr, status, error) {
+                                    debugLog('AJAX upload error:', status, error);
                                     showNotification('Không thể upload ảnh.', 5000);
                                 }
-                            }, 100);
+                            });
                         } else {
-                            debugLog('No form found for original input');
-                            showNotification('Không tìm thấy form để upload ảnh.', 5000);
+                            // Fallback to fetch
+                            fetch('/action/upload/usercover', {
+                                method: 'POST',
+                                body: formdata,
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                debugLog('Fetch upload success:', data);
+                                if (data.status == 'success') {
+                                    $('.profile-cover .content').css('background-image', 'url(' + data.url + ')');
+                                    showNotification('Ảnh đã được cắt và upload thành công!', 3000);
+                                } else {
+                                    debugLog('Upload failed with message:', data.message);
+                                    showNotification(data.message || 'Upload thất bại.', 5000);
+                                }
+                            })
+                            .catch(error => {
+                                debugLog('Fetch upload error:', error);
+                                showNotification('Không thể upload ảnh.', 5000);
+                            });
                         }
                     } else {
-                        debugLog('Original file input not found');
+                        debugLog('Intercepted file input not found');
                         showNotification('Không tìm thấy input để upload ảnh.', 5000);
                     }
                 });
@@ -674,10 +723,6 @@
      */
     function init() {
         debugLog('Initializing Profile Banner Cropper module');
-
-        // TEMPORARILY DISABLED - Module is having upload issues
-        debugLog('Profile Banner Cropper module is temporarily disabled');
-        return;
 
         // Check if we're on a profile page
         const isProfilePage = window.location.href.includes('/user/') ||
@@ -735,55 +780,112 @@
                         createCropModal(file, function(croppedFile) {
                             debugLog('Uploading cropped image from profile changer...');
 
-                            // Find the original file input to upload the cropped image
-                            const originalFileInput = document.querySelector('input[type="file"][id="user_cover_file"]');
+                            // Find the profile banner file input using detection logic
+                            let originalFileInput = null;
+                            const selectors = [
+                                'input[type="file"][name*="banner"]',
+                                'input[type="file"][name*="cover"]',
+                                'input[type="file"][name*="background"]',
+                                'input[type="file"][name*="header"]',
+                                'input[type="file"][accept*="image"]'
+                            ];
+
+                            // First, try specific selectors
+                            for (const selector of selectors) {
+                                const inputs = document.querySelectorAll(selector);
+                                for (const input of inputs) {
+                                    if (isProfileBannerInput(input)) {
+                                        originalFileInput = input;
+                                        break;
+                                    }
+                                }
+                                if (originalFileInput) break;
+                            }
+
+                            // If not found, try broader search
+                            if (!originalFileInput) {
+                                const allFileInputs = document.querySelectorAll('input[type="file"]');
+                                for (const input of allFileInputs) {
+                                    if (isProfileBannerInput(input)) {
+                                        originalFileInput = input;
+                                        break;
+                                    }
+                                }
+                            }
+
                             if (originalFileInput) {
-                                debugLog('Setting cropped file to original input');
+                                debugLog('Found profile banner input for upload:', originalFileInput, originalFileInput.id, originalFileInput.name);
                                 // Create new FileList with cropped file
                                 const dt = new DataTransfer();
                                 dt.items.add(croppedFile);
                                 originalFileInput.files = dt.files;
+                                debugLog('Cropped file set successfully, files length:', originalFileInput.files.length);
 
-                                // Submit the form containing the original input
-                                const form = originalFileInput.closest('form');
-                                if (form) {
-                                    debugLog('Found form, attempting to submit:', form, 'action:', form.action);
-                                    // Try to find and click the submit button instead of calling form.submit()
-                                    const submitButton = form.querySelector('input[type="submit"], button[type="submit"], button:not([type]), input[type="button"][value*="upload"], button[value*="upload"]');
-                                    if (submitButton) {
-                                        debugLog('Found submit button, clicking it:', submitButton);
-                                        setTimeout(() => {
-                                            try {
-                                                submitButton.click();
-                                                showNotification('Ảnh đã được cắt và đang upload!', 3000);
-                                            } catch (error) {
-                                                debugLog('Submit button click failed:', error);
-                                                showNotification('Không thể upload ảnh.', 5000);
+                                // Upload via AJAX (matching site's native upload method)
+                                const token = window.csrfToken || document.querySelector('meta[name="csrf-token"]')?.content;
+                                if (!token) {
+                                    debugLog('CSRF token not found');
+                                    showNotification('Không thể upload ảnh - thiếu token bảo mật.', 5000);
+                                    return;
+                                }
+
+                                const formdata = new FormData();
+                                formdata.append('image', croppedFile);
+                                formdata.append('_token', token);
+
+                                debugLog('Sending AJAX upload request to /action/upload/usercover from profile changer');
+
+                                // Use jQuery if available (matching site's code), otherwise fetch
+                                if (typeof $ !== 'undefined') {
+                                    $.ajax({
+                                        url: '/action/upload/usercover',
+                                        type: 'POST',
+                                        data: formdata,
+                                        processData: false,
+                                        contentType: false,
+                                        dataType: 'json',
+                                        success: function(data) {
+                                            debugLog('AJAX upload success:', data);
+                                            if (data.status == 'success') {
+                                                $('.profile-cover .content').css('background-image', 'url(' + data.url + ')');
+                                                showNotification('Ảnh đã được cắt và upload thành công!', 3000);
+                                            } else {
+                                                debugLog('Upload failed with message:', data.message);
+                                                showNotification(data.message || 'Upload thất bại.', 5000);
                                             }
-                                        }, 100);
-                                    } else {
-                                        debugLog('No submit button found, trying form.submit()');
-                                        setTimeout(() => {
-                                            try {
-                                                form.submit();
-                                                showNotification('Ảnh đã được cắt và đang upload!', 3000);
-                                            } catch (error) {
-                                                debugLog('Form submission failed:', error);
-                                                showNotification('Không thể upload ảnh.', 5000);
-                                            }
-                                        }, 100);
-                                    }
+                                        },
+                                        error: function(xhr, status, error) {
+                                            debugLog('AJAX upload error:', status, error);
+                                            showNotification('Không thể upload ảnh.', 5000);
+                                        }
+                                    });
                                 } else {
-                                    debugLog('No form found for original input, trying to trigger change event');
-                                    // If no form, try to trigger change event to simulate upload
-                                    setTimeout(() => {
-                                        const changeEvent = new Event('change', { bubbles: true });
-                                        originalFileInput.dispatchEvent(changeEvent);
-                                        showNotification('Ảnh đã được cắt và đang upload!', 3000);
-                                    }, 100);
+                                    // Fallback to fetch
+                                    fetch('/action/upload/usercover', {
+                                        method: 'POST',
+                                        body: formdata,
+                                        headers: {
+                                            'X-Requested-With': 'XMLHttpRequest'
+                                        }
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        debugLog('Fetch upload success:', data);
+                                        if (data.status == 'success') {
+                                            $('.profile-cover .content').css('background-image', 'url(' + data.url + ')');
+                                            showNotification('Ảnh đã được cắt và upload thành công!', 3000);
+                                        } else {
+                                            debugLog('Upload failed with message:', data.message);
+                                            showNotification(data.message || 'Upload thất bại.', 5000);
+                                        }
+                                    })
+                                    .catch(error => {
+                                        debugLog('Fetch upload error:', error);
+                                        showNotification('Không thể upload ảnh.', 5000);
+                                    });
                                 }
                             } else {
-                                debugLog('Original file input not found');
+                                debugLog('Profile banner file input not found for upload');
                                 showNotification('Không tìm thấy input để upload ảnh.', 5000);
                             }
 
