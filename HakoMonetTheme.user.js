@@ -53,6 +53,7 @@ const resourcePaths = {
     updateManagerJS: 'http://localhost:8080/module/update-manager.js',
     darkModePrompterJS: 'http://localhost:8080/module/dark-mode-prompter.js',
     fullscreenJS: 'http://localhost:8080/module/fullscreen.js',
+    keyboardShortcutsJS: 'http://localhost:8080/module/keyboard-shortcuts.js',
     deviceCSSLoaderJS: 'http://localhost:8080/module/device-css-loader.js',
     profileBannerCropperJS: 'http://localhost:8080/module/profile-banner-cropper.js',
     html2canvasJS: 'http://localhost:8080/api/html2canvas.min.js',
@@ -372,6 +373,7 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
         });
     }
 
+    // NOTE: Biết cách sắp xếp = hoạt động trơn chu
     async function loadAllResources() {
         const resources = [
             // main
@@ -382,8 +384,8 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
             'configJS',
             // menu
             'mainMenuJS',
-            // core (adblock, antipopup)
-            'adBlockerJS', 'antiPopupJS',
+            // core modules
+            'adBlockerJS', 'antiPopupJS', 'keyboardShortcutsJS',
             // css (other modules)
             'infoTruyenJS', 'animationJS', 'tagColorJS', 'fontImportJS', 'themeDetectorJS', 'deviceDetectorJS', 'autoReloadJS',
             'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyen', 'colorinfotruyenlight',
