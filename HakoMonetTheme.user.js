@@ -61,7 +61,6 @@
 // @resource     colorisCSS ./api/coloris.min.css
 // @resource     colorisColors ./api/coloris-colors.json
 // @resource     keyboardShortcutsJS ./module/keyboard-shortcuts.js
-// @resource     textColorAdapterJS ./module/text-color-adapter.js
 // @connect      html2canvas.hertzen.com
 // @connect      hertzen.com
 // ==/UserScript==
@@ -324,7 +323,7 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
             // css modules
             'infoTruyenJS', 'animationJS', 'tagColorJS', 'fontImportJS', 'themeDetectorJS',
             'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyen', 'colorinfotruyenlight',
-            'navbarLogoJS', 'readingPageJS', 'textColorAdapterJS',
+            'navbarLogoJS', 'readingPageJS',
             // dynamic css
             'deviceCSSLoaderJS', 'profileBannerCropperJS'
         ];
