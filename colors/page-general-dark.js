@@ -894,7 +894,8 @@
             }
 
             .ln-comment-form input.button,
-            .series-users .series-owner_name a {
+            .series-users .series-owner_name a,
+            .series-users .user-role {
                 color: ${textColor} !important;
             }
 
@@ -1562,7 +1563,8 @@
             }
 
             .ln-comment-form input.button,
-            .series-users .series-owner_name a {
+            .series-users .series-owner_name a,
+            .series-users .user-role {
                 color: ${textColor} !important;
             }
 
