@@ -1,16 +1,3 @@
-/**
- * Module cắt profile banner trước khi upload
- *
- * Module này cung cấp tính năng cắt ảnh profile banner trước khi upload,
- * giải quyết vấn đề trang web đích không có tính năng crop built-in.
- *
- * Tính năng chính:
- * - Chặn sự kiện chọn file ảnh
- * - Hiển thị modal crop với Cropper.js
- * - Upload ảnh đã cắt với CORS bypass
- * - Tích hợp với hệ thống config của theme
- */
-
 (function() {
     'use strict';
 
@@ -293,8 +280,6 @@
                     if (!cropper) return;
 
                     const canvas = cropper.getCroppedCanvas({
-                        width: MIN_WIDTH,
-                        height: MIN_HEIGHT,
                         fillColor: '#fff',
                         imageSmoothingEnabled: true,
                         imageSmoothingQuality: 'high'
@@ -390,7 +375,7 @@
                     }
 
                     const croppedFile = new File([blob], imageFile.name, {
-                        type: 'image/jpeg',
+                        type: 'image/png',
                         lastModified: Date.now()
                     });
 
@@ -402,7 +387,7 @@
                     }
 
                     closeModal();
-                }, 'image/jpeg', 0.9);
+                }, 'image/png');
             } else {
                 debugLog('Failed to get cropped canvas');
                 showNotification('Không thể tạo canvas đã cắt.', 5000);
