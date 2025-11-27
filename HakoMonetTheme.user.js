@@ -51,7 +51,6 @@
 // @resource     mainMenuJS ./module/main-menu.js
 // @resource     navbarLogoJS ./module/navbar-logo.js
 // @resource     updateManagerJS ./module/update-manager.js
-// @resource     darkModePrompterJS ./module/dark-mode-prompter.js
 // @resource     fullscreenJS ./module/fullscreen.js
 // @resource     deviceCSSLoaderJS ./module/device-css-loader.js
 // @resource     profileCropperJS ./module/profile-cropper.js
@@ -91,7 +90,6 @@
             mainMenu: '[MainMenu]',
             navbarLogo: '[NavbarLogo]',
             updateManager: '[UpdateManager]',
-            darkModePrompter: '[DarkModePrompter]',
             readingPage: '[ReadingPage]',
             infoTruyen: '[InfoTruyen]',
             tagColor: '[TagColor]',
@@ -182,55 +180,6 @@
         }
     }
     
-    function openSettings() {
-        // Mở trang cài đặt hoặc tạo dialog settings
-        showNotification('Cài đặt', 'Tính năng cài đặt đang được phát triển.', 3000);
-        debugLog('Mở cài đặt');
-
-        // Có thể tích hợp với GM_config sau này
-        try {
-            if (typeof GM_config !== 'undefined') {
-                GM_config.open();
-            }
-        } catch (e) {
-            debugLog('GM_config không khả dụng:', e);
-        }
-    }
-
-    function openColorConfig() {
-        // Đảm bảo config module đã được tải
-        if (typeof window.HMTConfig !== 'undefined' && typeof window.HMTConfig.openConfigDialog === 'function') {
-            window.HMTConfig.openConfigDialog();
-            showNotification('Cài đặt màu sắc', 'Mở bảng cài đặt màu sắc...', 3000);
-        } else {
-            showNotification('Lỗi', 'Module cài đặt màu sắc chưa được tải. Vui lòng làm mới trang.', 5000);
-            debugLog('Config module chưa được tải');
-        }
-    }
-
-    function openAdBlockerConfig() {
-        // Đảm bảo ad blocker module đã được tải
-        if (typeof window.HMTAdBlocker !== 'undefined' && typeof window.HMTAdBlocker.openDialog === 'function') {
-            window.HMTAdBlocker.openDialog();
-            showNotification('Ad Blocker', 'Mở bảng cài đặt Ad Blocker...', 3000);
-        } else {
-            showNotification('Lỗi', 'Module Ad Blocker chưa được tải. Vui lòng làm mới trang.', 5000);
-            debugLog('Ad Blocker module chưa được tải');
-        }
-    }
-
-    function openAntiPopupConfig() {
-        // Đảm bảo anti-popup module đã được tải
-        if (typeof window.HMTAntiPopup !== 'undefined' && typeof window.HMTAntiPopup.openDialog === 'function') {
-            window.HMTAntiPopup.openDialog();
-            showNotification('Anti-Popup', 'Mở bảng cài đặt Anti-Popup...', 3000);
-        } else {
-            showNotification('Lỗi', 'Module Anti-Popup chưa được tải. Vui lòng làm mới trang.', 5000);
-            debugLog('Anti-Popup module chưa được tải');
-        }
-    }
-    
-
     function getCurrentVersion() {
         try {
             // Extract version from script header comment
@@ -320,8 +269,7 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
             'mainMenuJS',
             // core modules
             'profileCropperJS', 'deviceDetectorJS', 'adBlockerJS', 'antiPopupJS',
-            'keyboardShortcutsJS', 'updateManagerJS', 'darkModePrompterJS',
-            'fullscreenJS', 'autoReloadJS', 'themeDetectorJS',
+            'keyboardShortcutsJS', 'updateManagerJS', 'fullscreenJS', 'autoReloadJS', 'themeDetectorJS',
             // css modules
             'deviceCSSLoaderJS', 'infoTruyenJS', 'tagColorJS', 'fontImportJS', 'animationJS',
             'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyen', 'colorinfotruyenlight',

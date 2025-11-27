@@ -30,6 +30,7 @@
      * @returns {Promise} Promise that resolves when CSS is loaded and applied
      */
     function loadCSS(url) {
+        debugLog('Attempting to load CSS from URL:', url);
         return new Promise((resolve, reject) => {
             GM_xmlhttpRequest({
                 method: 'GET',
@@ -39,13 +40,15 @@
                     'Cache-Control': 'no-cache'
                 },
                 onload: function(response) {
+                    debugLog('Received response for CSS load. Status:', response.status, 'URL:', url);
                     if (response.status === 200) {
+                        debugLog('CSS content length:', response.responseText.length, 'characters');
                         try {
                             GM_addStyle(response.responseText);
                             debugLog('Successfully loaded and applied CSS:', url);
                             resolve();
                         } catch (error) {
-                            debugLog('Error applying CSS:', error);
+                            debugLog('Error applying CSS with GM_addStyle:', error, 'URL:', url);
                             reject(error);
                         }
                     } else {
@@ -55,11 +58,11 @@
                     }
                 },
                 onerror: function(error) {
-                    debugLog('Network error loading CSS:', url, error);
+                    debugLog('Network error loading CSS:', url, 'Error details:', error);
                     reject(new Error(`Network error: ${error}`));
                 },
                 ontimeout: function() {
-                    debugLog('Timeout loading CSS:', url);
+                    debugLog('Timeout loading CSS:', url, 'after 10 seconds');
                     reject(new Error('Request timeout'));
                 },
                 timeout: 10000 // 10 second timeout
