@@ -13,12 +13,12 @@
 
     function debugLog(...args) {
         if (DEBUG && typeof window.Logger !== 'undefined') {
-            window.Logger.log('profileBannerCropper', ...args);
+            window.Logger.log('profileCropper', ...args);
         } else if (DEBUG) {
-            console.log('[ProfileBannerCropper]', ...args);
+            console.log('[ProfileCropper]', ...args);
         }
         // Always log for debugging
-        console.log('[ProfileBannerCropper]', ...args);
+        console.log('[ProfileCropper]', ...args);
     }
 
     // Cached Cropper.js library
@@ -834,7 +834,7 @@
     }
 
     // Export module
-    window.HMTProfileBannerCropper = {
+    window.HMTProfileCropper = {
         init: init,
         loadCropperLibrary: loadCropperLibrary,
         createCropModal: createCropModal,
