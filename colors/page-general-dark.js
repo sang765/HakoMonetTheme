@@ -1482,16 +1482,17 @@
                 background-color: ${palette[800]} !important;
             }
 
-            .hmt-crop-modal {
+            .hmt-crop-modal, .hmt-avatar-dialog {
                 background-color: ${palette[900]} !important;
             }
-            [class="hmt-crop-modal"] :is(h3, h4, p, .hmt-crop-cancel, .hmt-crop-upload) {
+            [class="hmt-crop-modal"] :is(h3, h4, p, .hmt-crop-cancel, .hmt-crop-upload),
+            [class="hmt-avatar-dialog"] :is(h3, p, .hmt-avatar-cancel, .hmt-avatar-no, .hmt-avatar-yes) {
                 color: ${textColor} !important;
             }
-            .hmt-crop-cancel {
+            .hmt-crop-cancel, .hmt-avatar-cancel, .hmt-avatar-no {
                 background-color: ${palette[700]} !important;
             }
-            .hmt-crop-upload {
+            .hmt-crop-upload, .hmt-avatar-yes {
                 background-color: ${palette[500]} !important;
             }
 

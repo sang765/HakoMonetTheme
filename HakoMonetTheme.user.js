@@ -54,7 +54,7 @@
 // @resource     darkModePrompterJS ./module/dark-mode-prompter.js
 // @resource     fullscreenJS ./module/fullscreen.js
 // @resource     deviceCSSLoaderJS ./module/device-css-loader.js
-// @resource     profileBannerCropperJS ./module/profile-banner-cropper.js
+// @resource     profileCropperJS ./module/profile-cropper.js
 // @resource     html2canvasJS ./api/html2canvas.min.js
 // @resource     monetTestJS ./api/monet-test.js
 // @resource     colorisJS ./api/coloris.min.js
@@ -319,13 +319,13 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
             // menu
             'mainMenuJS',
             // core modules
-            'deviceDetectorJS', 'adBlockerJS', 'antiPopupJS', 'keyboardShortcutsJS', 'updateManagerJS', 'darkModePrompterJS', 'fullscreenJS', 'autoReloadJS',
+            'profileCropperJS', 'deviceDetectorJS', 'adBlockerJS', 'antiPopupJS',
+            'keyboardShortcutsJS', 'updateManagerJS', 'darkModePrompterJS',
+            'fullscreenJS', 'autoReloadJS', 'themeDetectorJS',
             // css modules
-            'infoTruyenJS', 'animationJS', 'tagColorJS', 'fontImportJS', 'themeDetectorJS',
+            'deviceCSSLoaderJS', 'infoTruyenJS', 'tagColorJS', 'fontImportJS', 'animationJS',
             'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyen', 'colorinfotruyenlight',
             'navbarLogoJS', 'readingPageJS',
-            // dynamic css
-            'deviceCSSLoaderJS', 'profileBannerCropperJS'
         ];
 
         let loadedCount = 0;
