@@ -55,7 +55,7 @@ const resourcePaths = {
     fullscreenJS: 'http://localhost:8080/module/fullscreen.js',
     keyboardShortcutsJS: 'http://localhost:8080/module/keyboard-shortcuts.js',
     deviceCSSLoaderJS: 'http://localhost:8080/module/device-css-loader.js',
-    profileBannerCropperJS: 'http://localhost:8080/module/profile-banner-cropper.js',
+    profileCropperJS: 'http://localhost:8080/module/profile-cropper.js',
     html2canvasJS: 'http://localhost:8080/api/html2canvas.min.js',
     monetTestJS: 'http://localhost:8080/api/monet-test.js',
     colorisJS: 'http://localhost:8080/api/coloris.min.js',
@@ -385,13 +385,13 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
             // menu
             'mainMenuJS',
             // core modules
-            'deviceDetectorJS', 'adBlockerJS', 'antiPopupJS', 'keyboardShortcutsJS', 'updateManagerJS', 'darkModePrompterJS', 'fullscreenJS', 'autoReloadJS',
+            'profileCropperJS', 'deviceDetectorJS', 'adBlockerJS', 'antiPopupJS',
+            'keyboardShortcutsJS', 'updateManagerJS', 'darkModePrompterJS',
+            'fullscreenJS', 'autoReloadJS', 'themeDetectorJS',
             // css modules
-            'infoTruyenJS', 'animationJS', 'tagColorJS', 'fontImportJS', 'themeDetectorJS',
+            'deviceCSSLoaderJS', 'infoTruyenJS', 'tagColorJS', 'fontImportJS', 'animationJS',
             'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyen', 'colorinfotruyenlight',
             'navbarLogoJS', 'readingPageJS',
-            // dynamic css
-            'deviceCSSLoaderJS', 'profileBannerCropperJS'
         ];
 
         const promises = resources.map(resourceName => loadResource(resourceName));
