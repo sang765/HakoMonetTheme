@@ -51,7 +51,6 @@ const resourcePaths = {
     mainMenuJS: 'http://localhost:8080/module/main-menu.js',
     navbarLogoJS: 'http://localhost:8080/module/navbar-logo.js',
     updateManagerJS: 'http://localhost:8080/module/update-manager.js',
-    darkModePrompterJS: 'http://localhost:8080/module/dark-mode-prompter.js',
     fullscreenJS: 'http://localhost:8080/module/fullscreen.js',
     keyboardShortcutsJS: 'http://localhost:8080/module/keyboard-shortcuts.js',
     deviceCSSLoaderJS: 'http://localhost:8080/module/device-css-loader.js',
