@@ -87,7 +87,6 @@ const resourcePaths = {
             mainMenu: '[MainMenu]',
             navbarLogo: '[NavbarLogo]',
             updateManager: '[UpdateManager]',
-            darkModePrompter: '[DarkModePrompter]',
             readingPage: '[ReadingPage]',
             infoTruyen: '[InfoTruyen]',
             tagColor: '[TagColor]',
