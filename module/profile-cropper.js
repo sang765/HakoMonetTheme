@@ -724,8 +724,10 @@
             }
 
             const formdata = new FormData();
-        formdata.append('image', file);
+        formdata.append('image', processedFile);
         formdata.append('_token', token);
+
+        debugLog('Uploading processed file:', processedFile.name, processedFile.size, 'bytes');
 
         if (typeof $ !== 'undefined') {
             $.ajax({
