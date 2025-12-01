@@ -1797,68 +1797,9 @@ ${!isInfoPage() ? `
     }
 
     function showNotification(message, timeout = 3000) {
-        if (typeof GM_notification === 'function') {
-            GM_notification({
-                title: 'HakoMonetTheme',
-                text: message,
-                timeout: timeout,
-                silent: false
-            });
-        } else {
-            // Fallback notification
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                padding: 15px 20px;
-                border-radius: 10px;
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-                z-index: 10002;
-                max-width: 300px;
-                animation: slideIn 0.5s ease-out;
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            `;
-
-            notification.innerHTML = `
-                <h4 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 600;">HakoMonetTheme</h4>
-                <p style="margin: 0; font-size: 14px; opacity: 0.9;">${message}</p>
-            `;
-
-            // Thêm animation vào notification
-            setTimeout(() => {
-                notification.style.animation = 'hmtNotificationSlideIn 0.5s ease-out';
-            }, 10);
-
-            (window.top || window).document.body.appendChild(notification);
-
-            // Thêm keyframes cho notification animation nếu chưa có
-            if (!document.querySelector('#hmt-notification-styles')) {
-                const style = document.createElement('style');
-                style.id = 'hmt-notification-styles';
-                style.textContent = `
-                    @keyframes hmtNotificationSlideIn {
-                        from {
-                            transform: translateX(100%);
-                            opacity: 0;
-                        }
-                        to {
-                            transform: translateX(0);
-                            opacity: 1;
-                        }
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-
-            setTimeout(() => {
-                if (notification.parentElement) {
-                    notification.remove();
-                }
-            }, timeout);
-        }
+        // Notification functionality removed from modules
+        // Permission still granted in main userscript
+        return;
     }
 
     function openConfigDialog() {
@@ -1923,3 +1864,4 @@ ${!isInfoPage() ? `
     initializeConfig();
 
 })();
+

@@ -582,54 +582,9 @@
      * @param {number} timeout - Timeout in milliseconds
      */
     function showNotification(title, message, timeout = NOTIFICATION_TIMEOUT) {
-        // Sanitize inputs
-        const safeTitle = String(title || '').slice(0, 100);
-        const safeMessage = String(message || '').slice(0, 500);
-        const safeTimeout = Math.min(Math.max(Number(timeout) || NOTIFICATION_TIMEOUT, 1000), 10000);
-
-        try {
-            if (typeof GM_notification === 'function') {
-                GM_notification({
-                    title: safeTitle,
-                    text: safeMessage,
-                    timeout: safeTimeout,
-                    silent: false
-                });
-            } else {
-                // Fallback notification with security
-                const notification = document.createElement('div');
-                notification.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    color: white;
-                    padding: 15px 20px;
-                    border-radius: 10px;
-                    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-                    z-index: 10002;
-                    max-width: 300px;
-                    animation: slideIn 0.5s ease-out;
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                    pointer-events: none;
-                `;
-
-                notification.innerHTML = `
-                    <h4 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 600;">${safeTitle.replace(/</g, '<').replace(/>/g, '>')}</h4>
-                    <p style="margin: 0; font-size: 14px; opacity: 0.9;">${safeMessage.replace(/</g, '<').replace(/>/g, '>')}</p>
-                `;
-
-                document.body.appendChild(notification);
-
-                setTimeout(() => {
-                    if (notification.parentElement) {
-                        notification.remove();
-                    }
-                }, safeTimeout);
-            }
-        } catch (error) {
-            debugLog('Error showing notification:', error);
-        }
+        // Notification functionality removed from modules
+        // Permission still granted in main userscript
+        return;
     }
 
     // Export functions - simplified API focused on UI display
