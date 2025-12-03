@@ -25,39 +25,47 @@
 // @discord      https://discord.gg/uvQ6A3CDPq
 // ==/UserScript==
 
+// Server URL Configuration:
+// The script uses a configurable server URL for loading resources.
+// Default: http://localhost:8080
+// To change: Use the "⚙️ Cài đặt máy chủ" menu command in Tampermonkey/Greasemonkey menu.
+// The URL must be a valid HTTP/HTTPS URL. Invalid URLs will be rejected.
+// If the server is unavailable, the script will show error notifications and some features may not work.
+const baseURL = GM_getValue('server_url', 'http://localhost:8080');
+
 const resourcePaths = {
-    mainJS: 'http://localhost:8080/main.js',
-    monetAPIJS: 'http://localhost:8080/api/monet.js',
-    updateCheckerJS: 'http://localhost:8080/api/update-checker.js',
-    CORSJS: 'http://localhost:8080/module/cors.js',
-    infoTruyenJS: 'http://localhost:8080/class/info-truyen.js',
-    readingPageJS: 'http://localhost:8080/class/reading-page.js',
-    animationJS: 'http://localhost:8080/class/animation.js',
-    tagColorJS: 'http://localhost:8080/class/tag-color.js',
-    fontImportJS: 'http://localhost:8080/class/font-import.js',
-    colorinfotruyen: 'http://localhost:8080/colors/page-info-truyen-dark.js',
-    pagegeneralJS: 'http://localhost:8080/colors/page-general-dark.js',
-    pagegenerallightJS: 'http://localhost:8080/colors/page-general-light.js',
-    colorinfotruyenlight: 'http://localhost:8080/colors/page-info-truyen-light.js',
-    themeDetectorJS: 'http://localhost:8080/module/theme-detector.js',
-    deviceDetectorJS: 'http://localhost:8080/module/device-detector.js',
-    configJS: 'http://localhost:8080/module/config.js',
-    adBlockerJS: 'http://localhost:8080/module/ad-blocker.js',
-    antiPopupJS: 'http://localhost:8080/module/anti-popup.js',
-    mainMenuJS: 'http://localhost:8080/module/main-menu.js',
-    navbarLogoJS: 'http://localhost:8080/module/navbar-logo.js',
-    updateManagerJS: 'http://localhost:8080/module/update-manager.js',
-    fullscreenJS: 'http://localhost:8080/module/fullscreen.js',
-    keyboardShortcutsJS: 'http://localhost:8080/module/keyboard-shortcuts.js',
-    deviceCSSLoaderJS: 'http://localhost:8080/module/device-css-loader.js',
-    profileCropperJS: 'http://localhost:8080/module/profile-cropper.js',
-    creatorJS: 'http://localhost:8080/module/creator.js',
-    html2canvasJS: 'http://localhost:8080/api/html2canvas.min.js',
-    monetTestJS: 'http://localhost:8080/api/monet-test.js',
-    colorisJS: 'http://localhost:8080/api/coloris.min.js',
-    colorisCSS: 'http://localhost:8080/api/coloris.min.css',
-    colorisColors: 'http://localhost:8080/api/coloris-colors.json',
-    autoReloadJS: 'http://localhost:8080/module/auto-reload.js'
+    mainJS: `${baseURL}/main.js`,
+    monetAPIJS: `${baseURL}/api/monet.js`,
+    updateCheckerJS: `${baseURL}/api/update-checker.js`,
+    CORSJS: `${baseURL}/module/cors.js`,
+    infoTruyenJS: `${baseURL}/class/info-truyen.js`,
+    readingPageJS: `${baseURL}/class/reading-page.js`,
+    animationJS: `${baseURL}/class/animation.js`,
+    tagColorJS: `${baseURL}/class/tag-color.js`,
+    fontImportJS: `${baseURL}/class/font-import.js`,
+    colorinfotruyen: `${baseURL}/colors/page-info-truyen-dark.js`,
+    pagegeneralJS: `${baseURL}/colors/page-general-dark.js`,
+    pagegenerallightJS: `${baseURL}/colors/page-general-light.js`,
+    colorinfotruyenlight: `${baseURL}/colors/page-info-truyen-light.js`,
+    themeDetectorJS: `${baseURL}/module/theme-detector.js`,
+    deviceDetectorJS: `${baseURL}/module/device-detector.js`,
+    configJS: `${baseURL}/module/config.js`,
+    adBlockerJS: `${baseURL}/module/ad-blocker.js`,
+    antiPopupJS: `${baseURL}/module/anti-popup.js`,
+    mainMenuJS: `${baseURL}/module/main-menu.js`,
+    navbarLogoJS: `${baseURL}/module/navbar-logo.js`,
+    updateManagerJS: `${baseURL}/module/update-manager.js`,
+    fullscreenJS: `${baseURL}/module/fullscreen.js`,
+    keyboardShortcutsJS: `${baseURL}/module/keyboard-shortcuts.js`,
+    deviceCSSLoaderJS: `${baseURL}/module/device-css-loader.js`,
+    profileCropperJS: `${baseURL}/module/profile-cropper.js`,
+    creatorJS: `${baseURL}/module/creator.js`,
+    html2canvasJS: `${baseURL}/api/html2canvas.min.js`,
+    monetTestJS: `${baseURL}/api/monet-test.js`,
+    colorisJS: `${baseURL}/api/coloris.min.js`,
+    colorisCSS: `${baseURL}/api/coloris.min.css`,
+    colorisColors: `${baseURL}/api/coloris-colors.json`,
+    autoReloadJS: `${baseURL}/module/auto-reload.js`
 };
 
 (function() {
@@ -150,6 +158,16 @@ const resourcePaths = {
         }
     };
 
+    // URL validation function
+    function isValidURL(url) {
+        try {
+            new URL(url);
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
     // Legacy debugLog function for backward compatibility
     function debugLog(...args) {
         Logger.log('main', ...args);
@@ -177,7 +195,8 @@ const resourcePaths = {
     // Auto-reload functionality for local development
     function setupAutoReload() {
         try {
-            const ws = new WebSocket('ws://localhost:8080');
+            const wsUrl = baseURL.replace(/^http/, 'ws');
+            const ws = new WebSocket(wsUrl);
             ws.onopen = () => {
                 Logger.log('main', 'Connected to auto-reload server');
             };
@@ -209,6 +228,7 @@ const resourcePaths = {
                 }
             }, 'm');
             GM_registerMenuCommand('📊 Thông tin script', showScriptInfo, 'i');
+            GM_registerMenuCommand('⚙️ Cài đặt máy chủ', openServerSettings, 's');
 
             debugLog('Đã đăng ký menu commands');
         }
@@ -258,6 +278,68 @@ const resourcePaths = {
             showNotification('Anti-Popup', 'Mở bảng cài đặt Anti-Popup...', 3000);
         } else {
             showNotification('Lỗi', 'Module Anti-Popup chưa được tải. Vui lòng làm mới trang.', 5000);
+    function openServerSettings() {
+        const currentURL = GM_getValue('server_url', 'http://localhost:8080');
+
+        // Create modal dialog
+        const overlay = document.createElement('div');
+        overlay.style = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 10000; display: flex;
+            align-items: center; justify-content: center;
+        `;
+
+        const dialog = document.createElement('div');
+        dialog.style = `
+            background: white; border: 1px solid #ccc; padding: 20px;
+            border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 400px; width: 90%;
+        `;
+
+        dialog.innerHTML = `
+            <h3 style="margin-top: 0;">Cài đặt URL máy chủ</h3>
+            <p style="margin-bottom: 10px;">Nhập URL máy chủ để tải các tài nguyên. URL phải là HTTP hoặc HTTPS hợp lệ.</p>
+            <label for="serverUrlInput" style="display: block; margin-bottom: 5px;">URL máy chủ:</label>
+            <input type="url" id="serverUrlInput" value="${currentURL}" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+            <div style="margin-top: 15px; text-align: right;">
+                <button id="cancelBtn" style="margin-right: 10px; padding: 8px 16px; border: 1px solid #ccc; background: #f5f5f5; cursor: pointer;">Hủy</button>
+                <button id="saveBtn" style="padding: 8px 16px; border: none; background: #007bff; color: white; cursor: pointer; border-radius: 4px;">Lưu</button>
+            </div>
+        `;
+
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
+
+        const input = dialog.querySelector('#serverUrlInput');
+        const saveBtn = dialog.querySelector('#saveBtn');
+        const cancelBtn = dialog.querySelector('#cancelBtn');
+
+        const closeDialog = () => {
+            document.body.removeChild(overlay);
+        };
+
+        saveBtn.onclick = () => {
+            const newUrl = input.value.trim();
+            if (!isValidURL(newUrl)) {
+                alert('URL không hợp lệ. Vui lòng nhập URL HTTP hoặc HTTPS hợp lệ.');
+                return;
+            }
+            GM_setValue('server_url', newUrl);
+            showNotification('Cài đặt', 'URL máy chủ đã được lưu. Vui lòng tải lại trang để áp dụng thay đổi.', 5000);
+            closeDialog();
+        };
+
+        cancelBtn.onclick = closeDialog;
+
+        // Close on overlay click
+        overlay.onclick = (e) => {
+            if (e.target === overlay) closeDialog();
+        };
+
+        // Focus input
+        input.focus();
+        input.select();
+    }
             debugLog('Anti-Popup module chưa được tải');
         }
     }
