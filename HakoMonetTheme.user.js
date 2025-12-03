@@ -384,7 +384,7 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
             'mainMenuJS',
             // core modules
             'profileCropperJS', 'deviceDetectorJS', 'adBlockerJS', 'antiPopupJS',
-            'keyboardShortcutsJS', 'updateManagerJS', 'darkModePrompterJS',
+            'keyboardShortcutsJS', 'updateManagerJS',
             'fullscreenJS', 'autoReloadJS', 'themeDetectorJS',
             // css modules
             'deviceCSSLoaderJS', 'infoTruyenJS', 'tagColorJS', 'fontImportJS', 'animationJS',

@@ -1054,6 +1054,59 @@
             .series-rating .feature-value {
                 color: ${palette[700]};
             }
+
+            /* TinyMCE */
+            .tox .tox-dialog-wrap__backdrop {
+                background-color: ${MonetAPI.paletteToRgba(palette, 100, .75)};
+            }
+
+            .tox .tox-dialog {
+            	background-color: ${palette[200]};
+            	border-color: ${palette[300]};
+            	box-shadow: 0 16px 16px -10px ${MonetAPI.paletteToRgba(palette, 100, .15)},0 0 40px 1px ${MonetAPI.paletteToRgba(palette, 100, .15)};
+            }
+
+            .tox .tox-dialog__header {
+                background-color: ${palette[200]};
+                color: ${textColor};
+            }
+
+            .tox .tox-dialog__footer {
+                background-color: ${palette[200]};
+            }
+
+            .tox .tox-dialog__body-nav-item--active {
+                border-bottom: 2px solid ${palette[700]};
+                color: ${palette[700]};
+            }
+
+            .tox .tox-dialog__body-nav-item:focus {
+            	background-color: ${palette[300]};
+            }
+
+            .tox .tox-button {
+                background-color: ${palette[500]};
+                border-color: ${palette[500]};
+                color: ${textColor};
+            }
+
+            .tox .tox-button:hover:not(:disabled) {
+                background-color: ${palette[400]};
+                border-color: ${palette[400]};
+                color: ${textColor};
+            }
+
+            .tox .tox-listboxfield .tox-listbox--select, .tox .tox-textarea, .tox .tox-textarea-wrap .tox-textarea:focus, .tox .tox-textfield, .tox .tox-toolbar-textfield {
+            	background-color: ${palette[100]};
+            	border-color: ${palette[300]};
+            	color: ${textColor};
+            }
+
+            .tox .tox-custom-editor:focus-within, .tox .tox-listboxfield .tox-listbox--select:focus, .tox .tox-textarea-wrap:focus-within, .tox .tox-textarea:focus, .tox .tox-textfield:focus {
+            	background-color: ${palette[100]};
+            	border-color: ${palette[500]};
+            	box-shadow: 0 0 0 1px ${palette[500]};
+            }
         `;
 
         GM_addStyle(css);
@@ -1374,6 +1427,59 @@
             .button-follow .feature-value, .button-follow.followed .feature-value,
             .series-rating .feature-value {
                 color: ${defaultPalette[700]};
+            }
+
+            /* TinyMCE */
+            .tox .tox-dialog-wrap__backdrop {
+                background-color: ${MonetAPI.paletteToRgba(defaultPalette, 100, .75)};
+            }
+
+            .tox .tox-dialog {
+            	background-color: ${defaultPalette[200]};
+            	border-color: ${defaultPalette[300]};
+            	box-shadow: 0 16px 16px -10px ${MonetAPI.paletteToRgba(defaultPalette, 100, .15)},0 0 40px 1px ${MonetAPI.paletteToRgba(defaultPalette, 100, .15)};
+            }
+
+            .tox .tox-dialog__header {
+                background-color: ${defaultPalette[200]};
+                color: ${textColor};
+            }
+
+            .tox .tox-dialog__footer {
+                background-color: ${defaultPalette[200]};
+            }
+
+            .tox .tox-dialog__body-nav-item--active {
+                border-bottom: 2px solid ${defaultPalette[700]};
+                color: ${defaultPalette[700]};
+            }
+
+            .tox .tox-dialog__body-nav-item:focus {
+            	background-color: ${defaultPalette[300]};
+            }
+
+            .tox .tox-button {
+                background-color: ${defaultPalette[500]};
+                border-color: ${defaultPalette[500]};
+                color: ${textColor};
+            }
+
+            .tox .tox-button:hover:not(:disabled) {
+                background-color: ${defaultPalette[400]};
+                border-color: ${defaultPalette[400]};
+                color: ${textColor};
+            }
+
+            .tox .tox-listboxfield .tox-listbox--select, .tox .tox-textarea, .tox .tox-textarea-wrap .tox-textarea:focus, .tox .tox-textfield, .tox .tox-toolbar-textfield {
+            	background-color: ${defaultPalette[100]};
+            	border-color: ${defaultPalette[300]};
+            	color: ${textColor};
+            }
+
+            .tox .tox-custom-editor:focus-within, .tox .tox-listboxfield .tox-listbox--select:focus, .tox .tox-textarea-wrap:focus-within, .tox .tox-textarea:focus, .tox .tox-textfield:focus {
+            	background-color: ${defaultPalette[100]};
+            	border-color: ${defaultPalette[500]};
+            	box-shadow: 0 0 0 1px ${defaultPalette[500]};
             }
         `;
 
