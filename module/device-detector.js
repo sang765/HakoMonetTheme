@@ -20,19 +20,19 @@
         // Check user agent for device type
         checkUserAgent: function() {
             const userAgent = navigator.userAgent.toLowerCase();
-
-            // Tablet detection (check first to override mobile for tablets like iPad)
+            
+            // Mobile detection
+            const mobileRegex = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i;
+            if (mobileRegex.test(userAgent)) {
+                return 'mobile';
+            }
+            
+            // Tablet detection
             const tabletRegex = /ipad|tablet|playbook|silk/i;
             if (tabletRegex.test(userAgent)) {
                 return 'tablet';
             }
-
-            // Mobile detection
-            const mobileRegex = /android|webos|iphone|ipod|blackberry|iemobile|opera mini|mobile/i;
-            if (mobileRegex.test(userAgent)) {
-                return 'mobile';
-            }
-
+            
             // Desktop detection
             return 'desktop';
         },
@@ -40,7 +40,7 @@
         // Check screen width for device type
         checkScreenWidth: function() {
             const screenWidth = window.screen.width || window.innerWidth;
-
+            
             if (screenWidth <= 768) {
                 return 'mobile';
             } else if (screenWidth <= 1024) {
@@ -92,15 +92,25 @@
         }
 
         detectDevice() {
-            // Use user agent as the primary and only detection method
-            const result = deviceDetectors.checkUserAgent.call(this);
-            if (result) {
-                this.currentDevice = result;
-                debugLog('Device detected via user agent:', result);
-            } else {
-                // Default to desktop if user agent doesn't match any pattern
+            // Try different detection methods in order of reliability
+            const detectionMethods = [
+                deviceDetectors.checkUserAgent,
+                deviceDetectors.checkScreenWidth
+            ];
+
+            for (const method of detectionMethods) {
+                const result = method.call(this);
+                if (result) {
+                    this.currentDevice = result;
+                    debugLog('Device detected via', method.name, ':', result);
+                    break;
+                }
+            }
+
+            // Default to desktop if nothing detected
+            if (!this.currentDevice) {
                 this.currentDevice = 'desktop';
-                debugLog('No device pattern matched in user agent, defaulting to desktop');
+                debugLog('No device detected, defaulting to desktop');
             }
 
             // Get additional device info
