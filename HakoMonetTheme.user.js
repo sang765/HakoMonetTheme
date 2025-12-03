@@ -393,13 +393,19 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
                 url: path,
                 onload: function(response) {
                     if (response.status === 200) {
-                        try {
-                            eval(response.responseText);
-                            Logger.success('main', `Loaded ${resourceName}`);
+                        if (path.endsWith('.css')) {
+                            GM_addStyle(response.responseText);
+                            Logger.success('main', `Loaded CSS ${resourceName}`);
                             resolve(resourceName);
-                        } catch (error) {
-                            Logger.error('main', `Eval error for ${resourceName}:`, error);
-                            reject(error);
+                        } else {
+                            try {
+                                eval(response.responseText);
+                                Logger.success('main', `Loaded JS ${resourceName}`);
+                                resolve(resourceName);
+                            } catch (error) {
+                                Logger.error('main', `Eval error for ${resourceName}:`, error);
+                                reject(error);
+                            }
                         }
                     } else {
                         reject(new Error(`HTTP ${response.status} for ${resourceName}`));
