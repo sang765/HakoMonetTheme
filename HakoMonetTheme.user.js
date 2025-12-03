@@ -25,48 +25,84 @@
 // @discord      https://discord.gg/uvQ6A3CDPq
 // ==/UserScript==
 
-// Server URL Configuration:
-// The script uses a configurable server URL for loading resources.
-// Default: http://localhost:8080
-// To change: Use the "⚙️ Cài đặt máy chủ" menu command in Tampermonkey/Greasemonkey menu.
-// The URL must be a valid HTTP/HTTPS URL. Invalid URLs will be rejected.
-// If the server is unavailable, the script will show error notifications and some features may not work.
-const baseURL = GM_getValue('server_url', 'http://localhost:8080');
+// Local resource paths for development (hot-reload enabled)
+// Note: For local development, run 'run_local_host.bat' to start a server,
+// then use the "🔧 Cấu hình Server URL" menu to set the correct URL
+// For production, keep relative paths './main.js'
+// For Github Codespaces, use the menu to configure the forwarded URL
+let resourcePaths = {};
+let baseUrl = GM_getValue('server_base_url', 'http://localhost:8080');
 
-const resourcePaths = {
-    mainJS: `${baseURL}/main.js`,
-    monetAPIJS: `${baseURL}/api/monet.js`,
-    updateCheckerJS: `${baseURL}/api/update-checker.js`,
-    CORSJS: `${baseURL}/module/cors.js`,
-    infoTruyenJS: `${baseURL}/class/info-truyen.js`,
-    readingPageJS: `${baseURL}/class/reading-page.js`,
-    animationJS: `${baseURL}/class/animation.js`,
-    tagColorJS: `${baseURL}/class/tag-color.js`,
-    fontImportJS: `${baseURL}/class/font-import.js`,
-    colorinfotruyen: `${baseURL}/colors/page-info-truyen-dark.js`,
-    pagegeneralJS: `${baseURL}/colors/page-general-dark.js`,
-    pagegenerallightJS: `${baseURL}/colors/page-general-light.js`,
-    colorinfotruyenlight: `${baseURL}/colors/page-info-truyen-light.js`,
-    themeDetectorJS: `${baseURL}/module/theme-detector.js`,
-    deviceDetectorJS: `${baseURL}/module/device-detector.js`,
-    configJS: `${baseURL}/module/config.js`,
-    adBlockerJS: `${baseURL}/module/ad-blocker.js`,
-    antiPopupJS: `${baseURL}/module/anti-popup.js`,
-    mainMenuJS: `${baseURL}/module/main-menu.js`,
-    navbarLogoJS: `${baseURL}/module/navbar-logo.js`,
-    updateManagerJS: `${baseURL}/module/update-manager.js`,
-    fullscreenJS: `${baseURL}/module/fullscreen.js`,
-    keyboardShortcutsJS: `${baseURL}/module/keyboard-shortcuts.js`,
-    deviceCSSLoaderJS: `${baseURL}/module/device-css-loader.js`,
-    profileCropperJS: `${baseURL}/module/profile-cropper.js`,
-    creatorJS: `${baseURL}/module/creator.js`,
-    html2canvasJS: `${baseURL}/api/html2canvas.min.js`,
-    monetTestJS: `${baseURL}/api/monet-test.js`,
-    colorisJS: `${baseURL}/api/coloris.min.js`,
-    colorisCSS: `${baseURL}/api/coloris.min.css`,
-    colorisColors: `${baseURL}/api/coloris-colors.json`,
-    autoReloadJS: `${baseURL}/module/auto-reload.js`
-};
+// Function to get server configuration
+async function getServerConfig() {
+    const urlsToTry = [
+        baseUrl + '/config',
+        'http://localhost:8080/config',
+        'https://localhost:8080/config' // In case of HTTPS redirect
+    ];
+
+    for (const configUrl of urlsToTry) {
+        try {
+            Logger.log('main', `Trying to fetch config from: ${configUrl}`);
+            const response = await fetch(configUrl, {
+                method: 'GET',
+                mode: 'cors',
+                cache: 'no-cache'
+            });
+            if (response.ok) {
+                const config = await response.json();
+                baseUrl = config.baseUrl;
+                GM_setValue('server_base_url', baseUrl); // Save detected URL
+                Logger.log('main', `Detected server config: ${baseUrl} (Codespaces: ${config.isCodespaces})`);
+                return config;
+            }
+        } catch (error) {
+            Logger.debug('main', `Failed to fetch config from ${configUrl}:`, error);
+        }
+    }
+
+    Logger.log('main', 'Using configured base URL:', baseUrl);
+    return null;
+}
+
+// Initialize resource paths
+async function initializeResourcePaths() {
+    await getServerConfig();
+
+    resourcePaths = {
+        mainJS: `${baseUrl}/main.js`,
+        monetAPIJS: `${baseUrl}/api/monet.js`,
+        updateCheckerJS: `${baseUrl}/api/update-checker.js`,
+        CORSJS: `${baseUrl}/module/cors.js`,
+        infoTruyenJS: `${baseUrl}/class/info-truyen.js`,
+        readingPageJS: `${baseUrl}/class/reading-page.js`,
+        animationJS: `${baseUrl}/class/animation.js`,
+        tagColorJS: `${baseUrl}/class/tag-color.js`,
+        fontImportJS: `${baseUrl}/class/font-import.js`,
+        colorinfotruyen: `${baseUrl}/colors/page-info-truyen-dark.js`,
+        pagegeneralJS: `${baseUrl}/colors/page-general-dark.js`,
+        pagegenerallightJS: `${baseUrl}/colors/page-general-light.js`,
+        colorinfotruyenlight: `${baseUrl}/colors/page-info-truyen-light.js`,
+        themeDetectorJS: `${baseUrl}/module/theme-detector.js`,
+        deviceDetectorJS: `${baseUrl}/module/device-detector.js`,
+        configJS: `${baseUrl}/module/config.js`,
+        adBlockerJS: `${baseUrl}/module/ad-blocker.js`,
+        antiPopupJS: `${baseUrl}/module/anti-popup.js`,
+        mainMenuJS: `${baseUrl}/module/main-menu.js`,
+        navbarLogoJS: `${baseUrl}/module/navbar-logo.js`,
+        updateManagerJS: `${baseUrl}/module/update-manager.js`,
+        fullscreenJS: `${baseUrl}/module/fullscreen.js`,
+        keyboardShortcutsJS: `${baseUrl}/module/keyboard-shortcuts.js`,
+        deviceCSSLoaderJS: `${baseUrl}/module/device-css-loader.js`,
+        profileCropperJS: `${baseUrl}/module/profile-cropper.js`,
+        creatorJS: `${baseUrl}/module/creator.js`,
+        html2canvasJS: `${baseUrl}/api/html2canvas.min.js`,
+        monetTestJS: `${baseUrl}/api/monet-test.js`,
+        colorisJS: `${baseUrl}/api/coloris.min.js`,
+        colorisCSS: `${baseUrl}/api/coloris.min.css`,
+        colorisColors: `${baseUrl}/api/coloris-colors.json`
+    };
+}
 
 (function() {
     'use strict';
@@ -158,16 +194,6 @@ const resourcePaths = {
         }
     };
 
-    // URL validation function
-    function isValidURL(url) {
-        try {
-            new URL(url);
-            return true;
-        } catch {
-            return false;
-        }
-    }
-
     // Legacy debugLog function for backward compatibility
     function debugLog(...args) {
         Logger.log('main', ...args);
@@ -192,30 +218,6 @@ const resourcePaths = {
     // Expose Logger globally for modules
     window.Logger = Logger;
 
-    // Auto-reload functionality for local development
-    function setupAutoReload() {
-        try {
-            const wsUrl = baseURL.replace(/^http/, 'ws');
-            const ws = new WebSocket(wsUrl);
-            ws.onopen = () => {
-                Logger.log('main', 'Connected to auto-reload server');
-            };
-            ws.onmessage = (event) => {
-                if (event.data === 'reload') {
-                    Logger.log('main', 'Received reload signal, refreshing page...');
-                    window.location.reload();
-                }
-            };
-            ws.onclose = () => {
-                Logger.log('main', 'Disconnected from auto-reload server');
-            };
-            ws.onerror = (error) => {
-                Logger.debug('main', 'WebSocket error (server may not be running):', error);
-            };
-        } catch (error) {
-            Logger.debug('main', 'Failed to setup auto-reload:', error);
-        }
-    }
 
     function registerMenuCommands() {
         if (typeof GM_registerMenuCommand === 'function') {
@@ -228,7 +230,7 @@ const resourcePaths = {
                 }
             }, 'm');
             GM_registerMenuCommand('📊 Thông tin script', showScriptInfo, 'i');
-            GM_registerMenuCommand('⚙️ Cài đặt máy chủ', openServerSettings, 's');
+            GM_registerMenuCommand('🔧 Cấu hình Server URL', configureServerUrl, 's');
 
             debugLog('Đã đăng ký menu commands');
         }
@@ -278,68 +280,6 @@ const resourcePaths = {
             showNotification('Anti-Popup', 'Mở bảng cài đặt Anti-Popup...', 3000);
         } else {
             showNotification('Lỗi', 'Module Anti-Popup chưa được tải. Vui lòng làm mới trang.', 5000);
-    function openServerSettings() {
-        const currentURL = GM_getValue('server_url', 'http://localhost:8080');
-
-        // Create modal dialog
-        const overlay = document.createElement('div');
-        overlay.style = `
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 10000; display: flex;
-            align-items: center; justify-content: center;
-        `;
-
-        const dialog = document.createElement('div');
-        dialog.style = `
-            background: white; border: 1px solid #ccc; padding: 20px;
-            border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            max-width: 400px; width: 90%;
-        `;
-
-        dialog.innerHTML = `
-            <h3 style="margin-top: 0;">Cài đặt URL máy chủ</h3>
-            <p style="margin-bottom: 10px;">Nhập URL máy chủ để tải các tài nguyên. URL phải là HTTP hoặc HTTPS hợp lệ.</p>
-            <label for="serverUrlInput" style="display: block; margin-bottom: 5px;">URL máy chủ:</label>
-            <input type="url" id="serverUrlInput" value="${currentURL}" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
-            <div style="margin-top: 15px; text-align: right;">
-                <button id="cancelBtn" style="margin-right: 10px; padding: 8px 16px; border: 1px solid #ccc; background: #f5f5f5; cursor: pointer;">Hủy</button>
-                <button id="saveBtn" style="padding: 8px 16px; border: none; background: #007bff; color: white; cursor: pointer; border-radius: 4px;">Lưu</button>
-            </div>
-        `;
-
-        overlay.appendChild(dialog);
-        document.body.appendChild(overlay);
-
-        const input = dialog.querySelector('#serverUrlInput');
-        const saveBtn = dialog.querySelector('#saveBtn');
-        const cancelBtn = dialog.querySelector('#cancelBtn');
-
-        const closeDialog = () => {
-            document.body.removeChild(overlay);
-        };
-
-        saveBtn.onclick = () => {
-            const newUrl = input.value.trim();
-            if (!isValidURL(newUrl)) {
-                alert('URL không hợp lệ. Vui lòng nhập URL HTTP hoặc HTTPS hợp lệ.');
-                return;
-            }
-            GM_setValue('server_url', newUrl);
-            showNotification('Cài đặt', 'URL máy chủ đã được lưu. Vui lòng tải lại trang để áp dụng thay đổi.', 5000);
-            closeDialog();
-        };
-
-        cancelBtn.onclick = closeDialog;
-
-        // Close on overlay click
-        overlay.onclick = (e) => {
-            if (e.target === overlay) closeDialog();
-        };
-
-        // Focus input
-        input.focus();
-        input.select();
-    }
             debugLog('Anti-Popup module chưa được tải');
         }
     }
@@ -393,20 +333,48 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
     function toggleDebugMode() {
         const currentDebug = GM_getValue('debug_mode', false);
         const newDebug = !currentDebug;
-        
+
         GM_setValue('debug_mode', newDebug);
-        
+
         showNotification(
-            'Chế độ Debug', 
+            'Chế độ Debug',
             newDebug ? 'Đã bật chế độ debug' : 'Đã tắt chế độ debug',
             3000
         );
-        
+
         debugLog(`Chế độ debug ${newDebug ? 'bật' : 'tắt'}`);
-        
+
         // Reload để áp dụng thay đổi
         if (confirm('Cần tải lại trang để áp dụng thay đổi. Bạn có muốn tải lại ngay bây giờ không?')) {
             window.location.reload();
+        }
+    }
+
+    function configureServerUrl() {
+        const currentUrl = GM_getValue('server_base_url', 'http://localhost:8080');
+        const newUrl = prompt(
+            'Cấu hình URL Server cho Local Development:\n\n' +
+            '• Local: http://localhost:8080\n' +
+            '• Codespaces: https://[codespace-name]-8080.app.github.dev\n\n' +
+            'URL hiện tại: ' + currentUrl + '\n\n' +
+            'Nhập URL mới (để trống để reset về localhost):',
+            currentUrl
+        );
+
+        if (newUrl !== null) {
+            const finalUrl = newUrl.trim() || 'http://localhost:8080';
+            GM_setValue('server_base_url', finalUrl);
+            showNotification(
+                'Cấu hình Server URL',
+                `Đã cập nhật URL: ${finalUrl}\nVui lòng tải lại trang để áp dụng.`,
+                5000
+            );
+            debugLog('Server URL updated to:', finalUrl);
+
+            // Reload để áp dụng thay đổi
+            if (confirm('Cần tải lại trang để áp dụng URL mới. Bạn có muốn tải lại ngay bây giờ không?')) {
+                window.location.reload();
+            }
         }
     }
     
@@ -465,7 +433,7 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
             // core modules
             'profileCropperJS', 'creatorJS', 'deviceDetectorJS', 'adBlockerJS', 'antiPopupJS',
             'keyboardShortcutsJS', 'updateManagerJS',
-            'fullscreenJS', 'autoReloadJS', 'themeDetectorJS',
+            'fullscreenJS', 'themeDetectorJS',
             // css modules
             'deviceCSSLoaderJS', 'infoTruyenJS', 'tagColorJS', 'fontImportJS', 'animationJS',
             'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyen', 'colorinfotruyenlight',
@@ -570,6 +538,9 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
     async function initializeScript() {
         Logger.log('main', `Bắt đầu khởi tạo ${SCRIPT_NAME} v${GM_info.script.version}`);
 
+        // Initialize resource paths (detect Codespaces or localhost)
+        await initializeResourcePaths();
+
         // Check if we need to auto-reload after update
         const pendingReload = GM_getValue('pending_update_reload', false);
         const pendingTime = GM_getValue('pending_update_time', 0);
@@ -600,9 +571,6 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
 
         // Đăng ký menu commands
         registerMenuCommands();
-
-        // Setup auto-reload for local development
-        setupAutoReload();
 
         // Tải tất cả resources
         const { loadedCount } = await loadAllResources();
