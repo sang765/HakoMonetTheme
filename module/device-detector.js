@@ -37,13 +37,13 @@
             return 'desktop';
         },
         
-        // Check viewport width for device type
+        // Check screen width for device type
         checkScreenWidth: function() {
-            const viewportWidth = window.innerWidth || window.screen.width;
+            const screenWidth = window.screen.width || window.innerWidth;
 
-            if (viewportWidth <= 768) {
+            if (screenWidth <= 768) {
                 return 'mobile';
-            } else if (viewportWidth <= 1024) {
+            } else if (screenWidth <= 1024) {
                 return 'tablet';
             } else {
                 return 'desktop';
@@ -239,9 +239,8 @@
                 orientation: this.currentOrientation,
                 pixelRatio: this.pixelRatio,
                 isTouch: this.isTouch,
-                viewportWidth: window.innerWidth,
-                screenWidth: window.screen.width,
-                screenHeight: window.screen.height,
+                screenWidth: window.screen.width || window.innerWidth,
+                screenHeight: window.screen.height || window.innerHeight,
                 userAgent: navigator.userAgent
             };
         }
