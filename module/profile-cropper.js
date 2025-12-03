@@ -859,7 +859,7 @@
      * Initialize the module
      */
     function init() {
-        debugLog('Initializing Profile Banner Cropper module');
+        debugLog('Initializing Profile Cropper module');
 
         // Check if we're on a profile page
         const isProfilePage = window.location.href.includes('/user/') ||
@@ -898,7 +898,7 @@
             interceptFileInput();
         }, 5000);
 
-        debugLog('Profile Banner Cropper module initialized');
+        debugLog('Profile Cropper module initialized');
     }
 
     // Export module
