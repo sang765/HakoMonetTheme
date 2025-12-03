@@ -27,25 +27,41 @@
 
 // Local resource paths for development (hot-reload enabled)
 // Note: For local development, run 'run_local_host.bat' to start a server,
-// then change paths below to use localhost URLs (e.g., 'http://localhost:8080/main.js')
+// then use the "🔧 Cấu hình Server URL" menu to set the correct URL
 // For production, keep relative paths './main.js'
-// For Github Codespaces, URLs are automatically detected
+// For Github Codespaces, use the menu to configure the forwarded URL
 let resourcePaths = {};
-let baseUrl = 'http://localhost:8080';
+let baseUrl = GM_getValue('server_base_url', 'http://localhost:8080');
 
 // Function to get server configuration
 async function getServerConfig() {
-    try {
-        const response = await fetch('http://localhost:8080/config');
-        if (response.ok) {
-            const config = await response.json();
-            baseUrl = config.baseUrl;
-            Logger.log('main', `Detected server config: ${baseUrl} (Codespaces: ${config.isCodespaces})`);
-            return config;
+    const urlsToTry = [
+        baseUrl + '/config',
+        'http://localhost:8080/config',
+        'https://localhost:8080/config' // In case of HTTPS redirect
+    ];
+
+    for (const configUrl of urlsToTry) {
+        try {
+            Logger.log('main', `Trying to fetch config from: ${configUrl}`);
+            const response = await fetch(configUrl, {
+                method: 'GET',
+                mode: 'cors',
+                cache: 'no-cache'
+            });
+            if (response.ok) {
+                const config = await response.json();
+                baseUrl = config.baseUrl;
+                GM_setValue('server_base_url', baseUrl); // Save detected URL
+                Logger.log('main', `Detected server config: ${baseUrl} (Codespaces: ${config.isCodespaces})`);
+                return config;
+            }
+        } catch (error) {
+            Logger.debug('main', `Failed to fetch config from ${configUrl}:`, error);
         }
-    } catch (error) {
-        Logger.debug('main', 'Failed to fetch server config, using localhost defaults:', error);
     }
+
+    Logger.log('main', 'Using configured base URL:', baseUrl);
     return null;
 }
 
@@ -214,6 +230,7 @@ async function initializeResourcePaths() {
                 }
             }, 'm');
             GM_registerMenuCommand('📊 Thông tin script', showScriptInfo, 'i');
+            GM_registerMenuCommand('🔧 Cấu hình Server URL', configureServerUrl, 's');
 
             debugLog('Đã đăng ký menu commands');
         }
@@ -316,20 +333,48 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
     function toggleDebugMode() {
         const currentDebug = GM_getValue('debug_mode', false);
         const newDebug = !currentDebug;
-        
+
         GM_setValue('debug_mode', newDebug);
-        
+
         showNotification(
-            'Chế độ Debug', 
+            'Chế độ Debug',
             newDebug ? 'Đã bật chế độ debug' : 'Đã tắt chế độ debug',
             3000
         );
-        
+
         debugLog(`Chế độ debug ${newDebug ? 'bật' : 'tắt'}`);
-        
+
         // Reload để áp dụng thay đổi
         if (confirm('Cần tải lại trang để áp dụng thay đổi. Bạn có muốn tải lại ngay bây giờ không?')) {
             window.location.reload();
+        }
+    }
+
+    function configureServerUrl() {
+        const currentUrl = GM_getValue('server_base_url', 'http://localhost:8080');
+        const newUrl = prompt(
+            'Cấu hình URL Server cho Local Development:\n\n' +
+            '• Local: http://localhost:8080\n' +
+            '• Codespaces: https://[codespace-name]-8080.app.github.dev\n\n' +
+            'URL hiện tại: ' + currentUrl + '\n\n' +
+            'Nhập URL mới (để trống để reset về localhost):',
+            currentUrl
+        );
+
+        if (newUrl !== null) {
+            const finalUrl = newUrl.trim() || 'http://localhost:8080';
+            GM_setValue('server_base_url', finalUrl);
+            showNotification(
+                'Cấu hình Server URL',
+                `Đã cập nhật URL: ${finalUrl}\nVui lòng tải lại trang để áp dụng.`,
+                5000
+            );
+            debugLog('Server URL updated to:', finalUrl);
+
+            // Reload để áp dụng thay đổi
+            if (confirm('Cần tải lại trang để áp dụng URL mới. Bạn có muốn tải lại ngay bây giờ không?')) {
+                window.location.reload();
+            }
         }
     }
     

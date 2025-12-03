@@ -88,6 +88,9 @@ show_menu() {
     echo "[4] Kill Running Servers"
     echo "[5] Exit"
     echo ""
+    echo "Note: For Github Codespaces, use the userscript menu (🔧 Cấu hình Server URL)"
+    echo "to configure the forwarded URL after starting the server."
+    echo ""
 }
 
 while true; do

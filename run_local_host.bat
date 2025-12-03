@@ -15,6 +15,9 @@ echo [3] Check Server Status
 echo [4] Kill Running Servers
 echo [5] Exit
 echo.
+echo Note: For Github Codespaces, use the userscript menu (^🔧 Cấu hình Server URL^)
+echo to configure the forwarded URL after starting the server.
+echo.
 set /p choice="Enter your choice (1-5): "
 
 if "%choice%"=="1" goto python
