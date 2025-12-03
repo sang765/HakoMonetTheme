@@ -20,30 +20,30 @@
         // Check user agent for device type
         checkUserAgent: function() {
             const userAgent = navigator.userAgent.toLowerCase();
-            
-            // Mobile detection
-            const mobileRegex = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i;
-            if (mobileRegex.test(userAgent)) {
-                return 'mobile';
-            }
-            
-            // Tablet detection
+
+            // Tablet detection (check first to override mobile for tablets like iPad)
             const tabletRegex = /ipad|tablet|playbook|silk/i;
             if (tabletRegex.test(userAgent)) {
                 return 'tablet';
             }
-            
+
+            // Mobile detection
+            const mobileRegex = /android|webos|iphone|ipod|blackberry|iemobile|opera mini|mobile/i;
+            if (mobileRegex.test(userAgent)) {
+                return 'mobile';
+            }
+
             // Desktop detection
             return 'desktop';
         },
         
-        // Check screen width for device type
+        // Check viewport width for device type
         checkScreenWidth: function() {
-            const screenWidth = window.screen.width || window.innerWidth;
-            
-            if (screenWidth <= 768) {
+            const viewportWidth = window.innerWidth || window.screen.width;
+
+            if (viewportWidth <= 768) {
                 return 'mobile';
-            } else if (screenWidth <= 1024) {
+            } else if (viewportWidth <= 1024) {
                 return 'tablet';
             } else {
                 return 'desktop';
@@ -94,8 +94,8 @@
         detectDevice() {
             // Try different detection methods in order of reliability
             const detectionMethods = [
-                deviceDetectors.checkUserAgent,
-                deviceDetectors.checkScreenWidth
+                deviceDetectors.checkScreenWidth,
+                deviceDetectors.checkUserAgent
             ];
 
             for (const method of detectionMethods) {
@@ -239,8 +239,9 @@
                 orientation: this.currentOrientation,
                 pixelRatio: this.pixelRatio,
                 isTouch: this.isTouch,
-                screenWidth: window.screen.width || window.innerWidth,
-                screenHeight: window.screen.height || window.innerHeight,
+                viewportWidth: window.innerWidth,
+                screenWidth: window.screen.width,
+                screenHeight: window.screen.height,
                 userAgent: navigator.userAgent
             };
         }
