@@ -158,17 +158,14 @@
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', function() {
                     addOwnershipBadge();
-                    addOwnershipToBio();
                 });
             } else {
                 addOwnershipBadge();
-                addOwnershipToBio();
             }
 
             // Also try after a delay in case content loads dynamically
             setTimeout(function() {
                 addOwnershipBadge();
-                addOwnershipToBio();
             }, 2000);
         } else {
             debugLog('Not on owner profile page, checking for story page');
