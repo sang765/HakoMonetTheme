@@ -25,6 +25,10 @@
 // @discord      https://discord.gg/uvQ6A3CDPq
 // ==/UserScript==
 
+// Local resource paths for development (hot-reload enabled)
+// Note: For local development, run 'run_local_host.bat' to start a server,
+// then change paths below to use localhost URLs (e.g., 'http://localhost:8080/main.js')
+// For production, keep relative paths './main.js'
 const resourcePaths = {
     mainJS: 'http://localhost:8080/main.js',
     monetAPIJS: 'http://localhost:8080/api/monet.js',
@@ -174,6 +178,29 @@ const resourcePaths = {
     // Expose Logger globally for modules
     window.Logger = Logger;
 
+    // Auto-reload functionality for local development
+    function setupAutoReload() {
+        try {
+            const ws = new WebSocket('ws://localhost:8080');
+            ws.onopen = () => {
+                Logger.log('main', 'Connected to auto-reload server');
+            };
+            ws.onmessage = (event) => {
+                if (event.data === 'reload') {
+                    Logger.log('main', 'Received reload signal, refreshing page...');
+                    window.location.reload();
+                }
+            };
+            ws.onclose = () => {
+                Logger.log('main', 'Disconnected from auto-reload server');
+            };
+            ws.onerror = (error) => {
+                Logger.debug('main', 'WebSocket error (server may not be running):', error);
+            };
+        } catch (error) {
+            Logger.debug('main', 'Failed to setup auto-reload:', error);
+        }
+    }
 
     function registerMenuCommands() {
         if (typeof GM_registerMenuCommand === 'function') {
@@ -359,8 +386,8 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
             'mainMenuJS',
             // core modules
             'profileCropperJS', 'creatorJS', 'deviceDetectorJS', 'adBlockerJS', 'antiPopupJS',
-            'keyboardShortcutsJS', 'updateManagerJS', 'autoReloadJS',
-            'fullscreenJS', 'themeDetectorJS',
+            'keyboardShortcutsJS', 'updateManagerJS',
+            'fullscreenJS', 'autoReloadJS', 'themeDetectorJS',
             // css modules
             'deviceCSSLoaderJS', 'infoTruyenJS', 'tagColorJS', 'fontImportJS', 'animationJS',
             'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyen', 'colorinfotruyenlight',
@@ -495,6 +522,9 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
 
         // Đăng ký menu commands
         registerMenuCommands();
+
+        // Setup auto-reload for local development
+        setupAutoReload();
 
         // Tải tất cả resources
         const { loadedCount } = await loadAllResources();
