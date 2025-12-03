@@ -6,7 +6,6 @@
 
 const express = require('express');
 const chokidar = require('chokidar');
-const WebSocket = require('ws');
 const path = require('path');
 const fs = require('fs');
 
@@ -425,9 +424,29 @@ app.get('/status', (req, res) => {
     status: 'online',
     port: CONFIG.PORT,
     uptime: process.uptime(),
-    clients: wss ? wss.clients.size : 0,
     watching: watcher ? 'active' : 'inactive',
     timestamp: new Date().toISOString()
+  });
+});
+
+app.get('/config', (req, res) => {
+  // Detect if running in Github Codespaces
+  const isCodespaces = !!(process.env.CODESPACE_NAME && process.env.GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN);
+  let baseUrl;
+
+  if (isCodespaces) {
+    const codespaceName = process.env.CODESPACE_NAME;
+    const domain = process.env.GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN;
+    baseUrl = `https://${codespaceName}-${CONFIG.PORT}.${domain}`;
+  } else {
+    baseUrl = `http://${CONFIG.HOST}:${CONFIG.PORT}`;
+  }
+
+  res.json({
+    baseUrl: baseUrl,
+    isCodespaces: isCodespaces,
+    port: CONFIG.PORT,
+    host: CONFIG.HOST
   });
 });
 
@@ -469,9 +488,8 @@ try {
     console.log('='.repeat(50));
     console.log(`🌐 HTTP server: http://${CONFIG.HOST}:${CONFIG.PORT}`);
     console.log(`📊 Dashboard: http://${CONFIG.HOST}:${CONFIG.PORT}/dashboard`);
-    console.log(` Auto-reload: Enabled`);
+    console.log(` Auto-reload: Enabled (polling)`);
     console.log(`📁 Watching: ${path.resolve(CONFIG.WATCH_PATH)}`);
-    console.log(`🌐 WebSocket: ws://${CONFIG.HOST}:${CONFIG.PORT}`);
     console.log(`📊 Status API: http://${CONFIG.HOST}:${CONFIG.PORT}/status`);
     console.log('='.repeat(50));
     console.log('💡 Press Ctrl+C to stop the server');
@@ -482,14 +500,7 @@ try {
   process.exit(1);
 }
 
-// WebSocket server
-let wss;
-try {
-  wss = new WebSocket.Server({ server });
-  console.log('🔌 WebSocket server initialized');
-} catch (error) {
-  console.error('❌ Failed to initialize WebSocket server:', error.message);
-}
+// WebSocket server removed - using polling auto-reload instead
 
 // File watcher
 let watcher;
@@ -512,11 +523,7 @@ try {
     const relativePath = path.relative(CONFIG.WATCH_PATH, filePath);
     const timestamp = new Date().toISOString();
     console.log(`📝 File changed: ${relativePath} at ${timestamp}`);
-    if (relativePath.endsWith('.css') || relativePath.endsWith('.scss')) {
-      console.log(`[CSS] CSS file changed, skipping broadcast to avoid full reload`);
-      return; // Don't broadcast for CSS changes to avoid full page reload
-    }
-    broadcast('reload');
+    // File watching active for polling auto-reload
   });
 
   watcher.on('add', (filePath) => {
@@ -537,40 +544,7 @@ try {
   console.error('❌ Failed to initialize file watcher:', error.message);
 }
 
-// WebSocket connection handling
-if (wss) {
-  wss.on('connection', (ws, req) => {
-    const clientIP = req.socket.remoteAddress;
-    console.log(`🔗 Client connected: ${clientIP} (${wss.clients.size} total)`);
-
-    ws.on('message', (message) => {
-      console.log(`💬 Message from ${clientIP}:`, message.toString());
-    });
-
-    ws.on('close', () => {
-      console.log(`🔌 Client disconnected: ${clientIP} (${wss.clients.size - 1} remaining)`);
-    });
-
-    ws.on('error', (error) => {
-      console.error(`❌ WebSocket error from ${clientIP}:`, error);
-    });
-  });
-}
-
-// Broadcast function
-function broadcast(message) {
-  if (!wss) return;
-  let sent = 0;
-  wss.clients.forEach(client => {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(message);
-      sent++;
-    }
-  });
-  if (sent > 0) {
-    console.log(`📡 Broadcasted "${message}" to ${sent} clients`);
-  }
-}
+// WebSocket removed - using polling auto-reload instead
 
 // Graceful shutdown
 function shutdown(signal) {
@@ -583,16 +557,6 @@ function shutdown(signal) {
       watcher.close();
       console.log('👀 File watcher stopped');
       resolve();
-    }));
-  }
-
-  if (wss) {
-    promises.push(new Promise((resolve) => {
-      wss.clients.forEach(client => client.close());
-      wss.close(() => {
-        console.log('🔌 WebSocket server stopped');
-        resolve();
-      });
     }));
   }
 

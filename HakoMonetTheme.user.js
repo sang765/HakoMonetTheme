@@ -29,40 +29,64 @@
 // Note: For local development, run 'run_local_host.bat' to start a server,
 // then change paths below to use localhost URLs (e.g., 'http://localhost:8080/main.js')
 // For production, keep relative paths './main.js'
-const resourcePaths = {
-    mainJS: 'http://localhost:8080/main.js',
-    monetAPIJS: 'http://localhost:8080/api/monet.js',
-    updateCheckerJS: 'http://localhost:8080/api/update-checker.js',
-    CORSJS: 'http://localhost:8080/module/cors.js',
-    infoTruyenJS: 'http://localhost:8080/class/info-truyen.js',
-    readingPageJS: 'http://localhost:8080/class/reading-page.js',
-    animationJS: 'http://localhost:8080/class/animation.js',
-    tagColorJS: 'http://localhost:8080/class/tag-color.js',
-    fontImportJS: 'http://localhost:8080/class/font-import.js',
-    colorinfotruyen: 'http://localhost:8080/colors/page-info-truyen-dark.js',
-    pagegeneralJS: 'http://localhost:8080/colors/page-general-dark.js',
-    pagegenerallightJS: 'http://localhost:8080/colors/page-general-light.js',
-    colorinfotruyenlight: 'http://localhost:8080/colors/page-info-truyen-light.js',
-    themeDetectorJS: 'http://localhost:8080/module/theme-detector.js',
-    deviceDetectorJS: 'http://localhost:8080/module/device-detector.js',
-    configJS: 'http://localhost:8080/module/config.js',
-    adBlockerJS: 'http://localhost:8080/module/ad-blocker.js',
-    antiPopupJS: 'http://localhost:8080/module/anti-popup.js',
-    mainMenuJS: 'http://localhost:8080/module/main-menu.js',
-    navbarLogoJS: 'http://localhost:8080/module/navbar-logo.js',
-    updateManagerJS: 'http://localhost:8080/module/update-manager.js',
-    fullscreenJS: 'http://localhost:8080/module/fullscreen.js',
-    keyboardShortcutsJS: 'http://localhost:8080/module/keyboard-shortcuts.js',
-    deviceCSSLoaderJS: 'http://localhost:8080/module/device-css-loader.js',
-    profileCropperJS: 'http://localhost:8080/module/profile-cropper.js',
-    creatorJS: 'http://localhost:8080/module/creator.js',
-    html2canvasJS: 'http://localhost:8080/api/html2canvas.min.js',
-    monetTestJS: 'http://localhost:8080/api/monet-test.js',
-    colorisJS: 'http://localhost:8080/api/coloris.min.js',
-    colorisCSS: 'http://localhost:8080/api/coloris.min.css',
-    colorisColors: 'http://localhost:8080/api/coloris-colors.json',
-    autoReloadJS: 'http://localhost:8080/module/auto-reload.js'
-};
+// For Github Codespaces, URLs are automatically detected
+let resourcePaths = {};
+let baseUrl = 'http://localhost:8080';
+
+// Function to get server configuration
+async function getServerConfig() {
+    try {
+        const response = await fetch('http://localhost:8080/config');
+        if (response.ok) {
+            const config = await response.json();
+            baseUrl = config.baseUrl;
+            Logger.log('main', `Detected server config: ${baseUrl} (Codespaces: ${config.isCodespaces})`);
+            return config;
+        }
+    } catch (error) {
+        Logger.debug('main', 'Failed to fetch server config, using localhost defaults:', error);
+    }
+    return null;
+}
+
+// Initialize resource paths
+async function initializeResourcePaths() {
+    await getServerConfig();
+
+    resourcePaths = {
+        mainJS: `${baseUrl}/main.js`,
+        monetAPIJS: `${baseUrl}/api/monet.js`,
+        updateCheckerJS: `${baseUrl}/api/update-checker.js`,
+        CORSJS: `${baseUrl}/module/cors.js`,
+        infoTruyenJS: `${baseUrl}/class/info-truyen.js`,
+        readingPageJS: `${baseUrl}/class/reading-page.js`,
+        animationJS: `${baseUrl}/class/animation.js`,
+        tagColorJS: `${baseUrl}/class/tag-color.js`,
+        fontImportJS: `${baseUrl}/class/font-import.js`,
+        colorinfotruyen: `${baseUrl}/colors/page-info-truyen-dark.js`,
+        pagegeneralJS: `${baseUrl}/colors/page-general-dark.js`,
+        pagegenerallightJS: `${baseUrl}/colors/page-general-light.js`,
+        colorinfotruyenlight: `${baseUrl}/colors/page-info-truyen-light.js`,
+        themeDetectorJS: `${baseUrl}/module/theme-detector.js`,
+        deviceDetectorJS: `${baseUrl}/module/device-detector.js`,
+        configJS: `${baseUrl}/module/config.js`,
+        adBlockerJS: `${baseUrl}/module/ad-blocker.js`,
+        antiPopupJS: `${baseUrl}/module/anti-popup.js`,
+        mainMenuJS: `${baseUrl}/module/main-menu.js`,
+        navbarLogoJS: `${baseUrl}/module/navbar-logo.js`,
+        updateManagerJS: `${baseUrl}/module/update-manager.js`,
+        fullscreenJS: `${baseUrl}/module/fullscreen.js`,
+        keyboardShortcutsJS: `${baseUrl}/module/keyboard-shortcuts.js`,
+        deviceCSSLoaderJS: `${baseUrl}/module/device-css-loader.js`,
+        profileCropperJS: `${baseUrl}/module/profile-cropper.js`,
+        creatorJS: `${baseUrl}/module/creator.js`,
+        html2canvasJS: `${baseUrl}/api/html2canvas.min.js`,
+        monetTestJS: `${baseUrl}/api/monet-test.js`,
+        colorisJS: `${baseUrl}/api/coloris.min.js`,
+        colorisCSS: `${baseUrl}/api/coloris.min.css`,
+        colorisColors: `${baseUrl}/api/coloris-colors.json`
+    };
+}
 
 (function() {
     'use strict';
@@ -178,29 +202,6 @@ const resourcePaths = {
     // Expose Logger globally for modules
     window.Logger = Logger;
 
-    // Auto-reload functionality for local development
-    function setupAutoReload() {
-        try {
-            const ws = new WebSocket('ws://localhost:8080');
-            ws.onopen = () => {
-                Logger.log('main', 'Connected to auto-reload server');
-            };
-            ws.onmessage = (event) => {
-                if (event.data === 'reload') {
-                    Logger.log('main', 'Received reload signal, refreshing page...');
-                    window.location.reload();
-                }
-            };
-            ws.onclose = () => {
-                Logger.log('main', 'Disconnected from auto-reload server');
-            };
-            ws.onerror = (error) => {
-                Logger.debug('main', 'WebSocket error (server may not be running):', error);
-            };
-        } catch (error) {
-            Logger.debug('main', 'Failed to setup auto-reload:', error);
-        }
-    }
 
     function registerMenuCommands() {
         if (typeof GM_registerMenuCommand === 'function') {
@@ -387,7 +388,7 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
             // core modules
             'profileCropperJS', 'creatorJS', 'deviceDetectorJS', 'adBlockerJS', 'antiPopupJS',
             'keyboardShortcutsJS', 'updateManagerJS',
-            'fullscreenJS', 'autoReloadJS', 'themeDetectorJS',
+            'fullscreenJS', 'themeDetectorJS',
             // css modules
             'deviceCSSLoaderJS', 'infoTruyenJS', 'tagColorJS', 'fontImportJS', 'animationJS',
             'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyen', 'colorinfotruyenlight',
@@ -492,6 +493,9 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
     async function initializeScript() {
         Logger.log('main', `Bắt đầu khởi tạo ${SCRIPT_NAME} v${GM_info.script.version}`);
 
+        // Initialize resource paths (detect Codespaces or localhost)
+        await initializeResourcePaths();
+
         // Check if we need to auto-reload after update
         const pendingReload = GM_getValue('pending_update_reload', false);
         const pendingTime = GM_getValue('pending_update_time', 0);
@@ -522,9 +526,6 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
 
         // Đăng ký menu commands
         registerMenuCommands();
-
-        // Setup auto-reload for local development
-        setupAutoReload();
 
         // Tải tất cả resources
         const { loadedCount } = await loadAllResources();

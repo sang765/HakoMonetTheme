@@ -11,19 +11,17 @@ echo.
 echo Choose your preferred server:
 echo [1] Python HTTP Server (Port 8080)
 echo [2] Node.js HTTP Server (Port 8080)
-echo [3] Node.js Auto-Reload Server (Port 8080)
-echo [4] Check Server Status
-echo [5] Kill Running Servers
-echo [6] Exit
+echo [3] Check Server Status
+echo [4] Kill Running Servers
+echo [5] Exit
 echo.
-set /p choice="Enter your choice (1-6): "
+set /p choice="Enter your choice (1-5): "
 
 if "%choice%"=="1" goto python
 if "%choice%"=="2" goto nodejs
-if "%choice%"=="3" goto nodejs_autoreload
-if "%choice%"=="4" goto check_status
-if "%choice%"=="5" goto kill_servers
-if "%choice%"=="6" goto exit
+if "%choice%"=="3" goto check_status
+if "%choice%"=="4" goto kill_servers
+if "%choice%"=="5" goto exit
 
 echo [ERROR] Invalid choice. Please run again.
 pause
@@ -126,38 +124,6 @@ echo.
 npx http-server -p 8080 -c-1 --cors
 echo.
 echo [STOPPED] Node.js HTTP server stopped
-goto menu
-
-:nodejs_autoreload
-echo.
-echo [INFO] Checking Node.js installation...
-node --version >nul 2>&1
-if errorlevel 1 (
-    echo [ERROR] Node.js is not installed or not in PATH.
-    echo [HELP] Please install Node.js from https://nodejs.org
-    echo.
-    pause
-    goto start
-)
-
-echo [SUCCESS] Node.js found
-echo [INFO] Installing/updating dependencies...
-call npm install
-if errorlevel 1 (
-    echo [ERROR] Failed to install dependencies
-    echo.
-    pause
-    goto start
-)
-
-echo [STARTING] Node.js Auto-Reload server on port 8080...
-echo [ACCESS] http://localhost:8080
-echo [FEATURE] Auto-reload enabled - Save files in VSCode to refresh browser
-echo [STOP] Press Ctrl+C to stop the server
-echo.
-node server.js
-echo.
-echo [STOPPED] Auto-Reload server stopped
 goto menu
 
 :exit

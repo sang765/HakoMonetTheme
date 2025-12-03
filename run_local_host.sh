@@ -26,6 +26,28 @@ print_warning() {
     echo -e "${YELLOW}[WARNING]${NC} $1"
 }
 
+# Function to get Codespaces URL
+get_codespaces_url() {
+    local port=$1
+    if [ ! -z "$CODESPACE_NAME" ] && [ ! -z "$GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN" ]; then
+        echo "https://$CODESPACE_NAME-$port.$GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN"
+        return 0
+    fi
+    return 1
+}
+
+# Function to show access URLs
+show_access_urls() {
+    local port=$1
+    local server_type=$2
+    echo "[ACCESS] http://localhost:$port"
+    if get_codespaces_url $port; then
+        echo "[CODESPACE] $(get_codespaces_url $port)"
+        print_info "In Github Codespaces - use the CODESPACE URL for external access"
+    fi
+    echo "[STOP] Press Ctrl+C to stop the $server_type server"
+}
+
 # Function to check if port is in use
 check_port() {
     local port=$1
@@ -62,16 +84,15 @@ show_menu() {
     echo "Choose your preferred server:"
     echo "[1] Python HTTP Server (Port 8000)"
     echo "[2] Node.js HTTP Server (Port 8080)"
-    echo "[3] Node.js Auto-Reload Server (Port 8080) [BROKEN WEB CSS STYLING]"
-    echo "[4] Check Server Status"
-    echo "[5] Kill Running Servers"
-    echo "[6] Exit"
+    echo "[3] Check Server Status"
+    echo "[4] Kill Running Servers"
+    echo "[5] Exit"
     echo ""
 }
 
 while true; do
     show_menu
-    read -p "Enter your choice (1-6): " choice
+    read -p "Enter your choice (1-5): " choice
 
     case $choice in
         1)
@@ -94,8 +115,7 @@ while true; do
             fi
 
             print_info "Starting Python HTTP server on port 8000..."
-            echo "[ACCESS] http://localhost:8000"
-            echo "[STOP] Press Ctrl+C to stop the server"
+            show_access_urls 8000 "Python HTTP"
             echo ""
             $PYTHON_CMD -m http.server 8000
             echo ""
@@ -117,8 +137,7 @@ while true; do
             fi
 
             print_info "Starting Node.js HTTP server on port 8080..."
-            echo "[ACCESS] http://localhost:8080"
-            echo "[STOP] Press Ctrl+C to stop the server"
+            show_access_urls 8080 "Node.js HTTP"
             echo "[NOTE] http-server will be installed automatically if not present"
             echo ""
             npx http-server -p 8080 -c-1 --cors
@@ -126,35 +145,6 @@ while true; do
             print_info "Node.js HTTP server stopped"
             ;;
         3)
-            print_info "Checking Node.js installation..."
-            if ! command -v node &> /dev/null; then
-                print_error "Node.js is not installed or not in PATH."
-                print_info "Please install Node.js from https://nodejs.org"
-                continue
-            fi
-
-            print_success "Node.js found"
-            if check_port 8080; then
-                print_warning "Port 8080 is already in use. Attempting to free it..."
-                kill_port 8080
-            fi
-
-            print_info "Installing/updating dependencies..."
-            if ! npm install; then
-                print_error "Failed to install dependencies"
-                continue
-            fi
-
-            print_info "Starting Node.js Auto-Reload server on port 8080..."
-            echo "[ACCESS] http://localhost:8080"
-            echo "[FEATURE] Auto-reload enabled - Save files to refresh browser"
-            echo "[STOP] Press Ctrl+C to stop the server"
-            echo ""
-            node server.js
-            echo ""
-            print_info "Auto-Reload server stopped"
-            ;;
-        4)
             echo ""
             print_info "Checking server status..."
             echo ""
@@ -181,7 +171,7 @@ while true; do
             echo ""
             read -p "Press Enter to continue..."
             ;;
-        5)
+        4)
             echo ""
             print_info "Killing running servers..."
             echo ""
@@ -200,14 +190,14 @@ while true; do
             echo ""
             read -p "Press Enter to continue..."
             ;;
-        6)
+        5)
             echo ""
             print_info "Exiting HakoMonetTheme Development Server"
             echo "Goodbye! 👋"
             exit 0
             ;;
         *)
-            print_error "Invalid choice. Please select 1-6."
+            print_error "Invalid choice. Please select 1-5."
             sleep 2
             ;;
     esac
