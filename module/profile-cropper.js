@@ -187,24 +187,42 @@
                     padding: 15px 20px;
                     border-top: 1px solid #ddd;
                     display: flex;
-                    justify-content: flex-end;
-                    gap: 10px;
+                    justify-content: space-between;
+                    align-items: center;
                 ">
-                    <button class="hmt-crop-cancel" style="
-                        padding: 8px 16px;
-                        border: 1px solid #ddd;
-                        background: white;
-                        border-radius: 5px;
-                        cursor: pointer;
-                    ">Hủy</button>
-                    <button class="hmt-crop-upload" style="
-                        padding: 8px 16px;
-                        border: none;
-                        background: #007bff;
-                        color: white;
-                        border-radius: 5px;
-                        cursor: pointer;
-                    ">Cắt & Upload</button>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="hmt-crop-rotate-left" style="
+                            padding: 8px 16px;
+                            border: 1px solid #ddd;
+                            background: white;
+                            border-radius: 5px;
+                            cursor: pointer;
+                        " title="Xoay trái"><svg fill="#000000" width="20px" height="20px" viewBox="0 0 24 24" id="rotate-left" data-name="Flat Color" xmlns="http://www.w3.org/2000/svg" class="icon flat-color"><path id="primary" d="M13,3A9,9,0,0,0,4.91,8.08l-1-2.45a1,1,0,0,0-1.86.74l2,5A1,1,0,0,0,5,12a1,1,0,0,0,.37-.07l5-2a1,1,0,0,0-.74-1.86L6.54,9.31a7,7,0,1,1,1.21,7.32,1,1,0,0,0-1.41-.09A1,1,0,0,0,6.25,18,9,9,0,1,0,13,3Z" style="fill: rgb(0, 0, 0);"></path></svg></button>
+                        <button class="hmt-crop-rotate-right" style="
+                            padding: 8px 16px;
+                            border: 1px solid #ddd;
+                            background: white;
+                            border-radius: 5px;
+                            cursor: pointer;
+                        " title="Xoay phải"><svg fill="#000000" width="20px" height="20px" viewBox="0 0 24 24" id="rotate-right" data-name="Flat Color" xmlns="http://www.w3.org/2000/svg" class="icon flat-color"><path id="primary" d="M21.37,5.07a1,1,0,0,0-1.3.56l-1,2.45A9,9,0,1,0,17.75,18a1,1,0,0,0-.09-1.41,1,1,0,0,0-1.41.09,7,7,0,1,1,1.2-7.33L14.37,8.07a1,1,0,1,0-.74,1.86l5,2A1,1,0,0,0,19,12a1,1,0,0,0,.93-.63l2-5A1,1,0,0,0,21.37,5.07Z" style="fill: rgb(0, 0, 0);"></path></svg></button>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="hmt-crop-cancel" style="
+                            padding: 8px 16px;
+                            border: 1px solid #ddd;
+                            background: white;
+                            border-radius: 5px;
+                            cursor: pointer;
+                        ">Hủy</button>
+                        <button class="hmt-crop-upload" style="
+                            padding: 8px 16px;
+                            border: none;
+                            background: #007bff;
+                            color: white;
+                            border-radius: 5px;
+                            cursor: pointer;
+                        ">Cắt & Upload</button>
+                    </div>
                 </div>
                 <style>
                     @media (max-width: 767px) {
@@ -225,6 +243,13 @@
                         }
                         .hmt-crop-header, .hmt-crop-body, .hmt-crop-footer {
                             padding: 15px !important;
+                        }
+                        .hmt-crop-footer {
+                            flex-direction: column !important;
+                            gap: 10px !important;
+                        }
+                        .hmt-crop-footer > div {
+                            justify-content: center !important;
                         }
                     }
                 </style>
@@ -290,6 +315,26 @@
                         }
                     });
                     debugLog('Cropper initialized successfully');
+
+                    // Add rotate button event listeners
+                    const rotateLeftBtn = modal.querySelector('.hmt-crop-rotate-left');
+                    const rotateRightBtn = modal.querySelector('.hmt-crop-rotate-right');
+                    if (rotateLeftBtn) {
+                        rotateLeftBtn.addEventListener('click', () => {
+                            if (cropper) {
+                                cropper.rotate(-90);
+                                updatePreview();
+                            }
+                        });
+                    }
+                    if (rotateRightBtn) {
+                        rotateRightBtn.addEventListener('click', () => {
+                            if (cropper) {
+                                cropper.rotate(90);
+                                updatePreview();
+                            }
+                        });
+                    }
                 } catch (error) {
                     debugLog('Error initializing Cropper:', error);
                     showNotification('Không thể khởi tạo công cụ cắt ảnh.', 5000);

@@ -48,6 +48,7 @@
 // @resource     adBlockerJS ./module/ad-blocker.js
 // @resource     autoReloadJS ./module/auto-reload.js
 // @resource     antiPopupJS ./module/anti-popup.js
+// @resource     creatorJS ./module/creator.js
 // @resource     mainMenuJS ./module/main-menu.js
 // @resource     navbarLogoJS ./module/navbar-logo.js
 // @resource     updateManagerJS ./module/update-manager.js
@@ -268,7 +269,7 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
             // menu
             'mainMenuJS',
             // core modules
-            'profileCropperJS', 'deviceDetectorJS', 'adBlockerJS', 'antiPopupJS',
+            'profileCropperJS', 'creatorJS', 'deviceDetectorJS', 'adBlockerJS', 'antiPopupJS',
             'keyboardShortcutsJS', 'updateManagerJS', 'fullscreenJS', 'autoReloadJS', 'themeDetectorJS',
             // css modules
             'deviceCSSLoaderJS', 'infoTruyenJS', 'tagColorJS', 'fontImportJS', 'animationJS',
