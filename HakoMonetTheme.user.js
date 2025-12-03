@@ -56,8 +56,7 @@ const resourcePaths = {
     monetTestJS: 'http://localhost:8080/api/monet-test.js',
     colorisJS: 'http://localhost:8080/api/coloris.min.js',
     colorisCSS: 'http://localhost:8080/api/coloris.min.css',
-    colorisColors: 'http://localhost:8080/api/coloris-colors.json',
-    autoReloadJS: 'http://localhost:8080/module/auto-reload.js'
+    colorisColors: 'http://localhost:8080/api/coloris-colors.json'
 };
 
 (function() {
