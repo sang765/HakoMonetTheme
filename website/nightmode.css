@@ -1,0 +1,1160 @@
+.basic-section,
+.board-list,
+.board_categ-list,
+.detail-list,
+.feature-section,
+.index-top_notification,
+.mail-page .mail-detail-list,
+.modal-content,
+.page-breadcrumb,
+.private-tabs,
+.profile-feature,
+.series-users,
+.showcase-item,
+.sub-index-style {
+    background-color: #1f1f1f;
+    border-color: #1f1f1f #111 #0a0a0a;
+    border-style: solid;
+    border-width: 1px;
+    box-shadow: none
+}
+
+#licensed-list header.section-title,
+#tba-list header.section-title,
+.basic-section .sect-header,
+.detail-list header.section-title,
+.modal-header,
+.private-tabs header {
+    background-color: #2a2a2a;
+    border-bottom: none
+}
+
+#navbar-user #guest-menu ul.nav-submenu,
+.account-sidebar,
+.list-volume-wrapper,
+.ln-comment-toolkit,
+.ln-list-option,
+.navbar-menu.at-mobile,
+.navbar-menu.at-navbar .nav-submenu,
+.noti-sidebar {
+    box-shadow: 0 0 14px #111
+}
+
+button,
+input,
+label,
+optgroup,
+select,
+textarea {
+    background-color: #2a2a2a;
+    color: inherit
+}
+
+select option,
+select:focus {
+    background-color: #2a2a2a
+}
+
+label {
+    background-color: transparent
+}
+
+table tbody td,
+table tbody th,
+table tfoot td,
+table tfoot th,
+table thead td,
+table thead th {
+    color: #eee
+}
+
+[type=date],
+[type=email],
+[type=number],
+[type=password],
+[type=tel],
+[type=text],
+select,
+select.form-control {
+    background-color: #2a2a2a;
+    border-color: #3a3a3a;
+    color: #eee
+}
+
+[type=text]:focus,
+select.form-control:focus,
+select:focus {
+    background-color: #2a2a2a;
+    border-color: #ff0;
+    color: #eee
+}
+
+input::-moz-placeholder {
+    color: #eee
+}
+
+input::placeholder {
+    color: #eee
+}
+
+hr {
+    background: #444
+}
+
+body {
+    background-color: #111;
+    color: hsla(0, 0%, 100%, .9)
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: #eee
+}
+
+#navbar {
+    background-color: #2a2a2a
+}
+
+.navbar-menu.at-navbar .nav-submenu {
+    background-color: #333
+}
+
+.navbar-menu.at-navbar .nav-menu_item span {
+    color: #eee
+}
+
+.navbar-menu.at-navbar .nav-has-submenu.active .nav-menu_item .dropdown-icon,
+.navbar-menu.at-navbar .nav-has-submenu.active .nav-menu_item span,
+.navbar-menu.at-navbar .nav-menu_item .dropdown-icon {
+    color: hsla(0, 0%, 100%, .9)
+}
+
+.navbar-menu.at-mobile {
+    background-color: #333
+}
+
+.navbar-menu.at-mobile li {
+    border-bottom-color: #3e3e3e
+}
+
+span.sidenav-icon_white {
+    background-color: #eee
+}
+
+#noti-icon i,
+#series-unread-icon i {
+    color: #eee
+}
+
+#noti-icon.active .icon-wrapper {
+    background-color: #1f1f1f
+}
+
+.noti-sidebar .noti-more {
+    background-color: #4a4a4a
+}
+
+.noti-content {
+    color: hsla(0, 0%, 100%, .9)
+}
+
+.noti-content b {
+    color: #eee
+}
+
+.navbar-search .search-input {
+    background-color: #0a0a0a
+}
+
+#mainpart,
+#mainpart.at-index {
+    background-color: #111
+}
+
+#mainpart.custome-page,
+#mainpart.page-board {
+    background-color: #111 !important
+}
+
+.page-top-group.at-index {
+    background-color: #111
+}
+
+.a6-ratio {
+    background-color: #121212
+}
+
+.a6-ratio .img-in-ratio {
+    opacity: .9
+}
+
+.intromix-section .container .sect-body {
+    box-shadow: none
+}
+
+.intromix-series {
+    background-color: #252525;
+    border: 0
+}
+
+.intromix-series .series-title a {
+    color: inherit
+}
+
+.intromix-series .series-volumes-list {
+    background-color: #2f2f2f;
+    border: 0
+}
+
+.intromix-series .series-img .a6-ratio {
+    border-color: #1f1f1f !important
+}
+
+.intromix-series .series-volumes-list .series-volume {
+    border: 0
+}
+
+.i-n-f_header {
+    background-color: #163d4d;
+    border-bottom: 1px solid #0f2934
+}
+
+.i-n-f_header .header-text a {
+    color: #eee
+}
+
+.topic-item:hover {
+    opacity: .6
+}
+
+.topic-item a:hover {
+    color: inherit
+}
+
+.landscape.at-index.original-novels {
+    background-color: #0a0a0a;
+    border: 0
+}
+
+.tab-section.at-index {
+    background-color: #1c1c1c;
+    border: 0
+}
+
+.tab-list.at-index .sect-title {
+    border: 0;
+    color: #eee
+}
+
+.tab-list.at-index .tab-off {
+    background-color: #444;
+    border: 0;
+    color: #ddd
+}
+
+@media only screen and (max-width:999px) {
+    .intromix-series .series-summary:first-letter {
+        color: #fff
+    }
+}
+
+@media only screen and (max-width:787px) {
+    .last-topics {
+        border-top: 0
+    }
+
+    .tab-list.at-index {
+        background-color: #1c1c1c;
+        border-bottom: 0;
+        margin-top: 0;
+        padding: 10px 10px 0
+    }
+}
+
+.thumb_title a {
+    color: #ddd
+}
+
+.thumb_img {
+    border-color: #101010
+}
+
+.listall-item .listall-detail .series-title a {
+    color: inherit
+}
+
+.comment-user_ava img {
+    border-color: #444
+}
+
+.comment-item-at-index .comment-user_name {
+    color: hsla(0, 0%, 100%, .4)
+}
+
+.comment-item {
+    border-bottom-color: #3e3e3e
+}
+
+.comment-item .comment-user_ava {
+    opacity: .9
+}
+
+#chapter-comments .tab-list .sect-title,
+#chapter-comments .tab-list .sect-title.tab-off,
+#series-comments .tab-list .sect-title,
+#series-comments .tab-list .sect-title.tab-off {
+    color: inherit
+}
+
+.basic-section .sect-title,
+.basic-section .sect-title a {
+    color: #eee
+}
+
+.detail-list .detail-list-item {
+    border-bottom-color: #3e3e3e
+}
+
+.detail-list header.section-title {
+    color: #eee
+}
+
+.detail-list-item .detail-list-detail .lastest-chapter small,
+.detail-list-item .sub-attr-item .attr-name {
+    color: hsla(0, 0%, 100%, .4)
+}
+
+.sub-index-style .section-title {
+    background-color: #2a2a2a;
+    border: none;
+    color: #fff
+}
+
+.browse-section .pagination-footer,
+.has-pagination .pagination-footer {
+    background-color: #1f1f1f
+}
+
+.see-more_text {
+    border-top-color: #3e3e3e
+}
+
+.expand,
+.mobile-more,
+.summary-more.more-state {
+    background: linear-gradient(180deg, rgba(31, 31, 31, 0) 1%, #1f1f1f 75%, #1f1f1f);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#001f1f1f", endColorstr="#1f1f1f", GradientType=0)
+}
+
+.ln-comment-group:nth-child(odd) .expand {
+    background: linear-gradient(180deg, rgba(42, 42, 42, 0) 1%, #2a2a2a 75%, #2a2a2a);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#002a2a2a", endColorstr="#2a2a2a", GradientType=0)
+}
+
+.see-more a {
+    color: #eee
+}
+
+.topview_name .ranked-attr {
+    color: hsla(0, 0%, 100%, .4)
+}
+
+.topview-item:first-child .series-name,
+.topview-item:nth-child(2) .series-name,
+.topview-item:nth-child(3) .series-name {
+    color: #ec6a88
+}
+
+.page-breadcrumb {
+    background-color: #2a2a2a
+}
+
+.feature-section.at-volume .volume-name {
+    color: #eee
+}
+
+.feature-section .series-gerne-item {
+    background-color: #333
+}
+
+.feature-section .fact-name,
+.feature-section .info-name,
+.feature-section .series-name {
+    color: #eee
+}
+
+.statistic-list {
+    border-top-color: #3e3e3e
+}
+
+.statistic-list .statistic-name {
+    color: hsla(0, 0%, 100%, .4)
+}
+
+.statistic-list .statistic-value {
+    color: #eee
+}
+
+.statistic-list .block-wide.at-mobile {
+    border-bottom-color: #3e3e3e
+}
+
+.feature-section .summary-wrapper {
+    border-top-color: #3e3e3e
+}
+
+.feature-button {
+    border-color: hsla(0, 0%, 100%, .9);
+    color: hsla(0, 0%, 100%, .9)
+}
+
+.button-follow.follow {
+    border-color: #e22590
+}
+
+.series-users .fantrans-name,
+.series-users .owner_share-title {
+    color: hsla(0, 0%, 100%, .4)
+}
+
+.series-owner_name {
+    background-color: transparent
+}
+
+.series-owner_share .ln_info-name,
+.series-owner_share i {
+    color: inherit !important
+}
+
+.l-u_role {
+    background-color: #666;
+    border: 0
+}
+
+#toolkit-bar {
+    border-color: #666
+}
+
+.relate-topic .user-avatar {
+    border: 0
+}
+
+ul.list-chapters li:nth-child(2n) {
+    background-color: #252525
+}
+
+.ln_info-value {
+    border-left: 1px solid #666
+}
+
+ul.list-chapters li:hover {
+    background-color: #3f3f3f
+}
+
+ul.list-chapters li .chapter-name a:visited {
+    color: #777
+}
+
+ul.list-chapters li .chapter-name a:hover {
+    color: inherit
+}
+
+@media only screen and (max-width:999px) {
+    .mobile-toggle header {
+        background-color: #2a2a2a
+    }
+}
+
+.fantrans-value a {
+    color: #eee
+}
+
+ul.others-list li .others-img .a6-ratio {
+    border: 0
+}
+
+.visible-toolkit .visible-toolkit-item:hover {
+    border-bottom-color: hsla(0, 0%, 100%, .9)
+}
+
+.ln-comment-info {
+    background-color: #2a2a2a
+}
+
+.ln-comment-user_name {
+    color: #eee
+}
+
+.comment_toolkit {
+    border-color: #666
+}
+
+.ln-comment-time {
+    color: hsla(0, 0%, 100%, .4)
+}
+
+.ln-comment-wrapper {
+    border: 0
+}
+
+.arrow-left {
+    border-right-color: #252525
+}
+
+hr.ln-comment {
+    background-color: #666
+}
+
+.ln-comment-user_ava {
+    opacity: .9
+}
+
+.ln-comment-toolkit {
+    background-color: #2a2a2a;
+    border: 0;
+    color: inherit;
+    overflow: hidden
+}
+
+.visible-toolkit .visible-toolkit-item {
+    color: hsla(0, 0%, 100%, .9)
+}
+
+@media only screen and (max-width:787px) {
+
+    .fetch_reply,
+    .ln-comment-reply {
+        border-color: #666
+    }
+}
+
+.profile-showcase header,
+ol.list-volume li {
+    border-bottom-color: #3e3e3e
+}
+
+.profile-feature .profile-function.at-mobile {
+    border-top-color: #3e3e3e
+}
+
+.profile-showcase header span.number {
+    background-color: #3e3e3e
+}
+
+.profile-showcase header span,
+.showcase-item .series-status .status-name,
+.statistic-top .statistic-value {
+    color: #eee
+}
+
+.statistic-top .statistic-name {
+    color: hsla(0, 0%, 100%, .4)
+}
+
+.statistic-top {
+    border-bottom-color: #3e3e3e
+}
+
+.profile-info-item .info-name {
+    color: hsla(0, 0%, 100%, .4)
+}
+
+.profile-feature {
+    box-shadow: none
+}
+
+.profile-nav {
+    background-color: #252525
+}
+
+.profile-ava {
+    border-color: #666;
+    box-shadow: none
+}
+
+.profile-cover,
+.profile-page .table_at-profile {
+    border-color: #252525
+}
+
+.p-s_content {
+    background: #252525;
+    border: 0
+}
+
+table.listext-table {
+    background-color: #252525
+}
+
+table.listext-table tr th {
+    background-color: #2a2a2a;
+    border-bottom: 0;
+    color: #888
+}
+
+table.listext-table tr:nth-child(odd) {
+    background-color: #2a2a2a
+}
+
+table.listext-table tr:hover {
+    background-color: #3a3a3a
+}
+
+table.listext-table tr td {
+    border-bottom: 0
+}
+
+table.listext-table .timeago {
+    color: #eee
+}
+
+table.listext-table.has-covers tr td .series-cover {
+    border: 0
+}
+
+.page-header {
+    background: #252525
+}
+
+.alphabet_item,
+.page-header h2,
+.page-header h2 a {
+    color: #ddd
+}
+
+.alphabet_item:hover {
+    background-color: #ddd
+}
+
+.filter-type .button {
+    background-color: #2a2a2a;
+    border: 0;
+    border-radius: 4px;
+    color: #eee
+}
+
+.filter-type .button:hover {
+    opacity: .6
+}
+
+.orinovel-type .page-header h2 {
+    color: #1d7eaf
+}
+
+.convert-type .page-header h2 {
+    color: #dc8118
+}
+
+.bg_eee {
+    background-color: #1c1c1c
+}
+
+.fantrans_intro {
+    color: #eee
+}
+
+.cv_random-section {
+    background-color: #2a2a2a;
+    border-radius: 4px;
+    box-shadow: none
+}
+
+#ln-newestseries .ln-ns_item:nth-child(odd) {
+    background-color: #252525
+}
+
+.custome-page,
+.page-board {
+    background-image: none !important
+}
+
+.page-sub-header {
+    background-color: #1c1c1c
+}
+
+.ln-list-default li {
+    background-color: #2a2a2a
+}
+
+.ln-list-option li {
+    background-color: #333
+}
+
+.ln-list-option li:hover {
+    background-color: #2a2a2a
+}
+
+.ln-list-option li a:hover {
+    color: inherit
+}
+
+.ln-list-default,
+.ln-list-option {
+    border: 0
+}
+
+.board_categ-list {
+    color: #eee
+}
+
+table.broad-table tr th {
+    border-bottom: 0
+}
+
+table.broad-table tr th,
+table.broad-table tr:nth-child(odd) {
+    background-color: #2a2a2a
+}
+
+table.broad-table tr {
+    border-bottom: 0
+}
+
+table.broad-table tr:hover {
+    background-color: #3a3a3a
+}
+
+table.broad-table tr td .topic-avatar {
+    border: 0
+}
+
+.subtitle-category,
+table.broad-table tr td .topic-time {
+    color: hsla(0, 0%, 100%, .4)
+}
+
+.forum-page-wrapper {
+    background-color: transparent
+}
+
+.author-info {
+    opacity: 1
+}
+
+.search-gerne_item label {
+    color: #eee
+}
+
+.search-form.in {
+    background-color: #3a3a3a;
+    border: 0;
+    color: #eee
+}
+
+.tab-list {
+    background-color: #1c1c1c
+}
+
+.user-pm .mail,
+.user-pm .mail-list {
+    border-color: #444
+}
+
+.user-pm .mail {
+    background-color: #252525
+}
+
+.user-pm .mail:hover {
+    background-color: #4a4a4a
+}
+
+.noti-sidebar {
+    background-color: #333;
+    border: 0
+}
+
+#noti-icon.active {
+    background-color: #2a2a2a
+}
+
+#noti-icon.active i {
+    color: #fff
+}
+
+.noti-item {
+    border-color: #444
+}
+
+span.n-i_d-noti-phrase,
+span.n-i_d-noti-time {
+    color: inherit
+}
+
+.noti-item.untouch {
+    background-color: #3f3f3f
+}
+
+.noti-item:hover {
+    background-color: #2a2a2a
+}
+
+.noti-sidebar .noti-wrapper {
+    background-color: transparent
+}
+
+.account-sidebar {
+    background-color: #333
+}
+
+.account-sidebar li .nightmode-toggle,
+.account-sidebar li a {
+    color: hsla(0, 0%, 100%, .9)
+}
+
+.account-sidebar li {
+    border-bottom-color: #3e3e3e
+}
+
+.nav-user_icon.active {
+    background-color: #2a2a2a
+}
+
+#guest-menu .nav-submenu {
+    left: 0;
+    top: 50px
+}
+
+.nav-submenu {
+    background-color: #2a2a2a;
+    border-bottom-color: #3e3e3e
+}
+
+.nav-has-submenu.active .nav-menu_item .dropdown-icon,
+.nav-has-submenu.active .nav-menu_item span,
+.nav-menu_item .dropdown-icon,
+.nav-menu_item .menu-icon,
+.nav-submenu li .nightmode-toggle,
+.nav-submenu li a {
+    color: hsla(0, 0%, 100%, .9)
+}
+
+@media only screen and (max-width:999px) {
+
+    #sidenav-icon.active,
+    .navbar-menu {
+        background-color: #333
+    }
+
+    .navbar-menu {
+        border-bottom-color: #121212
+    }
+
+    #sidenav-icon.active span.sidenav-icon_white {
+        background-color: #eee
+    }
+
+    .navbar-menu li a span,
+    .navbar-menu li i {
+        color: #eee
+    }
+
+    .nav-menu_item:hover {
+        background-color: inherit;
+        opacity: .5
+    }
+}
+
+.re_set-in,
+.set-list label {
+    background-color: #121212
+}
+
+.rd_sidebar main {
+    background-color: #252525
+}
+
+.rd_sd-button_item,
+.rd_sidebar #chap_list li.current a {
+    color: #2a2a2a
+}
+
+.chapter-comment {
+    background-color: #121212;
+    color: #eee !important
+}
+
+.reading-content {
+    color: #2a2a2a
+}
+
+.index-top_notification a {
+    color: #eee
+}
+
+.mail-page .mail-item {
+    border-bottom-color: #3e3e3e
+}
+
+.mail-page .mail-starter .starter-name a.sender-name {
+    color: #eee
+}
+
+.mail-page .mail-wrapper {
+    background-color: transparent
+}
+
+.mail-page .mail-starter {
+    border-color: transparent
+}
+
+@media only screen and (max-width:787px) {
+    .mail-function.at-mail .button {
+        color: #eee
+    }
+
+    ul.mail-participants li {
+        background-color: #2a2a2a;
+        border-color: #252525
+    }
+}
+
+.licensed-volume-page .info-box {
+    background-color: #252525;
+    border-color: #121212
+}
+
+.licensed-volume-page #volumes-same-series .volume-item .a6-ratio,
+.licensed-volume-page .volume-cover .a6-ratio {
+    border-color: #121212 !important
+}
+
+.licensed-volume-page .store-list.at-licensed-volume .button {
+    opacity: .85
+}
+
+.licensed-list-page #search-by-month {
+    background-color: #252525
+}
+
+.licensed-list-page #search-by-month select {
+    background-color: #121212;
+    font-weight: 700
+}
+
+#licensed-list .listall-item .store-list .button {
+    opacity: .85
+}
+
+.licensed-list-page .search-filters {
+    background-color: #252525;
+    border-color: #1e1e1e
+}
+
+.licensed-list-page .keywords-bar {
+    opacity: .85
+}
+
+.page-title .page-name_wrapper .page-name {
+    color: #eee
+}
+
+.licensed-list-form .combine-input {
+    background-color: #1e1e1e
+}
+
+.licensed-list-form .sub-window {
+    background-color: #252525
+}
+
+.see-more_cover .see-more {
+    border-color: #fff
+}
+
+.see-more_cover .see-more:hover {
+    background-color: hsla(0, 0%, 100%, .3)
+}
+
+.thumb-item-flow .thumb_attr.chapter-title {
+    color: hsla(0, 0%, 100%, .9)
+}
+
+.thumb-item-flow .thumb_attr.series-title {
+    color: #eee
+}
+
+.comment-item-at-index {
+    border-bottom-color: #3e3e3e
+}
+
+.rank-cirle .rank-number {
+    background-color: #2a2a2a
+}
+
+.daily-recent_views .top-tab_title.title-active {
+    color: #eee
+}
+
+#licensed-list .listall-item {
+    border-bottom-color: #3e3e3e
+}
+
+.licensed-list-page #licensed-list .info-item .info-name {
+    color: #eee
+}
+
+.licensed-list-page #licensed-list .info-item {
+    border-bottom-color: #3e3e3e
+}
+
+.licensed-volume-page .info-box .info-name {
+    color: #eee
+}
+
+.licensed-volume-page .volume-title-group .series-name,
+.licensed-volume-page .volume-title-group .volume-title .publisher-name {
+    color: hsla(0, 0%, 100%, .4)
+}
+
+.licensed-volume-page .volume-title-group .series-name a,
+.licensed-volume-page .volume-title-group .volume-title .publisher-name a {
+    color: #eee
+}
+
+.user-private-tabs li a {
+    border-bottom-color: #3e3e3e;
+    color: #eee
+}
+
+.user-private-tabs li:hover {
+    background-color: #2a2a2a
+}
+
+.private-tabs header .user-name {
+    color: hsla(0, 0%, 100%, .4)
+}
+
+.bookmark-item {
+    border-bottom-color: #3e3e3e
+}
+
+ul.bookmarks_list li:nth-of-type(odd) {
+    background-color: #2a2a2a
+}
+
+#navbar-user #guest-menu .icon .white-point {
+    background-color: #eee
+}
+
+#navbar-user #guest-menu ul.nav-submenu {
+    background-color: #333
+}
+
+#navbar-user.guest a.login-link,
+.index-section .section-title,
+.last-topics .title {
+    color: #eee
+}
+
+.last-topics .topic-data {
+    color: hsla(0, 0%, 100%, .4)
+}
+
+.sts-bold {
+    background-color: hsla(0, 0%, 39%, .8)
+}
+
+.sts-empty {
+    border-bottom-color: hsla(0, 0%, 55%, .8);
+    color: #eee
+}
+
+.daily-recent_views .top-tab_title.title-active {
+    background-color: hsla(0, 0%, 39%, .8)
+}
+
+.bottom-part.at-index {
+    background-color: #1f1f1f;
+    border-bottom: 1px solid #3e3e3e;
+    border-top: 1px solid #3e3e3e
+}
+
+.rank-cirle .rank-circle-item:nth-of-type(2) .rank-number,
+.rank-cirle .rank-circle-item:nth-of-type(3) .rank-number {
+    background-color: hsla(0, 0%, 39%, .6)
+}
+
+.rank-cirle .rank-number {
+    background-color: rgba(80, 80, 80, .4)
+}
+
+.rank-cirle .rank-circle-item:nth-of-type(2) .series-title,
+.rank-cirle .rank-circle-item:nth-of-type(3) .series-title {
+    color: #eee
+}
+
+.rank-cirle .series-detail .series-title {
+    color: hsla(0, 0%, 100%, .9)
+}
+
+.rank-cirle .rank-count {
+    color: hsla(0, 0%, 100%, .4)
+}
+
+.index-background,
+.page-top-group.at-index .index-background {
+    background-color: #000;
+    background-image: url(/images/kuma_kuma_kuma_bear.jpg?cbaeb8e00c209f8f7d23aac3f57009c9)
+}
+
+.thumb-see-more .see-more-inside {
+    border-color: #3e3e3e
+}
+
+.owner-donate {
+    border-top-color: #3e3e3e
+}
+
+.comment-item .comment-location,
+.comment-item .series-name,
+.comment-item-at-index .comment-location {
+    color: hsla(0, 0%, 100%, .4)
+}
+
+.user-pm .mail.unread {
+    background-color: #4a4a4a
+}
+
+.mail-page .mail-starter .starter-name small time,
+.user-pm .mail-time {
+    color: hsla(0, 0%, 100%, .4)
+}
+
+#mainpart.reading-page.style-1 .title-item,
+#mainpart.reading-page.style-2 .title-item,
+#mainpart.reading-page.style-3 .title-item,
+#mainpart.reading-page.style-4 .title-item {
+    color: #111
+}
+
+.attached-series {
+    background-color: #2a2a2a
+}
+
+.page-content .topic-time {
+    color: hsla(0, 0%, 100%, .4)
+}
+
+.ln-comment-group:nth-child(odd) hr {
+    background-color: #3e3e3e
+}
+
+ul.list-chapters li .chapter-name small.unfinished-status {
+    color: hsla(0, 0%, 100%, .4)
+}
+
+.filters-wrapper {
+    background-color: #111
+}
+
+.form-control:disabled,
+.form-control[readonly] {
+    opacity: .5
+}
+
+.rd-basic_icon a {
+    color: #000
+}
