@@ -92,25 +92,15 @@
         }
 
         detectDevice() {
-            // Try different detection methods in order of reliability
-            const detectionMethods = [
-                deviceDetectors.checkScreenWidth,
-                deviceDetectors.checkUserAgent
-            ];
-
-            for (const method of detectionMethods) {
-                const result = method.call(this);
-                if (result) {
-                    this.currentDevice = result;
-                    debugLog('Device detected via', method.name, ':', result);
-                    break;
-                }
-            }
-
-            // Default to desktop if nothing detected
-            if (!this.currentDevice) {
+            // Use user agent as the primary and only detection method
+            const result = deviceDetectors.checkUserAgent.call(this);
+            if (result) {
+                this.currentDevice = result;
+                debugLog('Device detected via user agent:', result);
+            } else {
+                // Default to desktop if user agent doesn't match any pattern
                 this.currentDevice = 'desktop';
-                debugLog('No device detected, defaulting to desktop');
+                debugLog('No device pattern matched in user agent, defaulting to desktop');
             }
 
             // Get additional device info
