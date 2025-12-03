@@ -562,44 +562,9 @@
     }
 
     function showNotification(message, timeout = 3000) {
-        if (typeof GM_notification === 'function') {
-            GM_notification({
-                title: 'Ad Blocker',
-                text: message,
-                timeout: timeout,
-                silent: false
-            });
-        } else {
-            // Fallback notification
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-                color: white;
-                padding: 15px 20px;
-                border-radius: 10px;
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-                z-index: 10002;
-                max-width: 300px;
-                animation: slideIn 0.5s ease-out;
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            `;
-
-            notification.innerHTML = `
-                <h4 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 600;">Ad Blocker</h4>
-                <p style="margin: 0; font-size: 14px; opacity: 0.9;">${message}</p>
-            `;
-
-            document.body.appendChild(notification);
-
-            setTimeout(() => {
-                if (notification.parentElement) {
-                    notification.remove();
-                }
-            }, timeout);
-        }
+        // Notification functionality removed from modules
+        // Permission still granted in main userscript
+        return;
     }
 
     function openAdBlockerDialog() {

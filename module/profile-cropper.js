@@ -10,6 +10,9 @@
     const AVATAR_MIN_WIDTH = 120;
     const AVATAR_MIN_HEIGHT = 120;
     const AVATAR_ASPECT_RATIO = 1; // 1:1
+    
+    const MAX_AVATAR_FILE_SIZE = 1024 * 1024; // 1MB strict limit for avatar uploads due to website constraints
+    const MIN_COMPRESSED_SIZE = 900 * 1024; // Target minimum 900KB for compressed images to balance size and quality
 
     function debugLog(...args) {
         if (DEBUG && typeof window.Logger !== 'undefined') {
@@ -546,44 +549,83 @@
      * Show notification
      */
     function showNotification(message, timeout) {
-        timeout = timeout || 3000;
-        if (typeof GM_notification === 'function') {
-            GM_notification({
-                title: 'HakoMonetTheme - Profile Banner',
-                text: message,
-                timeout: timeout,
-                silent: false
-            });
-        } else {
-            // Fallback notification
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                padding: 15px 20px;
-                border-radius: 10px;
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-                z-index: 10002;
-                max-width: 300px;
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            `;
+        // Notification functionality removed from modules
+        // Permission still granted in main userscript
+        return;
+    }
 
-            notification.innerHTML = `
-                <h4 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 600;">HakoMonetTheme</h4>
-                <p style="margin: 0; font-size: 14px; opacity: 0.9;">${message}</p>
-            `;
+    /**
+     * Compress image to meet file size requirements
+     * Uses Canvas API for client-side compression with quality preservation
+     * Iteratively reduces JPEG/WebP quality or converts PNG to JPEG
+     * Ensures compressed size is <= 1MB and aims for >= 900KB
+     */
+    function compressImage(file) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
 
-            document.body.appendChild(notification);
+                // Preserve original dimensions to maintain aspect ratio and avoid quality loss from resizing
+                canvas.width = img.naturalWidth;
+                canvas.height = img.naturalHeight;
 
-            setTimeout(() => {
-                if (notification.parentElement) {
-                    notification.remove();
+                // Enable high-quality rendering to preserve details, colors, and sharpness
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+
+                ctx.drawImage(img, 0, 0);
+
+                // Determine output format - convert PNG to JPEG for compression since PNG doesn't support quality parameter
+                let outputType = file.type;
+                if (file.type === 'image/png') {
+                    outputType = 'image/jpeg'; // Convert PNG to JPEG for effective compression
                 }
-            }, timeout);
-        }
+
+                let quality = 0.9; // Start with high quality (90%) to maintain visual fidelity
+                const maxIterations = 16; // Prevent infinite loop, limit to 16 attempts
+                let iteration = 0;
+
+                const attemptCompression = () => {
+                    iteration++;
+                    canvas.toBlob((blob) => {
+                        if (!blob) {
+                            reject(new Error('Failed to compress image - canvas toBlob failed'));
+                            return;
+                        }
+
+                        debugLog(`Compression attempt ${iteration}: size ${blob.size} bytes, quality ${quality}`);
+
+                        if (blob.size > MAX_AVATAR_FILE_SIZE) {
+                            if (quality > 0.1 && iteration < maxIterations) {
+                                quality = Math.max(0.1, quality - 0.05); // Reduce quality in 5% steps
+                                attemptCompression(); // Retry with lower quality
+                            } else {
+                                reject(new Error('Cannot compress image below 1MB without unacceptable quality loss. Please select a smaller image.'));
+                            }
+                        } else {
+                            // Check if size is too small (below 900KB), but accept if we can't increase
+                            if (blob.size < MIN_COMPRESSED_SIZE && quality < 0.95 && iteration < maxIterations) {
+                                quality = Math.min(0.95, quality + 0.05); // Try higher quality to reach minimum size
+                                attemptCompression();
+                            } else {
+                                // Quality check: warn if quality dropped significantly (potential detail loss)
+                                if (quality < 0.5) {
+                                    debugLog('Warning: Image compressed with low quality, potential loss of details, colors, or sharpness');
+                                }
+                                resolve(blob);
+                            }
+                        }
+                    }, outputType, quality);
+                };
+
+                attemptCompression();
+            };
+
+            img.onerror = () => reject(new Error('Failed to load image for compression'));
+            img.src = URL.createObjectURL(file);
+        });
     }
 
     /**
@@ -653,18 +695,39 @@
     }
 
     /**
-     * Upload avatar image
+     * Upload avatar image with size validation and compression
      */
-    function uploadAvatar(file) {
-        const token = window.csrfToken || document.querySelector('meta[name="csrf-token"]')?.content;
-        if (!token) {
-            showNotification('Không thể upload ảnh - thiếu token bảo mật.', 5000);
-            return;
-        }
+    async function uploadAvatar(file) {
+        try {
+            const token = window.csrfToken || document.querySelector('meta[name="csrf-token"]')?.content;
+            if (!token) {
+                showNotification('Không thể upload ảnh - thiếu token bảo mật.', 5000);
+                return;
+            }
 
-        const formdata = new FormData();
-        formdata.append('image', file);
+            // Check file size and compress if needed to enforce 1MB limit
+            let processedFile = file;
+            if (file.size > MAX_AVATAR_FILE_SIZE) {
+                debugLog('File size exceeds 1MB, compressing...');
+                showNotification('Đang nén ảnh để giảm kích thước...', 2000); // Progress indicator for user feedback
+
+                try {
+                    const compressedBlob = await compressImage(file);
+                    processedFile = new File([compressedBlob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: compressedBlob.type });
+                    debugLog(`Compression successful: ${file.size} -> ${compressedBlob.size} bytes`);
+                    showNotification('Ảnh đã được nén thành công!', 2000);
+                } catch (compressionError) {
+                    debugLog('Compression failed:', compressionError);
+                    showNotification(compressionError.message, 5000);
+                    return; // Abort upload on compression failure
+                }
+            }
+
+            const formdata = new FormData();
+        formdata.append('image', processedFile);
         formdata.append('_token', token);
+
+        debugLog('Uploading processed file:', processedFile.name, processedFile.size, 'bytes');
 
         if (typeof $ !== 'undefined') {
             $.ajax({
@@ -704,8 +767,13 @@
                 }
             })
             .catch(error => {
+                debugLog('Fetch upload error:', error);
                 showNotification('Không thể upload ảnh.', 5000);
             });
+        }
+        } catch (error) {
+            debugLog('Error in uploadAvatar:', error);
+            showNotification('Lỗi không mong muốn khi upload ảnh.', 5000);
         }
     }
 
