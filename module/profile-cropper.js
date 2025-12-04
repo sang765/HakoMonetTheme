@@ -180,6 +180,9 @@
                         <div>
                             <p style="margin: 0; font-size: 14px;">Kích thước tối thiểu: ${minWidth}x${minHeight}px</p>
                             <p style="margin: 0; font-size: 14px;">Tỷ lệ: ${aspectRatio}:1</p>
+                            <p style="margin: 10px 0 0 0; font-size: 13px; color: #666; line-height: 1.4;">
+                                <strong>Lưu ý cho mobile:</strong> Nếu ảnh bị tràn ra ngoài vùng cắt, bạn có thể dùng hai ngón tay để phóng to/thu nhỏ ảnh.
+                            </p>
                         </div>
                         <div class="hmt-crop-preview">
                             <h4 style="margin: 0 0 10px 0; font-size: 16px;">Xem trước:</h4>
