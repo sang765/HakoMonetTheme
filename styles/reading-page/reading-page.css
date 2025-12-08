@@ -8,8 +8,13 @@
     width: 11.11% !important;
   }
 }
+@media only screen and (max-width: 980px) {
+  a#rd-fullscreen_icon {
+    padding: 14px 10px;
+  }
+}
 a#rd-fullscreen_icon {
-  padding: 16px;
+  font-weight: 400;
 }
 
 /*# sourceMappingURL=reading-page.css.map */
