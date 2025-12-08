@@ -21,7 +21,7 @@ if (isCodespaces) {
     }
     installUrl = `https://${codespaceName}-8080.${forwardingDomain}/HakoMonetTheme.user.js`;
 } else {
-    installUrl = 'http://localhost:8080/HakoMonetTheme.user.js';
+    installUrl = 'http://localhost:5500/HakoMonetTheme.user.js';
 }
 
 // Check and install dependencies if needed

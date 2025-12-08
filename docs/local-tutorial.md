@@ -72,8 +72,9 @@ Github Codespace cho phép phát triển trực tiếp trên đám mây mà khô
 6. **Phát Triển**: Chỉnh sửa code trực tiếp trong Codespace, thay đổi sẽ được sync tự động.
 
 > **Lưu ý**: Codespace có giới hạn thời gian sử dụng miễn phí. Phù hợp cho test nhanh hoặc phát triển không thường xuyên.
+> Bạn cần cấu hình `resourcePaths` trong `HakoMonetTheme.user.js` và **các module** để trỏ đến URL của Codespace (ví dụ: `https://<your-codespace-url>/main.js`).
 
-### Live Server Extension
+### Live Server Extension (Recommended dành cho người dùng VS Code)
 
 Live Server là extension VS Code cung cấp server HTTP đơn giản với tính năng live-reload, thay thế cho Python/Node.js server.
 
@@ -83,7 +84,7 @@ Live Server là extension VS Code cung cấp server HTTP đơn giản với tín
 4. **Cấu Hình Port**: Mặc định port 5500. Có thể thay đổi trong settings của extension.
 5. **Test**: Truy cập `http://localhost:5500` (hoặc port đã cấu hình) để xem files. Thay đổi code sẽ tự động reload browser.
 
-> **Lưu ý**: Với userscript, bạn cần cấu hình `resourcePaths` trong `HakoMonetTheme.user.js` để trỏ đến URL của Live Server (ví dụ: `http://localhost:5500/main.js`).
+> **Lưu ý**: Với userscript, bạn cần cấu hình `resourcePaths` trong `HakoMonetTheme.user.js` và **các module** để trỏ đến URL của Live Server (ví dụ: `http://localhost:5500/main.js`).
 
 ## Bước 2: Cấu Hình Userscript
 
@@ -108,7 +109,7 @@ const resourcePaths = {
 };
 ```
 
-> **Lưu ý**: Nếu dùng Node.js server, đổi thành `http://localhost:8080/`
+> **Lưu ý**: Nếu dùng Node.js server, đổi thành `http://localhost:5500/`
 
 ### 3. Import vào Userscript Manager
 - **Tampermonkey/Violentmonkey**: Import file `HakoMonetTheme.user.js`

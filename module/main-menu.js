@@ -4,7 +4,7 @@
     // Constants for better maintainability and readability
     const DEBUG = GM_getValue('debug_mode', false);
     const IS_LOCAL = GM_info.script.version === 'LocalDev';
-    const FOLDER_URL = IS_LOCAL ? 'http://localhost:8080/styles/' : 'https://sang765.github.io/HakoMonetTheme/styles/';
+    const FOLDER_URL = IS_LOCAL ? 'http://localhost:5500/styles/' : 'https://sang765.github.io/HakoMonetTheme/styles/';
     const CSS_FILE = 'userscript/mainmenu/hmt-main-menu.css';
     const CSS_MAP_FILE = 'userscript/mainmenu/hmt-main-menu.css.map';
     const DIALOG_CLASS = 'hmt-main-menu-dialog';
