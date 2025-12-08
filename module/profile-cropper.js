@@ -509,10 +509,10 @@
 
                     debugLog('Cropped image created:', croppedFile.size, 'bytes');
 
-                    // Call callback with cropped file
-                    callback(croppedFile);
-
-                    closeModal();
+                    // Disable button and call callback with cropped file, closeModal function, and button
+                    uploadBtn.disabled = true;
+                    uploadBtn.textContent = 'Đang upload...';
+                    callback(croppedFile, closeModal, uploadBtn);
                 }, 'image/png');
             } else {
                 debugLog('Failed to get cropped canvas');
@@ -730,11 +730,16 @@
     /**
      * Upload banner image
      */
-    function uploadBanner(file) {
+    function uploadBanner(file, closeModal, button) {
         const token = window.csrfToken || document.querySelector('meta[name="csrf-token"]')?.content;
         if (!token) {
             debugLog('CSRF token not found');
             showNotification('Không thể upload ảnh - thiếu token bảo mật.', 5000);
+            if (closeModal && button) {
+                closeModal();
+                button.disabled = false;
+                button.textContent = 'Cắt & Upload';
+            }
             return;
         }
 
@@ -761,10 +766,20 @@
                         debugLog('Upload failed with message:', data.message);
                         showNotification(data.message || 'Upload thất bại.', 5000);
                     }
+                    if (closeModal && button) {
+                        closeModal();
+                        button.disabled = false;
+                        button.textContent = 'Cắt & Upload';
+                    }
                 },
                 error: function(xhr, status, error) {
                     debugLog('AJAX upload error:', status, error);
                     showNotification('Không thể upload ảnh.', 5000);
+                    if (closeModal && button) {
+                        closeModal();
+                        button.disabled = false;
+                        button.textContent = 'Cắt & Upload';
+                    }
                 }
             });
         } else {
@@ -785,10 +800,20 @@
                     debugLog('Upload failed with message:', data.message);
                     showNotification(data.message || 'Upload thất bại.', 5000);
                 }
+                if (closeModal && button) {
+                    closeModal();
+                    button.disabled = false;
+                    button.textContent = 'Cắt & Upload';
+                }
             })
             .catch(error => {
                 debugLog('Fetch upload error:', error);
                 showNotification('Không thể upload ảnh.', 5000);
+                if (closeModal && button) {
+                    closeModal();
+                    button.disabled = false;
+                    button.textContent = 'Cắt & Upload';
+                }
             });
         }
     }
@@ -796,11 +821,16 @@
     /**
      * Upload avatar image with size validation and compression
      */
-    async function uploadAvatar(file) {
+    async function uploadAvatar(file, closeModal, button) {
         try {
             const token = window.csrfToken || document.querySelector('meta[name="csrf-token"]')?.content;
             if (!token) {
                 showNotification('Không thể upload ảnh - thiếu token bảo mật.', 5000);
+                if (closeModal && button) {
+                    closeModal();
+                    button.disabled = false;
+                    button.textContent = 'Cắt & Upload';
+                }
                 return;
             }
 
@@ -818,6 +848,11 @@
                 } catch (compressionError) {
                     debugLog('Compression failed:', compressionError);
                     showNotification(compressionError.message, 5000);
+                    if (closeModal && button) {
+                        closeModal();
+                        button.disabled = false;
+                        button.textContent = 'Cắt & Upload';
+                    }
                     return; // Abort upload on compression failure
                 }
             }
@@ -843,9 +878,19 @@
                     } else {
                         showNotification(data.message || 'Upload thất bại.', 5000);
                     }
+                    if (closeModal && button) {
+                        closeModal();
+                        button.disabled = false;
+                        button.textContent = 'Cắt & Upload';
+                    }
                 },
                 error: function(xhr, status, error) {
                     showNotification('Không thể upload ảnh.', 5000);
+                    if (closeModal && button) {
+                        closeModal();
+                        button.disabled = false;
+                        button.textContent = 'Cắt & Upload';
+                    }
                 }
             });
         } else {
@@ -864,15 +909,30 @@
                 } else {
                     showNotification(data.message || 'Upload thất bại.', 5000);
                 }
+                if (closeModal && button) {
+                    closeModal();
+                    button.disabled = false;
+                    button.textContent = 'Cắt & Upload';
+                }
             })
             .catch(error => {
                 debugLog('Fetch upload error:', error);
                 showNotification('Không thể upload ảnh.', 5000);
+                if (closeModal && button) {
+                    closeModal();
+                    button.disabled = false;
+                    button.textContent = 'Cắt & Upload';
+                }
             });
         }
         } catch (error) {
             debugLog('Error in uploadAvatar:', error);
             showNotification('Lỗi không mong muốn khi upload ảnh.', 5000);
+            if (closeModal && button) {
+                closeModal();
+                button.disabled = false;
+                button.textContent = 'Cắt & Upload';
+            }
         }
     }
 
