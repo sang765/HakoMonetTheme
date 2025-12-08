@@ -150,12 +150,26 @@
                 ">
                     <div class="hmt-crop-container" style="
                         flex: 1;
-                        min-height: 300px;
+                        height: 400px;
+                        max-height: 60vh;
+                        max-width: 100%;
                         border: 1px solid #ddd;
                         border-radius: 5px;
                         overflow: hidden;
+                        position: relative;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
                     ">
-                        <img id="hmt-crop-image" alt="Image preview" style="max-width: 100%; display: block;">
+                        <img id="hmt-crop-image" alt="Image preview" style="
+                            max-width: 100%;
+                            max-height: 100%;
+                            width: auto;
+                            height: auto;
+                            display: block;
+                            object-fit: contain;
+                            object-position: center;
+                        ">
                     </div>
                     <div class="hmt-crop-info" style="
                         width: 200px;
@@ -166,6 +180,9 @@
                         <div>
                             <p style="margin: 0; font-size: 14px;">Kích thước tối thiểu: ${minWidth}x${minHeight}px</p>
                             <p style="margin: 0; font-size: 14px;">Tỷ lệ: ${aspectRatio}:1</p>
+                            <p style="margin: 10px 0 0 0; font-size: 13px; color: #666; line-height: 1.4;">
+                                <strong>Lưu ý cho mobile:</strong> Nếu ảnh bị tràn ra ngoài vùng cắt, bạn có thể dùng hai ngón tay để phóng to/thu nhỏ ảnh.
+                            </p>
                         </div>
                         <div class="hmt-crop-preview">
                             <h4 style="margin: 0 0 10px 0; font-size: 16px;">Xem trước:</h4>
@@ -236,7 +253,9 @@
                         }
                         .hmt-crop-container {
                             order: 1 !important;
-                            min-height: 250px !important;
+                            height: 300px !important;
+                            max-height: 50vh !important;
+                            width: 100% !important;
                         }
                         .hmt-crop-preview {
                             display: none !important;
@@ -250,6 +269,13 @@
                         }
                         .hmt-crop-footer > div {
                             justify-content: center !important;
+                        }
+                        #hmt-crop-image {
+                            max-width: 100% !important;
+                            max-height: 100% !important;
+                            width: auto !important;
+                            height: auto !important;
+                            object-fit: contain !important;
                         }
                     }
                 </style>
@@ -268,6 +294,7 @@
         debugLog('Modal elements found:', !!img, !!closeBtn, !!cancelBtn, !!uploadBtn, !!previewBox);
 
         let cropper = null;
+        let handleResize = null;
 
         // Load image
         const reader = new FileReader();
@@ -300,14 +327,20 @@
                         autoCropArea: 1.0,
                         responsive: true,
                         restore: false,
+                        checkCrossOrigin: false,
+                        checkOrientation: false,
                         guides: true,
                         center: true,
                         highlight: false,
                         cropBoxMovable: true,
                         cropBoxResizable: true,
                         toggleDragModeOnDblclick: false,
+                        minContainerWidth: 200,
+                        minContainerHeight: 200,
                         ready: function() {
                             debugLog('Cropper ready');
+                            // Ensure cropper fits within container
+                            cropper.resize();
                             updatePreview();
                         },
                         crop: function(event) {
@@ -316,6 +349,22 @@
                     });
                     debugLog('Cropper initialized successfully');
 
+                    // Add window resize handler to prevent overflow on mobile orientation changes
+                    handleResize = function() {
+                        if (cropper) {
+                            debugLog('Window resized, adjusting cropper');
+                            cropper.resize();
+                        }
+                    };
+                    
+                    // Store resize handler for cleanup
+                    window.addEventListener('resize', handleResize);
+                    
+                    // Handle orientation change specifically for mobile
+                    window.addEventListener('orientationchange', function() {
+                        setTimeout(handleResize, 100); // Small delay to allow layout to settle
+                    });
+
                     // Add rotate button event listeners
                     const rotateLeftBtn = modal.querySelector('.hmt-crop-rotate-left');
                     const rotateRightBtn = modal.querySelector('.hmt-crop-rotate-right');
@@ -323,6 +372,7 @@
                         rotateLeftBtn.addEventListener('click', () => {
                             if (cropper) {
                                 cropper.rotate(-90);
+                                setTimeout(handleResize, 50); // Resize after rotation
                                 updatePreview();
                             }
                         });
@@ -331,6 +381,7 @@
                         rotateRightBtn.addEventListener('click', () => {
                             if (cropper) {
                                 cropper.rotate(90);
+                                setTimeout(handleResize, 50); // Resize after rotation
                                 updatePreview();
                             }
                         });
@@ -391,6 +442,9 @@
             if (cropper) {
                 cropper.destroy();
             }
+            // Remove resize event listeners to prevent memory leaks
+            window.removeEventListener('resize', handleResize);
+            window.removeEventListener('orientationchange', handleResize);
             modal.remove();
         }
 
@@ -455,10 +509,10 @@
 
                     debugLog('Cropped image created:', croppedFile.size, 'bytes');
 
-                    // Call callback with cropped file
-                    callback(croppedFile);
-
-                    closeModal();
+                    // Disable button and call callback with cropped file, closeModal function, and button
+                    uploadBtn.disabled = true;
+                    uploadBtn.textContent = 'Đang upload...';
+                    callback(croppedFile, closeModal, uploadBtn);
                 }, 'image/png');
             } else {
                 debugLog('Failed to get cropped canvas');
@@ -676,11 +730,16 @@
     /**
      * Upload banner image
      */
-    function uploadBanner(file) {
+    function uploadBanner(file, closeModal, button) {
         const token = window.csrfToken || document.querySelector('meta[name="csrf-token"]')?.content;
         if (!token) {
             debugLog('CSRF token not found');
             showNotification('Không thể upload ảnh - thiếu token bảo mật.', 5000);
+            if (closeModal && button) {
+                closeModal();
+                button.disabled = false;
+                button.textContent = 'Cắt & Upload';
+            }
             return;
         }
 
@@ -707,10 +766,20 @@
                         debugLog('Upload failed with message:', data.message);
                         showNotification(data.message || 'Upload thất bại.', 5000);
                     }
+                    if (closeModal && button) {
+                        closeModal();
+                        button.disabled = false;
+                        button.textContent = 'Cắt & Upload';
+                    }
                 },
                 error: function(xhr, status, error) {
                     debugLog('AJAX upload error:', status, error);
                     showNotification('Không thể upload ảnh.', 5000);
+                    if (closeModal && button) {
+                        closeModal();
+                        button.disabled = false;
+                        button.textContent = 'Cắt & Upload';
+                    }
                 }
             });
         } else {
@@ -731,10 +800,20 @@
                     debugLog('Upload failed with message:', data.message);
                     showNotification(data.message || 'Upload thất bại.', 5000);
                 }
+                if (closeModal && button) {
+                    closeModal();
+                    button.disabled = false;
+                    button.textContent = 'Cắt & Upload';
+                }
             })
             .catch(error => {
                 debugLog('Fetch upload error:', error);
                 showNotification('Không thể upload ảnh.', 5000);
+                if (closeModal && button) {
+                    closeModal();
+                    button.disabled = false;
+                    button.textContent = 'Cắt & Upload';
+                }
             });
         }
     }
@@ -742,11 +821,16 @@
     /**
      * Upload avatar image with size validation and compression
      */
-    async function uploadAvatar(file) {
+    async function uploadAvatar(file, closeModal, button) {
         try {
             const token = window.csrfToken || document.querySelector('meta[name="csrf-token"]')?.content;
             if (!token) {
                 showNotification('Không thể upload ảnh - thiếu token bảo mật.', 5000);
+                if (closeModal && button) {
+                    closeModal();
+                    button.disabled = false;
+                    button.textContent = 'Cắt & Upload';
+                }
                 return;
             }
 
@@ -764,6 +848,11 @@
                 } catch (compressionError) {
                     debugLog('Compression failed:', compressionError);
                     showNotification(compressionError.message, 5000);
+                    if (closeModal && button) {
+                        closeModal();
+                        button.disabled = false;
+                        button.textContent = 'Cắt & Upload';
+                    }
                     return; // Abort upload on compression failure
                 }
             }
@@ -789,9 +878,19 @@
                     } else {
                         showNotification(data.message || 'Upload thất bại.', 5000);
                     }
+                    if (closeModal && button) {
+                        closeModal();
+                        button.disabled = false;
+                        button.textContent = 'Cắt & Upload';
+                    }
                 },
                 error: function(xhr, status, error) {
                     showNotification('Không thể upload ảnh.', 5000);
+                    if (closeModal && button) {
+                        closeModal();
+                        button.disabled = false;
+                        button.textContent = 'Cắt & Upload';
+                    }
                 }
             });
         } else {
@@ -810,15 +909,30 @@
                 } else {
                     showNotification(data.message || 'Upload thất bại.', 5000);
                 }
+                if (closeModal && button) {
+                    closeModal();
+                    button.disabled = false;
+                    button.textContent = 'Cắt & Upload';
+                }
             })
             .catch(error => {
                 debugLog('Fetch upload error:', error);
                 showNotification('Không thể upload ảnh.', 5000);
+                if (closeModal && button) {
+                    closeModal();
+                    button.disabled = false;
+                    button.textContent = 'Cắt & Upload';
+                }
             });
         }
         } catch (error) {
             debugLog('Error in uploadAvatar:', error);
             showNotification('Lỗi không mong muốn khi upload ảnh.', 5000);
+            if (closeModal && button) {
+                closeModal();
+                button.disabled = false;
+                button.textContent = 'Cắt & Upload';
+            }
         }
     }
 
