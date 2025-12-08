@@ -56,6 +56,35 @@ hoặc
 Access your files at: http://localhost:8080
 ```
 
+## Phương Pháp Phát Triển Khác
+
+Ngoài cách thiết lập server local với Python hoặc Node.js, bạn có thể sử dụng Github Codespace cho phát triển trên đám mây hoặc Live Server extension cho VS Code để có trải nghiệm tương tự.
+
+### Github Codespace
+
+Github Codespace cho phép phát triển trực tiếp trên đám mây mà không cần cài đặt gì trên máy local.
+
+1. **Mở Repository**: Truy cập repository HakoMonetTheme trên GitHub.
+2. **Tạo Codespace**: Nhấn nút "Code" > "Open with Codespaces" > "New codespace".
+3. **Thiết Lập Môi Trường**: Codespace sẽ tự động clone repo và thiết lập VS Code trên đám mây với Node.js sẵn có.
+4. **Cài Đặt Dependencies** (nếu cần): Chạy `npm install` trong terminal của Codespace.
+5. **Chạy Server**: Sử dụng Live Server extension (xem bên dưới) hoặc chạy script `run_local_host.sh` với Node.js option.
+6. **Phát Triển**: Chỉnh sửa code trực tiếp trong Codespace, thay đổi sẽ được sync tự động.
+
+> **Lưu ý**: Codespace có giới hạn thời gian sử dụng miễn phí. Phù hợp cho test nhanh hoặc phát triển không thường xuyên.
+
+### Live Server Extension
+
+Live Server là extension VS Code cung cấp server HTTP đơn giản với tính năng live-reload, thay thế cho Python/Node.js server.
+
+1. **Cài Đặt Extension**: Tìm "[Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer)" trong VS Code Extensions marketplace và cài đặt.
+2. **Mở Project**: Mở thư mục HakoMonetTheme trong VS Code.
+3. **Khởi Chạy Server**: Nhấn chuột phải trên file `index.html` (hoặc bất kỳ file nào) > "Open with Live Server", hoặc sử dụng command palette: "Live Server: Open with Live Server".
+4. **Cấu Hình Port**: Mặc định port 5500. Có thể thay đổi trong settings của extension.
+5. **Test**: Truy cập `http://localhost:5500` (hoặc port đã cấu hình) để xem files. Thay đổi code sẽ tự động reload browser.
+
+> **Lưu ý**: Với userscript, bạn cần cấu hình `resourcePaths` trong `HakoMonetTheme.user.js` để trỏ đến URL của Live Server (ví dụ: `http://localhost:5500/main.js`).
+
 ## Bước 2: Cấu Hình Userscript
 
 ### 1. Mở file `HakoMonetTheme.user.js`
