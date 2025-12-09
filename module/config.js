@@ -150,6 +150,22 @@
         debugLog('Đã phát sự kiện chế độ màu trang thông tin thay đổi:', mode);
     }
 
+    function getProfileColorMode() {
+        return GM_getValue('profile_color_mode', 'default');
+    }
+
+    function setProfileColorMode(mode) {
+        GM_setValue('profile_color_mode', mode);
+        debugLog('Đã lưu chế độ màu trang profile:', mode);
+
+        // Phát sự kiện chế độ màu trang profile thay đổi
+        const modeChangeEvent = new CustomEvent('hmtProfileColorModeChanged', {
+            detail: { mode: mode }
+        });
+        (window.top || window).document.dispatchEvent(modeChangeEvent);
+        debugLog('Đã phát sự kiện chế độ màu trang profile thay đổi:', mode);
+    }
+
     function getExtractColorFromAvatar() {
         const value = GM_getValue('extract_color_from_avatar', false);
         debugLog('getExtractColorFromAvatar() returning:', value);
@@ -1033,9 +1049,17 @@
         <div class="hmt-color-setting">
             <label for="hmt-info-page-color-mode-select">Trang thông tin truyện:</label>
             <select id="hmt-info-page-color-mode-select" class="hmt-info-page-color-mode-select">
-                <option value="default" ${getInfoPageColorMode() === 'default' ? 'selected' : ''}>Mặc định (Màu từ config)</option>
+                <option value="default" ${getInfoPageColorMode() === 'default' ? 'selected' : ''}>Mặc định</option>
                 <option value="avatar" ${getInfoPageColorMode() === 'avatar' ? 'selected' : ''}>Avatar</option>
                 <option value="thumbnail" ${getInfoPageColorMode() === 'thumbnail' ? 'selected' : ''}>Thumbnail</option>
+            </select>
+        </div>
+        <div class="hmt-color-setting">
+            <label for="hmt-profile-color-mode-select">Trang profile:</label>
+            <select id="hmt-profile-color-mode-select" class="hmt-profile-color-mode-select">
+                <option value="default" ${getProfileColorMode() === 'default' ? 'selected' : ''}>Mặc định</option>
+                <option value="avatar" ${getProfileColorMode() === 'avatar' ? 'selected' : ''}>Avatar</option>
+                <option value="banner" ${getProfileColorMode() === 'banner' ? 'selected' : ''}>Banner</option>
             </select>
         </div>
     </div>
@@ -1631,7 +1655,8 @@ ${!isInfoPage() ? `
                  disable_colors_on_reading_page: false,
                  color_mode: 'default',
                  extract_color_from_avatar: false,
-                 info_page_color_mode: 'thumbnail'
+                 info_page_color_mode: 'thumbnail',
+                 profile_color_mode: 'default'
              };
 
              // Cập nhật preview color
