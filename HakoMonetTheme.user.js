@@ -213,6 +213,19 @@ const resourcePaths = {
 
     // Centralized notification function
     function showNotification(title, body, timeout = 5000) {
+        const message = `${title}: ${body}`;
+    
+        // Try to use website's native toast notification first
+        if (typeof Alpine !== 'undefined' && Alpine.store && Alpine.store('toast')) {
+            try {
+                Alpine.store('toast').show(message);
+                return;
+            } catch (e) {
+                Logger.error('main', 'Failed to show native notification:', e);
+            }
+        }
+    
+        // Fallback to GM_notification
         try {
             GM_notification({
                 title: title,
@@ -440,9 +453,10 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
                     10000
                 );
             } else {
+                const failedList = failedResources.join(', ');
                 showNotification(
                     'Cảnh báo',
-                    `Không thể tải ${failedCount} resources: ${failedResources.join(', ')}. Một số tính năng có thể không hoạt động.`,
+                    `Không thể tải ${failedCount} resources sau: ${failedList}. Một số tính năng có thể không hoạt động.`,
                     5000
                 );
             }
