@@ -20,8 +20,6 @@
         } else if (DEBUG) {
             console.log('[ProfileCropper]', ...args);
         }
-        // Always log for debugging
-        console.log('[ProfileCropper]', ...args);
     }
 
     // Cached Cropper.js library
