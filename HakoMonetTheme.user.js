@@ -56,11 +56,11 @@ const resourcePaths = {
     deviceCSSLoaderJS: 'http://localhost:5500/module/device-css-loader.js',
     profileCropperJS: 'http://localhost:5500/module/profile-cropper.js',
     creatorJS: 'http://localhost:5500/module/creator.js',
-    html2canvasJS: 'http://localhost:5500/api/html2canvas.min.js',
-    monetTestJS: 'http://localhost:5500/api/monet-test.js',
-    colorisJS: 'http://localhost:5500/api/coloris.min.js',
-    colorisCSS: 'http://localhost:5500/api/coloris.min.css',
-    colorisColors: 'http://localhost:5500/api/coloris-colors.json',
+    html2canvasJS: 'http://localhost:5500/lib/html2canvas.min.js',
+    monetTestJS: 'http://localhost:5500/lib/monet-test.js',
+    colorisJS: 'http://localhost:5500/lib/coloris.min.js',
+    colorisCSS: 'http://localhost:5500/lib/coloris.min.css',
+    colorisColors: 'http://localhost:5500/lib/coloris-colors.json',
     autoReloadJS: 'http://localhost:5500/module/auto-reload.js'
 };
 
@@ -387,7 +387,7 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
         const resources = [
             // main
             'mainJS',
-            // api
+            // api and libs
             'monetAPIJS', 'monetTestJS', 'updateCheckerJS', 'CORSJS', 'html2canvasJS', 'colorisJS', 'colorisCSS', 'colorisColors',
             // config
             'configJS',
