@@ -45,13 +45,8 @@ function setCustomHostURL() {
         // Reset to default
         GM_deleteValue('custom_host_url');
         hostURL = 'http://localhost:5500';
-        showNotification('Host URL đã reset về mặc định', `Host: ${hostURL}. Đang tải lại trang...`, 3000);
+        showNotification('Host URL đã reset về mặc định', `Host: ${hostURL}. Vui lòng tải lại trang để áp dụng thay đổi.`, 5000);
         debugLog(`Host URL reset to default: ${hostURL}`);
-
-        // Auto reload to apply changes
-        setTimeout(() => {
-            window.location.reload();
-        }, 1000);
     } else if (newHost.trim() !== currentHost) {
         // Basic URL validation
         try {
@@ -214,17 +209,51 @@ const resourcePaths = {
     // Centralized notification function
     function showNotification(title, body, timeout = 5000) {
         const message = `${title}: ${body}`;
-    
+
+        // Auto-detect notification type based on title
+        let type = 'info';
+        if (title.includes('Lỗi') || title.includes('Cảnh báo') || title.includes('Error') || title.includes('thất bại')) {
+            type = 'error';
+        }
+
         // Try to use website's native toast notification first
         if (typeof Alpine !== 'undefined' && Alpine.store && Alpine.store('toast')) {
             try {
                 Alpine.store('toast').show(message);
+
+                if (type === 'error') {
+                    // Change toast colors to red for errors
+                    const toastEl = document.querySelector('[x-show*="toast.on"]');
+                    if (toastEl) {
+                        // Change background, border, and text colors
+                        toastEl.classList.remove('bg-teal-100', 'border-teal-500', 'text-teal-900');
+                        toastEl.classList.add('bg-red-100', 'border-red-500', 'text-red-900');
+
+                        // Change icon color
+                        const svg = toastEl.querySelector('svg');
+                        if (svg) {
+                            svg.classList.remove('text-teal-500');
+                            svg.classList.add('text-red-500');
+                        }
+
+                        // Reset colors back to default after notification timeout + buffer
+                        setTimeout(() => {
+                            toastEl.classList.remove('bg-red-100', 'border-red-500', 'text-red-900');
+                            toastEl.classList.add('bg-teal-100', 'border-teal-500', 'text-teal-900');
+                            if (svg) {
+                                svg.classList.remove('text-red-500');
+                                svg.classList.add('text-teal-500');
+                            }
+                        }, timeout + 1000);
+                    }
+                }
+
                 return;
             } catch (e) {
                 Logger.error('main', 'Failed to show native notification:', e);
             }
         }
-    
+
         // Fallback to GM_notification
         try {
             GM_notification({
