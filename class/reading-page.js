@@ -3,7 +3,7 @@
 
     const DEBUG = GM_getValue('debug_mode', false);
     const IS_LOCAL = GM_info.script.version === 'LocalDev';
-    const FOLDER_URL = IS_LOCAL ? `${GM_getValue('custom_host_url', 'http://localhost:5500')}/styles/` : 'https://sang765.github.io/HakoMonetTheme/styles/';
+    const FOLDER_URL = IS_LOCAL ? 'http://localhost:5500/styles/' : 'https://sang765.github.io/HakoMonetTheme/styles/';
 
     function debugLog(...args) {
         if (DEBUG) {
