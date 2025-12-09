@@ -25,43 +25,84 @@
 // @discord      https://discord.gg/uvQ6A3CDPq
 // ==/UserScript==
 
+// Configurable host URL for development (default localhost:5500)
+let hostURL = GM_getValue('custom_host_url', 'http://localhost:5500');
+
+// Function to get current host URL
+function getHostURL() {
+    return hostURL;
+}
+
+// Function to set custom host URL
+function setCustomHostURL() {
+    const currentHost = getHostURL();
+    const newHost = prompt('Nhập URL host mới (ví dụ: http://localhost:5500):', currentHost);
+
+    if (newHost && newHost.trim() !== currentHost) {
+        // Basic URL validation
+        try {
+            const url = new URL(newHost.trim());
+            if (url.protocol === 'http:' || url.protocol === 'https:') {
+                hostURL = newHost.trim();
+                GM_setValue('custom_host_url', hostURL);
+                showNotification('Host URL đã cập nhật', `Host mới: ${hostURL}. Đang tải lại trang...`, 3000);
+                debugLog(`Host URL changed to: ${hostURL}`);
+
+                // Auto reload to apply changes
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                showNotification('Lỗi', 'URL phải bắt đầu bằng http:// hoặc https://', 5000);
+            }
+        } catch (e) {
+            showNotification('Lỗi', 'URL không hợp lệ. Vui lòng nhập URL đúng định dạng.', 5000);
+        }
+    } else if (newHost === null) {
+        // User cancelled
+        debugLog('Host URL change cancelled');
+    } else {
+        showNotification('Thông tin', 'Host URL không thay đổi.', 3000);
+    }
+}
+
 // Local resource paths for development (hot-reload enabled)
 // Note: For local development, run 'run_local_host.bat' to start a server,
-// then change paths below to use localhost URLs (e.g., 'http://localhost:5500/main.js')
+// then use menu command to set custom host URL (default: http://localhost:5500)
 // For production, keep relative paths './main.js'
 const resourcePaths = {
-    mainJS: 'http://localhost:5500/main.js',
-    monetAPIJS: 'http://localhost:5500/api/monet.js',
-    updateCheckerJS: 'http://localhost:5500/api/update-checker.js',
-    CORSJS: 'http://localhost:5500/module/cors.js',
-    infoTruyenJS: 'http://localhost:5500/class/info-truyen.js',
-    readingPageJS: 'http://localhost:5500/class/reading-page.js',
-    animationJS: 'http://localhost:5500/class/animation.js',
-    tagColorJS: 'http://localhost:5500/class/tag-color.js',
-    fontImportJS: 'http://localhost:5500/class/font-import.js',
-    colorinfotruyen: 'http://localhost:5500/colors/page-info-truyen-dark.js',
-    pagegeneralJS: 'http://localhost:5500/colors/page-general-dark.js',
-    pagegenerallightJS: 'http://localhost:5500/colors/page-general-light.js',
-    colorinfotruyenlight: 'http://localhost:5500/colors/page-info-truyen-light.js',
-    themeDetectorJS: 'http://localhost:5500/module/theme-detector.js',
-    deviceDetectorJS: 'http://localhost:5500/module/device-detector.js',
-    configJS: 'http://localhost:5500/module/config.js',
-    adBlockerJS: 'http://localhost:5500/module/ad-blocker.js',
-    antiPopupJS: 'http://localhost:5500/module/anti-popup.js',
-    mainMenuJS: 'http://localhost:5500/module/main-menu.js',
-    navbarLogoJS: 'http://localhost:5500/module/navbar-logo.js',
-    updateManagerJS: 'http://localhost:5500/module/update-manager.js',
-    fullscreenJS: 'http://localhost:5500/module/fullscreen.js',
-    keyboardShortcutsJS: 'http://localhost:5500/module/keyboard-shortcuts.js',
-    deviceCSSLoaderJS: 'http://localhost:5500/module/device-css-loader.js',
-    profileCropperJS: 'http://localhost:5500/module/profile-cropper.js',
-    creatorJS: 'http://localhost:5500/module/creator.js',
-    html2canvasJS: 'http://localhost:5500/lib/html2canvas.min.js',
-    monetTestJS: 'http://localhost:5500/lib/monet-test.js',
-    colorisJS: 'http://localhost:5500/lib/coloris.min.js',
-    colorisCSS: 'http://localhost:5500/lib/coloris.min.css',
-    colorisColors: 'http://localhost:5500/lib/coloris-colors.json',
-    autoReloadJS: 'http://localhost:5500/module/auto-reload.js'
+    mainJS: `${hostURL}/main.js`,
+    monetAPIJS: `${hostURL}/api/monet.js`,
+    updateCheckerJS: `${hostURL}/api/update-checker.js`,
+    CORSJS: `${hostURL}/module/cors.js`,
+    infoTruyenJS: `${hostURL}/class/info-truyen.js`,
+    readingPageJS: `${hostURL}/class/reading-page.js`,
+    animationJS: `${hostURL}/class/animation.js`,
+    tagColorJS: `${hostURL}/class/tag-color.js`,
+    fontImportJS: `${hostURL}/class/font-import.js`,
+    colorinfotruyen: `${hostURL}/colors/page-info-truyen-dark.js`,
+    pagegeneralJS: `${hostURL}/colors/page-general-dark.js`,
+    pagegenerallightJS: `${hostURL}/colors/page-general-light.js`,
+    colorinfotruyenlight: `${hostURL}/colors/page-info-truyen-light.js`,
+    themeDetectorJS: `${hostURL}/module/theme-detector.js`,
+    deviceDetectorJS: `${hostURL}/module/device-detector.js`,
+    configJS: `${hostURL}/module/config.js`,
+    adBlockerJS: `${hostURL}/module/ad-blocker.js`,
+    antiPopupJS: `${hostURL}/module/anti-popup.js`,
+    mainMenuJS: `${hostURL}/module/main-menu.js`,
+    navbarLogoJS: `${hostURL}/module/navbar-logo.js`,
+    updateManagerJS: `${hostURL}/module/update-manager.js`,
+    fullscreenJS: `${hostURL}/module/fullscreen.js`,
+    keyboardShortcutsJS: `${hostURL}/module/keyboard-shortcuts.js`,
+    deviceCSSLoaderJS: `${hostURL}/module/device-css-loader.js`,
+    profileCropperJS: `${hostURL}/module/profile-cropper.js`,
+    creatorJS: `${hostURL}/module/creator.js`,
+    html2canvasJS: `${hostURL}/lib/html2canvas.min.js`,
+    monetTestJS: `${hostURL}/lib/monet-test.js`,
+    colorisJS: `${hostURL}/lib/coloris.min.js`,
+    colorisCSS: `${hostURL}/lib/coloris.min.css`,
+    colorisColors: `${hostURL}/lib/coloris-colors.json`,
+    autoReloadJS: `${hostURL}/module/auto-reload.js`
 };
 
 (function() {
@@ -213,59 +254,11 @@ const resourcePaths = {
                 }
             }, 'm');
             GM_registerMenuCommand('📊 Thông tin script', showScriptInfo, 'i');
+            GM_registerMenuCommand('🔗 Cài đặt Host URL', setCustomHostURL, 'h');
 
             debugLog('Đã đăng ký menu commands');
         }
     }
-    
-    function openSettings() {
-        // Mở trang cài đặt hoặc tạo dialog settings
-        showNotification('Cài đặt', 'Tính năng cài đặt đang được phát triển.', 3000);
-        debugLog('Mở cài đặt');
-
-        // Có thể tích hợp với GM_config sau này
-        try {
-            if (typeof GM_config !== 'undefined') {
-                GM_config.open();
-            }
-        } catch (e) {
-            debugLog('GM_config không khả dụng:', e);
-        }
-    }
-
-    function openColorConfig() {
-        // Đảm bảo config module đã được tải
-        if (typeof window.HMTConfig !== 'undefined' && typeof window.HMTConfig.openConfigDialog === 'function') {
-            window.HMTConfig.openConfigDialog();
-            showNotification('Cài đặt màu sắc', 'Mở bảng cài đặt màu sắc...', 3000);
-        } else {
-            showNotification('Lỗi', 'Module cài đặt màu sắc chưa được tải. Vui lòng làm mới trang.', 5000);
-            debugLog('Config module chưa được tải');
-        }
-    }
-
-    function openAdBlockerConfig() {
-        // Đảm bảo ad blocker module đã được tải
-        if (typeof window.HMTAdBlocker !== 'undefined' && typeof window.HMTAdBlocker.openDialog === 'function') {
-            window.HMTAdBlocker.openDialog();
-            showNotification('Ad Blocker', 'Mở bảng cài đặt Ad Blocker...', 3000);
-        } else {
-            showNotification('Lỗi', 'Module Ad Blocker chưa được tải. Vui lòng làm mới trang.', 5000);
-            debugLog('Ad Blocker module chưa được tải');
-        }
-    }
-
-    function openAntiPopupConfig() {
-        // Đảm bảo anti-popup module đã được tải
-        if (typeof window.HMTAntiPopup !== 'undefined' && typeof window.HMTAntiPopup.openDialog === 'function') {
-            window.HMTAntiPopup.openDialog();
-            showNotification('Anti-Popup', 'Mở bảng cài đặt Anti-Popup...', 3000);
-        } else {
-            showNotification('Lỗi', 'Module Anti-Popup chưa được tải. Vui lòng làm mới trang.', 5000);
-            debugLog('Anti-Popup module chưa được tải');
-        }
-    }
-    
 
     function getCurrentVersion() {
         try {

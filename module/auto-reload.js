@@ -52,7 +52,8 @@
                 let hasChanges = false;
 
                 for (const file of filesToCheck) {
-                    const response = await fetch(window.location.origin + file + '?' + Date.now(), {
+                    const hostURL = GM_getValue('custom_host_url', 'http://localhost:5500');
+                    const response = await fetch(hostURL + file + '?' + Date.now(), {
                         method: 'HEAD',
                         cache: 'no-cache'
                     });
