@@ -181,7 +181,7 @@ const resourcePaths = {
     // Auto-reload functionality for local development
     function setupAutoReload() {
         try {
-            const ws = new WebSocket('ws://localhost:8080');
+            const ws = new WebSocket('ws://localhost:5500');
             ws.onopen = () => {
                 Logger.log('main', 'Connected to auto-reload server');
             };
@@ -348,11 +348,20 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
                 onload: function(response) {
                     if (response.status === 200) {
                         try {
-                            eval(response.responseText);
-                            Logger.success('main', `Loaded ${resourceName}`);
+                            // Handle CSS files differently - inject as style instead of eval
+                            if (path.endsWith('.css') || resourceName.includes('CSS')) {
+                                const style = document.createElement('style');
+                                style.textContent = response.responseText;
+                                style.setAttribute('data-resource', resourceName);
+                                document.head.appendChild(style);
+                                Logger.success('main', `Injected CSS for ${resourceName}`);
+                            } else {
+                                eval(response.responseText);
+                                Logger.success('main', `Loaded ${resourceName}`);
+                            }
                             resolve(resourceName);
                         } catch (error) {
-                            Logger.error('main', `Eval error for ${resourceName}:`, error);
+                            Logger.error('main', `Error processing ${resourceName}:`, error);
                             reject(error);
                         }
                     } else {
