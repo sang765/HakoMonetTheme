@@ -11,7 +11,7 @@
     }
 
     // Base URL for device CSS files
-    const FOLDER_URL = IS_LOCAL ? 'http://localhost:5500/styles/device/' : 'https://sang765.github.io/HakoMonetTheme/styles/device/';
+    const FOLDER_URL = IS_LOCAL ? 'http://localhost:8080/styles/device/' : 'https://sang765.github.io/HakoMonetTheme/styles/device/';
 
     // Add timestamp to force reload in local development
     const CACHE_BUSTER = IS_LOCAL ? '?t=' + Date.now() : '';
