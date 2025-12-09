@@ -3,7 +3,7 @@
 
     const DEBUG = GM_getValue('debug_mode', false);
     const IS_LOCAL = GM_info.script.version === 'LocalDev';
-    const FOLDER_URL = IS_LOCAL ? 'http://localhost:8080/styles/' : 'https://sang765.github.io/HakoMonetTheme/styles/';
+    const FOLDER_URL = IS_LOCAL ? 'http://localhost:5500/styles/' : 'https://sang765.github.io/HakoMonetTheme/styles/';
     const CSS_FILE = 'userscript/configmenu/hmt-config-menu.css';
     const CSS_MAP_FILE = 'userscript/configmenu/hmt-config-menu.css.map';
 
@@ -11,9 +11,9 @@
     let cachedCssBlobUrl = null;
 
     // Coloris library URLs (local versions for userscript compatibility)
-    const COLORIS_CSS_URL = IS_LOCAL ? 'http://localhost:8080/api/coloris.min.css' : 'https://sang765.github.io/HakoMonetTheme/api/coloris.min.css';
-    const COLORIS_JS_URL = IS_LOCAL ? 'http://localhost:8080/api/coloris.min.js' : 'https://sang765.github.io/HakoMonetTheme/api/coloris.min.js';
-    const COLORIS_COLORS_URL = IS_LOCAL ? 'http://localhost:8080/api/coloris-colors.json' : 'https://sang765.github.io/HakoMonetTheme/api/coloris-colors.json';
+    const COLORIS_CSS_URL = IS_LOCAL ? `${GM_getValue('custom_host_url', 'http://localhost:5500')}/api/coloris.min.css` : 'https://sang765.github.io/HakoMonetTheme/api/coloris.min.css';
+    const COLORIS_JS_URL = IS_LOCAL ? `${GM_getValue('custom_host_url', 'http://localhost:5500')}/api/coloris.min.js` : 'https://sang765.github.io/HakoMonetTheme/api/coloris.min.js';
+    const COLORIS_COLORS_URL = IS_LOCAL ? `${GM_getValue('custom_host_url', 'http://localhost:5500')}/api/coloris-colors.json` : 'https://sang765.github.io/HakoMonetTheme/api/coloris-colors.json';
 
     // Cached Coloris resources
     let cachedColorisCss = null;

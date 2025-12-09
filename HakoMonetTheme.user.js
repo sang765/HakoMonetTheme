@@ -55,11 +55,11 @@
 // @resource     fullscreenJS ./module/fullscreen.js
 // @resource     deviceCSSLoaderJS ./module/device-css-loader.js
 // @resource     profileCropperJS ./module/profile-cropper.js
-// @resource     html2canvasJS ./api/html2canvas.min.js
+// @resource     html2canvasJS ./lib/html2canvas.min.js
 // @resource     monetTestJS ./api/monet-test.js
-// @resource     colorisJS ./api/coloris.min.js
-// @resource     colorisCSS ./api/coloris.min.css
-// @resource     colorisColors ./api/coloris-colors.json
+// @resource     colorisJS ./lib/coloris.min.js
+// @resource     colorisCSS ./lib/coloris.min.css
+// @resource     colorisColors ./lib/coloris-colors.json
 // @resource     keyboardShortcutsJS ./module/keyboard-shortcuts.js
 // @connect      html2canvas.hertzen.com
 // @connect      hertzen.com
@@ -262,7 +262,7 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
         const resources = [
             // main
             'mainJS',
-            // api
+            // api và lib
             'monetAPIJS', 'monetTestJS', 'updateCheckerJS', 'CORSJS', 'html2canvasJS', 'colorisJS', 'colorisCSS', 'colorisColors',
             // config
             'configJS',
