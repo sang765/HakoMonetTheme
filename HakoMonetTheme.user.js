@@ -25,90 +25,40 @@
 // @discord      https://discord.gg/uvQ6A3CDPq
 // ==/UserScript==
 
-// Configurable host URL for development (default localhost:5500)
-let hostURL = GM_getValue('custom_host_url', 'http://localhost:5500');
-
-// Function to get current host URL
-function getHostURL() {
-    return hostURL;
-}
-
-// Function to set custom host URL
-function setCustomHostURL() {
-    const currentHost = getHostURL();
-    const newHost = prompt('Nhập URL host mới (ví dụ: http://localhost:5500):', currentHost);
-
-    if (newHost === null) {
-        // User cancelled
-        debugLog('Host URL change cancelled');
-    } else if (newHost.trim() === '') {
-        // Reset to default
-        GM_deleteValue('custom_host_url');
-        hostURL = 'http://localhost:5500';
-        showNotification('Host URL đã reset về mặc định', `Host: ${hostURL}. Vui lòng tải lại trang để áp dụng thay đổi.`, 5000);
-        debugLog(`Host URL reset to default: ${hostURL}`);
-    } else if (newHost.trim() !== currentHost) {
-        // Basic URL validation
-        try {
-            const url = new URL(newHost.trim());
-            if (url.protocol === 'http:' || url.protocol === 'https:') {
-                hostURL = newHost.trim();
-                GM_setValue('custom_host_url', hostURL);
-                showNotification('Host URL đã cập nhật', `Host mới: ${hostURL}. Đang tải lại trang...`, 3000);
-                debugLog(`Host URL changed to: ${hostURL}`);
-
-                // Auto reload to apply changes
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
-            } else {
-                showNotification('Lỗi', 'URL phải bắt đầu bằng http:// hoặc https://', 5000);
-            }
-        } catch (e) {
-            showNotification('Lỗi', 'URL không hợp lệ. Vui lòng nhập URL đúng định dạng.', 5000);
-        }
-    } else {
-        showNotification('Thông tin', 'Host URL không thay đổi.', 3000);
-    }
-}
-
-// Local resource paths for development (hot-reload enabled)
-// Note: For local development, run 'run_local_host.bat' to start a server,
-// then use menu command to set custom host URL (default: http://localhost:5500)
-// For production, keep relative paths './main.js'
+// Resource paths using relative paths
 const resourcePaths = {
-    mainJS: `${hostURL}/main.js`,
-    monetAPIJS: `${hostURL}/api/monet.js`,
-    updateCheckerJS: `${hostURL}/api/update-checker.js`,
-    CORSJS: `${hostURL}/module/cors.js`,
-    infoTruyenJS: `${hostURL}/class/info-truyen.js`,
-    readingPageJS: `${hostURL}/class/reading-page.js`,
-    animationJS: `${hostURL}/class/animation.js`,
-    tagColorJS: `${hostURL}/class/tag-color.js`,
-    fontImportJS: `${hostURL}/class/font-import.js`,
-    colorinfotruyen: `${hostURL}/colors/page-info-truyen-dark.js`,
-    pagegeneralJS: `${hostURL}/colors/page-general-dark.js`,
-    pagegenerallightJS: `${hostURL}/colors/page-general-light.js`,
-    colorinfotruyenlight: `${hostURL}/colors/page-info-truyen-light.js`,
-    themeDetectorJS: `${hostURL}/module/theme-detector.js`,
-    deviceDetectorJS: `${hostURL}/module/device-detector.js`,
-    configJS: `${hostURL}/module/config.js`,
-    adBlockerJS: `${hostURL}/module/ad-blocker.js`,
-    antiPopupJS: `${hostURL}/module/anti-popup.js`,
-    mainMenuJS: `${hostURL}/module/main-menu.js`,
-    navbarLogoJS: `${hostURL}/module/navbar-logo.js`,
-    updateManagerJS: `${hostURL}/module/update-manager.js`,
-    fullscreenJS: `${hostURL}/module/fullscreen.js`,
-    keyboardShortcutsJS: `${hostURL}/module/keyboard-shortcuts.js`,
-    deviceCSSLoaderJS: `${hostURL}/module/device-css-loader.js`,
-    profileCropperJS: `${hostURL}/module/profile-cropper.js`,
-    creatorJS: `${hostURL}/module/creator.js`,
-    html2canvasJS: `${hostURL}/lib/html2canvas.min.js`,
-    monetTestJS: `${hostURL}/lib/monet-test.js`,
-    colorisJS: `${hostURL}/lib/coloris.min.js`,
-    colorisCSS: `${hostURL}/lib/coloris.min.css`,
-    colorisColors: `${hostURL}/lib/coloris-colors.json`,
-    autoReloadJS: `${hostURL}/module/auto-reload.js`
+    mainJS: 'http://localhost:5500/main.js',
+    monetAPIJS: 'http://localhost:5500/api/monet.js',
+    updateCheckerJS: 'http://localhost:5500/api/update-checker.js',
+    CORSJS: 'http://localhost:5500/module/cors.js',
+    infoTruyenJS: 'http://localhost:5500/class/info-truyen.js',
+    readingPageJS: 'http://localhost:5500/class/reading-page.js',
+    animationJS: 'http://localhost:5500/class/animation.js',
+    tagColorJS: 'http://localhost:5500/class/tag-color.js',
+    fontImportJS: 'http://localhost:5500/class/font-import.js',
+    colorinfotruyen: 'http://localhost:5500/colors/page-info-truyen-dark.js',
+    pagegeneralJS: 'http://localhost:5500/colors/page-general-dark.js',
+    pagegenerallightJS: 'http://localhost:5500/colors/page-general-light.js',
+    colorinfotruyenlight: 'http://localhost:5500/colors/page-info-truyen-light.js',
+    themeDetectorJS: 'http://localhost:5500/module/theme-detector.js',
+    deviceDetectorJS: 'http://localhost:5500/module/device-detector.js',
+    configJS: 'http://localhost:5500/module/config.js',
+    adBlockerJS: 'http://localhost:5500/module/ad-blocker.js',
+    antiPopupJS: 'http://localhost:5500/module/anti-popup.js',
+    mainMenuJS: 'http://localhost:5500/module/main-menu.js',
+    navbarLogoJS: 'http://localhost:5500/module/navbar-logo.js',
+    updateManagerJS: 'http://localhost:5500/module/update-manager.js',
+    fullscreenJS: 'http://localhost:5500/module/fullscreen.js',
+    keyboardShortcutsJS: 'http://localhost:5500/module/keyboard-shortcuts.js',
+    deviceCSSLoaderJS: 'http://localhost:5500/module/device-css-loader.js',
+    profileCropperJS: 'http://localhost:5500/module/profile-cropper.js',
+    creatorJS: 'http://localhost:5500/module/creator.js',
+    html2canvasJS: 'http://localhost:5500/lib/html2canvas.min.js',
+    monetTestJS: 'http://localhost:5500/lib/monet-test.js',
+    colorisJS: 'http://localhost:5500/lib/coloris.min.js',
+    colorisCSS: 'http://localhost:5500/lib/coloris.min.css',
+    colorisColors: 'http://localhost:5500/lib/coloris-colors.json',
+    autoReloadJS: 'http://localhost:5500/module/auto-reload.js'
 };
 
 (function() {
@@ -238,30 +188,6 @@ const resourcePaths = {
     // Expose Logger globally for modules
     window.Logger = Logger;
 
-    // Auto-reload functionality for local development
-    function setupAutoReload() {
-        try {
-            const ws = new WebSocket('ws://localhost:5500');
-            ws.onopen = () => {
-                Logger.log('main', 'Connected to auto-reload server');
-            };
-            ws.onmessage = (event) => {
-                if (event.data === 'reload') {
-                    Logger.log('main', 'Received reload signal, refreshing page...');
-                    window.location.reload();
-                }
-            };
-            ws.onclose = () => {
-                Logger.log('main', 'Disconnected from auto-reload server');
-            };
-            ws.onerror = (error) => {
-                Logger.debug('main', 'WebSocket error (server may not be running):', error);
-            };
-        } catch (error) {
-            Logger.debug('main', 'Failed to setup auto-reload:', error);
-        }
-    }
-
     function registerMenuCommands() {
         if (typeof GM_registerMenuCommand === 'function') {
             GM_registerMenuCommand('📋 Menu chính', function() {
@@ -273,8 +199,6 @@ const resourcePaths = {
                 }
             }, 'm');
             GM_registerMenuCommand('📊 Thông tin script', showScriptInfo, 'i');
-            GM_registerMenuCommand('🔗 Cài đặt Host URL', setCustomHostURL, 'h');
-
             debugLog('Đã đăng ký menu commands');
         }
     }
@@ -544,9 +468,6 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
 
         // Đăng ký menu commands
         registerMenuCommands();
-
-        // Setup auto-reload for local development
-        setupAutoReload();
 
         // Tải tất cả resources
         const { loadedCount } = await loadAllResources();
