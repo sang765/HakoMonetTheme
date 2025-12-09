@@ -38,7 +38,21 @@ function setCustomHostURL() {
     const currentHost = getHostURL();
     const newHost = prompt('Nhập URL host mới (ví dụ: http://localhost:5500):', currentHost);
 
-    if (newHost && newHost.trim() !== currentHost) {
+    if (newHost === null) {
+        // User cancelled
+        debugLog('Host URL change cancelled');
+    } else if (newHost.trim() === '') {
+        // Reset to default
+        GM_deleteValue('custom_host_url');
+        hostURL = 'http://localhost:5500';
+        showNotification('Host URL đã reset về mặc định', `Host: ${hostURL}. Đang tải lại trang...`, 3000);
+        debugLog(`Host URL reset to default: ${hostURL}`);
+
+        // Auto reload to apply changes
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
+    } else if (newHost.trim() !== currentHost) {
         // Basic URL validation
         try {
             const url = new URL(newHost.trim());
@@ -58,9 +72,6 @@ function setCustomHostURL() {
         } catch (e) {
             showNotification('Lỗi', 'URL không hợp lệ. Vui lòng nhập URL đúng định dạng.', 5000);
         }
-    } else if (newHost === null) {
-        // User cancelled
-        debugLog('Host URL change cancelled');
     } else {
         showNotification('Thông tin', 'Host URL không thay đổi.', 3000);
     }
