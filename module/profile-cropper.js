@@ -23,31 +23,6 @@
         // Always log for debugging
         console.log('[ProfileCropper]', ...args);
     }
-    function isAnimatedWebP(file) {
-        return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const buffer = e.target.result;
-                const dataView = new DataView(buffer);
-                if (dataView.getUint32(0, false) !== 0x52494646) { // 'RIFF'
-                    resolve(false);
-                    return;
-                }
-                let offset = 12; // after 'WEBP'
-                while (offset < buffer.byteLength - 8) {
-                    const chunkType = String.fromCharCode(dataView.getUint8(offset), dataView.getUint8(offset+1), dataView.getUint8(offset+2), dataView.getUint8(offset+3));
-                    if (chunkType === 'ANIM') {
-                        resolve(true);
-                        return;
-                    }
-                    const chunkSize = dataView.getUint32(offset + 4, true);
-                    offset += 8 + chunkSize;
-                }
-                resolve(false);
-            };
-            reader.readAsArrayBuffer(file);
-        });
-    }
 
     // Cached Cropper.js library
     let cachedCropperJs = null;
@@ -108,30 +83,6 @@
             })
             .catch(error => {
                 debugLog('Error loading Cropper.js library:', error);
-                reject(error);
-            });
-        });
-    }
-
-    /**
-     * Load LibWebP library for handling WEBP animations
-     */
-    function loadLibWebP() {
-        return new Promise((resolve, reject) => {
-            if (typeof LibWebP !== 'undefined') {
-                debugLog('LibWebP already loaded');
-                resolve();
-                return;
-            }
-
-            fetch('https://cdn.jsdelivr.net/npm/libwebpjs@0.6.0/libwebpjs.js').then(r => r.text()).then(js => {
-                const script = document.createElement('script');
-                script.textContent = js;
-                document.head.appendChild(script);
-                debugLog('LibWebP loaded');
-                resolve();
-            }).catch(error => {
-                debugLog('Error loading LibWebP:', error);
                 reject(error);
             });
         });
@@ -544,85 +495,25 @@
                 }
 
                 debugLog('Converting canvas to blob');
-                isAnimatedWebP(imageFile).then(isAnimated => {
-                    if (isAnimated) {
-                        debugLog('Animated WEBP detected, using LibWebP for cropping');
-                        loadLibWebP().then(() => {
-                            LibWebP.decode(imageFile).then(frames => {
-                                const cropData = cropper.getData();
-                                let targetWidth = cropData.width;
-                                let targetHeight = cropData.height;
-                                if (targetWidth < minWidth || targetHeight < minHeight) {
-                                    targetWidth = minWidth;
-                                    targetHeight = minHeight;
-                                }
-                                const croppedFrames = frames.map(frame => {
-                                    const canvas = document.createElement('canvas');
-                                    canvas.width = targetWidth;
-                                    canvas.height = targetHeight;
-                                    const ctx = canvas.getContext('2d');
-                                    ctx.imageSmoothingEnabled = true;
-                                    ctx.imageSmoothingQuality = 'high';
-                                    ctx.drawImage(frame, -cropData.x, -cropData.y, cropData.width, cropData.height, 0, 0, targetWidth, targetHeight);
-                                    return canvas;
-                                });
-                                LibWebP.encode(croppedFrames, { quality: 80 }).then(blob => {
-                                    const croppedFile = new File([blob], imageFile.name, {
-                                        type: 'image/webp',
-                                        lastModified: Date.now()
-                                    });
-                                    debugLog('Cropped animated WEBP created:', croppedFile.size, 'bytes');
-                                    uploadBtn.disabled = true;
-                                    uploadBtn.textContent = 'Đang upload...';
-                                    callback(croppedFile, closeModal, uploadBtn);
-                                }).catch(error => {
-                                    debugLog('Error encoding cropped WEBP:', error);
-                                    showNotification('Không thể cắt ảnh WEBP động.', 5000);
-                                });
-                            }).catch(error => {
-                                debugLog('Error decoding WEBP:', error);
-                                showNotification('Không thể xử lý ảnh WEBP động.', 5000);
-                            });
-                        }).catch(error => {
-                            debugLog('Error loading LibWebP:', error);
-                            showNotification('Không thể tải thư viện xử lý WEBP.', 5000);
-                        });
-                    } else {
-                        canvas.toBlob(function(blob) {
-                            if (!blob) {
-                                debugLog('Failed to create blob from canvas');
-                                showNotification('Không thể tạo ảnh đã cắt.', 5000);
-                                return;
-                            }
-                            const croppedFile = new File([blob], imageFile.name, {
-                                type: 'image/png',
-                                lastModified: Date.now()
-                            });
-                            debugLog('Cropped image created:', croppedFile.size, 'bytes');
-                            uploadBtn.disabled = true;
-                            uploadBtn.textContent = 'Đang upload...';
-                            callback(croppedFile, closeModal, uploadBtn);
-                        }, 'image/png');
+                canvas.toBlob(function(blob) {
+                    if (!blob) {
+                        debugLog('Failed to create blob from canvas');
+                        showNotification('Không thể tạo ảnh đã cắt.', 5000);
+                        return;
                     }
-                }).catch(error => {
-                    debugLog('Error checking if animated WEBP:', error);
-                    // Fallback to normal
-                    canvas.toBlob(function(blob) {
-                        if (!blob) {
-                            debugLog('Failed to create blob from canvas');
-                            showNotification('Không thể tạo ảnh đã cắt.', 5000);
-                            return;
-                        }
-                        const croppedFile = new File([blob], imageFile.name, {
-                            type: 'image/png',
-                            lastModified: Date.now()
-                        });
-                        debugLog('Cropped image created:', croppedFile.size, 'bytes');
-                        uploadBtn.disabled = true;
-                        uploadBtn.textContent = 'Đang upload...';
-                        callback(croppedFile, closeModal, uploadBtn);
-                    }, 'image/png');
-                });
+
+                    const croppedFile = new File([blob], imageFile.name, {
+                        type: 'image/png',
+                        lastModified: Date.now()
+                    });
+
+                    debugLog('Cropped image created:', croppedFile.size, 'bytes');
+
+                    // Disable button and call callback with cropped file, closeModal function, and button
+                    uploadBtn.disabled = true;
+                    uploadBtn.textContent = 'Đang upload...';
+                    callback(croppedFile, closeModal, uploadBtn);
+                }, 'image/png');
             } else {
                 debugLog('Failed to get cropped canvas');
                 showNotification('Không thể tạo canvas đã cắt.', 5000);
