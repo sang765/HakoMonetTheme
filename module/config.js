@@ -1610,6 +1610,13 @@ ${!isInfoPage() ? `
                       debugLog('[Config] Lưu chế độ màu trang info:', infoPageColorModeSelect.value);
                   }
 
+                  // Lưu chế độ màu profile
+                  const profileColorModeSelect = dialog.querySelector('#hmt-profile-color-mode-select');
+                  if (profileColorModeSelect) {
+                      setProfileColorMode(profileColorModeSelect.value);
+                      debugLog('[Config] Lưu chế độ màu trang profile:', profileColorModeSelect.value);
+                  }
+
                   // Thực sự lưu màu vào storage và phát sự kiện chính thức
                   if (isInfoPage()) {
                       setInfoPageDefaultColor(selectedColor);
@@ -1705,6 +1712,12 @@ ${!isInfoPage() ? `
              const infoPageColorModeSelect = dialog.querySelector('#hmt-info-page-color-mode-select');
              if (infoPageColorModeSelect) {
                  infoPageColorModeSelect.value = defaultSettings.info_page_color_mode;
+             }
+
+             // Reset profile color mode dropdown
+             const profileColorModeSelect = dialog.querySelector('#hmt-profile-color-mode-select');
+             if (profileColorModeSelect) {
+                 profileColorModeSelect.value = defaultSettings.profile_color_mode;
              }
 
              // Hiển thị lại custom color section
@@ -1809,6 +1822,15 @@ ${!isInfoPage() ? `
             });
         }
 
+        // Profile color mode dropdown
+        const profileColorModeSelect = dialog.querySelector('#hmt-profile-color-mode-select');
+        if (profileColorModeSelect) {
+            profileColorModeSelect.addEventListener('change', function() {
+                setProfileColorMode(this.value);
+                showNotification('Đã cập nhật chế độ màu trang profile!', 3000);
+            });
+        }
+
         // Đóng khi nhấn ESC
         (window.top || window).document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
@@ -1875,6 +1897,8 @@ ${!isInfoPage() ? `
         setExtractColorFromAvatar: setExtractColorFromAvatar,
         getInfoPageColorMode: getInfoPageColorMode,
         setInfoPageColorMode: setInfoPageColorMode,
+        getProfileColorMode: getProfileColorMode,
+        setProfileColorMode: setProfileColorMode,
         getUseProxy: getUseProxy,
         setUseProxy: setUseProxy,
         getPreferredProxy: getPreferredProxy,

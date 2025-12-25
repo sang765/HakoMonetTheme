@@ -40,6 +40,8 @@ const resourcePaths = {
     pagegeneralJS: 'http://localhost:5500/colors/page-general-dark.js',
     pagegenerallightJS: 'http://localhost:5500/colors/page-general-light.js',
     colorinfotruyenlight: 'http://localhost:5500/colors/page-info-truyen-light.js',
+    pageprofileJS: 'http://localhost:5500/colors/page-profile-dark.js',
+    pageprofilelightJS: 'http://localhost:5500/colors/page-profile-light.js',
     themeDetectorJS: 'http://localhost:5500/module/theme-detector.js',
     deviceDetectorJS: 'http://localhost:5500/module/device-detector.js',
     configJS: 'http://localhost:5500/module/config.js',
@@ -95,6 +97,8 @@ const resourcePaths = {
             pageGeneralLight: '[PageGeneralLight]',
             pageInfoTruyen: '[PageInfoTruyen]',
             pageInfoTruyenLight: '[PageInfoTruyenLight]',
+            pageProfile: '[PageProfile]',
+            pageProfileLight: '[PageProfileLight]',
             corsMaster: '[CORSMaster]',
             autoReload: '[AutoReload]'
         },
@@ -336,6 +340,7 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
             // css modules
             'deviceCSSLoaderJS', 'infoTruyenJS', 'tagColorJS', 'fontImportJS', 'animationJS',
             'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyen', 'colorinfotruyenlight',
+            'pageprofileJS', 'pageprofilelightJS',
             'navbarLogoJS', 'readingPageJS',
         ];
 
