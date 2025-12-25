@@ -11,9 +11,9 @@
     let cachedCssBlobUrl = null;
 
     // Coloris library URLs (local versions for userscript compatibility)
-    const COLORIS_CSS_URL = IS_LOCAL ? 'http://localhost:5500/api/coloris.min.css' : 'https://sang765.github.io/HakoMonetTheme/api/coloris.min.css';
-    const COLORIS_JS_URL = IS_LOCAL ? 'http://localhost:5500/api/coloris.min.js' : 'https://sang765.github.io/HakoMonetTheme/api/coloris.min.js';
-    const COLORIS_COLORS_URL = IS_LOCAL ? 'http://localhost:5500/api/coloris-colors.json' : 'https://sang765.github.io/HakoMonetTheme/api/coloris-colors.json';
+    const COLORIS_CSS_URL = IS_LOCAL ? 'http://localhost:5500/lib/coloris.min.css' : 'https://sang765.github.io/HakoMonetTheme/lib/coloris.min.css';
+    const COLORIS_JS_URL = IS_LOCAL ? 'http://localhost:5500/lib/coloris.min.js' : 'https://sang765.github.io/HakoMonetTheme/lib/coloris.min.js';
+    const COLORIS_COLORS_URL = IS_LOCAL ? 'http://localhost:5500/lib/coloris-colors.json' : 'https://sang765.github.io/HakoMonetTheme/lib/coloris-colors.json';
 
     // Cached Coloris resources
     let cachedColorisCss = null;
