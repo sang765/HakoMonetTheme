@@ -72,7 +72,7 @@ Github Codespace cho phép phát triển trực tiếp trên đám mây mà khô
 6. **Phát Triển**: Chỉnh sửa code trực tiếp trong Codespace, thay đổi sẽ được sync tự động.
 
 > **Lưu ý**: Codespace có giới hạn thời gian sử dụng miễn phí. Phù hợp cho test nhanh hoặc phát triển không thường xuyên.
-> Bạn cần cấu hình `resourcePaths` trong `HakoMonetTheme.user.js` và **các module** để trỏ đến URL của Codespace (ví dụ: `https://<your-codespace-url>/main.js`).
+> Sau khi start server, sử dụng GM command "🔧 Set Custom Host URL" để cấu hình URL của Codespace.
 
 ### Live Server Extension (Recommended dành cho người dùng VS Code)
 
@@ -84,36 +84,28 @@ Live Server là extension VS Code cung cấp server HTTP đơn giản với tín
 4. **Cấu Hình Port**: Mặc định port 5500. Có thể thay đổi trong settings của extension.
 5. **Test**: Truy cập `http://localhost:5500` (hoặc port đã cấu hình) để xem files. Thay đổi code sẽ tự động reload browser.
 
-> **Lưu ý**: Với userscript, bạn cần cấu hình `resourcePaths` trong `HakoMonetTheme.user.js` và **các module** để trỏ đến URL của Live Server (ví dụ: `http://localhost:5500/main.js`).
+> **Lưu ý**: Sau khi start Live Server, sử dụng GM command "🔧 Set Custom Host URL" để cấu hình `http://localhost:5500` (hoặc port đã cấu hình).
 
 ## Bước 2: Cấu Hình Userscript
 
-### 1. Mở file `HakoMonetTheme.user.js`
-Tìm phần `resourcePaths` (khoảng dòng 34-66)
-
-### 2. Thay đổi paths từ relative sang localhost
-**Trước (production):**
-```javascript
-const resourcePaths = {
-    mainJS: './main.js',
-    // ...
-};
-```
-
-**Sau (local development):**
-```javascript
-const resourcePaths = {
-    mainJS: 'http://localhost:8000/main.js',
-    monetAPIJS: 'http://localhost:8000/api/monet.js',
-    // ... thay tất cả paths
-};
-```
-
-> **Lưu ý**: Nếu dùng Node.js server, đổi thành `http://localhost:5500/`
-
-### 3. Import vào Userscript Manager
+### 1. Import Userscript
 - **Tampermonkey/Violentmonkey**: Import file `HakoMonetTheme.user.js`
 - **Greasemonkey**: Cần cấu hình thêm để cho phép localhost
+
+### 2. Cấu Hình URL Host (Tự Động)
+Userscript đã được cấu hình sẵn để sử dụng URL host có thể tùy chỉnh:
+
+1. Sau khi import, truy cập trang target (ln.hako.vn, docln.net, hoặc docln.sbs)
+2. Mở menu userscript (icon userscript ở góc phải trên cùng)
+3. Chọn **"🔧 Set Custom Host URL"**
+4. Nhập URL của server local:
+   - Python server: `http://localhost:8000`
+   - Node.js server: `http://localhost:8080`
+   - Live Server: `http://localhost:5500`
+   - Codespace: URL được cung cấp bởi Codespace
+5. Xác nhận và reload trang
+
+> **Lưu ý**: URL sẽ được lưu tự động và áp dụng cho tất cả các file. Không cần chỉnh sửa code thủ công nữa!
 
 ## Bước 3: Test Hot-Reload
 
@@ -141,8 +133,8 @@ const resourcePaths = {
 
 ### Lỗi "Failed to load resource"
 - Kiểm tra server có đang chạy không
-- Đúng port (8000 cho Python, 8080 cho Node.js)
-- Paths trong `resourcePaths` đúng URL localhost
+- Kiểm tra URL host đã được cấu hình đúng trong GM command "🔧 Set Custom Host URL"
+- Đúng port (8000 cho Python, 8080 cho Node.js, 5500 cho Live Server)
 
 ### Lỗi CORS
 - Đảm bảo userscript manager cho phép localhost
@@ -196,8 +188,8 @@ Nếu bạn gặp lỗi từ Cloudflare về rate limit khi truy cập các tran
 ## Chuyển Về Production
 
 Khi muốn dùng bản production:
-1. Thay đổi lại `resourcePaths` về relative paths (`'./main.js'`)
-2. Import lại userscript từ GitHub
+1. Sử dụng GM command "🔧 Set Custom Host URL" và nhập URL production (hoặc để trống để reset về mặc định)
+2. Hoặc import lại userscript từ GitHub (sẽ tự động dùng relative paths)
 
 ---
 

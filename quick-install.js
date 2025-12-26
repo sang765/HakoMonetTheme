@@ -1,5 +1,6 @@
 const { exec } = require('child_process');
-const installUrl = 'http://localhost:5500/HakoMonetTheme.user.js';
+const baseUrl = process.env.HMT_BASE_URL || 'http://localhost:5500';
+const installUrl = `${baseUrl}/HakoMonetTheme.user.js`;
 
 console.log('Opening HakoMonetTheme install link...');
 console.log(`URL: ${installUrl}`);

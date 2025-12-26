@@ -25,49 +25,55 @@
 // @discord      https://discord.gg/uvQ6A3CDPq
 // ==/UserScript==
 
-// Resource paths using relative paths
-const resourcePaths = {
-    mainJS: 'http://localhost:5500/main.js',
-    monetAPIJS: 'http://localhost:5500/api/monet.js',
-    updateCheckerJS: 'http://localhost:5500/api/update-checker.js',
-    CORSJS: 'http://localhost:5500/module/cors.js',
-    infoTruyenJS: 'http://localhost:5500/class/info-truyen.js',
-    readingPageJS: 'http://localhost:5500/class/reading-page.js',
-    animationJS: 'http://localhost:5500/class/animation.js',
-    tagColorJS: 'http://localhost:5500/class/tag-color.js',
-    fontImportJS: 'http://localhost:5500/class/font-import.js',
-    colorinfotruyen: 'http://localhost:5500/colors/page-info-truyen-dark.js',
-    pagegeneralJS: 'http://localhost:5500/colors/page-general-dark.js',
-    pagegenerallightJS: 'http://localhost:5500/colors/page-general-light.js',
-    colorinfotruyenlight: 'http://localhost:5500/colors/page-info-truyen-light.js',
-    pageprofileJS: 'http://localhost:5500/colors/page-profile-dark.js',
-    pageprofilelightJS: 'http://localhost:5500/colors/page-profile-light.js',
-    themeDetectorJS: 'http://localhost:5500/module/theme-detector.js',
-    deviceDetectorJS: 'http://localhost:5500/module/device-detector.js',
-    configJS: 'http://localhost:5500/module/config.js',
-    adBlockerJS: 'http://localhost:5500/module/ad-blocker.js',
-    antiPopupJS: 'http://localhost:5500/module/anti-popup.js',
-    mainMenuJS: 'http://localhost:5500/module/main-menu.js',
-    navbarLogoJS: 'http://localhost:5500/module/navbar-logo.js',
-    updateManagerJS: 'http://localhost:5500/module/update-manager.js',
-    fullscreenJS: 'http://localhost:5500/module/fullscreen.js',
-    keyboardShortcutsJS: 'http://localhost:5500/module/keyboard-shortcuts.js',
-    deviceCSSLoaderJS: 'http://localhost:5500/module/device-css-loader.js',
-    profileCropperJS: 'http://localhost:5500/module/profile-cropper.js',
-    creatorJS: 'http://localhost:5500/module/creator.js',
-    html2canvasJS: 'http://localhost:5500/lib/html2canvas.min.js',
-    monetTestJS: 'http://localhost:5500/lib/monet-test.js',
-    colorisJS: 'http://localhost:5500/lib/coloris.min.js',
-    colorisCSS: 'http://localhost:5500/lib/coloris.min.css',
-    colorisColors: 'http://localhost:5500/lib/coloris-colors.json',
-    autoReloadJS: 'http://localhost:5500/module/auto-reload.js'
-};
-
 (function() {
     'use strict';
 
     const DEBUG = GM_getValue('debug_mode', false);
     const SCRIPT_NAME = 'Hako: Monet Theme - Local Version';
+
+    // Get configurable base URL
+    const baseUrl = GM_getValue('custom_host_url', 'http://localhost:5500');
+
+    // Expose base URL globally for external files
+    window.HMTBaseUrl = baseUrl;
+
+    // Resource paths using configurable base URL
+    const resourcePaths = {
+        mainJS: `${baseUrl}/main.js`,
+        monetAPIJS: `${baseUrl}/api/monet.js`,
+        updateCheckerJS: `${baseUrl}/api/update-checker.js`,
+        CORSJS: `${baseUrl}/module/cors.js`,
+        infoTruyenJS: `${baseUrl}/class/info-truyen.js`,
+        readingPageJS: `${baseUrl}/class/reading-page.js`,
+        animationJS: `${baseUrl}/class/animation.js`,
+        tagColorJS: `${baseUrl}/class/tag-color.js`,
+        fontImportJS: `${baseUrl}/class/font-import.js`,
+        colorinfotruyen: `${baseUrl}/colors/page-info-truyen-dark.js`,
+        pagegeneralJS: `${baseUrl}/colors/page-general-dark.js`,
+        pagegenerallightJS: `${baseUrl}/colors/page-general-light.js`,
+        colorinfotruyenlight: `${baseUrl}/colors/page-info-truyen-light.js`,
+        pageprofileJS: `${baseUrl}/colors/page-profile-dark.js`,
+        pageprofilelightJS: `${baseUrl}/colors/page-profile-light.js`,
+        themeDetectorJS: `${baseUrl}/module/theme-detector.js`,
+        deviceDetectorJS: `${baseUrl}/module/device-detector.js`,
+        configJS: `${baseUrl}/module/config.js`,
+        adBlockerJS: `${baseUrl}/module/ad-blocker.js`,
+        antiPopupJS: `${baseUrl}/module/anti-popup.js`,
+        mainMenuJS: `${baseUrl}/module/main-menu.js`,
+        navbarLogoJS: `${baseUrl}/module/navbar-logo.js`,
+        updateManagerJS: `${baseUrl}/module/update-manager.js`,
+        fullscreenJS: `${baseUrl}/module/fullscreen.js`,
+        keyboardShortcutsJS: `${baseUrl}/module/keyboard-shortcuts.js`,
+        deviceCSSLoaderJS: `${baseUrl}/module/device-css-loader.js`,
+        profileCropperJS: `${baseUrl}/module/profile-cropper.js`,
+        creatorJS: `${baseUrl}/module/creator.js`,
+        html2canvasJS: `${baseUrl}/lib/html2canvas.min.js`,
+        monetTestJS: `${baseUrl}/lib/monet-test.js`,
+        colorisJS: `${baseUrl}/lib/coloris.min.js`,
+        colorisCSS: `${baseUrl}/lib/coloris.min.css`,
+        colorisColors: `${baseUrl}/lib/coloris-colors.json`,
+        autoReloadJS: `${baseUrl}/module/auto-reload.js`
+    };
 
     let isCheckingForUpdate = false;
 
@@ -203,6 +209,7 @@ const resourcePaths = {
                 }
             }, 'm');
             GM_registerMenuCommand('📊 Thông tin script', showScriptInfo, 'i');
+            GM_registerMenuCommand('🔧 Set Custom Host URL', setCustomHostUrl, 'h');
             debugLog('Đã đăng ký menu commands');
         }
     }
@@ -255,20 +262,44 @@ Engine: ${GM_info.scriptEngine || 'Không rõ'}
     function toggleDebugMode() {
         const currentDebug = GM_getValue('debug_mode', false);
         const newDebug = !currentDebug;
-        
+
         GM_setValue('debug_mode', newDebug);
-        
+
         showNotification(
-            'Chế độ Debug', 
+            'Chế độ Debug',
             newDebug ? 'Đã bật chế độ debug' : 'Đã tắt chế độ debug',
             3000
         );
-        
+
         debugLog(`Chế độ debug ${newDebug ? 'bật' : 'tắt'}`);
-        
+
         // Reload để áp dụng thay đổi
         if (confirm('Cần tải lại trang để áp dụng thay đổi. Bạn có muốn tải lại ngay bây giờ không?')) {
             window.location.reload();
+        }
+    }
+
+    function setCustomHostUrl() {
+        const currentUrl = GM_getValue('custom_host_url', 'http://localhost:5500');
+        const newUrl = prompt('Nhập custom host URL (ví dụ: http://localhost:5500 hoặc https://your-server.com):', currentUrl);
+
+        if (newUrl && newUrl.trim() !== '' && newUrl !== currentUrl) {
+            // Basic URL validation
+            try {
+                new URL(newUrl);
+                GM_setValue('custom_host_url', newUrl.trim());
+                showNotification('Host URL Updated', `Đã thiết lập thành: ${newUrl}`, 3000);
+                Logger.log('main', `Custom host URL set to: ${newUrl}`);
+
+                // Prompt to reload to apply changes
+                if (confirm('Cần tải lại trang để áp dụng thay đổi URL host. Bạn có muốn tải lại ngay bây giờ không?')) {
+                    window.location.reload();
+                }
+            } catch (e) {
+                showNotification('Lỗi', 'URL không hợp lệ. Vui lòng nhập URL đầy đủ (bao gồm http:// hoặc https://).', 5000);
+            }
+        } else if (newUrl === currentUrl) {
+            showNotification('Không thay đổi', 'URL mới giống với URL hiện tại.', 3000);
         }
     }
     
