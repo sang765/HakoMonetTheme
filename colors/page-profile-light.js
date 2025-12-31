@@ -581,6 +581,7 @@
                 --monet-background-dark: ${palette[100]};
                 --monet-elevated: ${palette[0]};
                 --monet-elevated-dark: ${palette[100]};
+                --monet-text-primary: ${textColor};
             }
 
             /* Faster transitions for interactive elements */
@@ -1121,6 +1122,35 @@
 
             .profile-showcase header, ol.list-volume li {
                 border-bottom-color: ${palette[800]} !important;}
+
+            .exp-bar-wrapper {
+                background-color: var(--monet-surface-dark) !important;
+            }
+            .exp-bar {
+                background-color: var(--monet-primary) !important;
+            }
+            .button.to-contact {
+                background-color: var(--monet-primary) !important;
+                color: var(--monet-text-primary) !important;
+            }
+            .pagination_wrap a.current, .pagination_wrap a:hover {
+                background-color: var(--monet-primary) !important;
+                color: var(--monet-text-primary) !important;
+            }
+
+            .button:hover {
+                background-color: ${palette[100]} !important;
+            }
+
+            .bg-gray-200 {
+                --tw-bg-opacity: 1;
+                background-color: ${palette[200]} !important;
+            }
+
+            .text-blue-100 {
+                --tw-text-opacity: 1;
+                color: ${palette[100]} !important;
+            }
         `;
 
         GM_addStyle(css);
