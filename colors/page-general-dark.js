@@ -10,14 +10,23 @@
         } else if (DEBUG) {
             console.log('[PageGeneral]', ...args);
         }
-    }
+    debugLog('initPageGeneral called for DARK mode');
 
-    function isTargetDomain(url) {
-        if (!url) return false;
-        return TARGET_DOMAINS.some(domain => url.includes(domain));
-    }
 
-    function initPageGeneral() {
+    // Check if in dark mode
+    const isDarkMode = document.cookie.includes('night_mode=true');
+    if (!isDarkMode) {
+        debugLog('In light mode, skipping dark theme application');
+        return; }
+
+    // Check if profile page (should not apply general colors)
+    if (document.querySelector('main.profile-page')) {
+        debugLog('On profile page, skipping general dark colors');
+        return;
+    }
+        debugLog('initPageGeneral called for DARK mode');
+
+    // Check if reading page and disable colors setting
         debugLog('initPageGeneral called for DARK mode');
         debugLog('Theme detector loaded:', !!window.__themeDetectorLoaded);
         debugLog('ThemeDetector available:', !!window.ThemeDetector);
