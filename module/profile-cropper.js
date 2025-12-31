@@ -384,6 +384,52 @@
                             }
                         });
                     }
+
+                    // Prevent context menu (right-click) on image and container
+                    const cropContainer = modal.querySelector('.hmt-crop-container');
+                    const cropImage = modal.querySelector('#hmt-crop-image');
+                    
+                    function preventContextMenu(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return false;
+                    }
+                    
+                    if (cropContainer) {
+                        cropContainer.addEventListener('contextmenu', preventContextMenu);
+                        cropContainer.addEventListener('touchstart', function(e) {
+                            // Prevent long-press context menu on mobile
+                            if (e.touches.length === 1) {
+                                clearTimeout(this.touchTimer);
+                                this.touchTimer = setTimeout(() => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                }, 500);
+                            }
+                        }, { passive: false });
+                        
+                        cropContainer.addEventListener('touchend', function(e) {
+                            clearTimeout(this.touchTimer);
+                        });
+                    }
+                    
+                    if (cropImage) {
+                        cropImage.addEventListener('contextmenu', preventContextMenu);
+                        cropImage.addEventListener('touchstart', function(e) {
+                            // Prevent long-press context menu on mobile
+                            if (e.touches.length === 1) {
+                                clearTimeout(this.touchTimer);
+                                this.touchTimer = setTimeout(() => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                }, 500);
+                            }
+                        }, { passive: false });
+                        
+                        cropImage.addEventListener('touchend', function(e) {
+                            clearTimeout(this.touchTimer);
+                        });
+                    }
                 } catch (error) {
                     debugLog('Error initializing Cropper:', error);
                     showNotification('Không thể khởi tạo công cụ cắt ảnh.', 5000);
