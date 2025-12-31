@@ -150,6 +150,22 @@
         debugLog('Đã phát sự kiện chế độ màu trang thông tin thay đổi:', mode);
     }
 
+    function getProfileColorMode() {
+        return GM_getValue('profile_color_mode', 'default');
+    }
+
+    function setProfileColorMode(mode) {
+        GM_setValue('profile_color_mode', mode);
+        debugLog('Đã lưu chế độ màu trang profile:', mode);
+
+        // Phát sự kiện chế độ màu trang profile thay đổi
+        const modeChangeEvent = new CustomEvent('hmtProfileColorModeChanged', {
+            detail: { mode: mode }
+        });
+        (window.top || window).document.dispatchEvent(modeChangeEvent);
+        debugLog('Đã phát sự kiện chế độ màu trang profile thay đổi:', mode);
+    }
+
     function getExtractColorFromAvatar() {
         const value = GM_getValue('extract_color_from_avatar', false);
         debugLog('getExtractColorFromAvatar() returning:', value);
@@ -1038,6 +1054,14 @@
                 <option value="thumbnail" ${getInfoPageColorMode() === 'thumbnail' ? 'selected' : ''}>Thumbnail</option>
             </select>
         </div>
+        <div class="hmt-color-setting">
+            <label for="hmt-profile-color-mode-select">Trang profile:</label>
+            <select id="hmt-profile-color-mode-select" class="hmt-profile-color-mode-select">
+                <option value="default" ${getProfileColorMode() === 'default' ? 'selected' : ''}>Mặc định</option>
+                <option value="avatar" ${getProfileColorMode() === 'avatar' ? 'selected' : ''}>Avatar</option>
+                <option value="banner" ${getProfileColorMode() === 'banner' ? 'selected' : ''}>Banner</option>
+            </select>
+        </div>
     </div>
 </div>
 
@@ -1784,6 +1808,15 @@ ${!isInfoPage() ? `
             });
         }
 
+        // Profile color mode dropdown
+        const profileColorModeSelect = dialog.querySelector('#hmt-profile-color-mode-select');
+        if (profileColorModeSelect) {
+            profileColorModeSelect.addEventListener('change', function() {
+                setProfileColorMode(this.value);
+                showNotification('Đã cập nhật chế độ màu trang profile!', 3000);
+            });
+        }
+
         // Đóng khi nhấn ESC
         (window.top || window).document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
@@ -1850,6 +1883,8 @@ ${!isInfoPage() ? `
         setExtractColorFromAvatar: setExtractColorFromAvatar,
         getInfoPageColorMode: getInfoPageColorMode,
         setInfoPageColorMode: setInfoPageColorMode,
+        getProfileColorMode: getProfileColorMode,
+        setProfileColorMode: setProfileColorMode,
         getUseProxy: getUseProxy,
         setUseProxy: setUseProxy,
         getPreferredProxy: getPreferredProxy,
