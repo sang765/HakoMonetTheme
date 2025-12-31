@@ -159,6 +159,9 @@
     function applyAvatarColorScheme() {
         debugLog('Bắt đầu trích xuất màu từ avatar profile');
 
+        // Áp dụng màu mặc định trước để tránh tải chậm
+        applyConfigColor();
+
         // Tìm avatar element trên profile page
         const avatarElement = document.querySelector('.profile-ava img');
         debugLog('Profile avatar element found:', !!avatarElement);
@@ -205,6 +208,9 @@
     // Hàm áp dụng màu từ banner
     function applyBannerColorScheme() {
         debugLog('Bắt đầu trích xuất màu từ banner profile');
+
+        // Áp dụng màu mặc định trước để tránh tải chậm
+        applyConfigColor();
 
         // Tìm banner element trên profile page
         const bannerElement = document.querySelector('.profile-cover .content');
