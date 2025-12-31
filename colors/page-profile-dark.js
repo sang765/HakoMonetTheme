@@ -1128,27 +1128,37 @@
             }
             .exp-bar {
                 background-color: var(--monet-primary) !important;
+            .profile-showcase header span.number {
+                background-color: ${palette[800]} !important;
+                color: ${textColor} !important;
+            }
+            }
+
+            .profile-showcase header, ol.list-volume li {
+                border-bottom-color: ${palette[800]} !important;}
+                color: var(--monet-text-primary) !important;
+
+            .exp-bar-wrapper {
+                background-color: var(--monet-surface-dark) !important;
+            }
+            .exp-bar {
+                background-color: ${palette[500]} !important;
             }
             .button.to-contact {
                 background-color: var(--monet-primary) !important;
                 color: var(--monet-text-primary) !important;
             }
             .pagination_wrap a.current, .pagination_wrap a:hover {
-                background-color: var(--monet-primary) !important;
-                color: var(--monet-text-primary) !important;
+                background-color: ${palette[500]} !important;
+                color: ${textColor} !important;
+            }
+            main.profile-page .pagination_wrap .current {
+                background-color: ${palette[500]} !important;
+                color: ${textColor} !important;
+            }
             }
 
             .button:hover {
-                background-color: ${palette[200]} !important;
-            }
-
-            .bg-gray-200 {
-                --tw-bg-opacity: 1;
-                background-color: ${palette[200]} !important;
-            }
-
-            .text-blue-100 {
-                --tw-text-opacity: 1;
                 color: ${palette[100]} !important;
             }
         `;
