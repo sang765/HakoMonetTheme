@@ -538,26 +538,52 @@
                     debugLog('Canvas resized successfully');
                 }
 
-                debugLog('Converting canvas to blob');
-                canvas.toBlob(function(blob) {
-                    if (!blob) {
-                        debugLog('Failed to create blob from canvas');
-                        showNotification('Không thể tạo ảnh đã cắt.', 5000);
-                        return;
-                    }
-
-                    const croppedFile = new File([blob], imageFile.name, {
-                        type: 'image/png',
-                        lastModified: Date.now()
+                // For GIF files, preserve animation by not using canvas conversion
+                if (imageFile.type === 'image/gif') {
+                    debugLog('GIF file detected in crop modal, checking animation...');
+                    
+                    checkIfGifAnimated(imageFile).then(isAnimated => {
+                        if (isAnimated) {
+                            debugLog('Animated GIF detected, preserving animation by uploading original file');
+                            // For animated GIFs, use the original file to preserve animation
+                            uploadBtn.disabled = true;
+                            uploadBtn.textContent = 'Đang upload...';
+                            callback(imageFile, closeModal, uploadBtn);
+                        } else {
+                            debugLog('Static GIF detected, processing through canvas');
+                            processCanvasCrop();
+                        }
+                    }).catch(error => {
+                        debugLog('Error checking GIF animation in crop modal, processing through canvas:', error);
+                        processCanvasCrop();
                     });
+                } else {
+                    debugLog('Non-GIF file, processing through canvas');
+                    processCanvasCrop();
+                }
+                
+                function processCanvasCrop() {
+                    debugLog('Converting canvas to blob');
+                    canvas.toBlob(function(blob) {
+                        if (!blob) {
+                            debugLog('Failed to create blob from canvas');
+                            showNotification('Không thể tạo ảnh đã cắt.', 5000);
+                            return;
+                        }
 
-                    debugLog('Cropped image created:', croppedFile.size, 'bytes');
+                        const croppedFile = new File([blob], imageFile.name, {
+                            type: 'image/png',
+                            lastModified: Date.now()
+                        });
 
-                    // Disable button and call callback with cropped file, closeModal function, and button
-                    uploadBtn.disabled = true;
-                    uploadBtn.textContent = 'Đang upload...';
-                    callback(croppedFile, closeModal, uploadBtn);
-                }, 'image/png');
+                        debugLog('Cropped image created:', croppedFile.size, 'bytes');
+
+                        // Disable button and call callback with cropped file, closeModal function, and button
+                        uploadBtn.disabled = true;
+                        uploadBtn.textContent = 'Đang upload...';
+                        callback(croppedFile, closeModal, uploadBtn);
+                    }, 'image/png');
+                }
             } else {
                 debugLog('Failed to get cropped canvas');
                 showNotification('Không thể tạo canvas đã cắt.', 5000);
@@ -702,73 +728,147 @@
      * Uses Canvas API for client-side compression with quality preservation
      * Iteratively reduces JPEG/WebP quality or converts PNG to JPEG
      * Ensures compressed size is <= 1MB and aims for >= 900KB
+     * Preserves GIF animation by bypassing compression for animated GIFs
      */
     function compressImage(file) {
         return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-
-                // Preserve original dimensions to maintain aspect ratio and avoid quality loss from resizing
-                canvas.width = img.naturalWidth;
-                canvas.height = img.naturalHeight;
-
-                // Enable high-quality rendering to preserve details, colors, and sharpness
-                ctx.imageSmoothingEnabled = true;
-                ctx.imageSmoothingQuality = 'high';
-
-                ctx.drawImage(img, 0, 0);
-
-                // Determine output format - convert PNG to JPEG for compression since PNG doesn't support quality parameter
-                let outputType = file.type;
-                if (file.type === 'image/png') {
-                    outputType = 'image/jpeg'; // Convert PNG to JPEG for effective compression
-                }
-
-                let quality = 0.9; // Start with high quality (90%) to maintain visual fidelity
-                const maxIterations = 16; // Prevent infinite loop, limit to 16 attempts
-                let iteration = 0;
-
-                const attemptCompression = () => {
-                    iteration++;
-                    canvas.toBlob((blob) => {
-                        if (!blob) {
-                            reject(new Error('Failed to compress image - canvas toBlob failed'));
-                            return;
-                        }
-
-                        debugLog(`Compression attempt ${iteration}: size ${blob.size} bytes, quality ${quality}`);
-
-                        if (blob.size > MAX_AVATAR_FILE_SIZE) {
-                            if (quality > 0.1 && iteration < maxIterations) {
-                                quality = Math.max(0.1, quality - 0.05); // Reduce quality in 5% steps
-                                attemptCompression(); // Retry with lower quality
-                            } else {
-                                reject(new Error('Cannot compress image below 1MB without unacceptable quality loss. Please select a smaller image.'));
-                            }
+            // Check if file is a GIF
+            if (file.type === 'image/gif') {
+                debugLog('GIF file detected, checking if animated...');
+                
+                // For GIF files, we need to check if they're animated
+                checkIfGifAnimated(file).then(isAnimated => {
+                    if (isAnimated) {
+                        debugLog('Animated GIF detected, preserving animation');
+                        // For animated GIFs, just return the original file if it's under the size limit
+                        if (file.size <= MAX_AVATAR_FILE_SIZE) {
+                            resolve(file);
                         } else {
-                            // Check if size is too small (below 900KB), but accept if we can't increase
-                            if (blob.size < MIN_COMPRESSED_SIZE && quality < 0.95 && iteration < maxIterations) {
-                                quality = Math.min(0.95, quality + 0.05); // Try higher quality to reach minimum size
-                                attemptCompression();
-                            } else {
-                                // Quality check: warn if quality dropped significantly (potential detail loss)
-                                if (quality < 0.5) {
-                                    debugLog('Warning: Image compressed with low quality, potential loss of details, colors, or sharpness');
-                                }
-                                resolve(blob);
-                            }
+                            // If animated GIF is too large, we can't compress it without losing animation
+                            reject(new Error('Animated GIF file is too large. Please select a smaller animated GIF or convert to static image.'));
                         }
-                    }, outputType, quality);
-                };
+                    } else {
+                        debugLog('Static GIF detected, compressing as static image');
+                        // For static GIFs, compress like other images
+                        compressStaticImage(file, resolve, reject);
+                    }
+                }).catch(error => {
+                    debugLog('Error checking GIF animation, treating as static:', error);
+                    // If we can't determine animation status, compress as static
+                    compressStaticImage(file, resolve, reject);
+                });
+                return;
+            }
+            
+            // For non-GIF files, compress normally
+            compressStaticImage(file, resolve, reject);
+        });
+    }
+    
+    /**
+     * Check if a GIF file is animated by examining its byte structure
+     */
+    function checkIfGifAnimated(file) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const buffer = e.target.result;
+                const view = new Uint8Array(buffer);
+                
+                // Check for NETSCAPE2.0 extension which indicates animation
+                // Look for the sequence: 0x21 0xFF 0x0B 0x4E 0x45 0x54 0x53 0x43 0x41 0x50 0x45 0x32 0x2E 0x30
+                const animationSignature = [0x21, 0xFF, 0x0B, 0x4E, 0x45, 0x54, 0x53, 0x43, 0x41, 0x50, 0x45, 0x32, 0x2E, 0x30];
+                
+                for (let i = 0; i < view.length - animationSignature.length; i++) {
+                    let match = true;
+                    for (let j = 0; j < animationSignature.length; j++) {
+                        if (view[i + j] !== animationSignature[j]) {
+                            match = false;
+                            break;
+                        }
+                    }
+                    if (match) {
+                        resolve(true);
+                        return;
+                    }
+                }
+                
+                resolve(false);
+            };
+            reader.onerror = () => resolve(false);
+            // Read only first 10KB to check for animation signature
+            const blob = file.slice(0, 10240);
+            reader.readAsArrayBuffer(blob);
+        });
+    }
+    
+    /**
+     * Compress static images (non-animated GIFs, JPEGs, PNGs, etc.)
+     */
+    function compressStaticImage(file, resolve, reject) {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
 
-                attemptCompression();
+            // Preserve original dimensions to maintain aspect ratio and avoid quality loss from resizing
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+
+            // Enable high-quality rendering to preserve details, colors, and sharpness
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+
+            ctx.drawImage(img, 0, 0);
+
+            // Determine output format - convert PNG to JPEG for compression since PNG doesn't support quality parameter
+            let outputType = file.type;
+            if (file.type === 'image/png' || file.type === 'image/gif') {
+                outputType = 'image/jpeg'; // Convert PNG/GIF to JPEG for effective compression
+            }
+
+            let quality = 0.9; // Start with high quality (90%) to maintain visual fidelity
+            const maxIterations = 16; // Prevent infinite loop, limit to 16 attempts
+            let iteration = 0;
+
+            const attemptCompression = () => {
+                iteration++;
+                canvas.toBlob((blob) => {
+                    if (!blob) {
+                        reject(new Error('Failed to compress image - canvas toBlob failed'));
+                        return;
+                    }
+
+                    debugLog(`Compression attempt ${iteration}: size ${blob.size} bytes, quality ${quality}`);
+
+                    if (blob.size > MAX_AVATAR_FILE_SIZE) {
+                        if (quality > 0.1 && iteration < maxIterations) {
+                            quality = Math.max(0.1, quality - 0.05); // Reduce quality in 5% steps
+                            attemptCompression(); // Retry with lower quality
+                        } else {
+                            reject(new Error('Cannot compress image below 1MB without unacceptable quality loss. Please select a smaller image.'));
+                        }
+                    } else {
+                        // Check if size is too small (below 900KB), but accept if we can't increase
+                        if (blob.size < MIN_COMPRESSED_SIZE && quality < 0.95 && iteration < maxIterations) {
+                            quality = Math.min(0.95, quality + 0.05); // Try higher quality to reach minimum size
+                            attemptCompression();
+                        } else {
+                            // Quality check: warn if quality dropped significantly (potential detail loss)
+                            if (quality < 0.5) {
+                                debugLog('Warning: Image compressed with low quality, potential loss of details, colors, or sharpness');
+                            }
+                            resolve(blob);
+                        }
+                    }
+                }, outputType, quality);
             };
 
-            img.onerror = () => reject(new Error('Failed to load image for compression'));
-            img.src = URL.createObjectURL(file);
-        });
+            attemptCompression();
+        };
+
+        img.onerror = () => reject(new Error('Failed to load image for compression'));
+        img.src = URL.createObjectURL(file);
     }
 
     /**
@@ -1023,10 +1123,25 @@
                 if (input.id === 'user_avatar_file') {
                     // Avatar logic
                     if (file.type === 'image/gif') {
-                        debugLog('GIF detected, uploading directly');
-                        uploadAvatar(file);
+                        debugLog('GIF detected, checking if animated...');
+                        checkIfGifAnimated(file).then(isAnimated => {
+                            if (isAnimated) {
+                                debugLog('Animated GIF detected, uploading directly to preserve animation');
+                                uploadAvatar(file);
+                            } else {
+                                debugLog('Static GIF detected, checking aspect ratio');
+                                checkAspectRatioAndHandle(file);
+                            }
+                        }).catch(error => {
+                            debugLog('Error checking GIF animation, treating as static:', error);
+                            checkAspectRatioAndHandle(file);
+                        });
                     } else {
-                        // Check aspect ratio
+                        // Check aspect ratio for non-GIF files
+                        checkAspectRatioAndHandle(file);
+                    }
+                    
+                    function checkAspectRatioAndHandle(file) {
                         const reader = new FileReader();
                         reader.onload = function(e) {
                             const img = new Image();
