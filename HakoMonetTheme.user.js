@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Hako: Monet Theme
 // @namespace    https://github.com/sang765
-// @version      5.7.0
+// @version      5.7.1
 // @description  Material You theme for Hako/DocLN.
 // @description:vi Material You theme dành cho Hako/DocLN.
 // @icon         https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/.github/assets/logo.png
@@ -44,6 +44,7 @@
 // @resource     colorinfotruyenlight ./colors/page-info-truyen-light.js
 // @resource     pageprofileJS ./colors/page-profile-dark.js
 // @resource     pageprofilelightJS ./colors/page-profile-light.js
+// @resource     colorsLoaderJS ./module/colors-loader.js
 // @resource     themeDetectorJS ./module/theme-detector.js
 // @resource     deviceDetectorJS ./module/device-detector.js
 // @resource     configJS ./module/config.js
@@ -275,8 +276,7 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
             'keyboardShortcutsJS', 'updateManagerJS', 'fullscreenJS', 'autoReloadJS', 'themeDetectorJS',
             // css modules
             'deviceCSSLoaderJS', 'infoTruyenJS', 'tagColorJS', 'fontImportJS', 'animationJS',
-            'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyen', 'colorinfotruyenlight',
-            'pageprofileJS', 'pageprofilelightJS',
+            'colorsLoaderJS',
             'navbarLogoJS', 'readingPageJS',
         ];
 
