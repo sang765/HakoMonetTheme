@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Hako: Monet Theme
 // @namespace    https://github.com/sang765
-// @version      5.6.9
+// @version      5.7.0
 // @description  Material You theme for Hako/DocLN.
 // @description:vi Material You theme dành cho Hako/DocLN.
 // @icon         https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/.github/assets/logo.png
@@ -24,8 +24,8 @@
 // @connect      *
 // @run-at       document-start
 // @supportURL   https://github.com/sang765/HakoMonetTheme/issues
-// @updateURL    https://sang765.github.io/HakoMonetTheme/HakoMonetTheme.user.js
-// @downloadURL  https://sang765.github.io/HakoMonetTheme/HakoMonetTheme.user.js
+// @updateURL    https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/HakoMonetTheme.user.js
+// @downloadURL  https://raw.githubusercontent.com/sang765/HakoMonetTheme/main/HakoMonetTheme.user.js
 // @homepageURL  https://github.com/sang765/HakoMonetTheme
 // @license      MIT
 // @discord      https://discord.gg/uvQ6A3CDPq
@@ -42,6 +42,8 @@
 // @resource     pagegeneralJS ./colors/page-general-dark.js
 // @resource     pagegenerallightJS ./colors/page-general-light.js
 // @resource     colorinfotruyenlight ./colors/page-info-truyen-light.js
+// @resource     pageprofileJS ./colors/page-profile-dark.js
+// @resource     pageprofilelightJS ./colors/page-profile-light.js
 // @resource     themeDetectorJS ./module/theme-detector.js
 // @resource     deviceDetectorJS ./module/device-detector.js
 // @resource     configJS ./module/config.js
@@ -71,7 +73,7 @@
     const DEBUG = GM_getValue('debug_mode', false);
     const SCRIPT_NAME = 'Hako: Monet Theme';
     const GITHUB_REPO = 'https://github.com/sang765/HakoMonetTheme';
-    const RAW_GITHUB_URL = 'https://sang765.github.io/HakoMonetTheme';
+    const RAW_GITHUB_URL = 'https://raw.githubusercontent.com/sang765/HakoMonetTheme/main';
 
     let isCheckingForUpdate = false;
 
@@ -274,6 +276,7 @@ Báo cáo lỗi: ${GITHUB_REPO}/issues
             // css modules
             'deviceCSSLoaderJS', 'infoTruyenJS', 'tagColorJS', 'fontImportJS', 'animationJS',
             'pagegeneralJS', 'pagegenerallightJS', 'colorinfotruyen', 'colorinfotruyenlight',
+            'pageprofileJS', 'pageprofilelightJS',
             'navbarLogoJS', 'readingPageJS',
         ];
 
