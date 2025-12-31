@@ -1173,8 +1173,23 @@
         // File upload handler
         fileBtn.addEventListener('click', () => {
             closeModal();
+            // Temporarily remove our click handler to allow normal file input behavior
+            const originalClickHandler = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                createMethodSelectionDialog(input);
+            };
+            
+            // Remove our click handler temporarily
+            input.removeEventListener('click', originalClickHandler);
+            
             // Trigger the original file input
             input.click();
+            
+            // Re-add our click handler after a short delay
+            setTimeout(() => {
+                input.addEventListener('click', originalClickHandler);
+            }, 100);
         });
 
         // URL upload handler
