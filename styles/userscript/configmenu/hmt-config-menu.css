@@ -306,8 +306,7 @@
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
   pointer-events: none;
   transition: all 0.3s ease;
-  -webkit-backdrop-filter: blur(4px);
-          backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
 }
 
 .hmt-color-picker-info.updating {
