@@ -56,3 +56,6 @@ temp/
 # --- Optional local histories / tooling
 .history/
 .idx
+
+# --- Project AI
+opencode.json
