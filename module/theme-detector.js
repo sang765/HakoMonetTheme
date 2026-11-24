@@ -16,23 +16,52 @@
     }
 
     // Theme detection methods
+    function parseThemeValue(value) {
+        if (value === null || value === undefined) return null;
+        const normalized = String(value).trim().toLowerCase();
+        if (['true', '1', 'dark', 'on'].includes(normalized)) return 'dark';
+        if (['false', '0', 'light', 'off'].includes(normalized)) return 'light';
+        return null;
+    }
+
     const themeDetectors = {
-        // Check storage and cookies for night_mode
+        // What the site actually rendered is the source of truth. Hako sets
+        // `dark` / `light` on the root element (Tailwind dark mode).
+        checkDom: function() {
+            const elements = [document.documentElement, document.body].filter(Boolean);
+            for (const el of elements) {
+                const attrTheme = el.getAttribute('data-theme') || el.getAttribute('data-mode');
+                const parsedAttr = parseThemeValue(attrTheme);
+                if (parsedAttr) return parsedAttr;
+                if (el.classList.contains('dark') || el.classList.contains('dark-mode') ||
+                    el.classList.contains('night-mode')) return 'dark';
+                if (el.classList.contains('light') || el.classList.contains('light-mode')) return 'light';
+            }
+            return null;
+        },
+
+        // localStorage is what the site's UI writes; the cookie can be stale.
+        // An explicit "light" must never be overridden by an old "dark" cookie.
         checkStorageAndCookies: function() {
-            // Check localStorage
+            let fromStorage = null;
             if (typeof localStorage !== 'undefined') {
-                const nightMode = localStorage.getItem('night_mode');
-                if (nightMode === 'true') return 'dark';
+                try {
+                    fromStorage = parseThemeValue(localStorage.getItem('night_mode'));
+                } catch (e) {
+                    fromStorage = null;
+                }
             }
 
-            // Check cookies
-            const cookies = document.cookie.split(';');
+            let fromCookie = null;
+            const cookies = document.cookie ? document.cookie.split(';') : [];
             for (const cookie of cookies) {
-                const [name, value] = cookie.trim().split('=');
-                if (name === 'night_mode' && value === 'true') return 'dark';
+                const separator = cookie.indexOf('=');
+                if (separator === -1) continue;
+                if (cookie.slice(0, separator).trim() !== 'night_mode') continue;
+                fromCookie = parseThemeValue(cookie.slice(separator + 1).trim());
             }
 
-            return 'light';
+            return fromStorage || fromCookie || null;
         }
     };
 
@@ -60,6 +89,7 @@
         detectTheme() {
             // Try different detection methods in order of reliability
             const detectionMethods = [
+                themeDetectors.checkDom,
                 themeDetectors.checkStorageAndCookies
             ];
 
@@ -101,6 +131,9 @@
             if (previousTheme !== newTheme) {
                 debugLog('Theme changed from', previousTheme, 'to', newTheme);
                 this.notifyListeners(newTheme, previousTheme);
+                (window.top || window).document.dispatchEvent(new CustomEvent('hmtThemeChanged', {
+                    detail: { theme: newTheme, previousTheme: previousTheme }
+                }));
             }
         }
 

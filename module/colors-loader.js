@@ -33,9 +33,52 @@
         return 'general';
     }
 
-    // Theme detection
+    // Theme detection — reuse the single source of truth when available.
+    // The fallback mirrors theme-detector.js: explicit "light" always wins.
     function detectTheme() {
-        return document.cookie.includes('night_mode=true') ? 'dark' : 'light';
+        if (window.ThemeDetector && typeof window.ThemeDetector.getCurrentTheme === 'function') {
+            const detected = window.ThemeDetector.getCurrentTheme();
+            return detected === 'dark' ? 'dark' : 'light';
+        }
+
+        const parse = (value) => {
+            if (value === null || value === undefined) return null;
+            const normalized = String(value).trim().toLowerCase();
+            if (['true', '1', 'dark', 'on'].includes(normalized)) return 'dark';
+            if (['false', '0', 'light', 'off'].includes(normalized)) return 'light';
+            return null;
+        };
+
+        let stored = null;
+        try {
+            stored = parse(localStorage.getItem('night_mode'));
+        } catch (e) {
+            stored = null;
+        }
+
+        let cookie = null;
+        const cookies = document.cookie ? document.cookie.split(';') : [];
+        for (const entry of cookies) {
+            const separator = entry.indexOf('=');
+            if (separator === -1) continue;
+            if (entry.slice(0, separator).trim() !== 'night_mode') continue;
+            cookie = parse(entry.slice(separator + 1).trim());
+        }
+
+        return stored || cookie || 'light';
+    }
+
+    // The CSS templates below were authored for dark mode (high tone = surface).
+    // For light mode the tones are inverted: palette[900] (near black) becomes
+    // palette[100] (near white), palette[800] -> palette[200], etc.
+    function getThemePalette(palette, theme) {
+        if (!palette || theme !== 'light') return palette;
+        const themed = {};
+        Object.keys(palette).forEach(key => {
+            const tone = Number(key);
+            if (Number.isInteger(tone)) themed[key] = palette[1000 - tone] || palette[tone];
+        });
+        return themed;
     }
 
     // Check if reading page and disable colors setting
@@ -356,10 +399,18 @@
 
         const textColor = isLight ? '#000' : '#fff';
 
-        // Generate CSS based on theme and page type
-        const css = generateColorCSS(palette, textColor, isLight, theme, pageType);
+        // Light theme needs the inverted palette and dark text; dark theme keeps
+        // the original behaviour untouched.
+        const themedPalette = getThemePalette(palette, theme);
+        const effectiveTextColor = theme === 'light' ? '#111827' : textColor;
 
-        GM_addStyle(css);
+        // Generate CSS based on theme and page type
+        const css = generateColorCSS(themedPalette, effectiveTextColor, isLight, theme, pageType);
+
+        const style = GM_addStyle(css);
+        if (style && typeof style.setAttribute === 'function') {
+            style.setAttribute('data-hmt-theme-style', theme);
+        }
         debugLog(`Applied Monet theme with color: ${palette[500]} for ${pageType} page (${theme})`);
 
         // Add overlay for reading pages
@@ -407,7 +458,7 @@
             .paging_item.paging_prevnext.next:hover,
             .paging_item.paging_prevnext.prev:hover {
                 background-color: ${palette[500]} !important;
-                color: ${isLight ? '#000' : '#fff'} !important;
+                color: ${textColor} !important;
             }
 
             .series-owner.group-mem,
@@ -563,13 +614,13 @@
             }
 
             .expand, .mobile-more, .summary-more.more-state {
-                background: linear-gradient(180deg, rgba(31,31,31,0) 1%, ${palette[800]} 75%, ${palette[800]}) !important;
-                filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#001f1f1f",endColorstr="${palette[900]}",GradientType=0) !important;
+                background: linear-gradient(180deg, ${theme === 'light' ? 'rgba(255,255,255,0)' : 'rgba(31,31,31,0)'} 1%, ${palette[800]} 75%, ${palette[800]}) !important;
+                filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="${theme === 'light' ? '#00ffffff' : '#001f1f1f'}",endColorstr="${palette[900]}",GradientType=0) !important;
             }
 
             .ln-comment-group:nth-child(odd) .expand {
-                background: linear-gradient(180deg, rgba(42,42,42,0) 1%, ${palette[800]} 75%, ${palette[800]}) !important;
-                filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#002a2a2a",endColorstr="${palette[800]}",GradientType=0) !important;
+                background: linear-gradient(180deg, ${theme === 'light' ? 'rgba(248,249,250,0)' : 'rgba(42,42,42,0)'} 1%, ${palette[800]} 75%, ${palette[800]}) !important;
+                filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="${theme === 'light' ? '#00f8f9fa' : '#002a2a2a'}",endColorstr="${palette[800]}",GradientType=0) !important;
             }
 
             .visible-toolkit .visible-toolkit-item.do-like.liked {
@@ -803,7 +854,21 @@
 
     // Setup event listeners for real-time color changes
     function setupEventListeners(pageType) {
+        if (window.__colorsLoaderEventsSetup) return;
+        window.__colorsLoaderEventsSetup = true;
         debugLog('Setting up event listeners for color changes');
+
+        // Theme change (site light/dark toggle) — drop styles injected for the
+        // previous theme, otherwise the old !important rules keep winning.
+        (window.top || window).document.addEventListener('hmtThemeChanged', function(event) {
+            const newTheme = event.detail && event.detail.theme ? event.detail.theme : detectTheme();
+            debugLog('Received theme change event:', newTheme);
+
+            document.querySelectorAll('style[data-hmt-theme-style]').forEach(style => style.remove());
+
+            if (shouldDisableColorsOnReadingPage()) return;
+            setTimeout(() => applyColorsForPage(detectPageType(), newTheme), 50);
+        });
 
         // Color change events
         (window.top || window).document.addEventListener('hmtColorChanged', function(event) {
