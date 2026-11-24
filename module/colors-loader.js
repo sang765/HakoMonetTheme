@@ -543,6 +543,25 @@
                 background-color: ${palette[800]} !important;
             }
 
+            ${theme === 'light' ? `
+            /* Hako keeps dark comment bubbles even in light mode — force light surfaces.
+               Extra specificity is needed to beat the site's .dark\\:bg-* utilities. */
+            html body .ln-comment-item,
+            html body .ln-comment-item .ln-comment-content,
+            html body .ln-comment-content,
+            html body .comment-item,
+            html body .comment-item-at-index {
+                background-color: ${palette[800]} !important;
+                color: ${textColor} !important;
+            }
+
+            html body .ln-comment-item .ln-comment-content.long-text,
+            html body .ln-comment-item .ln-comment-content a,
+            html body .ln-comment-item .ln-comment-content .ln-comment-user_name a {
+                color: ${textColor} !important;
+            }
+            ` : ''}
+
             .bg-gray-100 {
                 background-color: ${palette[100]} !important;
             }
